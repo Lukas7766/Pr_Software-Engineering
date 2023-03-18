@@ -133,6 +133,10 @@ public class BoardPane extends GridPane {
 
         });
 
+        setOnKeyPressed((e) -> { // TODO: Keyboard input?
+            return;
+        });
+
         board.addListener((e) -> {
             Image stoneImg;
             if(e.getColor() == StoneColor.BLACK) {
