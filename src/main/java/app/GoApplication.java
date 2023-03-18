@@ -39,7 +39,7 @@ public class GoApplication extends Application {
 
         // Altered by Gerald to add the BoardPane
         Board board = new Board(19);
-        BoardPane boardPane = new BoardPane(board);
+        BoardPane boardPane = new BoardPane(board, "file:tile_0.png", "file:tile_1.png", "file:stone_0.png", "file:stone_1.png");
         BorderPane root = new BorderPane();
         root.setCenter(boardPane);
         root.setTop(vBox);

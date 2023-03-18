@@ -30,16 +30,16 @@ public class BoardPane extends GridPane {
     private ImageView selectionHover = null;
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
-    public BoardPane(Board board) {
+    public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
         this.BOARD = board;
         this.SIZE = board.getSize();
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
-        tiles[0] = new Image("file:tile_0.png", true);
-        tiles[1] = new Image("file:tile_1.png", true);
+        tiles[0] = new Image(tile0, true);
+        tiles[1] = new Image(tile1, true);
 
-        stones[0] = new Image("file:stone_0.png", true);
-        stones[1] = new Image("file:stone_1.png", true);
+        stones[0] = new Image(stone0, true);
+        stones[1] = new Image(stone1, true);
 
         // Graphical details of this board pane
         setAlignment(Pos.CENTER);
@@ -133,8 +133,8 @@ public class BoardPane extends GridPane {
 
         });
 
-        setOnKeyPressed((e) -> { // TODO: Keyboard input?
-            return;
+        setOnKeyPressed((e) -> {
+            // TODO: Keyboard input?
         });
 
         board.addListener((e) -> {
