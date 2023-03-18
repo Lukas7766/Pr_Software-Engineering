@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -36,8 +37,16 @@ public class GoApplication extends Application {
 
         VBox vBox = new VBox(menuBar);
 
-        Scene scene = new Scene(vBox, 960, 600);
+        // Altered by Gerald to add the BoardPane
+        Board board = new Board(19);
+        BoardPane boardPane = new BoardPane(board);
+        BorderPane root = new BorderPane();
+        root.setCenter(boardPane);
+        root.setTop(vBox);
 
+        Scene scene = new Scene(root, 960, 600);
+
+        // Same as before from here on
         stage.setScene(scene);
         stage.show();
     }
