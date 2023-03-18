@@ -17,6 +17,7 @@ public class GoApplication extends Application {
 
         stage.setTitle("Go Game - App");
 
+        //Menu test - start
         Menu files = new Menu();
         files.setText("files");
 
@@ -31,7 +32,7 @@ public class GoApplication extends Application {
 
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(files);
-
+        //Menu test - end
 
         VBox vBox = new VBox(menuBar);
 
