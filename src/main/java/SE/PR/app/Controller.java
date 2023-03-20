@@ -1,4 +1,4 @@
-package app;
+package SE.PR.app;
 
 public class Controller {
 }

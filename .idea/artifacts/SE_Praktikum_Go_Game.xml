@@ -3,7 +3,7 @@
     <output-path>$PROJECT_DIR$/out/artifacts/SE_Praktikum_Go_Game</output-path>
     <root id="root">
       <element id="archive" name="SE_Praktikum_Go_Game.jar">
-        <element id="module-output" name="SE_Praktikum_Go_Game" />
+        <element id="module-output" name="app" />
       </element>
     </root>
   </artifact>

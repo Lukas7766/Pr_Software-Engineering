@@ -1,4 +1,4 @@
-package app;
+package SE.PR.app;
 
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -39,7 +39,11 @@ public class GoApplication extends Application {
 
         // Altered by Gerald to add the BoardPane
         Board board = new Board(19);
-        BoardPane boardPane = new BoardPane(board, "file:tile_0.png", "file:tile_1.png", "file:stone_0.png", "file:stone_1.png");
+        BoardPane boardPane = new BoardPane(board,
+                "file:src/main/resources/SE.PR.app/tile_0.png",
+                "file:src/main/resources/SE.PR.app/tile_1.png",
+                "file:src/main/resources/SE.PR.app/stone_0.png",
+                "file:src/main/resources/SE.PR.app/stone_1.png");
         BorderPane root = new BorderPane();
         root.setCenter(boardPane);
         root.setTop(vBox);
