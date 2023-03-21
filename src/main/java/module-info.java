@@ -1,6 +1,5 @@
-module SE.PR.app {
-    requires javafx.graphics;
+module pr_se.gogame {
     requires javafx.controls;
-    opens SE.PR.app;
-    exports SE.PR.app;
+    opens  pr_se.gogame;
+    exports pr_se.gogame;
 }
