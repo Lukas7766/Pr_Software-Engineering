@@ -1,6 +1,5 @@
-module SE.Praktikum.Go.Game {
-    requires javafx.graphics;
+module pr_se.gogame {
     requires javafx.controls;
-
-    opens app;
+    opens  pr_se.gogame;
+    exports pr_se.gogame;
 }
