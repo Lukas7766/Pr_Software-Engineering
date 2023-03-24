@@ -1,11 +1,14 @@
-package pr_se.gogame;
+package pr_se.gogame.model;
+
+import pr_se.gogame.view_controller.GoListener;
+import pr_se.gogame.view_controller.StoneSetEvent;
 
 import java.util.LinkedList;
 
 /**
- * Controller Dummy (for now)
+ * Model Dummy (for now)
  */
-public class Board {
+public class Board implements BoardInterface {
     private final int SIZE;
     private final LinkedList<GoListener> listeners;
 

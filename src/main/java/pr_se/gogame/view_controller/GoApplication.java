@@ -1,4 +1,4 @@
-package pr_se.gogame;
+package pr_se.gogame.view_controller;
 
 import javafx.application.Application;
 import javafx.scene.Parent;
@@ -11,6 +11,7 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
+import pr_se.gogame.model.Board;
 
 public class GoApplication extends Application {
     @Override

@@ -1,4 +1,4 @@
-package pr_se.gogame;
+package pr_se.gogame.view_controller;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -7,8 +7,11 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
+import pr_se.gogame.model.Board;
+import pr_se.gogame.model.StoneColor;
 
 /**
+ * View/Controller
  * Go Board that uses image files for its (checkerboard) tiles and stones
  */
 public class BoardPane extends GridPane {

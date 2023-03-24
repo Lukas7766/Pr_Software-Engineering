@@ -1,4 +1,6 @@
-package pr_se.gogame;
+package pr_se.gogame.view_controller;
+
+import pr_se.gogame.model.StoneColor;
 
 public class StoneSetEvent {
 
