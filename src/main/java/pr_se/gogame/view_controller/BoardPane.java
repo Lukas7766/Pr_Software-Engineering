@@ -50,6 +50,15 @@ public class BoardPane extends GridPane {
         setVgap(0);
         setPadding(new Insets(0, 0, 0, 0));
 
+        //SeWa
+        // Graphical details of this board pane
+        //setMinSize(0,0);
+        //setHgap(0);
+        //setVgap(0);
+        //setPadding(new Insets(0, 0, 0, 5));
+
+
+
         // Fill the grid with ImageViews of alternating tiles
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {

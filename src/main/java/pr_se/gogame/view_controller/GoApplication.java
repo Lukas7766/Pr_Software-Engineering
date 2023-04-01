@@ -15,6 +15,10 @@ import pr_se.gogame.model.Board;
 import pr_se.gogame.model.Game;
 
 public class GoApplication extends Application {
+
+    private static final int WIDTH = 960;
+    private static final int HEIGHT = 600;
+
     @Override
     public void start(Stage stage) throws Exception {
 
@@ -34,7 +38,7 @@ public class GoApplication extends Application {
         root.setCenter(boardPane);
         root.setTop(new HeaderPane(this,stage, game));
 
-        Scene scene = new Scene(root, 960, 600);
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
 
         stage.setScene(scene);
         stage.show();

@@ -1,4 +1,11 @@
 package pr_se.gogame.view_controller;
+import javafx.beans.binding.Bindings;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.StackPane;
+import pr_se.gogame.model.Game;
 
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -10,10 +17,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import pr_se.gogame.model.Game;
 
 import java.io.File;
 import java.util.HashSet;
@@ -21,7 +29,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class HeaderPane extends VBox {
+public class HeaderPane extends StackPane {
 
     private final Application app;
     private final Stage stage;
@@ -41,8 +49,28 @@ public class HeaderPane extends VBox {
         menuBar.getMenus().add(fileSection());
         menuBar.getMenus().add(gameSection());
         menuBar.getMenus().add(helpSection());
+        menuBar.setBackground(Background.fill(Color.LIGHTGRAY));
 
+
+
+
+
+        Rectangle r = new Rectangle();
+        r.setFill(Color.LIGHTGRAY);
+        r.setHeight(35);
+        r.setArcHeight(10.0);
+        r.setArcWidth(10.0);
+
+
+        this.getChildren().add(r);
         this.getChildren().add(menuBar);
+
+        //necessary otherwise padding is not working -> scale up does but scale down doesn't
+        //setMinSize(0,0);
+
+        //top, right, bottom, left
+        setPadding(new Insets(5, 5, 5, 5));
+        r.widthProperty().bind(widthProperty().subtract(10));
     }
 
     private Menu fileSection() {
