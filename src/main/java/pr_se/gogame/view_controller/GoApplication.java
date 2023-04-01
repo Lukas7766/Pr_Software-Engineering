@@ -12,31 +12,14 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Board;
+import pr_se.gogame.model.Game;
 
 public class GoApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
 
         stage.setTitle("Go Game - App");
-
-        //Menu test - start
-        Menu files = new Menu();
-        files.setText("files");
-
-        MenuItem importFile = new MenuItem();
-        importFile.setText("import file");
-        files.getItems().add(importFile);
-
-        MenuItem exportFile = new MenuItem();
-        exportFile.setText("export file");
-        files.getItems().add(exportFile);
-        exportFile.setOnAction(e -> System.out.println("hihi"));
-
-        MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().add(files);
-        //Menu test - end
-
-        VBox vBox = new VBox(menuBar);
+        Game game = new Game();
 
         // Altered by Gerald to add the BoardPane
         Board board = new Board(19);
@@ -46,19 +29,15 @@ public class GoApplication extends Application {
                 path+"tile_1.png",
                 path+"stone_0.png",
                 path+"stone_1.png");
+
         BorderPane root = new BorderPane();
         root.setCenter(boardPane);
-        root.setTop(vBox);
+        root.setTop(new HeaderPane(this,stage, game));
 
         Scene scene = new Scene(root, 960, 600);
 
-        // Same as before from here on
         stage.setScene(scene);
         stage.show();
-    }
-
-    private Parent createContent() {
-        return new StackPane(new Text("Hello World"));
     }
 
     public static void main(String[] args) {
