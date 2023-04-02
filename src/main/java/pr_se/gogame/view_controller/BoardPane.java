@@ -45,17 +45,17 @@ public class BoardPane extends GridPane {
         stones[1] = new Image(stone1, true);
 
         // Graphical details of this board pane
-        setAlignment(Pos.CENTER);
-        setHgap(0);
-        setVgap(0);
-        setPadding(new Insets(0, 0, 0, 0));
+        //setAlignment(Pos.CENTER);
+        //setHgap(0);
+        //setVgap(0);
+        //setPadding(new Insets(0, 0, 0, 0));
 
         //SeWa
         // Graphical details of this board pane
-        //setMinSize(0,0);
-        //setHgap(0);
-        //setVgap(0);
-        //setPadding(new Insets(0, 0, 0, 5));
+        setMinSize(0,0);
+        setHgap(0);
+        setVgap(0);
+        setPadding(new Insets(2.5, 0, 0, 0));
 
 
 

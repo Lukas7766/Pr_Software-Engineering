@@ -1,10 +1,7 @@
 package pr_se.gogame.view_controller;
 
-import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.layout.Background;
-import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
 
@@ -56,8 +53,6 @@ public class HeaderPane extends VBox {
         Rectangle rL1 = new Rectangle();
         rL1.setFill(Color.LIGHTGRAY);
         rL1.setHeight(25);
-        rL1.setArcHeight(5);
-        rL1.setArcWidth(5);
 
         StackPane lane1 = new StackPane();
 
@@ -74,8 +69,6 @@ public class HeaderPane extends VBox {
         Rectangle rL2 = new Rectangle();
         rL2.setFill(Color.LIGHTGRAY);
         rL2.setHeight(35);
-        rL2.setArcHeight(5);
-        rL2.setArcWidth(5);
 
         StackPane lane2 = new StackPane();
 
@@ -84,7 +77,7 @@ public class HeaderPane extends VBox {
 
         this.getChildren().add(lane2);
 
-        lane2.setPadding(new Insets(2.5, 5, 5, 5)); //top, right, bottom, left
+        lane2.setPadding(new Insets(2.5, 5, 2.5, 5)); //top, right, bottom, left
         rL2.widthProperty().bind(lane2.widthProperty().subtract(10));
     }
 
