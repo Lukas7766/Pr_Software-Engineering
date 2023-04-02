@@ -1,4 +1,5 @@
 package pr_se.gogame.view_controller;
+
 import javafx.beans.binding.Bindings;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -29,7 +30,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-public class HeaderPane extends StackPane {
+public class HeaderPane extends VBox {
 
     private final Application app;
     private final Stage stage;
@@ -45,32 +46,46 @@ public class HeaderPane extends StackPane {
         this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.goGame"))
                 .collect(Collectors.toCollection(HashSet::new));
 
+        //Header Lane 1 ###################################################################################
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileSection());
         menuBar.getMenus().add(gameSection());
         menuBar.getMenus().add(helpSection());
         menuBar.setBackground(Background.fill(Color.LIGHTGRAY));
 
+        Rectangle rL1 = new Rectangle();
+        rL1.setFill(Color.LIGHTGRAY);
+        rL1.setHeight(25);
+        rL1.setArcHeight(5);
+        rL1.setArcWidth(5);
 
+        StackPane lane1 = new StackPane();
 
+        lane1.setMinSize(0, 0); //necessary to keep padding working -> scale up does but scale down doesn't
+        lane1.getChildren().add(rL1);
+        lane1.getChildren().add(menuBar);
 
+        this.getChildren().add(lane1);
 
-        Rectangle r = new Rectangle();
-        r.setFill(Color.LIGHTGRAY);
-        r.setHeight(35);
-        r.setArcHeight(10.0);
-        r.setArcWidth(10.0);
+        lane1.setPadding(new Insets(5, 5, 2.5, 5)); //top, right, bottom, left
+        rL1.widthProperty().bind(lane1.widthProperty().subtract(10));
 
+        //Header Lane 2 ###################################################################################
+        Rectangle rL2 = new Rectangle();
+        rL2.setFill(Color.LIGHTGRAY);
+        rL2.setHeight(35);
+        rL2.setArcHeight(5);
+        rL2.setArcWidth(5);
 
-        this.getChildren().add(r);
-        this.getChildren().add(menuBar);
+        StackPane lane2 = new StackPane();
 
-        //necessary otherwise padding is not working -> scale up does but scale down doesn't
-        //setMinSize(0,0);
+        lane2.setMinSize(0, 0);//necessary to keep padding working -> scale up does but scale down doesn't
+        lane2.getChildren().add(rL2);
 
-        //top, right, bottom, left
-        setPadding(new Insets(5, 5, 5, 5));
-        r.widthProperty().bind(widthProperty().subtract(10));
+        this.getChildren().add(lane2);
+
+        lane2.setPadding(new Insets(2.5, 5, 5, 5)); //top, right, bottom, left
+        rL2.widthProperty().bind(lane2.widthProperty().subtract(10));
     }
 
     private Menu fileSection() {
@@ -121,6 +136,7 @@ public class HeaderPane extends StackPane {
         alert.setTitle("Close Go Game");
         alert.setHeaderText("Do you really want to close your Game?");
         alert.setContentText("Choose your option:");
+        alert.initOwner(stage);
 
         ButtonType noSaveBtn = new ButtonType("without save");
         ButtonType saveBtn = new ButtonType("with save");
@@ -186,6 +202,7 @@ public class HeaderPane extends StackPane {
             box.setHeaderText(null);
             box.setContentText("This Go Game was developed by Gerald, Lukas and Sebastian.");
             box.initStyle(StageStyle.UTILITY);
+            box.initOwner(stage);
             box.show();
         });
 
@@ -200,5 +217,4 @@ public class HeaderPane extends StackPane {
 
         return (isSave) ? fileChooser.showSaveDialog(stage) : fileChooser.showOpenDialog(stage);
     }
-
 }
