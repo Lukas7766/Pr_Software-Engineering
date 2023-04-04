@@ -88,7 +88,7 @@ public class HeaderPane extends VBox {
         MenuItem newGameItem = new MenuItem();
         newGameItem.setText("New Game");
         files.getItems().add(newGameItem);
-        newGameItem.setOnAction(e -> game.newGame());
+        newGameItem.setOnAction(e -> game.initGame());
 
         MenuItem importFileItem = new MenuItem();
         importFileItem.setText("Import Game");

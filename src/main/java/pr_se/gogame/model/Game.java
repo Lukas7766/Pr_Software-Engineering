@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Game implements GameInterface {
+
+    private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private int size = 19;
     private int komi = 0;
@@ -16,16 +18,18 @@ public class Game implements GameInterface {
         this.listeners = new ArrayList<>();
     }
 
-    public void newGame() {
-        newGame(size, komi);
+    public void initGame() {
+       fireInitGame(GameCommand.INIT);
     }
 
+
     @Override
-    public void newGame(int size, int komi) {
+    public void newGame(GameCommand gameCommand, int size, int komi) {
         this.size = size;
         this.komi = komi;
+        this.gameCommand = gameCommand;
         System.out.println("newGame, Size: " + size + " Komi: " + komi);
-        fireNewGame(size, komi);
+        fireNewGame(gameCommand, size, komi);
     }
 
 
@@ -83,11 +87,24 @@ public class Game implements GameInterface {
 
     }
 
-    private void fireNewGame(int size, int komi) {
-        GameEvent e = new GameEvent(size, komi);
+    @Override
+    public GameCommand getGameState() {
+        return null;
+    }
+
+    private void fireNewGame(GameCommand gameCommand,int size, int komi) {
+        GameEvent e = new GameEvent(gameCommand,size, komi);
         for (GameListener l : listeners) {
-            l.resetGame(e);
+            l.gameCommand(e);
         }
     }
+
+    private void fireInitGame(GameCommand init) {
+        GameEvent e = new GameEvent(GameCommand.INIT);
+        for (GameListener l : listeners){
+            l.gameCommand(e);
+        }
+    }
+
 
 }
