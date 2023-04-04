@@ -9,6 +9,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import pr_se.gogame.model.Board;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
 
 /**
@@ -21,6 +22,7 @@ public class BoardPane extends GridPane {
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately; TODO: might need a better name
     private final Board BOARD;                      // Model Dummy for MVC-adherence; might also be called "game"
 
+    private final Game game;
     /*
      * Custom resources
      */
@@ -35,6 +37,7 @@ public class BoardPane extends GridPane {
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
     public BoardPane(Game game, String tile0, String tile1, String stone0, String stone1) {
+        this.game = game;
         this.BOARD = new Board(game.getSize());
         this.SIZE = BOARD.getSize();
 
@@ -51,16 +54,19 @@ public class BoardPane extends GridPane {
         //setVgap(0);
         //setPadding(new Insets(0, 0, 0, 0));
 
-        //SeWa
+        //SeWa - begin
         // Graphical details of this board pane
         setMinSize(0,0);
         setHgap(0);
         setVgap(0);
         setPadding(new Insets(2.5, 0, 0, 0));
 
+        game.addListener(l -> {
+            if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
+            System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
+        }); //ToDo: full Event integration
 
-
-        game.addListener(l -> System.out.println("inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi())); //ToDo: full Event integration
+        //SeWa - end
 
         // Fill the grid with ImageViews of alternating tiles
         for(int i = 0; i < this.SIZE; i++) {

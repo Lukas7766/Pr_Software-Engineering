@@ -1,5 +1,7 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.view_controller.GameEvent;
+import pr_se.gogame.view_controller.GameListener;
 import pr_se.gogame.view_controller.GoListener;
 import pr_se.gogame.view_controller.StoneSetEvent;
 
@@ -55,4 +57,5 @@ public class Board implements BoardInterface {
             l.stoneSet(e);
         }
     }
+
 }
