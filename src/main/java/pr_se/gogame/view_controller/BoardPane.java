@@ -8,6 +8,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import pr_se.gogame.model.Board;
+import pr_se.gogame.model.Game;
 import pr_se.gogame.model.StoneColor;
 
 /**
@@ -33,9 +34,9 @@ public class BoardPane extends GridPane {
     private ImageView selectionHover = null;
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
-    public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
-        this.BOARD = board;
-        this.SIZE = board.getSize();
+    public BoardPane(Game game, String tile0, String tile1, String stone0, String stone1) {
+        this.BOARD = new Board(game.getSize());
+        this.SIZE = BOARD.getSize();
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
         tiles[0] = new Image(tile0, true);
@@ -58,6 +59,8 @@ public class BoardPane extends GridPane {
         setPadding(new Insets(2.5, 0, 0, 0));
 
 
+
+        game.addListener(l -> System.out.println("inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi())); //ToDo: full Event integration
 
         // Fill the grid with ImageViews of alternating tiles
         for(int i = 0; i < this.SIZE; i++) {
@@ -149,7 +152,7 @@ public class BoardPane extends GridPane {
             // TODO: Keyboard input?
         });
 
-        board.addListener((e) -> {
+        BOARD.addListener((e) -> {
             Image stoneImg;
             if(e.getColor() == StoneColor.BLACK) {
                 stoneImg = stones[0];
