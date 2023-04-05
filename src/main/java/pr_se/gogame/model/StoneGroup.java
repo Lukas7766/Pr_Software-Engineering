@@ -1,23 +1,28 @@
 package pr_se.gogame.model;
 
+import javafx.geometry.Pos;
+
+import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.Set;
 
 public class StoneGroup {
     private final StoneColor stoneColor;
 
     private final LinkedList<Position> locations;
 
-    private int liberties;
+    private final Set<Position> liberties;
 
-    public StoneGroup(StoneColor stoneColor, int x, int y, int liberties) {
+    //private final StoneGroupPointer pointer;
+
+    public StoneGroup(StoneColor stoneColor, int x, int y, Set<Position> liberties) {
         this.stoneColor = stoneColor;
         this.locations = new LinkedList<>();
-        this.liberties = 0;
+        this.liberties = liberties;
         addLocation(x, y, liberties);
     }
 
-    public void addLocation(int x, int y, int addedLiberties) {
-        // removeLiberties(1); // TODO: Unsure whether this should be done in here as part of updating the liberties.
+    public void addLocation(int x, int y, Set<Position> addedLiberties) {
         addLiberties(addedLiberties);
         locations.add(new Position(x, y));
     }
@@ -27,21 +32,54 @@ public class StoneGroup {
             throw new NullPointerException();
         }
 
-        if(other.getStoneGroup().getStoneColor() != stoneColor) {
-            throw new IllegalArgumentException("Stone group must be of same color!");
-        }
+        mergeWithStoneGroup(other.getStoneGroup());
 
-        addLiberties(other.getStoneGroup().getLiberties());
-        this.locations.addAll(other.getStoneGroup().getLocations());
         other.setStoneGroup(this);
     }
 
-    public void addLiberties(int addedLiberties) {
-        liberties += addedLiberties;
+    public void mergeWithStoneGroup(StoneGroup other) {
+        if(other == null) {
+            throw new NullPointerException();
+        }
+
+        if(other.getStoneColor() != stoneColor) {
+            throw new IllegalArgumentException("Stone group must be of same color!");
+        }
+
+        addLiberties(other.getLiberties());
+        locations.addAll(other.getLocations());
     }
 
-    public void removeLiberties(int removedLiberties) {
-        liberties -= removedLiberties;
+    public void addLiberties(Set<Position> addedLiberties) {
+        if(addedLiberties == null) {
+            throw new NullPointerException();
+        }
+
+        liberties.addAll(addedLiberties);
+    }
+
+    public void removeLiberties(Set<Position> removedLiberties) {
+        if(removedLiberties == null) {
+            throw new NullPointerException();
+        }
+
+        liberties.removeAll(removedLiberties);
+    }
+
+    public void addLiberty(Position liberty) {
+        if(liberty == null) {
+            throw new NullPointerException();
+        }
+
+        liberties.add(liberty);
+    }
+
+    public void removeLiberty(Position liberty) {
+        if(liberty == null) {
+            throw new NullPointerException();
+        }
+
+        liberties.remove(liberty);
     }
 
     // Getters and Setters
@@ -53,11 +91,11 @@ public class StoneGroup {
         return locations;
     }
 
-    public int getLiberties() {
-        return liberties;
+    public Set<Position> getLiberties() {
+        return this.liberties;
     }
 
-    public void setLiberties(int liberties) {
-        this.liberties = liberties;
-    }
+    /*public StoneGroupPointer getPointer() {
+        return pointer;
+    }*/
 }
