@@ -48,7 +48,10 @@ public class BoardPane extends GridPane {
         setAlignment(Pos.CENTER);
         setHgap(0);
         setVgap(0);
-        setPadding(new Insets(0, 0, 0, 0));
+        setPadding(new Insets(0, 0, 2.5, 0));
+        setMinSize(0, 0);
+
+        // setGridLinesVisible(true);
 
         // Fill the grid with ImageViews of alternating tiles
         for(int i = 0; i < this.SIZE; i++) {
@@ -71,7 +74,8 @@ public class BoardPane extends GridPane {
                     Integer row = getRowIndex(target);
 
                     if (col != null && row != null) {
-                        System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
+                        board.printDebugInfo(col, row);
+                        //System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
                         Image stoneImg;
                         if (this.BOARD.getCurColor() == StoneColor.BLACK) {
                             stoneImg = stones[0];
@@ -87,18 +91,18 @@ public class BoardPane extends GridPane {
                         add(iv, col, row);
 
                         getChildren().remove(lastMouseHover);
-                        System.out.println("Removed hover!");               // TODO: Remove in finished product
+                        //System.out.println("Removed hover!");               // TODO: Remove in finished product
                         lastMouseTarget = target;
                         lastMouseHover = iv;
                     } else {
-                        System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
+                        //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
                         getChildren().remove(lastMouseHover);
                         lastMouseTarget = null;
                         lastMouseHover = null;
                     }
                 }
             } else {
-                System.out.println("Hover target is null!");                // TODO: Remove in finished product
+                //System.out.println("Hover target is null!");                // TODO: Remove in finished product
                 lastMouseTarget = null;
                 lastMouseHover = null;
             }
@@ -140,19 +144,42 @@ public class BoardPane extends GridPane {
             // TODO: Keyboard input?
         });
 
-        board.addListener((e) -> {
-            Image stoneImg;
-            if(e.getColor() == StoneColor.BLACK) {
-                stoneImg = stones[0];
-            } else {
-                stoneImg = stones[1];
+        board.addListener(new GoListener() {
+            @Override
+            public void stoneSet(StoneSetEvent e) {
+                Image stoneImg;
+                if(e.getColor() == StoneColor.BLACK) {
+                    stoneImg = stones[0];
+                } else {
+                    stoneImg = stones[1];
+                }
+
+                ImageView iv = new ImageView(stoneImg);
+                iv.fitHeightProperty().bind(heightProperty().subtract(SIZE).divide(SIZE));
+                iv.fitWidthProperty().bind(widthProperty().subtract(SIZE).divide(SIZE));
+                iv.setPreserveRatio(true);
+                add(iv, e.getCol(), e.getRow());
             }
 
-            ImageView iv = new ImageView(stoneImg);
-            iv.fitHeightProperty().bind(heightProperty().subtract(this.SIZE).divide(this.SIZE));
-            iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
-            iv.setPreserveRatio(true);
-            add(iv, e.getCol(), e.getRow());
+            @Override
+            public void stoneRemoved(StoneRemovedEvent e) {
+                ImageView needle = null;
+
+                for(Node iv : getChildren()) {
+                    if(getRowIndex(iv) == e.getRow() && getColumnIndex(iv) == e.getCol()) {
+                        needle = (ImageView)iv;
+                        if(needle.getImage() == stones[0] || needle.getImage() == stones[1]) {
+                            break;
+                        } else {
+                            needle = null;
+                        }
+                    }
+                }
+
+                if(needle != null) {
+                    getChildren().remove(needle);
+                }
+            }
         });
     }
 
@@ -165,7 +192,7 @@ public class BoardPane extends GridPane {
             Integer col = getColumnIndex(selectionTarget);
             Integer row = getRowIndex(selectionTarget);
             if(col != null && row != null) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
-                BOARD.setStone(col, row);
+                BOARD.setStone(col, row, BOARD.getCurColor());
             } else {
                 System.out.println("Confirmation outside of actual board on " + lastMouseTarget); // TODO: Remove in finished product
             }

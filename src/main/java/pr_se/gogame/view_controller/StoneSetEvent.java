@@ -2,25 +2,12 @@ package pr_se.gogame.view_controller;
 
 import pr_se.gogame.model.StoneColor;
 
-public class StoneSetEvent {
-
-    private final int COL;
-    private final int ROW;
-
+public class StoneSetEvent extends StoneEvent {
     private final StoneColor COLOR;
 
     public StoneSetEvent(int col, int row, StoneColor color) {
-        this.COL = col;
-        this.ROW = row;
+        super(col, row);
         this.COLOR = color;
-    }
-
-    public int getCol() {
-        return COL;
-    }
-
-    public int getRow() {
-        return ROW;
     }
 
     public StoneColor getColor() {

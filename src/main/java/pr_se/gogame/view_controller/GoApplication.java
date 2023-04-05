@@ -12,11 +12,15 @@ import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Board;
+import pr_se.gogame.model.Position;
+
+import java.util.HashSet;
+import java.util.Set;
+import java.util.TreeSet;
 
 public class GoApplication extends Application {
     @Override
     public void start(Stage stage) throws Exception {
-
         stage.setTitle("Go Game - App");
 
         //Menu test - start
@@ -43,7 +47,7 @@ public class GoApplication extends Application {
         final String path = "file:src/main/resources/pr_se/gogame/";
         BoardPane boardPane = new BoardPane(board,
                 path+"tile_0.png",
-                path+"tile_1.png",
+                path+"tile_0.png",
                 path+"stone_0.png",
                 path+"stone_1.png");
         BorderPane root = new BorderPane();
