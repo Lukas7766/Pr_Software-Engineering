@@ -19,11 +19,6 @@ public class StoneGroup {
         this.stoneColor = stoneColor;
         this.locations = new LinkedList<>();
         this.liberties = liberties;
-        addLocation(x, y, liberties);
-    }
-
-    public void addLocation(int x, int y, Set<Position> addedLiberties) {
-        addLiberties(addedLiberties);
         locations.add(new Position(x, y));
     }
 

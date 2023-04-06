@@ -7,6 +7,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
+import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Board;
 import pr_se.gogame.model.StoneColor;
 
@@ -18,7 +19,7 @@ public class BoardPane extends GridPane {
 
     private final int SIZE;                         // number of columns and rows, respectively
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately; TODO: might need a better name
-    private final Board BOARD;                      // Model Dummy for MVC-adherence; might also be called "game"
+    private Board board;                      // Model Dummy for MVC-adherence; might also be called "game"
 
     /*
      * Custom resources
@@ -28,13 +29,15 @@ public class BoardPane extends GridPane {
 
     // TODO: This sort of thing would ideally be cleaned up by using some sort of data structure.
     private Node lastMouseTarget = null;
+
+    private StackPane lastTargetSP = null;
     private ImageView lastMouseHover = null;
     private Node selectionTarget = null;
     private ImageView selectionHover = null;
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
     public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
-        this.BOARD = board;
+        setBoard(board);
         this.SIZE = board.getSize();
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
@@ -56,28 +59,36 @@ public class BoardPane extends GridPane {
         // Fill the grid with ImageViews of alternating tiles
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {
+                StackPane sp = new StackPane();
+
                 ImageView iv = new ImageView(tiles[(j % 2 + i % 2) % 2]);
                 iv.setPreserveRatio(true);
                 iv.fitHeightProperty().bind(heightProperty().subtract(this.SIZE).divide(this.SIZE));
                 iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
-                add(iv, j, i);
-                setMargin(iv, new Insets(0, 0, 0, 0));
+                iv.setMouseTransparent(true);
+
+                sp.getChildren().add(iv);
+
+                add(sp, j, i);
             }
         }
 
         // Set up listeners
         setOnMouseMoved(e -> {
             Node target = (Node)e.getTarget();
+            System.out.println("Target is of class " + target.getClass());
             if(target != null) {
                 if(target != lastMouseTarget) {                                 // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
                     if (col != null && row != null) {
-                        board.printDebugInfo(col, row);
-                        //System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
+                        StackPane targetSP = (StackPane)target;
+                        this.board.printDebugInfo(col, row);
+
+                        System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
                         Image stoneImg;
-                        if (this.BOARD.getCurColor() == StoneColor.BLACK) {
+                        if (this.board.getCurColor() == StoneColor.BLACK) {
                             stoneImg = stones[0];
                         } else {
                             stoneImg = stones[1];
@@ -88,22 +99,32 @@ public class BoardPane extends GridPane {
                         iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
                         iv.setPreserveRatio(true);
                         iv.setOpacity(0.5);
-                        add(iv, col, row);
+                        iv.setMouseTransparent(true);
 
-                        getChildren().remove(lastMouseHover);
+                        targetSP.getChildren().add(iv);
+
+                        // Remove old hover
+                        if(lastTargetSP != null) {
+                            lastTargetSP.getChildren().remove(lastMouseHover);
+                        }
                         //System.out.println("Removed hover!");               // TODO: Remove in finished product
                         lastMouseTarget = target;
+                        lastTargetSP = targetSP;
                         lastMouseHover = iv;
                     } else {
                         //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
-                        getChildren().remove(lastMouseHover);
+                        if(lastTargetSP != null) {
+                            lastTargetSP.getChildren().remove(lastMouseHover);
+                        }
                         lastMouseTarget = null;
+                        // lastTargetSP = null;
                         lastMouseHover = null;
                     }
                 }
             } else {
                 //System.out.println("Hover target is null!");                // TODO: Remove in finished product
                 lastMouseTarget = null;
+                // lastTargetSP = null;
                 lastMouseHover = null;
             }
         });
@@ -144,6 +165,12 @@ public class BoardPane extends GridPane {
             // TODO: Keyboard input?
         });
 
+
+    }
+
+    public void setBoard(Board board) {
+        this.board = board;
+
         board.addListener(new GoListener() {
             @Override
             public void stoneSet(StoneSetEvent e) {
@@ -158,7 +185,8 @@ public class BoardPane extends GridPane {
                 iv.fitHeightProperty().bind(heightProperty().subtract(SIZE).divide(SIZE));
                 iv.fitWidthProperty().bind(widthProperty().subtract(SIZE).divide(SIZE));
                 iv.setPreserveRatio(true);
-                add(iv, e.getCol(), e.getRow());
+                StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
+                destinationSP.getChildren().add(iv);
             }
 
             @Override
@@ -192,7 +220,7 @@ public class BoardPane extends GridPane {
             Integer col = getColumnIndex(selectionTarget);
             Integer row = getRowIndex(selectionTarget);
             if(col != null && row != null) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
-                BOARD.setStone(col, row, BOARD.getCurColor());
+                board.setStone(col, row, board.getCurColor());
             } else {
                 System.out.println("Confirmation outside of actual board on " + lastMouseTarget); // TODO: Remove in finished product
             }

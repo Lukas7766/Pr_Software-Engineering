@@ -8,6 +8,7 @@ import static pr_se.gogame.model.RelativeDirection.*;
 import static pr_se.gogame.model.StoneColor.*;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Model Dummy (for now)
@@ -60,45 +61,41 @@ public class Board implements BoardInterface {
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
         // Are there even neighbors?
-        if(surroundingSGPs.size() > 0) {
-            StoneGroupPointer firstSameColorGroupPtr = null;
-            Set<StoneGroupPointer> checkedPointers = new HashSet<>();
-            Set<StoneGroup> checkedGroups = new HashSet<>();
+        StoneGroupPointer firstSameColorGroupPtr = null;
+        Set<StoneGroupPointer> checkedPointers = new HashSet<>();
+        Set<StoneGroup> checkedGroups = new HashSet<>();
 
-            for(StoneGroupPointer sgp : surroundingSGPs.values()) {
-                if(sgp != null & !checkedPointers.contains(sgp)) {
-                    StoneGroup curGroup = sgp.getStoneGroup();
-                    if(!checkedGroups.contains(curGroup)) {
-                        curGroup.removeLiberty(new Position(x, y));
-                        if(curGroup.getStoneColor() == color) {
-                            if(firstSameColorGroupPtr != null) {
-                                firstSameColorGroupPtr.getStoneGroup().mergeWithStoneGroupPtr(sgp);
-                            } else {
-                                curGroup.mergeWithStoneGroup(newGroup);
-                                firstSameColorGroupPtr = sgp;
-                            }
+        for(StoneGroupPointer sgp : surroundingSGPs.values()) {
+            if(sgp != null & !checkedPointers.contains(sgp)) {
+                StoneGroup curGroup = sgp.getStoneGroup();
+                if(!checkedGroups.contains(curGroup)) {
+                    curGroup.removeLiberty(new Position(x, y));
+                    if(curGroup.getStoneColor() == color) {
+                        if(firstSameColorGroupPtr != null) {
+                            firstSameColorGroupPtr.getStoneGroup().mergeWithStoneGroupPtr(sgp);
+                        } else {
+                            curGroup.mergeWithStoneGroup(newGroup);
+                            firstSameColorGroupPtr = sgp;
                         }
-                        checkedGroups.add(curGroup);
                     }
-                    checkedPointers.add(sgp);
+                    checkedGroups.add(curGroup);
                 }
+                checkedPointers.add(sgp);
             }
+        }
 
-            if(firstSameColorGroupPtr == null) {
-                board[x][y] = new StoneGroupPointer(newGroup);
-            } else {
-                board[x][y] = firstSameColorGroupPtr;
-            }
-
-            for(StoneGroup sg : checkedGroups) {
-                if((sg.getStoneColor() != color || sg == firstSameColorGroupPtr.getStoneGroup()) && sg.getLiberties().size() == 0) {
-                    for(Position p : sg.getLocations()) {
-                        removeStone(p.X, p.Y);
-                    }
-                }
-            }
-        } else {
+        if(firstSameColorGroupPtr == null) {
             board[x][y] = new StoneGroupPointer(newGroup);
+        } else {
+            board[x][y] = firstSameColorGroupPtr;
+        }
+
+        for(StoneGroup sg : checkedGroups) {
+            if ((sg.getStoneColor() != color || sg == firstSameColorGroupPtr.getStoneGroup()) && sg.getLiberties().size() == 0) {
+                for (Position p : sg.getLocations()) {
+                    removeStone(p.X, p.Y);
+                }
+            }
         }
 
         if(board[x][y] == null) {
@@ -106,7 +103,7 @@ public class Board implements BoardInterface {
             return;
         }
 
-        System.out.println("Board will set " + color + " stone at x " + x + ", y " + y);
+        // System.out.println("Board will set " + color + " stone at x " + x + ", y " + y);
 
         // Update UI
         fireStoneSet(x, y, color);
@@ -122,16 +119,17 @@ public class Board implements BoardInterface {
 
     @Override
     public void removeStone(int x, int y) {
-        System.out.println("Board will remove " + board[x][y].getStoneGroup().getStoneColor() + " stone at x " + x + ", y " + y);
+        // System.out.println("Board will remove " + board[x][y].getStoneGroup().getStoneColor() + " stone at x " + x + ", y " + y);
 
         board[x][y] = null;
 
         Map<RelativeDirection, StoneGroupPointer> neighbors = getSurroundingStoneGroupPtrs(x, y);
-        HashSet<StoneGroupPointer> uniqueNeighborPtrs = new HashSet<>(neighbors.values());
-        HashSet<StoneGroup> uniqueNeighborGroups = new HashSet<>();
-        for(StoneGroupPointer sgp : uniqueNeighborPtrs) {
-            uniqueNeighborGroups.add(sgp.getStoneGroup());
-        }
+        HashSet<StoneGroup> uniqueNeighborGroups = new HashSet<>(
+            neighbors.values()
+                .stream()
+                .map(p -> p.getStoneGroup())
+                .collect(Collectors.toSet()));
+
         for(StoneGroup sg : uniqueNeighborGroups) {
             sg.addLiberty(new Position(x, y));
         }
