@@ -1,28 +1,25 @@
 package pr_se.gogame.view_controller;
 
 import javafx.geometry.Insets;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.StackPane;
+import javafx.geometry.Pos;
+import javafx.scene.control.*;
+import javafx.scene.effect.DisplacementMap;
+import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuItem;
-import javafx.scene.control.SeparatorMenuItem;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import pr_se.gogame.model.GameCommand;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -75,10 +72,112 @@ public class HeaderPane extends VBox {
         lane2.setMinSize(0, 0);//necessary to keep padding working -> scale up does but scale down doesn't
         lane2.getChildren().add(rL2);
 
+        lane2.getChildren().add(shortMenu());
+
+
         this.getChildren().add(lane2);
 
         lane2.setPadding(new Insets(2.5, 5, 2.5, 5)); //top, right, bottom, left
         rL2.widthProperty().bind(lane2.widthProperty().subtract(10));
+    }
+
+    private HBox shortMenu(){
+        HBox lane = new HBox();
+
+        List<Button> playbackControlList = new ArrayList<>();
+
+
+        HBox playbackControl = new HBox();
+        playbackControl.setAlignment(Pos.CENTER_LEFT);
+        playbackControl.setPadding(new Insets(0,0,0,5));
+
+
+        Button fastBackward = new Button();
+        fastBackward.setText("<<");
+        fastBackward.setFocusTraversable(false);
+        playbackControlList.add(fastBackward);
+        //playbackControl.getChildren().add(fastBackward);
+
+        Button backward = new Button();
+        backward.setText("<");
+        backward.setFocusTraversable(false);
+        playbackControlList.add(backward);
+        //playbackControl.getChildren().add(backward);
+
+        Button forward = new Button();
+        forward.setText(">");
+        forward.setFocusTraversable(false);
+        playbackControlList.add(forward);
+        //playbackControl.getChildren().add(forward);
+
+        Button fastForward = new Button();
+        fastForward.setText(">>");
+        fastForward.setFocusTraversable(false);
+        playbackControlList.add(fastForward);
+        //playbackControl.getChildren().add(fastForward);
+
+        playbackControl.getChildren().addAll(playbackControlList);
+        playbackControlList.forEach(e -> e.setDisable(true));
+
+        game.addListener(l -> {
+            if (l.getGameCommand() == GameCommand.PLAYBACK){
+                playbackControlList.forEach(e -> e.setDisable(false));
+            } else
+                playbackControlList.forEach(e -> e.setDisable(true));
+        });
+
+
+
+        lane.getChildren().add(playbackControl);
+
+        HBox gameShortCards = new HBox();
+        gameShortCards.setAlignment(Pos.CENTER_LEFT);
+        gameShortCards.setSpacing(25);
+        gameShortCards.setPadding(new Insets(0,0,0,135));
+        List<Button> gameShortCardList = new ArrayList<>();
+
+        Button pass = new Button("Pass");
+        pass.setFocusTraversable(false);
+        pass.setOnAction(e -> game.pass());
+        gameShortCardList.add(pass);
+        //gameShortCards.getChildren().add(pass);
+
+        Button resign = new Button("Resign");
+        resign.setFocusTraversable(false);
+        resign.setOnAction(e -> game.resign());
+        gameShortCardList.add(resign);
+        //gameShortCards.getChildren().add(resign);
+
+
+        Button scoreGame = new Button("Score Game");
+        scoreGame.setFocusTraversable(false);
+        scoreGame.setOnAction(e -> game.scoreGame());
+        gameShortCardList.add(scoreGame);
+        //gameShortCards.getChildren().add(scoreGame);
+
+        Button confirm = new Button("Confirm");
+        confirm.setFocusTraversable(false);
+        confirm.setOnAction(e -> game.confirmChoice());
+        gameShortCardList.add(confirm);
+        //gameShortCards.getChildren().add(confirm);
+
+        gameShortCards.getChildren().addAll(gameShortCardList);
+        gameShortCardList.forEach(e -> e.setDisable(true));
+
+        game.addListener(l -> {
+            if (l.getGameCommand() == GameCommand.INIT){
+                gameShortCardList.forEach(e -> e.setDisable(true));
+            }
+            else {
+                gameShortCardList.forEach(e -> e.setDisable(false));
+            }
+
+        });
+
+        lane.getChildren().add(gameShortCards);
+
+        return lane;
+
     }
 
     private Menu fileSection() {
@@ -151,20 +250,37 @@ public class HeaderPane extends VBox {
         Menu menu = new Menu();
         menu.setText("Game");
 
+        List<MenuItem> gameSectionItems = new ArrayList<>();
+
         MenuItem passItem = new MenuItem();
         passItem.setText("Pass");
-        menu.getItems().add(passItem);
+        //menu.getItems().add(passItem);
+        gameSectionItems.add(passItem);
         passItem.setOnAction(e -> game.pass());
 
         MenuItem resignItem = new MenuItem();
         resignItem.setText("Resign");
-        menu.getItems().add(resignItem);
+        //menu.getItems().add(resignItem);
+        gameSectionItems.add(resignItem);
         resignItem.setOnAction(e -> game.resign());
 
         MenuItem scoreGameItem = new MenuItem();
         scoreGameItem.setText("Score Game");
-        menu.getItems().add(scoreGameItem);
+        //menu.getItems().add(scoreGameItem);
+        gameSectionItems.add(scoreGameItem);
         scoreGameItem.setOnAction(e -> game.scoreGame());
+
+        menu.getItems().addAll(gameSectionItems);
+        gameSectionItems.forEach(e -> e.setDisable(true));
+
+        game.addListener(l -> {
+            if (l.getGameCommand() == GameCommand.INIT){
+                gameSectionItems.forEach(e -> e.setDisable(true));
+            }
+            else {
+                gameSectionItems.forEach(e -> e.setDisable(false));
+            }
+        });
 
         SeparatorMenuItem sep = new SeparatorMenuItem();
 

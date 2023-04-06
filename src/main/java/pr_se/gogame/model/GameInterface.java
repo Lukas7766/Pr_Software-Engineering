@@ -30,4 +30,6 @@ public interface GameInterface {
     void removeListener(GameListener l);
 
     GameCommand getGameState();
+
+    void confirmChoice();
 }

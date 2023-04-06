@@ -16,6 +16,7 @@ public class Game implements GameInterface {
 
     public Game() {
         this.listeners = new ArrayList<>();
+        this.gameCommand = GameCommand.INIT;
     }
 
     public void initGame() {
@@ -90,6 +91,11 @@ public class Game implements GameInterface {
     @Override
     public GameCommand getGameState() {
         return null;
+    }
+
+    @Override
+    public void confirmChoice() {
+        System.out.println("confirmChoice");
     }
 
     private void fireNewGame(GameCommand gameCommand,int size, int komi) {
