@@ -9,9 +9,8 @@ import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import pr_se.gogame.model.Board;
@@ -37,14 +36,12 @@ public class BoardPane extends GridPane {
 
     // TODO: This sort of thing would ideally be cleaned up by using some sort of data structure.
     private Node lastMouseTarget = null;
-
-    private StackPane lastTargetSP = null;
     private ImageView lastMouseHover = null;
     private Node selectionTarget = null;
     private ImageView selectionHover = null;
 
     private enum cellLayerIndices {
-        BACKGROUND, BLACKHOVER, WHITEHOVER, BLACKSTONE, WHITESTONE, LABEL;
+        BLACKHOVER, WHITEHOVER, BLACKSTONE, WHITESTONE, LABEL;
     }
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the baord (as those might be changed during a game).
@@ -61,6 +58,8 @@ public class BoardPane extends GridPane {
                 false,      // smooth
                 true);      // backgroundLoading
         tiles[1] = new Image(tile1, 128, 128, true, false, true);
+
+        setBackground(new Background(new BackgroundImage[]{ new BackgroundImage(tiles[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, new BackgroundSize(1, 1, true, true, false, false))}));
 
         stones[0] = new Image(
                 stone0,     // URL
@@ -87,7 +86,7 @@ public class BoardPane extends GridPane {
                 // would be that the lines would always remain as thin as they are, no matter how large the board is
                 // scaled.
                 ImageView iv = getCellImageView(tiles[(j % 2 + i % 2) % 2]);
-                sp.getChildren().add(iv);
+                // sp.getChildren().add(iv);
 
                 ImageView blackHover = getCellImageView(stones[0]);
                 blackHover.setVisible(false);
@@ -121,6 +120,7 @@ public class BoardPane extends GridPane {
             // System.out.println("Target is of class " + target.getClass());
             if(target != null) {
                 if(target != lastMouseTarget) {                                 // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
+                    System.out.println("Hovering over something new!");
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
@@ -144,7 +144,6 @@ public class BoardPane extends GridPane {
                         }
                         //System.out.println("Removed hover!");               // TODO: Remove in finished product
                         lastMouseTarget = target;
-                        lastTargetSP = targetSP;
                         lastMouseHover = iv;
                     } else {
                         //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
@@ -152,14 +151,12 @@ public class BoardPane extends GridPane {
                             lastMouseHover.setVisible(false);
                         }
                         lastMouseTarget = null;
-                        // lastTargetSP = null;
                         lastMouseHover = null;
                     }
                 }
             } else {
                 //System.out.println("Hover target is null!");                // TODO: Remove in finished product
                 lastMouseTarget = null;
-                // lastTargetSP = null;
                 lastMouseHover = null;
             }
         });
