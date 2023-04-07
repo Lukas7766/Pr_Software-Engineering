@@ -1,5 +1,8 @@
 package pr_se.gogame.view_controller;
 
+import javafx.beans.InvalidationListener;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableBooleanValue;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -21,8 +24,10 @@ import pr_se.gogame.model.StoneColor;
 public class BoardPane extends GridPane {
 
     private final int SIZE;                         // number of columns and rows, respectively
-    private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately; TODO: might need a better name
-    private Board board;                      // Model Dummy for MVC-adherence; might also be called "game"
+    private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
+
+    private boolean showsMoveNumbers = true;        // whether move numbers are shown
+    private Board board;                            // Model for MVC-adherence; Will likely be replaced with Game
 
     /*
      * Custom resources
@@ -44,31 +49,47 @@ public class BoardPane extends GridPane {
         this.SIZE = board.getSize();
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
-        tiles[0] = new Image(tile0, true);
-        tiles[1] = new Image(tile1, true);
+        tiles[0] = new Image(
+                tile0,      // URL
+                128,        // requestedWidth
+                128,        // requestedHeight
+                true,       // preserveRation
+                false,      // smooth
+                true);      // backgroundLoading
+        tiles[1] = new Image(tile1, 128, 128, true, false, true);
 
-        stones[0] = new Image(stone0, true);
+        stones[0] = new Image(
+                stone0,     // URL
+                true);      // backgroundLoading
         stones[1] = new Image(stone1, true);
 
         // Graphical details of this board pane
         setAlignment(Pos.CENTER);
         setHgap(0);
         setVgap(0);
-        setPadding(new Insets(0, 0, 2.5, 0));
+        setPadding(new Insets(0, 0, 0, 0));
         setMinSize(0, 0);
 
-        // setGridLinesVisible(true);
+        setGridLinesVisible(true);
 
         // Fill the grid with ImageViews of alternating tiles
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {
                 StackPane sp = new StackPane();
 
+                // TODO: To prevent the thin lines from disappearing, and possibly also the white lines in between from
+                // appearing, maybe the tiles should not actually change in size and instead be loaded in way bigger
+                // than they could be shown, with only the viewport (displayed portion) changing in size. Diasadvantage
+                // would be that the lines would always remain as thin as they are, no matter how large the board is
+                // scaled.
                 ImageView iv = new ImageView(tiles[(j % 2 + i % 2) % 2]);
                 iv.setPreserveRatio(true);
                 iv.fitHeightProperty().bind(heightProperty().subtract(this.SIZE).divide(this.SIZE));
                 iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
                 iv.setMouseTransparent(true);
+                iv.setSmooth(false);
+
+                // setMargin(iv, new Insets(0, 0, 0, 0);
 
                 sp.getChildren().add(iv);
 
@@ -77,13 +98,15 @@ public class BoardPane extends GridPane {
                 sp.getChildren().add(l);
 
                 add(sp, j, i);
+
+                // setMargin(sp, new Insets(0, 0, 0, 0);
             }
         }
 
         // Set up listeners
         setOnMouseMoved(e -> {
             Node target = (Node)e.getTarget();
-            System.out.println("Target is of class " + target.getClass());
+            // System.out.println("Target is of class " + target.getClass());
             if(target != null) {
                 if(target != lastMouseTarget) {                                 // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
                     Integer col = getColumnIndex(target);
@@ -93,7 +116,7 @@ public class BoardPane extends GridPane {
                         StackPane targetSP = (StackPane)target;
                         this.board.printDebugInfo(col, row);
 
-                        System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
+                        // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
                         Image stoneImg;
                         if (this.board.getCurColor() == StoneColor.BLACK) {
                             stoneImg = stones[0];
@@ -110,7 +133,7 @@ public class BoardPane extends GridPane {
 
                         targetSP.getChildren().add(iv);
 
-                        // Remove old hover
+                        // Remove old hover                                    // TODO: Remove in finished product
                         if(lastTargetSP != null) {
                             lastTargetSP.getChildren().remove(lastMouseHover);
                         }
@@ -200,35 +223,33 @@ public class BoardPane extends GridPane {
                 StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
                 destinationSP.getChildren().add(iv);
 
-                Label l = (Label)destinationSP.getChildren().get(destinationSP.getChildren().size() - 2);
-                l.setText("" + e.getMoveNumber());
-                l.setTextFill(labelColor);
-                l.toFront();
-                l.setVisible(true);
+                if(showsMoveNumbers) {
+                    Label l = (Label) destinationSP.getChildren().get(destinationSP.getChildren().size() - 2);
+                    l.setText("" + e.getMoveNumber());
+                    l.setTextFill(labelColor);
+                    l.toFront();
+                    l.setVisible(true);
+                }
             }
 
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
-                ImageView needle = null;
                 StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
                 // TODO: Having to know the index of elements within the cell seems like a huge design flaw. Solution: Make a custom class extending StackPane?
-                destinationSP.getChildren().remove(destinationSP.getChildren().size() - 1);
-                // destinationSP.getChildren().get(destinationSP.getChildren().size() - 1).toBack();
-
-                /*for(Node iv : getChildren()) {
-                    if(getRowIndex(iv) == e.getRow() && getColumnIndex(iv) == e.getCol()) {
-                        needle = (ImageView)iv;
-                        if(needle.getImage() == stones[0] || needle.getImage() == stones[1]) {
-                            break;
-                        } else {
-                            needle = null;
-                        }
-                    }
-                }*/
-
-                /*if(needle != null) {
-                    getChildren().remove(needle);
-                }*/
+                /*
+                 *  TODO: Signifacntly differing idea: Have all elements in a cell always be available and just toggle
+                 *  their visibility. That's probably more efficient than constantly creating new ImageViews and
+                 *  ensures fixed indices for all components, possibly removing the need for a dedicated BoardCell-
+                 *  class (which might be replaced with a simple ENUM for all components, though I don't know whether
+                 *  a dedicated class wouldn't be better design).
+                 */
+                if(showsMoveNumbers) {
+                    // Hide text: Apparently, the index is determined by the node's position on the screen (the further at the front, the higher the index).
+                    destinationSP.getChildren().get(destinationSP.getChildren().size() - 1).setVisible(false); // Label is at the front, therefore it has the highest index
+                    destinationSP.getChildren().remove(destinationSP.getChildren().size() - 2); // Stone is behind label, therefore it has the second-highest index
+                } else {
+                    destinationSP.getChildren().remove(destinationSP.getChildren().size() - 1); // Stone is at the front, therefore it has the highest index
+                }
             }
         });
     }
