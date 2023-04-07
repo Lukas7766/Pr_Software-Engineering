@@ -1,10 +1,6 @@
 package pr_se.gogame.view_controller;
 
-import javafx.beans.InvalidationListener;
-import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableBooleanValue;
 import javafx.geometry.Insets;
-import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -12,7 +8,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 import pr_se.gogame.model.Board;
 import pr_se.gogame.model.StoneColor;
 
@@ -41,20 +36,88 @@ public class BoardPane extends GridPane {
     private ImageView selectionHover = null;
 
     private class BoardCell extends StackPane {
-        private final ImageView background;
-        private final ImageView blackHover;
-        private final ImageView whiteHover;
-        private final ImageView blackStone;
-        private final ImageView whiteStone;
-        private final ImageView label;
+        private final ImageView TILE;
+        private final ImageView BLACK_HOVER;
+        private final ImageView WHITE_HOVER;
+        private final ImageView BLACK_STONE;
+        private final ImageView WHITE_STONE;
+        private final Label LABEL;
 
-        private BoardCell(Image background, Image foreGround, Image blackStone, Image whiteStone) {
-            
+        private BoardCell(Image tile) {
+            /*
+             * TODO: To prevent the thin lines from disappearing, and possibly also the white lines in between from
+             * appearing, maybe the tiles should not actually change in size and instead be loaded in way bigger
+             * than they could be shown, with only the viewport (displayed portion) changing in size. Diasadvantage
+             * would be that the lines would always remain as thin as they are, no matter how large the board is
+             * scaled.
+             */
+
+            this.TILE = getCellImageView(tile);
+            getChildren().add(this.TILE);
+
+            this.BLACK_HOVER = getCellImageView(stones[0]);
+            this.BLACK_HOVER.setVisible(false);
+            getChildren().add(this.BLACK_HOVER);
+
+            this.WHITE_HOVER = getCellImageView(stones[1]);
+            this.WHITE_HOVER.setVisible(false);
+            getChildren().add(this.WHITE_HOVER);
+
+            this.BLACK_STONE = getCellImageView(stones[0]);
+            this.BLACK_STONE.setVisible(false);
+            getChildren().add(this.BLACK_STONE);
+
+            this.WHITE_STONE = getCellImageView(stones[1]);
+            this.WHITE_STONE.setVisible(false);
+            getChildren().add(this.WHITE_STONE);
+
+            this.LABEL = new Label("0");
+            this.LABEL.setVisible(false);
+            setMargin(this.LABEL, new Insets(0, 0, 0, 0));
+            getChildren().add(this.LABEL);
         }
-    }
 
-    private enum cellLayerIndices {
-        BACKGROUND, BLACKHOVER, WHITEHOVER, BLACKSTONE, WHITESTONE, LABEL;
+        private ImageView getCellImageView(Image i) {
+            if(i == null) {
+                throw new NullPointerException();
+            }
+
+            ImageView iv = new ImageView(i);
+            iv.setPreserveRatio(true);
+            iv.fitHeightProperty().bind(BoardPane.this.heightProperty().divide(SIZE).subtract(1));
+            iv.fitWidthProperty().bind(BoardPane.this.widthProperty().divide(SIZE).subtract(1));
+            iv.setMouseTransparent(true);
+            iv.setSmooth(false);
+            setMargin(iv, new Insets(0, 0, 0, 0));
+
+            return iv;
+        }
+
+        // Getters
+
+        public ImageView getTile() {
+            return TILE;
+        }
+
+        public ImageView getBlackHover() {
+            return BLACK_HOVER;
+        }
+
+        public ImageView getWhiteHover() {
+            return WHITE_HOVER;
+        }
+
+        public ImageView getBlackStone() {
+            return BLACK_STONE;
+        }
+
+        public ImageView getWhiteStone() {
+            return WHITE_STONE;
+        }
+
+        public Label getLabel() {
+            return LABEL;
+        }
     }
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the baord (as those might be changed during a game).
@@ -86,72 +149,33 @@ public class BoardPane extends GridPane {
 
         // setGridLinesVisible(true);
 
-        // Fill the grid with ImageViews of alternating tiles
+        // Fill the grid with BoardCells [of alternating tiles]
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {
-                StackPane sp = new StackPane();
-
-                // TODO: To prevent the thin lines from disappearing, and possibly also the white lines in between from
-                // appearing, maybe the tiles should not actually change in size and instead be loaded in way bigger
-                // than they could be shown, with only the viewport (displayed portion) changing in size. Diasadvantage
-                // would be that the lines would always remain as thin as they are, no matter how large the board is
-                // scaled.
-                ImageView iv = getCellImageView(tiles[(j % 2 + i % 2) % 2]);
-                sp.getChildren().add(iv);
-
-                ImageView blackHover = getCellImageView(stones[0]);
-                blackHover.setVisible(false);
-                sp.getChildren().add(blackHover);
-
-                ImageView whiteHover = getCellImageView(stones[1]);
-                whiteHover.setVisible(false);
-                sp.getChildren().add(whiteHover);
-
-                ImageView blackStone = getCellImageView(stones[0]);
-                blackStone.setVisible(false);
-                sp.getChildren().add(blackStone);
-
-                ImageView whiteStone = getCellImageView(stones[1]);
-                whiteStone.setVisible(false);
-                sp.getChildren().add(whiteStone);
-
-                Label l = new Label("0");
-                l.setVisible(false);
-                setMargin(l, new Insets(0, 0, 0, 0));
-                sp.getChildren().add(l);
-
-                add(sp, j, i);
-
-                setMargin(sp, new Insets(0, 0, 0, 0));
+                BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2]);
+                add(bc, j, i);
+                setMargin(bc, new Insets(0, 0, 0, 0));
             }
         }
-
-        /*StackPane testSP = (StackPane)getChildren().get(0);
-        ImageView firstBG = (ImageView)testSP.getChildren().get(cellLayerIndices.BACKGROUND.ordinal());
-        prefWidthProperty().bind(firstBG.fitWidthProperty().add(1).multiply(19));*/
 
         // Set up listeners
         setOnMouseMoved(e -> {
             Node target = (Node)e.getTarget();
-            // System.out.println("Target is of class " + target.getClass());
+            // System.out.println("Target is of class " + target.getClass());   // TODO: Remove in finished product
             if(target != null) {
                 if(target != lastMouseTarget) {                                 // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
                     if (col != null && row != null) {
-                        StackPane targetSP = (StackPane)target;
-                        ImageView background = (ImageView)targetSP.getChildren().get(cellLayerIndices.BACKGROUND.ordinal());
-                        System.out.println("This background's image smoothing: " + background.smoothProperty().get());
+                        BoardCell targetBC = (BoardCell) target;
                         this.board.printDebugInfo(col, row);
 
                         // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
-                        int stoneIndex = cellLayerIndices.BLACKHOVER.ordinal();
+                        ImageView iv = targetBC.getBlackHover();
                         if (this.board.getCurColor() != StoneColor.BLACK) {
-                            stoneIndex = cellLayerIndices.WHITEHOVER.ordinal();
+                            iv = targetBC.getWhiteHover();
                         }
-
-                        ImageView iv = (ImageView)targetSP.getChildren().get(stoneIndex);
                         iv.setOpacity(0.5);
                         iv.setVisible(true);
 
@@ -217,32 +241,17 @@ public class BoardPane extends GridPane {
 
     }
 
-    private ImageView getCellImageView(Image i) {
-        if(i == null) {
-            throw new NullPointerException();
-        }
-
-        ImageView iv = new ImageView(i);
-        iv.setPreserveRatio(true);
-        iv.fitHeightProperty().bind(heightProperty().divide(this.SIZE).subtract(1));
-        iv.fitWidthProperty().bind(widthProperty().divide(this.SIZE).subtract(1));
-        iv.setMouseTransparent(true);
-        iv.setSmooth(false);
-        setMargin(iv, new Insets(0, 0, 0, 0));
-
-        return iv;
-    }
-
     public void setBoard(Board board) {
         this.board = board;
 
         board.addListener(new GoListener() {
             @Override
             public void stoneSet(StoneSetEvent e) {
-                int stoneIndex = cellLayerIndices.BLACKSTONE.ordinal();
+                BoardCell destinationBC = (BoardCell) getChildren().get(e.getRow() * SIZE + e.getCol());
+                ImageView iv = destinationBC.getBlackStone();
                 Color labelColor = Color.rgb(255, 255, 255);
                 if(e.getColor() != StoneColor.BLACK) {
-                    stoneIndex = cellLayerIndices.WHITESTONE.ordinal();
+                    iv = destinationBC.getWhiteStone();
                     labelColor = Color.rgb(0, 0, 0);
                 }
 
@@ -250,12 +259,10 @@ public class BoardPane extends GridPane {
                     selectionHover.setVisible(false);
                 }*/
 
-                StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
-                ImageView iv = (ImageView)destinationSP.getChildren().get(stoneIndex);
                 iv.setVisible(true);
 
                 if(showsMoveNumbers) {
-                    Label l = (Label) destinationSP.getChildren().get(cellLayerIndices.LABEL.ordinal());
+                    Label l = destinationBC.getLabel();
                     l.setText("" + e.getMoveNumber());
                     l.setTextFill(labelColor);
                     l.toFront();
@@ -265,20 +272,18 @@ public class BoardPane extends GridPane {
 
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
-                StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
-                // TODO: Having to know the index of elements within the cell seems like a huge design flaw. Solution: Make a custom class extending StackPane?
+                BoardCell destinationBC = (BoardCell) getChildren().get(e.getRow() * SIZE + e.getCol());
 
-                destinationSP.getChildren().get(cellLayerIndices.LABEL.ordinal()).setVisible(false);
-                destinationSP.getChildren().get(cellLayerIndices.WHITESTONE.ordinal()).setVisible(false);
-                destinationSP.getChildren().get(cellLayerIndices.BLACKSTONE.ordinal()).setVisible(false);
+                destinationBC.getLabel().setVisible(false);
+                destinationBC.getWhiteStone().setVisible(false);
+                destinationBC.getBlackStone().setVisible(false);
 
             }
 
             @Override
             public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-                StackPane destinationSP = (StackPane)getChildren().get(y * SIZE + x);
-                Label l = (Label)destinationSP.getChildren().get(cellLayerIndices.LABEL.ordinal());
-                l.setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
+                BoardCell destinationBC = (BoardCell) getChildren().get(y * SIZE + x);
+                destinationBC.getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
         });
     }
