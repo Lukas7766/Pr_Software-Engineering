@@ -26,7 +26,7 @@ public class BoardPane extends GridPane {
     private final int SIZE;                         // number of columns and rows, respectively
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
 
-    private boolean showsMoveNumbers = true;        // whether move numbers are shown
+    private boolean showsMoveNumbers = false;        // whether move numbers are shown
     private Board board;                            // Model for MVC-adherence; Will likely be replaced with Game
 
     /*
@@ -43,7 +43,11 @@ public class BoardPane extends GridPane {
     private Node selectionTarget = null;
     private ImageView selectionHover = null;
 
-    // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
+    private enum cellLayerIndices {
+        BACKGROUND, BLACKHOVER, WHITEHOVER, BLACKSTONE, WHITESTONE, LABEL;
+    }
+
+    // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the baord (as those might be changed during a game).
     public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
         setBoard(board);
         this.SIZE = board.getSize();
@@ -70,7 +74,7 @@ public class BoardPane extends GridPane {
         setPadding(new Insets(0, 0, 0, 0));
         setMinSize(0, 0);
 
-        setGridLinesVisible(true);
+        // setGridLinesVisible(true);
 
         // Fill the grid with ImageViews of alternating tiles
         for(int i = 0; i < this.SIZE; i++) {
@@ -82,16 +86,24 @@ public class BoardPane extends GridPane {
                 // than they could be shown, with only the viewport (displayed portion) changing in size. Diasadvantage
                 // would be that the lines would always remain as thin as they are, no matter how large the board is
                 // scaled.
-                ImageView iv = new ImageView(tiles[(j % 2 + i % 2) % 2]);
-                iv.setPreserveRatio(true);
-                iv.fitHeightProperty().bind(heightProperty().subtract(this.SIZE).divide(this.SIZE));
-                iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
-                iv.setMouseTransparent(true);
-                iv.setSmooth(false);
-
-                // setMargin(iv, new Insets(0, 0, 0, 0);
-
+                ImageView iv = getCellImageView(tiles[(j % 2 + i % 2) % 2]);
                 sp.getChildren().add(iv);
+
+                ImageView blackHover = getCellImageView(stones[0]);
+                blackHover.setVisible(false);
+                sp.getChildren().add(blackHover);
+
+                ImageView whiteHover = getCellImageView(stones[1]);
+                whiteHover.setVisible(false);
+                sp.getChildren().add(whiteHover);
+
+                ImageView blackStone = getCellImageView(stones[0]);
+                blackStone.setVisible(false);
+                sp.getChildren().add(blackStone);
+
+                ImageView whiteStone = getCellImageView(stones[1]);
+                whiteStone.setVisible(false);
+                sp.getChildren().add(whiteStone);
 
                 Label l = new Label("0");
                 l.setVisible(false);
@@ -117,25 +129,18 @@ public class BoardPane extends GridPane {
                         this.board.printDebugInfo(col, row);
 
                         // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
-                        Image stoneImg;
-                        if (this.board.getCurColor() == StoneColor.BLACK) {
-                            stoneImg = stones[0];
-                        } else {
-                            stoneImg = stones[1];
+                        int stoneIndex = cellLayerIndices.BLACKHOVER.ordinal();
+                        if (this.board.getCurColor() != StoneColor.BLACK) {
+                            stoneIndex = cellLayerIndices.WHITEHOVER.ordinal();
                         }
 
-                        ImageView iv = new ImageView(stoneImg);
-                        iv.fitHeightProperty().bind(heightProperty().subtract(this.SIZE).divide(this.SIZE));
-                        iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
-                        iv.setPreserveRatio(true);
+                        ImageView iv = (ImageView)targetSP.getChildren().get(stoneIndex);
                         iv.setOpacity(0.5);
-                        iv.setMouseTransparent(true);
-
-                        targetSP.getChildren().add(iv);
+                        iv.setVisible(true);
 
                         // Remove old hover                                    // TODO: Remove in finished product
-                        if(lastTargetSP != null) {
-                            lastTargetSP.getChildren().remove(lastMouseHover);
+                        if(lastMouseHover != null) {
+                            lastMouseHover.setVisible(false);
                         }
                         //System.out.println("Removed hover!");               // TODO: Remove in finished product
                         lastMouseTarget = target;
@@ -143,8 +148,8 @@ public class BoardPane extends GridPane {
                         lastMouseHover = iv;
                     } else {
                         //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
-                        if(lastTargetSP != null) {
-                            lastTargetSP.getChildren().remove(lastMouseHover);
+                        if(lastMouseHover != null) {
+                            lastMouseHover.setVisible(false);
                         }
                         lastMouseTarget = null;
                         // lastTargetSP = null;
@@ -165,9 +170,9 @@ public class BoardPane extends GridPane {
                     Integer col = getColumnIndex(lastMouseTarget);
                     Integer row = getRowIndex(lastMouseTarget);
                     if (col != null && row != null) { // TODO: Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
-                        if (selectionHover != null && lastTargetSP != null) {
-                            lastTargetSP.getChildren().remove(selectionHover);
-                        }
+                        /*if (selectionHover != null) {
+                            selectionHover.setVisible(false);
+                        }*/
                         selectionTarget = lastMouseTarget;
                         selectionHover = lastMouseHover;
                         selectionHover.setOpacity(0.75);
@@ -198,33 +203,45 @@ public class BoardPane extends GridPane {
 
     }
 
+    private ImageView getCellImageView(Image i) {
+        if(i == null) {
+            throw new NullPointerException();
+        }
+
+        ImageView iv = new ImageView(i);
+        iv.setPreserveRatio(true);
+        iv.fitHeightProperty().bind(heightProperty().subtract(this.SIZE).divide(this.SIZE));
+        iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
+        iv.setMouseTransparent(true);
+        iv.setSmooth(false);
+        // setMargin(iv, new Insets(0, 0, 0, 0);
+
+        return iv;
+    }
+
     public void setBoard(Board board) {
         this.board = board;
 
         board.addListener(new GoListener() {
             @Override
             public void stoneSet(StoneSetEvent e) {
-                Image stoneImg;
-                Color labelColor = null;
-                if(e.getColor() == StoneColor.BLACK) {
-                    stoneImg = stones[0];
-                    labelColor = Color.rgb(255, 255, 255);
-                } else {
-                    stoneImg = stones[1];
+                int stoneIndex = cellLayerIndices.BLACKSTONE.ordinal();
+                Color labelColor = Color.rgb(255, 255, 255);
+                if(e.getColor() != StoneColor.BLACK) {
+                    stoneIndex = cellLayerIndices.WHITESTONE.ordinal();
                     labelColor = Color.rgb(0, 0, 0);
                 }
 
-                ImageView iv = new ImageView(stoneImg);
-                iv.fitHeightProperty().bind(heightProperty().subtract(SIZE).divide(SIZE));
-                iv.fitWidthProperty().bind(widthProperty().subtract(SIZE).divide(SIZE));
-                iv.setPreserveRatio(true);
-                iv.setMouseTransparent(true);
+                /*if(selectionHover != null) {
+                    selectionHover.setVisible(false);
+                }*/
 
                 StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
-                destinationSP.getChildren().add(iv);
+                ImageView iv = (ImageView)destinationSP.getChildren().get(stoneIndex);
+                iv.setVisible(true);
 
                 if(showsMoveNumbers) {
-                    Label l = (Label) destinationSP.getChildren().get(destinationSP.getChildren().size() - 2);
+                    Label l = (Label) destinationSP.getChildren().get(cellLayerIndices.LABEL.ordinal());
                     l.setText("" + e.getMoveNumber());
                     l.setTextFill(labelColor);
                     l.toFront();
@@ -236,20 +253,11 @@ public class BoardPane extends GridPane {
             public void stoneRemoved(StoneRemovedEvent e) {
                 StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
                 // TODO: Having to know the index of elements within the cell seems like a huge design flaw. Solution: Make a custom class extending StackPane?
-                /*
-                 *  TODO: Signifacntly differing idea: Have all elements in a cell always be available and just toggle
-                 *  their visibility. That's probably more efficient than constantly creating new ImageViews and
-                 *  ensures fixed indices for all components, possibly removing the need for a dedicated BoardCell-
-                 *  class (which might be replaced with a simple ENUM for all components, though I don't know whether
-                 *  a dedicated class wouldn't be better design).
-                 */
-                if(showsMoveNumbers) {
-                    // Hide text: Apparently, the index is determined by the node's position on the screen (the further at the front, the higher the index).
-                    destinationSP.getChildren().get(destinationSP.getChildren().size() - 1).setVisible(false); // Label is at the front, therefore it has the highest index
-                    destinationSP.getChildren().remove(destinationSP.getChildren().size() - 2); // Stone is behind label, therefore it has the second-highest index
-                } else {
-                    destinationSP.getChildren().remove(destinationSP.getChildren().size() - 1); // Stone is at the front, therefore it has the highest index
-                }
+
+                destinationSP.getChildren().get(cellLayerIndices.LABEL.ordinal()).setVisible(false);
+                destinationSP.getChildren().get(cellLayerIndices.WHITESTONE.ordinal()).setVisible(false);
+                destinationSP.getChildren().get(cellLayerIndices.BLACKSTONE.ordinal()).setVisible(false);
+
             }
         });
     }
@@ -259,8 +267,8 @@ public class BoardPane extends GridPane {
     // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
     public void confirmMove() {
         if(selectionTarget != null) {
-            if(lastTargetSP != null) {
-                lastTargetSP.getChildren().remove(selectionHover);
+            if(selectionHover != null) {
+                selectionHover.setVisible(false);
             }
             Integer col = getColumnIndex(selectionTarget);
             Integer row = getRowIndex(selectionTarget);
