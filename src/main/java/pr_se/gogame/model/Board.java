@@ -19,7 +19,10 @@ public class Board implements BoardInterface {
 
     private final StoneGroupPointer[][] board;
 
-    // Likely to be removed
+    // TODO: Should this be moved to game?
+    private int moveNumber;
+
+    // Likely to be removed (or definitely moved to game).
     private StoneColor curColor = BLACK;
 
     private int lastDebugX = 0;
@@ -29,6 +32,7 @@ public class Board implements BoardInterface {
         this.SIZE = size;
         listeners = new LinkedList<>();
         this.board = new StoneGroupPointer[SIZE][SIZE];
+        moveNumber = 1;
     }
 
     @Override
@@ -108,6 +112,8 @@ public class Board implements BoardInterface {
         // Update UI
         fireStoneSet(x, y, color);
 
+        moveNumber++;
+
         // Update current player color
         // TODO: Remove and delegate to Game
         if(color == WHITE) {
@@ -150,7 +156,7 @@ public class Board implements BoardInterface {
 
     // Private methods
     private void fireStoneSet(int x, int y, StoneColor c) {
-        StoneSetEvent e = new StoneSetEvent(x, y, c);
+        StoneSetEvent e = new StoneSetEvent(x, y, c, moveNumber);
 
         for(GoListener l : listeners) {
             l.stoneSet(e);

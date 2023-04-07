@@ -3,11 +3,14 @@ package pr_se.gogame.view_controller;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import pr_se.gogame.model.Board;
 import pr_se.gogame.model.StoneColor;
 
@@ -68,6 +71,10 @@ public class BoardPane extends GridPane {
                 iv.setMouseTransparent(true);
 
                 sp.getChildren().add(iv);
+
+                Label l = new Label("0");
+                l.setVisible(false);
+                sp.getChildren().add(l);
 
                 add(sp, j, i);
             }
@@ -135,8 +142,8 @@ public class BoardPane extends GridPane {
                     Integer col = getColumnIndex(lastMouseTarget);
                     Integer row = getRowIndex(lastMouseTarget);
                     if (col != null && row != null) { // TODO: Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
-                        if (selectionHover != null) {
-                            getChildren().remove(selectionHover);
+                        if (selectionHover != null && lastTargetSP != null) {
+                            lastTargetSP.getChildren().remove(selectionHover);
                         }
                         selectionTarget = lastMouseTarget;
                         selectionHover = lastMouseHover;
@@ -175,25 +182,40 @@ public class BoardPane extends GridPane {
             @Override
             public void stoneSet(StoneSetEvent e) {
                 Image stoneImg;
+                Color labelColor = null;
                 if(e.getColor() == StoneColor.BLACK) {
                     stoneImg = stones[0];
+                    labelColor = Color.rgb(255, 255, 255);
                 } else {
                     stoneImg = stones[1];
+                    labelColor = Color.rgb(0, 0, 0);
                 }
 
                 ImageView iv = new ImageView(stoneImg);
                 iv.fitHeightProperty().bind(heightProperty().subtract(SIZE).divide(SIZE));
                 iv.fitWidthProperty().bind(widthProperty().subtract(SIZE).divide(SIZE));
                 iv.setPreserveRatio(true);
+                iv.setMouseTransparent(true);
+
                 StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
                 destinationSP.getChildren().add(iv);
+
+                Label l = (Label)destinationSP.getChildren().get(destinationSP.getChildren().size() - 2);
+                l.setText("" + e.getMoveNumber());
+                l.setTextFill(labelColor);
+                l.toFront();
+                l.setVisible(true);
             }
 
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
                 ImageView needle = null;
+                StackPane destinationSP = (StackPane)getChildren().get(e.getRow() * SIZE + e.getCol());
+                // TODO: Having to know the index of elements within the cell seems like a huge design flaw. Solution: Make a custom class extending StackPane?
+                destinationSP.getChildren().remove(destinationSP.getChildren().size() - 1);
+                // destinationSP.getChildren().get(destinationSP.getChildren().size() - 1).toBack();
 
-                for(Node iv : getChildren()) {
+                /*for(Node iv : getChildren()) {
                     if(getRowIndex(iv) == e.getRow() && getColumnIndex(iv) == e.getCol()) {
                         needle = (ImageView)iv;
                         if(needle.getImage() == stones[0] || needle.getImage() == stones[1]) {
@@ -202,11 +224,11 @@ public class BoardPane extends GridPane {
                             needle = null;
                         }
                     }
-                }
+                }*/
 
-                if(needle != null) {
+                /*if(needle != null) {
                     getChildren().remove(needle);
-                }
+                }*/
             }
         });
     }
@@ -216,7 +238,9 @@ public class BoardPane extends GridPane {
     // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
     public void confirmMove() {
         if(selectionTarget != null) {
-            getChildren().remove(selectionHover);
+            if(lastTargetSP != null) {
+                lastTargetSP.getChildren().remove(selectionHover);
+            }
             Integer col = getColumnIndex(selectionTarget);
             Integer row = getRowIndex(selectionTarget);
             if(col != null && row != null) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.

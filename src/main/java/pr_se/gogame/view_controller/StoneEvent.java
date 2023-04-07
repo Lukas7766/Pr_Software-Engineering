@@ -7,6 +7,10 @@ public abstract class StoneEvent {
     private final int ROW;
 
     protected StoneEvent(int col, int row) {
+        if(col < 0 || row < 0) {
+            throw new IllegalArgumentException();
+        }
+
         this.COL = col;
         this.ROW = row;
     }
