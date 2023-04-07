@@ -1,6 +1,7 @@
 package pr_se.gogame.view_controller;
 
 import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -36,7 +37,7 @@ public class BoardPane extends GridPane {
     private ImageView selectionHover = null;
 
     private class BoardCell extends StackPane {
-        private final ImageView TILE;
+        private final ImageView TILE = null;
         private final ImageView BLACK_HOVER;
         private final ImageView WHITE_HOVER;
         private final ImageView BLACK_STONE;
@@ -44,6 +45,7 @@ public class BoardPane extends GridPane {
         private final Label LABEL;
 
         private BoardCell(Image tile) {
+            this.setMinSize(0, 0);
 
             /*
              * TODO: To prevent the thin lines from disappearing, and possibly also the white lines in between from
@@ -53,8 +55,10 @@ public class BoardPane extends GridPane {
              * scaled.
              */
 
-            this.TILE = getCellImageView(tile);
-            getChildren().add(this.TILE);
+            /*this.TILE = getCellImageView(tile);
+            getChildren().add(this.TILE);*/
+            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
+            this.setBackground(new Background(bgImg));
 
             this.BLACK_HOVER = getCellImageView(stones[0]);
             this.BLACK_HOVER.setVisible(false);
@@ -142,7 +146,7 @@ public class BoardPane extends GridPane {
         stones[1] = new Image(stone1, true);
 
         // Graphical details of this board pane
-        // setAlignment(Pos.CENTER);
+        setAlignment(Pos.CENTER);
         setHgap(0);
         setVgap(0);
         setPadding(new Insets(0, 0, 0, 0));

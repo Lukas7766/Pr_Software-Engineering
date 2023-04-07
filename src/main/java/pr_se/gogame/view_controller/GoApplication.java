@@ -56,8 +56,8 @@ public class GoApplication extends Application {
 
         Scene scene = new Scene(root, 960, 600);
 
-        /*stage.setMinWidth(640);
-        stage.setMinHeight(480);*/
+        /*stage.setMinWidth(320);
+        stage.setMinHeight(200);*/
 
         // Same as before from here on
         stage.setScene(scene);
