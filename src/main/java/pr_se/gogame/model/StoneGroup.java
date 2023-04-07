@@ -13,6 +13,8 @@ public class StoneGroup {
 
     private final Set<Position> liberties;
 
+    private final Set<StoneGroupPointer> pointers;
+
     // TODO: Remove these debug variables
     private static int nextSerialNo = 0;
     public final int serialNo;
@@ -21,6 +23,8 @@ public class StoneGroup {
         this.stoneColor = stoneColor;
         this.locations = new LinkedList<>();
         this.liberties = liberties;
+        this.pointers = new HashSet<>();
+
         locations.add(new Position(x, y));
         serialNo = nextSerialNo;
         nextSerialNo++;
@@ -47,6 +51,11 @@ public class StoneGroup {
 
         addLiberties(other.getLiberties());
         locations.addAll(other.getLocations());
+        other.getPointers().forEach(p -> {
+            p.setStoneGroup(this);
+            addPointer(p);
+        });
+        other.removeAllPointers();
     }
 
     public void addLiberties(Set<Position> addedLiberties) {
@@ -94,7 +103,15 @@ public class StoneGroup {
         return this.liberties;
     }
 
-    /*public StoneGroupPointer getPointer() {
-        return pointer;
-    }*/
+    public void addPointer(StoneGroupPointer ptr) {
+        pointers.add(ptr);
+    }
+
+    public void removeAllPointers() {
+        pointers.removeAll(pointers);
+    }
+
+    public Set<StoneGroupPointer> getPointers() {
+        return pointers;
+    }
 }

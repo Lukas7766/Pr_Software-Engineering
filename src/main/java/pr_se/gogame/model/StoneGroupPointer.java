@@ -12,6 +12,7 @@ public class StoneGroupPointer {
             throw new NullPointerException();
         }
         setStoneGroup(stoneGroup);
+        this.stoneGroup.addPointer(this);
         serialNo = nextSerialNo;
         nextSerialNo++;
     }
