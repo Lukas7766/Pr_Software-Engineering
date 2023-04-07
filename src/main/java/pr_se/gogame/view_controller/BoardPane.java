@@ -25,7 +25,7 @@ public class BoardPane extends GridPane {
     private final int SIZE;                         // number of columns and rows, respectively
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
 
-    private boolean showsMoveNumbers = false;        // whether move numbers are shown
+    private boolean showsMoveNumbers = true;        // whether move numbers are shown
     private Board board;                            // Model for MVC-adherence; Will likely be replaced with Game
 
     /*
@@ -40,8 +40,21 @@ public class BoardPane extends GridPane {
     private Node selectionTarget = null;
     private ImageView selectionHover = null;
 
+    private class BoardCell extends StackPane {
+        private final ImageView background;
+        private final ImageView blackHover;
+        private final ImageView whiteHover;
+        private final ImageView blackStone;
+        private final ImageView whiteStone;
+        private final ImageView label;
+
+        private BoardCell(Image background, Image foreGround, Image blackStone, Image whiteStone) {
+            
+        }
+    }
+
     private enum cellLayerIndices {
-        BLACKHOVER, WHITEHOVER, BLACKSTONE, WHITESTONE, LABEL;
+        BACKGROUND, BLACKHOVER, WHITEHOVER, BLACKSTONE, WHITESTONE, LABEL;
     }
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the baord (as those might be changed during a game).
@@ -59,15 +72,13 @@ public class BoardPane extends GridPane {
                 true);      // backgroundLoading
         tiles[1] = new Image(tile1, 128, 128, true, false, true);
 
-        setBackground(new Background(new BackgroundImage[]{ new BackgroundImage(tiles[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, new BackgroundSize(1, 1, true, true, false, false))}));
-
         stones[0] = new Image(
                 stone0,     // URL
                 true);      // backgroundLoading
         stones[1] = new Image(stone1, true);
 
         // Graphical details of this board pane
-        setAlignment(Pos.CENTER);
+        // setAlignment(Pos.CENTER);
         setHgap(0);
         setVgap(0);
         setPadding(new Insets(0, 0, 0, 0));
@@ -86,7 +97,7 @@ public class BoardPane extends GridPane {
                 // would be that the lines would always remain as thin as they are, no matter how large the board is
                 // scaled.
                 ImageView iv = getCellImageView(tiles[(j % 2 + i % 2) % 2]);
-                // sp.getChildren().add(iv);
+                sp.getChildren().add(iv);
 
                 ImageView blackHover = getCellImageView(stones[0]);
                 blackHover.setVisible(false);
@@ -106,13 +117,18 @@ public class BoardPane extends GridPane {
 
                 Label l = new Label("0");
                 l.setVisible(false);
+                setMargin(l, new Insets(0, 0, 0, 0));
                 sp.getChildren().add(l);
 
                 add(sp, j, i);
 
-                // setMargin(sp, new Insets(0, 0, 0, 0);
+                setMargin(sp, new Insets(0, 0, 0, 0));
             }
         }
+
+        /*StackPane testSP = (StackPane)getChildren().get(0);
+        ImageView firstBG = (ImageView)testSP.getChildren().get(cellLayerIndices.BACKGROUND.ordinal());
+        prefWidthProperty().bind(firstBG.fitWidthProperty().add(1).multiply(19));*/
 
         // Set up listeners
         setOnMouseMoved(e -> {
@@ -120,12 +136,13 @@ public class BoardPane extends GridPane {
             // System.out.println("Target is of class " + target.getClass());
             if(target != null) {
                 if(target != lastMouseTarget) {                                 // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
-                    System.out.println("Hovering over something new!");
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
                     if (col != null && row != null) {
                         StackPane targetSP = (StackPane)target;
+                        ImageView background = (ImageView)targetSP.getChildren().get(cellLayerIndices.BACKGROUND.ordinal());
+                        System.out.println("This background's image smoothing: " + background.smoothProperty().get());
                         this.board.printDebugInfo(col, row);
 
                         // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
@@ -207,11 +224,11 @@ public class BoardPane extends GridPane {
 
         ImageView iv = new ImageView(i);
         iv.setPreserveRatio(true);
-        iv.fitHeightProperty().bind(heightProperty().subtract(this.SIZE).divide(this.SIZE));
-        iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
+        iv.fitHeightProperty().bind(heightProperty().divide(this.SIZE).subtract(1));
+        iv.fitWidthProperty().bind(widthProperty().divide(this.SIZE).subtract(1));
         iv.setMouseTransparent(true);
         iv.setSmooth(false);
-        // setMargin(iv, new Insets(0, 0, 0, 0);
+        setMargin(iv, new Insets(0, 0, 0, 0));
 
         return iv;
     }
@@ -255,6 +272,13 @@ public class BoardPane extends GridPane {
                 destinationSP.getChildren().get(cellLayerIndices.WHITESTONE.ordinal()).setVisible(false);
                 destinationSP.getChildren().get(cellLayerIndices.BLACKSTONE.ordinal()).setVisible(false);
 
+            }
+
+            @Override
+            public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
+                StackPane destinationSP = (StackPane)getChildren().get(y * SIZE + x);
+                Label l = (Label)destinationSP.getChildren().get(cellLayerIndices.LABEL.ordinal());
+                l.setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
         });
     }

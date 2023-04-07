@@ -150,6 +150,16 @@ public class Board implements BoardInterface {
             System.out.println("Liberties: " + board[x][y].getStoneGroup().getLiberties().size());
         }
 
+        for(int i = 0; i < SIZE; i++) {
+            for(int j = 0; j < SIZE; j++) {
+                if(board[i][j] != null) {
+                    for (GoListener l : listeners) {
+                        l.debugInfoRequested(i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    }
+                }
+            }
+        }
+
         lastDebugX = x;
         lastDebugY = y;
     }

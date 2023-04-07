@@ -13,13 +13,17 @@ public class StoneGroup {
 
     private final Set<Position> liberties;
 
-    //private final StoneGroupPointer pointer;
+    // TODO: Remove these debug variables
+    private static int nextSerialNo = 0;
+    public final int serialNo;
 
     public StoneGroup(StoneColor stoneColor, int x, int y, Set<Position> liberties) {
         this.stoneColor = stoneColor;
         this.locations = new LinkedList<>();
         this.liberties = liberties;
         locations.add(new Position(x, y));
+        serialNo = nextSerialNo;
+        nextSerialNo++;
     }
 
     public void mergeWithStoneGroupPtr(StoneGroupPointer other) {
