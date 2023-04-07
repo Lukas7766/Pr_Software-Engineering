@@ -20,7 +20,7 @@ import pr_se.gogame.model.StoneColor;
  * View/Controller
  * Go Board that uses image files for its (checkerboard) tiles and stones
  */
-public class BoardPane extends GridPane {
+public class BoardPane extends TilePane {
 
     private final int SIZE;                         // number of columns and rows, respectively
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
@@ -41,13 +41,17 @@ public class BoardPane extends GridPane {
     private ImageView selectionHover = null;
 
     private enum cellLayerIndices {
-        BLACKHOVER, WHITEHOVER, BLACKSTONE, WHITESTONE, LABEL;
+        BACKGROUND, BLACKHOVER, WHITEHOVER, BLACKSTONE, WHITESTONE, LABEL;
     }
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the baord (as those might be changed during a game).
     public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
+        super();
+
         setBoard(board);
         this.SIZE = board.getSize();
+        setPrefColumns(this.SIZE);
+
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
         tiles[0] = new Image(
@@ -59,7 +63,7 @@ public class BoardPane extends GridPane {
                 true);      // backgroundLoading
         tiles[1] = new Image(tile1, 128, 128, true, false, true);
 
-        setBackground(new Background(new BackgroundImage[]{ new BackgroundImage(tiles[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, new BackgroundSize(1, 1, true, true, false, false))}));
+        // setBackground(new Background(new BackgroundImage[]{ new BackgroundImage(tiles[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.DEFAULT, new BackgroundSize(1, 1, true, true, false, false))}));
 
         stones[0] = new Image(
                 stone0,     // URL
@@ -86,7 +90,7 @@ public class BoardPane extends GridPane {
                 // would be that the lines would always remain as thin as they are, no matter how large the board is
                 // scaled.
                 ImageView iv = getCellImageView(tiles[(j % 2 + i % 2) % 2]);
-                // sp.getChildren().add(iv);
+                sp.getChildren().add(iv);
 
                 ImageView blackHover = getCellImageView(stones[0]);
                 blackHover.setVisible(false);
@@ -108,14 +112,26 @@ public class BoardPane extends GridPane {
                 l.setVisible(false);
                 sp.getChildren().add(l);
 
-                add(sp, j, i);
+                getChildren().add(sp);
 
-                // setMargin(sp, new Insets(0, 0, 0, 0);
+                setMargin(sp, new Insets(0, 0, 0, 0));
+                sp.setPadding(new Insets(0, 0, 0, 0));
             }
         }
 
+        /*setPrefTileWidth(10);
+        setPrefTileHeight(10);*/
+        StackPane cell0 = (StackPane)getChildren().get(0);
+        ImageView bg = (ImageView)cell0.getChildren().get(cellLayerIndices.BACKGROUND.ordinal());
+        prefTileWidthProperty().bind(bg.fitWidthProperty());
+        prefTileHeightProperty().bind(bg.fitHeightProperty());
+        setTileAlignment(Pos.TOP_LEFT);
+        setHgap(0);
+        setVgap(0);
+        setPadding(new Insets(0, 0, 0, 0));
+
         // Set up listeners
-        setOnMouseMoved(e -> {
+        /*setOnMouseMoved(e -> {
             Node target = (Node)e.getTarget();
             // System.out.println("Target is of class " + target.getClass());
             if(target != null) {
@@ -167,9 +183,6 @@ public class BoardPane extends GridPane {
                     Integer col = getColumnIndex(lastMouseTarget);
                     Integer row = getRowIndex(lastMouseTarget);
                     if (col != null && row != null) { // TODO: Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
-                        /*if (selectionHover != null) {
-                            selectionHover.setVisible(false);
-                        }*/
                         selectionTarget = lastMouseTarget;
                         selectionHover = lastMouseHover;
                         selectionHover.setOpacity(0.75);
@@ -195,7 +208,7 @@ public class BoardPane extends GridPane {
 
         setOnKeyPressed((e) -> {
             // TODO: Keyboard input?
-        });
+        });*/
 
 
     }
@@ -211,7 +224,7 @@ public class BoardPane extends GridPane {
         iv.fitWidthProperty().bind(widthProperty().subtract(this.SIZE).divide(this.SIZE));
         iv.setMouseTransparent(true);
         iv.setSmooth(false);
-        // setMargin(iv, new Insets(0, 0, 0, 0);
+        setMargin(iv, new Insets(0, 0, 0, 0));
 
         return iv;
     }
@@ -262,7 +275,7 @@ public class BoardPane extends GridPane {
     // TODO: Call this from the main UI if moves are to be confirmed.
     // TODO: Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse might be on the board during confirmation)
     // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
-    public void confirmMove() {
+    /*public void confirmMove() {
         if(selectionTarget != null) {
             if(selectionHover != null) {
                 selectionHover.setVisible(false);
@@ -275,7 +288,7 @@ public class BoardPane extends GridPane {
                 System.out.println("Confirmation outside of actual board on " + lastMouseTarget); // TODO: Remove in finished product
             }
         }
-    }
+    }*/
 
     // Getters and Setters
     public boolean needsMoveConfirmation() {
