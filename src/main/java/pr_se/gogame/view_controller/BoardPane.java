@@ -44,10 +44,11 @@ public class BoardPane extends GridPane {
         private final Label LABEL;
 
         private BoardCell(Image tile) {
+
             /*
              * TODO: To prevent the thin lines from disappearing, and possibly also the white lines in between from
              * appearing, maybe the tiles should not actually change in size and instead be loaded in way bigger
-             * than they could be shown, with only the viewport (displayed portion) changing in size. Diasadvantage
+             * than they could be shown, with only the viewport (displayed portion) changing in size. Disadvantage
              * would be that the lines would always remain as thin as they are, no matter how large the board is
              * scaled.
              */
@@ -205,24 +206,18 @@ public class BoardPane extends GridPane {
         setOnMouseClicked(e -> {
             if(e.getButton() == MouseButton.PRIMARY) { // This check is only for testing independently of the main UI.
                 if (lastMouseTarget != null) {
-                    Integer col = getColumnIndex(lastMouseTarget);
-                    Integer row = getRowIndex(lastMouseTarget);
-                    if (col != null && row != null) { // TODO: Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
-                        /*if (selectionHover != null) {
-                            selectionHover.setVisible(false);
-                        }*/
-                        selectionTarget = lastMouseTarget;
-                        selectionHover = lastMouseHover;
-                        selectionHover.setOpacity(0.75);
+                    /*if (selectionHover != null) {
+                        selectionHover.setVisible(false);
+                    }*/
+                    selectionTarget = lastMouseTarget;
+                    selectionHover = lastMouseHover;
+                    selectionHover.setOpacity(0.75);
 
-                        lastMouseTarget = null;
-                        lastMouseHover = null;
+                    lastMouseTarget = null;
+                    lastMouseHover = null;
 
-                        if (!needsMoveConfirmation) {
-                            confirmMove();
-                        }
-                    } else {
-                        System.out.println("Click outside of actual board on " + lastMouseTarget); // TODO: Remove in finished product
+                    if (!needsMoveConfirmation) {
+                        confirmMove();
                     }
                 } else {
                     System.out.println("Click outside of BoardPane"); // TODO: Remove in finished product

@@ -4,11 +4,9 @@ import pr_se.gogame.view_controller.GoListener;
 import pr_se.gogame.view_controller.StoneRemovedEvent;
 import pr_se.gogame.view_controller.StoneSetEvent;
 
-import static pr_se.gogame.model.RelativeDirection.*;
 import static pr_se.gogame.model.StoneColor.*;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Model Dummy (for now)
@@ -58,44 +56,36 @@ public class Board implements BoardInterface {
         }
 
         // Get neighbors
-        Map<RelativeDirection, StoneGroupPointer> surroundingSGPs = getSurroundingStoneGroupPtrs(x, y);
-        System.out.println("No. neighbors: " + surroundingSGPs.size());
+        Set<StoneGroup> surroundingSGs = getSurroundingStoneGroups(x, y);
+        System.out.println("No. neighbor groups: " + surroundingSGs.size());
 
         Set<Position> newStoneLiberties = getLibertiesAt(x, y);
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
-        // Are there even neighbors?
-        StoneGroupPointer firstSameColorGroupPtr = null;
-        Set<StoneGroupPointer> checkedPointers = new HashSet<>();
-        Set<StoneGroup> checkedGroups = new HashSet<>();
+        StoneGroup firstSameColorGroup = null;
 
-        for(StoneGroupPointer sgp : surroundingSGPs.values()) {
-            if(sgp != null & !checkedPointers.contains(sgp)) {
-                StoneGroup curGroup = sgp.getStoneGroup();
-                if(!checkedGroups.contains(curGroup)) {
-                    curGroup.removeLiberty(new Position(x, y));
-                    if(curGroup.getStoneColor() == color) {
-                        if(firstSameColorGroupPtr != null) {
-                            firstSameColorGroupPtr.getStoneGroup().mergeWithStoneGroupPtr(sgp);
-                        } else {
-                            curGroup.mergeWithStoneGroup(newGroup);
-                            firstSameColorGroupPtr = sgp;
-                        }
+        for(StoneGroup sg : surroundingSGs) {
+            if(sg != null) {
+                sg.removeLiberty(new Position(x, y));
+                if(sg.getStoneColor() == color) {
+                    if(firstSameColorGroup != null) {
+                        firstSameColorGroup.mergeWithStoneGroup(sg);
+                    } else {
+                        sg.mergeWithStoneGroup(newGroup);
+                        firstSameColorGroup = sg;
                     }
-                    checkedGroups.add(curGroup);
                 }
-                checkedPointers.add(sgp);
             }
         }
 
-        if(firstSameColorGroupPtr == null) {
-            board[x][y] = new StoneGroupPointer(newGroup);
-        } else {
-            board[x][y] = firstSameColorGroupPtr;
+        if(firstSameColorGroup == null) {
+            firstSameColorGroup = newGroup;
+            surroundingSGs.add(newGroup);
         }
+        board[x][y] = firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
 
-        for(StoneGroup sg : checkedGroups) {
-            if ((sg.getStoneColor() != color || sg == firstSameColorGroupPtr.getStoneGroup()) && sg.getLiberties().size() == 0) {
+        for(StoneGroup sg : surroundingSGs) {
+            if ((sg.getStoneColor() != color || sg == firstSameColorGroup) && sg.getLiberties().size() == 0) {
                 for (Position p : sg.getLocations()) {
                     removeStone(p.X, p.Y);
                 }
@@ -106,8 +96,6 @@ public class Board implements BoardInterface {
             System.out.println("SUICIDE DETECTED!!!");
             return;
         }
-
-        // System.out.println("Board will set " + color + " stone at x " + x + ", y " + y);
 
         // Update UI
         fireStoneSet(x, y, color);
@@ -125,18 +113,9 @@ public class Board implements BoardInterface {
 
     @Override
     public void removeStone(int x, int y) {
-        // System.out.println("Board will remove " + board[x][y].getStoneGroup().getStoneColor() + " stone at x " + x + ", y " + y);
-
         board[x][y] = null;
 
-        Map<RelativeDirection, StoneGroupPointer> neighbors = getSurroundingStoneGroupPtrs(x, y);
-        HashSet<StoneGroup> uniqueNeighborGroups = new HashSet<>(
-            neighbors.values()
-                .stream()
-                .map(p -> p.getStoneGroup())
-                .collect(Collectors.toSet()));
-
-        for(StoneGroup sg : uniqueNeighborGroups) {
+        for(StoneGroup sg : getSurroundingStoneGroups(x, y)) {
             sg.addLiberty(new Position(x, y));
         }
 
@@ -181,7 +160,29 @@ public class Board implements BoardInterface {
         }
     }
 
-    private Map<RelativeDirection, StoneGroupPointer> getSurroundingStoneGroupPtrs(int x, int y) {
+    private Set<StoneGroup> getSurroundingStoneGroups(int x, int y) {
+        if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
+            throw new IllegalArgumentException();
+        }
+
+        Set<StoneGroup> existingGroups = new HashSet<>();
+        if(y > 0 && board[x][y - 1] != null) {
+            existingGroups.add(board[x][y - 1].getStoneGroup());
+        }
+        if(y < SIZE - 1 && board[x][y + 1] != null) {
+            existingGroups.add(board[x][y + 1].getStoneGroup());
+        }
+        if(x > 0 && board[x - 1][y] != null) {
+            existingGroups.add(board[x - 1][y].getStoneGroup());
+        }
+        if(x < SIZE - 1 && board[x + 1][y] != null) {
+            existingGroups.add(board[x + 1][y].getStoneGroup());
+        }
+
+        return existingGroups;
+    }
+
+    /*private Map<RelativeDirection, StoneGroupPointer> getSurroundingStoneGroupPtrs(int x, int y) {
         if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();
         }
@@ -198,28 +199,6 @@ public class Board implements BoardInterface {
         }
         if(x < SIZE - 1 && board[x + 1][y] != null) {
             existingPtrs.put(RIGHT, board[x + 1][y]);
-        }
-
-        return existingPtrs;
-    }
-
-    /*private Map<Position, StoneGroupPointer> getSurroundingStoneGroupPtrs(int x, int y) {
-        if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
-            throw new IllegalArgumentException();
-        }
-
-        Map<Position, StoneGroupPointer> existingPtrs = new HashMap<>();
-        if(y > 0 && board[x][y - 1] != null) {
-            existingPtrs.put(new Position(x, y - 1), board[x][y - 1]);
-        }
-        if(y < SIZE - 1 && board[x][y + 1] != null) {
-            existingPtrs.put(new Position(x, y + 1), board[x][y + 1]);
-        }
-        if(x > 0 && board[x - 1][y] != null) {
-            existingPtrs.put(new Position(x - 1, y), board[x - 1][y]);
-        }
-        if(x < SIZE - 1 && board[x + 1][y] != null) {
-            existingPtrs.put(new Position(x + 1, y), board[x + 1][y]);
         }
 
         return existingPtrs;
