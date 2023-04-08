@@ -1,11 +1,16 @@
 package pr_se.gogame.view_controller;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.IntegerBinding;
+import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.input.MouseButton;
@@ -98,12 +103,19 @@ public class BoardPane extends GridPane {
             this.WHITE_STONE.setVisible(false);
             getChildren().add(this.WHITE_STONE);
 
+            /*maxWidthProperty().bind(this.BLACK_STONE.fitWidthProperty());
+            maxHeightProperty().bind(this.BLACK_STONE.fitHeightProperty());*/
+
+            // setting this here (and, perhaps, in BoardPane) would fix the gaps but the cells wouldn't all be the
+            // exact same size.
+            // setSnapToPixel(false);
+
             this.LABEL = new Label("0");
             this.LABEL.setVisible(false);
             setMargin(this.LABEL, new Insets(0, 0, 0, 0));
             this.LABEL.setMinSize(0, 0);
             final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
-            FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(4));
+            FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(4).subtract(Bindings.length(this.LABEL.textProperty())));
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
             getChildren().add(this.LABEL);
         }
@@ -120,8 +132,12 @@ public class BoardPane extends GridPane {
              * wider than high. With that being said, the gap between the cells won't disappear with the removal of
              * the subtract(1), anyway.
              */
-            iv.fitHeightProperty().bind(BoardPane.this.heightProperty().divide(SIZE).subtract(1));
-            iv.fitWidthProperty().bind(BoardPane.this.widthProperty().divide(SIZE).subtract(1));
+            final NumberBinding CELL_ASPECT_RATIO = Bindings.min(BoardPane.this.widthProperty(), BoardPane.this.heightProperty()).divide(SIZE);
+            final NumberBinding ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);
+            iv.fitHeightProperty().bind(ROUNDED_CELL_ASPECT_RATIO);
+            iv.fitWidthProperty().bind(ROUNDED_CELL_ASPECT_RATIO);
+            //iv.fitHeightProperty().bind(BoardPane.this.heightProperty().divide(SIZE)/*.subtract(1)*/);
+            //iv.fitWidthProperty().bind(BoardPane.this.widthProperty().divide(SIZE)/*.subtract(1)*/);
             iv.setMouseTransparent(true);
             iv.setSmooth(false);
             setMargin(iv, new Insets(0, 0, 0, 0));
@@ -158,7 +174,11 @@ public class BoardPane extends GridPane {
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the baord (as those might be changed during a game).
     public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
+        setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
         setBoard(board);
+        // setting this false here (and especially in BoardCell) would fix the gaps but the cells wouldn't all be the
+        // exact same size.
+        // setSnapToPixel(false);
         this.SIZE = board.getSize();
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
@@ -185,6 +205,13 @@ public class BoardPane extends GridPane {
         setVgap(0);
         setPadding(new Insets(0, 0, 0, 0));
         setMinSize(0, 0);
+        // final NumberBinding ASPECT_RATIO = Bindings.min(heightProperty(), widthProperty());
+        // maxWidthProperty().bind(heightProperty());
+        // maxHeightProperty().bind(maxWidthProperty());
+        setVgrow(this, Priority.ALWAYS);
+        /*setMaxWidth(Control.USE_PREF_SIZE);
+        setMaxHeight(Control.USE_PREF_SIZE);*/
+        setFillWidth(this, false);
 
         // setGridLinesVisible(true);
 
@@ -196,8 +223,15 @@ public class BoardPane extends GridPane {
                 bc.prefHeightProperty().bind(BoardPane.this.heightProperty().divide(SIZE));*/
                 /*bc.prefWidthProperty().bind(Bindings.min(BoardPane.this.heightProperty().divide(SIZE), BoardPane.this.widthProperty().divide(SIZE)));
                 bc.prefWidthProperty().bind(Bindings.min(BoardPane.this.widthProperty().divide(SIZE), BoardPane.this.heightProperty().divide(SIZE)));*/
+                /*final NumberBinding BOARD_CELL_ASPECT_RATIO = Bindings.min(BoardPane.this.widthProperty(), BoardPane.this.heightProperty()).divide(SIZE);
+                setVgrow(bc, Priority.NEVER);
+                setHgrow(bc, Priority.NEVER);
+                bc.prefWidthProperty().bind(BOARD_CELL_ASPECT_RATIO);
+                bc.prefWidthProperty().bind(BOARD_CELL_ASPECT_RATIO);*/
                 add(bc, j, i);
                 setMargin(bc, new Insets(0, 0, 0, 0));
+                setHalignment(bc, HPos.LEFT);
+                setValignment(bc, VPos.TOP);
             }
         }
 
@@ -212,7 +246,10 @@ public class BoardPane extends GridPane {
 
                     if (col != null && row != null) {
                         BoardCell targetBC = (BoardCell) target;
-                        this.board.printDebugInfo(col, row);
+                        // this.board.printDebugInfo(col, row);
+                        System.out.println("GridPane size: " + widthProperty().get() + "/" + heightProperty().get());
+                        System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
+                        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());
 
                         // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
                         ImageView iv = targetBC.getBlackHover();

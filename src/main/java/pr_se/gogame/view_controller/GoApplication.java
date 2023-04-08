@@ -7,6 +7,7 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
 import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.text.Text;
@@ -43,7 +44,7 @@ public class GoApplication extends Application {
         VBox vBox = new VBox(menuBar);
 
         // Altered by Gerald to add the BoardPane
-        Board board = new Board(13);
+        Board board = new Board(19);
         final String path = "file:src/main/resources/pr_se/gogame/";
         BoardPane boardPane = new BoardPane(board,
                 path+"tile_0.png",
@@ -52,7 +53,15 @@ public class GoApplication extends Application {
                 path+"stone_1.png");
         BorderPane root = new BorderPane();
         root.setCenter(boardPane);
+
+        /*Pane envelope = new Pane();
+        envelope.prefHeightProperty().bind(boardPane.heightProperty());
+        envelope.getChildren().add(boardPane);
+        root.setCenter(envelope);*/
+
         root.setTop(vBox);
+
+
 
         Scene scene = new Scene(root, 960, 600);
 
