@@ -84,7 +84,7 @@ public class BoardPane extends GridPane {
             setMargin(this.LABEL, new Insets(0, 0, 0, 0));
             this.LABEL.setMinSize(0, 0);
             final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
-            FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(4).subtract(Bindings.length(this.LABEL.textProperty())));
+            FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty())));
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
             getChildren().add(this.LABEL);
         }
@@ -150,10 +150,12 @@ public class BoardPane extends GridPane {
         }
 
         private void setWhite() {
+            this.LABEL.setTextFill(Color.rgb(0, 0, 0));
             set(WHITE_STONE);
         }
 
         private void setBlack() {
+            this.LABEL.setTextFill(Color.rgb(255, 255, 255));
             set(BLACK_STONE);
         }
 
@@ -166,6 +168,9 @@ public class BoardPane extends GridPane {
 
         private void set(ImageView iv) {
             iv.setVisible(true);
+            if(showsMoveNumbers) {
+                this.LABEL.setVisible(true);
+            }
         }
 
         // Getters
@@ -251,9 +256,8 @@ public class BoardPane extends GridPane {
                     if (col != null && row != null) {
                         BoardCell targetBC = (BoardCell) target;
                         // this.board.printDebugInfo(col, row);
-                        /*System.out.println("GridPane size: " + widthProperty().get() + "/" + heightProperty().get());
                         System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
-                        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());*/
+                        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());
 
                         // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
                         if (this.board.getCurColor() == StoneColor.BLACK) {
@@ -322,25 +326,12 @@ public class BoardPane extends GridPane {
             @Override
             public void stoneSet(StoneSetEvent e) {
                 BoardCell destinationBC = (BoardCell) getChildren().get(e.getRow() * SIZE + e.getCol());
-                ImageView iv = destinationBC.getBlackStone();
-                Color labelColor = Color.rgb(255, 255, 255);
-                if(e.getColor() != StoneColor.BLACK) {
-                    iv = destinationBC.getWhiteStone();
-                    labelColor = Color.rgb(0, 0, 0);
-                }
+                destinationBC.getLabel().setText("" + e.getMoveNumber());
 
-                /*if(selectionHover != null) {
-                    selectionHover.setVisible(false);
-                }*/
-
-                iv.setVisible(true);
-
-                if(showsMoveNumbers) {
-                    Label l = destinationBC.getLabel();
-                    l.setText("" + e.getMoveNumber());
-                    l.setTextFill(labelColor);
-                    l.toFront();
-                    l.setVisible(true);
+                if(e.getColor() == StoneColor.BLACK) {
+                    destinationBC.setBlack();
+                } else {
+                    destinationBC.setWhite();
                 }
             }
 
