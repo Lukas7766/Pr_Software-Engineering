@@ -35,12 +35,8 @@ public class BoardPane extends GridPane {
      */
     private final Image[] tiles = new Image [2];
     private final Image[] stones = new Image [2];
-
-    // TODO: This sort of thing would ideally be cleaned up by using some sort of data structure.
-    private Node lastMouseTarget = null;
-    private ImageView lastMouseHover = null;
-    private Node selectionTarget = null;
-    private ImageView selectionHover = null;
+    private BoardCell lastBC = null;
+    private BoardCell selectionBC = null;
 
     private class BoardCell extends StackPane {
         private final ImageView TILE;
@@ -49,6 +45,8 @@ public class BoardPane extends GridPane {
         private final ImageView BLACK_STONE;
         private final ImageView WHITE_STONE;
         private final Label LABEL;
+
+        private boolean isSelected = false;
 
         private BoardCell(Image tile) {
             this.setMinSize(0, 0);
@@ -108,6 +106,66 @@ public class BoardPane extends GridPane {
             setMargin(iv, new Insets(0, 0, 0, 0));
 
             return iv;
+        }
+
+        public void hoverWhite() {
+            hover(WHITE_HOVER);
+        }
+
+        public void hoverBlack() {
+            hover(BLACK_HOVER);
+        }
+
+        public void unhover() {
+            if(!isSelected) {
+                BLACK_HOVER.setVisible(false);
+                WHITE_HOVER.setVisible(false);
+            }
+        }
+
+        private void hover(ImageView iv) {
+            unhover(); // might be unnecessary
+            iv.setOpacity(0.5);
+            iv.setVisible(true);
+        }
+
+        public void selectWhite() {
+            select(WHITE_HOVER);
+        }
+
+        public void selectBlack() {
+            select(BLACK_HOVER);
+        }
+
+        public void deselect() {
+            isSelected = false;
+            unhover();
+        }
+
+        private void select(ImageView iv) {
+            // maybe deselect() first? See hover().
+            iv.setOpacity(0.75);
+            iv.setVisible(true);
+            isSelected = true;
+        }
+
+        private void setWhite() {
+            set(WHITE_STONE);
+        }
+
+        private void setBlack() {
+            set(BLACK_STONE);
+        }
+
+        public void unset() {
+            deselect();
+            BLACK_STONE.setVisible(false);
+            WHITE_STONE.setVisible(false);
+            LABEL.setVisible(false);
+        }
+
+        private void set(ImageView iv) {
+            iv.setVisible(true);
         }
 
         // Getters
@@ -186,60 +244,56 @@ public class BoardPane extends GridPane {
             Node target = (Node)e.getTarget();
             // System.out.println("Target is of class " + target.getClass());   // TODO: Remove in finished product
             if(target != null) {
-                if(target != lastMouseTarget) {                                 // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
+                if(target != lastBC) {                                 // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
                     if (col != null && row != null) {
                         BoardCell targetBC = (BoardCell) target;
                         // this.board.printDebugInfo(col, row);
-                        System.out.println("GridPane size: " + widthProperty().get() + "/" + heightProperty().get());
+                        /*System.out.println("GridPane size: " + widthProperty().get() + "/" + heightProperty().get());
                         System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
-                        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());
+                        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());*/
 
                         // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
-                        ImageView iv = targetBC.getBlackHover();
-                        if (this.board.getCurColor() != StoneColor.BLACK) {
-                            iv = targetBC.getWhiteHover();
+                        if (this.board.getCurColor() == StoneColor.BLACK) {
+                            targetBC.hoverBlack();
+                        } else {
+                            targetBC.hoverWhite();
                         }
-                        iv.setOpacity(0.5);
-                        iv.setVisible(true);
 
                         // Remove old hover                                    // TODO: Remove in finished product
-                        if(lastMouseHover != null) {
-                            lastMouseHover.setVisible(false);
+                        if(lastBC != null) {
+                            lastBC.unhover();
                         }
                         //System.out.println("Removed hover!");               // TODO: Remove in finished product
-                        lastMouseTarget = target;
-                        lastMouseHover = iv;
-                    } else {
+                        lastBC = targetBC;
+                    } else if(lastBC != null) {
                         //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
-                        if(lastMouseHover != null) {
-                            lastMouseHover.setVisible(false);
-                        }
-                        lastMouseTarget = null;
-                        lastMouseHover = null;
+                        lastBC.unhover();
+                        lastBC = null;
                     }
                 }
             } else {
                 //System.out.println("Hover target is null!");                // TODO: Remove in finished product
-                lastMouseTarget = null;
-                lastMouseHover = null;
+                lastBC = null;
             }
         });
 
         setOnMouseClicked(e -> {
             if(e.getButton() == MouseButton.PRIMARY) { // This check is only for testing independently of the main UI.
-                if (lastMouseTarget != null) {
-                    /*if (selectionHover != null) {
-                        selectionHover.setVisible(false);
-                    }*/
-                    selectionTarget = lastMouseTarget;
-                    selectionHover = lastMouseHover;
-                    selectionHover.setOpacity(0.75);
+                if (lastBC != null) {
+                    if (selectionBC != null) {
+                        selectionBC.deselect();
+                    }
+                    selectionBC = lastBC;
+                    if(board.getCurColor() == StoneColor.BLACK) {
+                        selectionBC.selectBlack();
+                    } else {
+                        selectionBC.selectWhite();
+                    }
 
-                    lastMouseTarget = null;
-                    lastMouseHover = null;
+                    lastBC = null;
 
                     if (!needsMoveConfirmation) {
                         confirmMove();
@@ -294,10 +348,7 @@ public class BoardPane extends GridPane {
             public void stoneRemoved(StoneRemovedEvent e) {
                 BoardCell destinationBC = (BoardCell) getChildren().get(e.getRow() * SIZE + e.getCol());
 
-                destinationBC.getLabel().setVisible(false);
-                destinationBC.getWhiteStone().setVisible(false);
-                destinationBC.getBlackStone().setVisible(false);
-
+                destinationBC.unset();
             }
 
             @Override
@@ -312,16 +363,13 @@ public class BoardPane extends GridPane {
     // TODO: Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse might be on the board during confirmation)
     // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
     public void confirmMove() {
-        if(selectionTarget != null) {
-            if(selectionHover != null) {
-                selectionHover.setVisible(false);
-            }
-            Integer col = getColumnIndex(selectionTarget);
-            Integer row = getRowIndex(selectionTarget);
+        if(selectionBC != null) {
+            Integer col = getColumnIndex(selectionBC);
+            Integer row = getRowIndex(selectionBC);
             if(col != null && row != null) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
                 board.setStone(col, row, board.getCurColor());
             } else {
-                System.out.println("Confirmation outside of actual board on " + lastMouseTarget); // TODO: Remove in finished product
+                System.out.println("Confirmation outside of actual board on " + lastBC); // TODO: Remove in finished product
             }
         }
     }
@@ -335,12 +383,11 @@ public class BoardPane extends GridPane {
     }
 
     public boolean showsMoveNumbers() {
-        return false;
-        // TODO: Implement
+        return showsMoveNumbers;
     }
 
-    public void setShowsMoveNumbers() {
-        // TODO: Implement
+    public void setShowsMoveNumbers(boolean showsMoveNumbers) {
+        this.showsMoveNumbers = showsMoveNumbers;
     }
 
     public boolean showsCoordinates() {
