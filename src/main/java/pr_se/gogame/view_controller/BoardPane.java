@@ -53,8 +53,6 @@ public class BoardPane extends GridPane {
         private BoardCell(Image tile) {
             this.setMinSize(0, 0);
 
-            /*this.TILE = getCellImageView(tile);
-            getChildren().add(this.TILE);*/
             BackgroundSize bgSz = new BackgroundSize(
                     100,     // width
                     100,        // height
@@ -83,9 +81,6 @@ public class BoardPane extends GridPane {
             this.WHITE_STONE.setVisible(false);
             getChildren().add(this.WHITE_STONE);
 
-            /*maxWidthProperty().bind(this.BLACK_STONE.fitWidthProperty());
-            maxHeightProperty().bind(this.BLACK_STONE.fitHeightProperty());*/
-
             this.LABEL = new Label("0");
             this.LABEL.setVisible(false);
             setMargin(this.LABEL, new Insets(0, 0, 0, 0));
@@ -103,7 +98,7 @@ public class BoardPane extends GridPane {
 
             ImageView iv = new ImageView(i);
             iv.setPreserveRatio(true);
-            
+
             final NumberBinding CELL_ASPECT_RATIO = Bindings.min(BoardPane.this.widthProperty(), BoardPane.this.heightProperty()).divide(SIZE);
             final NumberBinding ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);
             iv.fitHeightProperty().bind(ROUNDED_CELL_ASPECT_RATIO);
