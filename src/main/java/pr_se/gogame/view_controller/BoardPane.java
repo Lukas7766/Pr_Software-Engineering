@@ -1,5 +1,8 @@
 package pr_se.gogame.view_controller;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -37,7 +40,7 @@ public class BoardPane extends GridPane {
     private ImageView selectionHover = null;
 
     private class BoardCell extends StackPane {
-        private final ImageView TILE = null;
+        private final ImageView TILE;
         private final ImageView BLACK_HOVER;
         private final ImageView WHITE_HOVER;
         private final ImageView BLACK_STONE;
@@ -46,19 +49,36 @@ public class BoardPane extends GridPane {
 
         private BoardCell(Image tile) {
             this.setMinSize(0, 0);
-
-            /*
-             * TODO: To prevent the thin lines from disappearing, and possibly also the white lines in between from
-             * appearing, maybe the tiles should not actually change in size and instead be loaded in way bigger
-             * than they could be shown, with only the viewport (displayed portion) changing in size. Disadvantage
-             * would be that the lines would always remain as thin as they are, no matter how large the board is
-             * scaled.
-             */
-
             /*this.TILE = getCellImageView(tile);
             getChildren().add(this.TILE);*/
-            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
+
+            BackgroundSize bgSz = new BackgroundSize(
+                    100,      // width
+                    100,         // height
+                    true,       // widthAsPercentage
+                    true,       // heightAsPercentage
+                    false,      //
+                    true);
+            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
+            BackgroundImage bgImg2 = new BackgroundImage(stones[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
             this.setBackground(new Background(bgImg));
+
+            /*
+             * THIS looked so promising at first, but there's a major problem: The tiles aren't actually being scaled,
+             * they're just being put into the center of each cell at a size that's so large that, on my 1080p display,
+             * I simply can't drag the window big enough to reach the edges. But if I set the initial size to some-
+             * thing lower (e.g., 32x32) huge gaps appear between the tiles. Additionally, of course, if the
+             * graphics are to be customizable, a user would reasonably expect them to be shown in their entirety, not
+             * just extending from the center outward.
+             *
+             * Pros: NO image scaling, thus lines always remain sharp and clear (though thicker lines will cover up
+             * the actual playing field at very low resolutions).
+             *
+             * Cons: Not actually applicable to very high resolutions, and not showing all of the tile.
+             */
+            /*BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
+            this.setBackground(new Background(bgImg));*/
+            this.TILE = null;
 
             this.BLACK_HOVER = getCellImageView(stones[0]);
             this.BLACK_HOVER.setVisible(false);
@@ -70,6 +90,8 @@ public class BoardPane extends GridPane {
 
             this.BLACK_STONE = getCellImageView(stones[0]);
             this.BLACK_STONE.setVisible(false);
+            // BackgroundImage bgImg2 = new BackgroundImage(stones[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
+            // getBackground().getImages().add(bgImg2);
             getChildren().add(this.BLACK_STONE);
 
             this.WHITE_STONE = getCellImageView(stones[1]);
@@ -79,6 +101,10 @@ public class BoardPane extends GridPane {
             this.LABEL = new Label("0");
             this.LABEL.setVisible(false);
             setMargin(this.LABEL, new Insets(0, 0, 0, 0));
+            this.LABEL.setMinSize(0, 0);
+            final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
+            FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(4));
+            this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
             getChildren().add(this.LABEL);
         }
 
@@ -89,6 +115,11 @@ public class BoardPane extends GridPane {
 
             ImageView iv = new ImageView(i);
             iv.setPreserveRatio(true);
+            /*
+             * For some reason, unless 1 pixel of width is subtracted, the cells aren't perfectly square but one pixel
+             * wider than high. With that being said, the gap between the cells won't disappear with the removal of
+             * the subtract(1), anyway.
+             */
             iv.fitHeightProperty().bind(BoardPane.this.heightProperty().divide(SIZE).subtract(1));
             iv.fitWidthProperty().bind(BoardPane.this.widthProperty().divide(SIZE).subtract(1));
             iv.setMouseTransparent(true);
@@ -131,14 +162,17 @@ public class BoardPane extends GridPane {
         this.SIZE = board.getSize();
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
+        final int DEFAULT_IMAGE_SIZE = 128;
+        final boolean SMOOTHE_IMAGES = false;
+
         tiles[0] = new Image(
                 tile0,      // URL
-                128,        // requestedWidth
-                128,        // requestedHeight
+                DEFAULT_IMAGE_SIZE,        // requestedWidth
+                DEFAULT_IMAGE_SIZE,        // requestedHeight
                 true,       // preserveRation
-                false,      // smooth
+                SMOOTHE_IMAGES,      // smooth
                 true);      // backgroundLoading
-        tiles[1] = new Image(tile1, 128, 128, true, false, true);
+        tiles[1] = new Image(tile1, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTHE_IMAGES, true);
 
         stones[0] = new Image(
                 stone0,     // URL
@@ -158,6 +192,10 @@ public class BoardPane extends GridPane {
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {
                 BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2]);
+                /*bc.prefWidthProperty().bind(BoardPane.this.widthProperty().divide(SIZE));
+                bc.prefHeightProperty().bind(BoardPane.this.heightProperty().divide(SIZE));*/
+                /*bc.prefWidthProperty().bind(Bindings.min(BoardPane.this.heightProperty().divide(SIZE), BoardPane.this.widthProperty().divide(SIZE)));
+                bc.prefWidthProperty().bind(Bindings.min(BoardPane.this.widthProperty().divide(SIZE), BoardPane.this.heightProperty().divide(SIZE)));*/
                 add(bc, j, i);
                 setMargin(bc, new Insets(0, 0, 0, 0));
             }

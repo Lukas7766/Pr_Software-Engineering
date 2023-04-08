@@ -43,12 +43,12 @@ public class GoApplication extends Application {
         VBox vBox = new VBox(menuBar);
 
         // Altered by Gerald to add the BoardPane
-        Board board = new Board(19);
+        Board board = new Board(13);
         final String path = "file:src/main/resources/pr_se/gogame/";
         BoardPane boardPane = new BoardPane(board,
                 path+"tile_0.png",
                 path+"tile_0.png",
-                path+"stone_0.png",
+                path+"stone_0_square.png",
                 path+"stone_1.png");
         BorderPane root = new BorderPane();
         root.setCenter(boardPane);
@@ -56,8 +56,8 @@ public class GoApplication extends Application {
 
         Scene scene = new Scene(root, 960, 600);
 
-        /*stage.setMinWidth(320);
-        stage.setMinHeight(200);*/
+        stage.setMinWidth(320);
+        stage.setMinHeight(200);
 
         // Same as before from here on
         stage.setScene(scene);
