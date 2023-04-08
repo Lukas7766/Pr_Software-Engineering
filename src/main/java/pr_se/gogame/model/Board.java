@@ -182,28 +182,6 @@ public class Board implements BoardInterface {
         return existingGroups;
     }
 
-    /*private Map<RelativeDirection, StoneGroupPointer> getSurroundingStoneGroupPtrs(int x, int y) {
-        if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
-            throw new IllegalArgumentException();
-        }
-
-        Map<RelativeDirection, StoneGroupPointer> existingPtrs = new EnumMap<>(RelativeDirection.class);
-        if(y > 0 && board[x][y - 1] != null) {
-            existingPtrs.put(ABOVE, board[x][y - 1]);
-        }
-        if(y < SIZE - 1 && board[x][y + 1] != null) {
-            existingPtrs.put(BELOW, board[x][y + 1]);
-        }
-        if(x > 0 && board[x - 1][y] != null) {
-            existingPtrs.put(LEFT, board[x - 1][y]);
-        }
-        if(x < SIZE - 1 && board[x + 1][y] != null) {
-            existingPtrs.put(RIGHT, board[x + 1][y]);
-        }
-
-        return existingPtrs;
-    }*/
-
     private StoneGroup getStoneGroupAt(int x, int y) {
         if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();

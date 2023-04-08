@@ -1,7 +1,6 @@
 package pr_se.gogame.view_controller;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.IntegerBinding;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
@@ -10,12 +9,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.Control;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import javafx.scene.image.ImageView;
 import javafx.scene.paint.Color;
 import pr_se.gogame.model.Board;
 import pr_se.gogame.model.StoneColor;
@@ -54,35 +52,19 @@ public class BoardPane extends GridPane {
 
         private BoardCell(Image tile) {
             this.setMinSize(0, 0);
+
             /*this.TILE = getCellImageView(tile);
             getChildren().add(this.TILE);*/
-
             BackgroundSize bgSz = new BackgroundSize(
-                    100,      // width
-                    100,         // height
+                    100,     // width
+                    100,        // height
                     true,       // widthAsPercentage
                     true,       // heightAsPercentage
-                    false,      //
-                    true);
+                    false,      // contain
+                    true);      // cover
             BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
             BackgroundImage bgImg2 = new BackgroundImage(stones[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
             this.setBackground(new Background(bgImg));
-
-            /*
-             * THIS looked so promising at first, but there's a major problem: The tiles aren't actually being scaled,
-             * they're just being put into the center of each cell at a size that's so large that, on my 1080p display,
-             * I simply can't drag the window big enough to reach the edges. But if I set the initial size to some-
-             * thing lower (e.g., 32x32) huge gaps appear between the tiles. Additionally, of course, if the
-             * graphics are to be customizable, a user would reasonably expect them to be shown in their entirety, not
-             * just extending from the center outward.
-             *
-             * Pros: NO image scaling, thus lines always remain sharp and clear (though thicker lines will cover up
-             * the actual playing field at very low resolutions).
-             *
-             * Cons: Not actually applicable to very high resolutions, and not showing all of the tile.
-             */
-            /*BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
-            this.setBackground(new Background(bgImg));*/
             this.TILE = null;
 
             this.BLACK_HOVER = getCellImageView(stones[0]);
@@ -95,8 +77,6 @@ public class BoardPane extends GridPane {
 
             this.BLACK_STONE = getCellImageView(stones[0]);
             this.BLACK_STONE.setVisible(false);
-            // BackgroundImage bgImg2 = new BackgroundImage(stones[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, BackgroundSize.DEFAULT);
-            // getBackground().getImages().add(bgImg2);
             getChildren().add(this.BLACK_STONE);
 
             this.WHITE_STONE = getCellImageView(stones[1]);
@@ -105,10 +85,6 @@ public class BoardPane extends GridPane {
 
             /*maxWidthProperty().bind(this.BLACK_STONE.fitWidthProperty());
             maxHeightProperty().bind(this.BLACK_STONE.fitHeightProperty());*/
-
-            // setting this here (and, perhaps, in BoardPane) would fix the gaps but the cells wouldn't all be the
-            // exact same size.
-            // setSnapToPixel(false);
 
             this.LABEL = new Label("0");
             this.LABEL.setVisible(false);
@@ -127,17 +103,11 @@ public class BoardPane extends GridPane {
 
             ImageView iv = new ImageView(i);
             iv.setPreserveRatio(true);
-            /*
-             * For some reason, unless 1 pixel of width is subtracted, the cells aren't perfectly square but one pixel
-             * wider than high. With that being said, the gap between the cells won't disappear with the removal of
-             * the subtract(1), anyway.
-             */
+            
             final NumberBinding CELL_ASPECT_RATIO = Bindings.min(BoardPane.this.widthProperty(), BoardPane.this.heightProperty()).divide(SIZE);
             final NumberBinding ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);
             iv.fitHeightProperty().bind(ROUNDED_CELL_ASPECT_RATIO);
             iv.fitWidthProperty().bind(ROUNDED_CELL_ASPECT_RATIO);
-            //iv.fitHeightProperty().bind(BoardPane.this.heightProperty().divide(SIZE)/*.subtract(1)*/);
-            //iv.fitWidthProperty().bind(BoardPane.this.widthProperty().divide(SIZE)/*.subtract(1)*/);
             iv.setMouseTransparent(true);
             iv.setSmooth(false);
             setMargin(iv, new Insets(0, 0, 0, 0));
@@ -172,27 +142,23 @@ public class BoardPane extends GridPane {
         }
     }
 
-    // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the baord (as those might be changed during a game).
+    // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the board (as those might be changed during a game).
     public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
-        setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
         setBoard(board);
-        // setting this false here (and especially in BoardCell) would fix the gaps but the cells wouldn't all be the
-        // exact same size.
-        // setSnapToPixel(false);
         this.SIZE = board.getSize();
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
         final int DEFAULT_IMAGE_SIZE = 128;
-        final boolean SMOOTHE_IMAGES = false;
+        final boolean SMOOTH_IMAGES = false;
 
         tiles[0] = new Image(
-                tile0,      // URL
-                DEFAULT_IMAGE_SIZE,        // requestedWidth
-                DEFAULT_IMAGE_SIZE,        // requestedHeight
-                true,       // preserveRation
-                SMOOTHE_IMAGES,      // smooth
-                true);      // backgroundLoading
-        tiles[1] = new Image(tile1, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTHE_IMAGES, true);
+                tile0,              // URL
+                DEFAULT_IMAGE_SIZE, // requestedWidth
+                DEFAULT_IMAGE_SIZE, // requestedHeight
+                true,               // preserveRation
+                SMOOTH_IMAGES,     // smooth
+                true);              // backgroundLoading
+        tiles[1] = new Image(tile1, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
 
         stones[0] = new Image(
                 stone0,     // URL
@@ -200,18 +166,12 @@ public class BoardPane extends GridPane {
         stones[1] = new Image(stone1, true);
 
         // Graphical details of this board pane
+        setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
         setAlignment(Pos.CENTER);
         setHgap(0);
         setVgap(0);
         setPadding(new Insets(0, 0, 0, 0));
         setMinSize(0, 0);
-        // final NumberBinding ASPECT_RATIO = Bindings.min(heightProperty(), widthProperty());
-        // maxWidthProperty().bind(heightProperty());
-        // maxHeightProperty().bind(maxWidthProperty());
-        setVgrow(this, Priority.ALWAYS);
-        /*setMaxWidth(Control.USE_PREF_SIZE);
-        setMaxHeight(Control.USE_PREF_SIZE);*/
-        setFillWidth(this, false);
 
         // setGridLinesVisible(true);
 
@@ -219,15 +179,6 @@ public class BoardPane extends GridPane {
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {
                 BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2]);
-                /*bc.prefWidthProperty().bind(BoardPane.this.widthProperty().divide(SIZE));
-                bc.prefHeightProperty().bind(BoardPane.this.heightProperty().divide(SIZE));*/
-                /*bc.prefWidthProperty().bind(Bindings.min(BoardPane.this.heightProperty().divide(SIZE), BoardPane.this.widthProperty().divide(SIZE)));
-                bc.prefWidthProperty().bind(Bindings.min(BoardPane.this.widthProperty().divide(SIZE), BoardPane.this.heightProperty().divide(SIZE)));*/
-                /*final NumberBinding BOARD_CELL_ASPECT_RATIO = Bindings.min(BoardPane.this.widthProperty(), BoardPane.this.heightProperty()).divide(SIZE);
-                setVgrow(bc, Priority.NEVER);
-                setHgrow(bc, Priority.NEVER);
-                bc.prefWidthProperty().bind(BOARD_CELL_ASPECT_RATIO);
-                bc.prefWidthProperty().bind(BOARD_CELL_ASPECT_RATIO);*/
                 add(bc, j, i);
                 setMargin(bc, new Insets(0, 0, 0, 0));
                 setHalignment(bc, HPos.LEFT);

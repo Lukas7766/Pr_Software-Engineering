@@ -50,14 +50,9 @@ public class GoApplication extends Application {
                 path+"tile_0.png",
                 path+"tile_0.png",
                 path+"stone_0_square.png",
-                path+"stone_1.png");
+                path+"stone_1_square.png");
         BorderPane root = new BorderPane();
         root.setCenter(boardPane);
-
-        /*Pane envelope = new Pane();
-        envelope.prefHeightProperty().bind(boardPane.heightProperty());
-        envelope.getChildren().add(boardPane);
-        root.setCenter(envelope);*/
 
         root.setTop(vBox);
 
