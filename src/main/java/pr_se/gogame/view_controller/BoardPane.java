@@ -9,9 +9,11 @@ import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.geometry.VPos;
 import javafx.scene.Node;
+import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
+import javafx.scene.image.PixelReader;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -38,6 +40,8 @@ public class BoardPane extends GridPane {
     private BoardCell lastBC = null;
     private BoardCell selectionBC = null;
 
+    private final NumberBinding ROUNDED_CELL_ASPECT_RATIO; // Instantiate only once per BoardPane, as it's the same for all contained BoarcCells
+
     private class BoardCell extends StackPane {
         private final ImageView TILE;
         private final ImageView BLACK_HOVER;
@@ -47,6 +51,7 @@ public class BoardPane extends GridPane {
         private final Label LABEL;
 
         private boolean isSelected = false;
+        private boolean isSet = false;
 
         private BoardCell(Image tile) {
             this.setMinSize(0, 0);
@@ -64,28 +69,33 @@ public class BoardPane extends GridPane {
             this.TILE = null;
 
             this.BLACK_HOVER = getCellImageView(stones[0]);
-            this.BLACK_HOVER.setVisible(false);
             getChildren().add(this.BLACK_HOVER);
 
             this.WHITE_HOVER = getCellImageView(stones[1]);
-            this.WHITE_HOVER.setVisible(false);
             getChildren().add(this.WHITE_HOVER);
 
             this.BLACK_STONE = getCellImageView(stones[0]);
-            this.BLACK_STONE.setVisible(false);
             getChildren().add(this.BLACK_STONE);
 
             this.WHITE_STONE = getCellImageView(stones[1]);
-            this.WHITE_STONE.setVisible(false);
             getChildren().add(this.WHITE_STONE);
 
             this.LABEL = new Label("0");
             this.LABEL.setVisible(false);
             setMargin(this.LABEL, new Insets(0, 0, 0, 0));
             this.LABEL.setMinSize(0, 0);
+
             final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
             FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty())));
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
+
+            /*PixelReader p = stones[0].getPixelReader();
+            if(p == null) {
+                throw new NullPointerException("MANUALLY THROWN NPE");
+            }
+            ColorPicker c = new ColorPicker(p.getColor((int)(stones[0].getWidth() / 2), (int)(stones[0].getHeight() / 2)));
+            this.LABEL.textFillProperty().bind(c.valueProperty());*/
+
             getChildren().add(this.LABEL);
         }
 
@@ -96,13 +106,11 @@ public class BoardPane extends GridPane {
 
             ImageView iv = new ImageView(i);
             iv.setPreserveRatio(true);
-
-            final NumberBinding CELL_ASPECT_RATIO = Bindings.min(BoardPane.this.widthProperty(), BoardPane.this.heightProperty()).divide(SIZE);
-            final NumberBinding ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);
             iv.fitHeightProperty().bind(ROUNDED_CELL_ASPECT_RATIO);
             iv.fitWidthProperty().bind(ROUNDED_CELL_ASPECT_RATIO);
             iv.setMouseTransparent(true);
             iv.setSmooth(false);
+            iv.setVisible(false);
             setMargin(iv, new Insets(0, 0, 0, 0));
 
             return iv;
@@ -124,9 +132,11 @@ public class BoardPane extends GridPane {
         }
 
         private void hover(ImageView iv) {
-            unhover(); // might be unnecessary
-            iv.setOpacity(0.5);
-            iv.setVisible(true);
+            unhover();              // might be unnecessary
+            if(!isSet && !isSelected) {
+                iv.setOpacity(0.5);
+                iv.setVisible(true);
+            }
         }
 
         public void selectWhite() {
@@ -143,19 +153,17 @@ public class BoardPane extends GridPane {
         }
 
         private void select(ImageView iv) {
-            // maybe deselect() first? See hover().
+            deselect();             // might be unnecessary
             iv.setOpacity(0.75);
             iv.setVisible(true);
             isSelected = true;
         }
 
         private void setWhite() {
-            this.LABEL.setTextFill(Color.rgb(0, 0, 0));
             set(WHITE_STONE);
         }
 
         private void setBlack() {
-            this.LABEL.setTextFill(Color.rgb(255, 255, 255));
             set(BLACK_STONE);
         }
 
@@ -164,13 +172,21 @@ public class BoardPane extends GridPane {
             BLACK_STONE.setVisible(false);
             WHITE_STONE.setVisible(false);
             LABEL.setVisible(false);
+            isSet = false;
         }
 
         private void set(ImageView iv) {
+            deselect();
             iv.setVisible(true);
             if(showsMoveNumbers) {
+                PixelReader p = iv.getImage().getPixelReader();
+                if(p == null) {
+                    throw new NullPointerException("Can't get stone color");
+                }
+                this.LABEL.setTextFill(p.getColor((int)(iv.getImage().getWidth() / 2), (int)(iv.getImage().getHeight() / 2)).invert());
                 this.LABEL.setVisible(true);
             }
+            isSet = true;
         }
 
         // Getters
@@ -204,6 +220,8 @@ public class BoardPane extends GridPane {
     public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
         setBoard(board);
         this.SIZE = board.getSize();
+        final NumberBinding CELL_ASPECT_RATIO = Bindings.min(BoardPane.this.widthProperty(), BoardPane.this.heightProperty()).divide(SIZE);
+        ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
         final int DEFAULT_IMAGE_SIZE = 128;
@@ -351,7 +369,7 @@ public class BoardPane extends GridPane {
     }
 
     // TODO: Call this from the main UI if moves are to be confirmed.
-    // TODO: Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse might be on the board during confirmation)
+    // TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse might be on the board during confirmation)
     // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
     public void confirmMove() {
         if(selectionBC != null) {

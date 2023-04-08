@@ -49,7 +49,7 @@ public class GoApplication extends Application {
         BoardPane boardPane = new BoardPane(board,
                 path+"tile_0.png",
                 path+"tile_0.png",
-                path+"stone_0.png",
+                path+"stone_0_square.png",
                 path+"stone_1.png");
         BorderPane root = new BorderPane();
         root.setCenter(boardPane);
