@@ -87,13 +87,9 @@ public class BoardSuperPane2 extends AnchorPane {
         coordsRight.maxHeightProperty().bind(bp.heightProperty());
 
         getChildren().add(coordsAbove);
-        setTopAnchor(coordsAbove, 0.0);
         getChildren().add(coordsBelow);
-        setBottomAnchor(coordsBelow, 0.0);
         getChildren().add(coordsLeft);
-        setLeftAnchor(coordsLeft, 0.0);
         getChildren().add(coordsRight);
-        setRightAnchor(coordsRight, 0.0);
 
         System.out.println("bL: " + coordsLeft.minWidthProperty().get());
         System.out.println("bA: " + coordsAbove.minWidthProperty().get());
@@ -108,47 +104,39 @@ public class BoardSuperPane2 extends AnchorPane {
                 System.out.println("Right anchor before: " + getRightAnchor(bp));
                 System.out.println("-----------------Debug info just before: ");
                 bp.printDebugInfo();
-                System.out.println("Setting it to " + offset + " - " + bp.getDeadWidthAtRight());
+                System.out.println("Setting it to " + offset);
                 setRightAnchor(bp, offset);
                 System.out.println("Right anchor now: " + getRightAnchor(bp));
-                setRightAnchor(coordsAbove, offset);
-                setRightAnchor(coordsBelow, offset);
             }
         });
 
         coordsLeft.widthProperty().addListener((o, n, t) -> {
             double offset = t.doubleValue();
             setLeftAnchor(bp, offset);
-            setLeftAnchor(coordsAbove, offset);
-            setLeftAnchor(coordsBelow, offset);
         });
 
         coordsAbove.heightProperty().addListener((o, n, t) -> {
             double offset = t.doubleValue();
             setTopAnchor(bp, offset);
-            setTopAnchor(coordsLeft, offset);
-            setTopAnchor(coordsRight, offset);
         });
 
         coordsBelow.heightProperty().addListener((o, n, t) -> {
             double offset = t.doubleValue();
             setBottomAnchor(bp, offset);
-            setBottomAnchor(coordsLeft, offset);
-            setBottomAnchor(coordsRight, offset);
         });
 
         bp.addActualChangeListener((o, n, t) -> {
-            System.out.println("-----------------Actual Board size has changed:");
+            /*System.out.println("-----------------Actual Board size has changed:");
             bp.printDebugInfo();
             System.out.println("Dead width now: " + bp.getDeadWidthAtRight());
-            System.out.println("Offset is " + getRightAnchor(bp));
+            System.out.println("Offset is " + getRightAnchor(bp));*/
 
-            System.out.println("******* Right bar is currently at: " + getRightAnchor(coordsRight));
+            // System.out.println("******* Right bar is currently at: " + getRightAnchor(coordsRight));
             double newRightAnchor = bp.getDeadWidthAtRight() + getRightAnchor(bp);
             setRightAnchor(coordsRight, newRightAnchor - coordsRight.getWidth());
             setRightAnchor(coordsAbove, newRightAnchor);
             setRightAnchor(coordsBelow, newRightAnchor);
-            System.out.println("******* Right bar is afterwards at: " + getRightAnchor(coordsRight));
+            // System.out.println("******* Right bar is afterwards at: " + getRightAnchor(coordsRight));
 
             double newLeftAnchor = bp.getDeadWidthAtLeft() + getLeftAnchor(bp);
             setLeftAnchor(coordsLeft, newLeftAnchor - coordsLeft.getWidth());
