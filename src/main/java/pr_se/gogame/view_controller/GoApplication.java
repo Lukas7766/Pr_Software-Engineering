@@ -80,6 +80,7 @@ public class GoApplication extends Application {
         stage.setScene(scene);
         stage.show();
 
+        // Or is it?
         System.out.println("root width/height: " + root.getWidth() + "/" + root.getHeight());
         System.out.println("menuBar width/height: " + menuBar.getWidth() + "/" + menuBar.getHeight());
         System.out.println("bsp width/height: " + bsp.getWidth() + "/" + bsp.getHeight());
@@ -91,8 +92,6 @@ public class GoApplication extends Application {
         System.out.println("------------------After fitting it snuggly:");
         bsp.printDebugInfo();
         VBox test = (VBox)bsp.getChildren().get(4);
-        // test.setPrefWidth(test.getPrefWidth() + 1);
-        // test.setPrefWidth(test.getPrefWidth() - 1);
     }
 
     private Parent createContent() {

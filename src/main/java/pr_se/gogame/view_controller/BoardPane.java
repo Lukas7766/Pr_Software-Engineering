@@ -57,7 +57,7 @@ public class BoardPane extends GridPane {
         private boolean isSelected = false;
         private boolean isSet = false;
 
-        public BoardCell(Image tile) {
+        private BoardCell(Image tile) {
             this.setMinSize(0, 0);
 
             BackgroundSize bgSz = new BackgroundSize(
@@ -382,8 +382,6 @@ public class BoardPane extends GridPane {
             }
         };
 
-        // getFirstBC().widthProperty().addListener(myCL);
-        // getFirstBC().heightProperty().addListener(myCL);
         getFirstBC().boundsInParentProperty().addListener(myCL);
     }
 
