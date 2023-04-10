@@ -80,7 +80,7 @@ public class GoApplication extends Application {
         System.out.println("menuBar width/height: " + menuBar.getWidth() + "/" + menuBar.getHeight());
         System.out.println("bsp width/height: " + bsp.getWidth() + "/" + bsp.getHeight());
         System.out.println("-------------------------------------------------------------");
-        
+
         // bsp.printDebugInfo();
         VBox test = (VBox)bsp.getChildren().get(4);
     }
