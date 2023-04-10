@@ -4,12 +4,12 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.geometry.HPos;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
+import javafx.geometry.Bounds;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.geometry.VPos;
 import javafx.scene.Node;
-import javafx.scene.control.ColorPicker;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
@@ -20,6 +20,8 @@ import javafx.scene.paint.Color;
 import pr_se.gogame.model.Board;
 import pr_se.gogame.model.StoneColor;
 
+import java.util.LinkedList;
+
 /**
  * View/Controller
  * Go Board that uses image files for its (checkerboard) tiles and stones
@@ -28,9 +30,11 @@ public class BoardPane extends GridPane {
 
     private final int SIZE;                         // number of columns and rows, respectively
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
-
     private boolean showsMoveNumbers = true;        // whether move numbers are shown
+    private boolean showsCoordinates = true;
     private Board board;                            // Model for MVC-adherence; Will likely be replaced with Game
+
+    private LinkedList<ChangeListener> actualChangeListeners = new LinkedList<>();
 
     /*
      * Custom resources
@@ -53,7 +57,7 @@ public class BoardPane extends GridPane {
         private boolean isSelected = false;
         private boolean isSet = false;
 
-        private BoardCell(Image tile) {
+        public BoardCell(Image tile) {
             this.setMinSize(0, 0);
 
             BackgroundSize bgSz = new BackgroundSize(
@@ -64,7 +68,6 @@ public class BoardPane extends GridPane {
                     false,      // contain
                     true);      // cover
             BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
-            BackgroundImage bgImg2 = new BackgroundImage(stones[0], BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
             this.setBackground(new Background(bgImg));
             this.TILE = null;
 
@@ -89,14 +92,10 @@ public class BoardPane extends GridPane {
             FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty())));
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
 
-            /*PixelReader p = stones[0].getPixelReader();
-            if(p == null) {
-                throw new NullPointerException("MANUALLY THROWN NPE");
-            }
-            ColorPicker c = new ColorPicker(p.getColor((int)(stones[0].getWidth() / 2), (int)(stones[0].getHeight() / 2)));
-            this.LABEL.textFillProperty().bind(c.valueProperty());*/
-
             getChildren().add(this.LABEL);
+
+            /*this.prefWidthProperty().bind(BLACK_STONE.fitWidthProperty());
+            this.prefHeightProperty().bind(BLACK_STONE.fitHeightProperty());*/
         }
 
         private ImageView getCellImageView(Image i) {
@@ -220,7 +219,12 @@ public class BoardPane extends GridPane {
     public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
         setBoard(board);
         this.SIZE = board.getSize();
-        final NumberBinding CELL_ASPECT_RATIO = Bindings.min(BoardPane.this.widthProperty(), BoardPane.this.heightProperty()).divide(SIZE);
+        /*
+         * We have to subtract the width/height of the labels (if present) from the width/height of the BoardPane
+         * before division, if (and only if) labels are displayed.
+         */
+        // Bindings.subtract(widthProperty(), widthProperty der längsten Labels);
+        final NumberBinding CELL_ASPECT_RATIO = Bindings.min(widthProperty(), heightProperty()).divide(SIZE);
         ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
@@ -232,7 +236,7 @@ public class BoardPane extends GridPane {
                 DEFAULT_IMAGE_SIZE, // requestedWidth
                 DEFAULT_IMAGE_SIZE, // requestedHeight
                 true,               // preserveRation
-                SMOOTH_IMAGES,     // smooth
+                SMOOTH_IMAGES,      // smooth
                 true);              // backgroundLoading
         tiles[1] = new Image(tile1, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
 
@@ -251,16 +255,51 @@ public class BoardPane extends GridPane {
 
         // setGridLinesVisible(true);
 
-        // Fill the grid with BoardCells [of alternating tiles]
+        // Add top labels
+        /*for(int i = 0; i < this.SIZE; i++) {
+            Label l = new Label("" + (char)('A' + i));
+            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+            // l.setTextAlignment(TextAlignment.CENTER); // Only works on multi-line text
+            add(l, i + 1, 0);
+            setValignment(l, VPos.BOTTOM);
+            setHalignment(l, HPos.CENTER);
+        }*/
+        // Fill the grid
         for(int i = 0; i < this.SIZE; i++) {
+            // add left label
+            /*Label l = new Label("" + (SIZE - i));
+            // l.setTextAlignment(TextAlignment.RIGHT); // Only works on multi-line text
+            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+            add(l, 0, i + 1);
+            setValignment(l, VPos.CENTER);
+            setHalignment(l, HPos.RIGHT);*/
+
+            // add BoardCells [of alternating tiles]
             for(int j = 0; j < this.SIZE; j++) {
                 BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2]);
-                add(bc, j, i);
+                add(bc, j/* + 1*/, i/* + 1*/);
                 setMargin(bc, new Insets(0, 0, 0, 0));
-                setHalignment(bc, HPos.LEFT);
-                setValignment(bc, VPos.TOP);
+                /*setHalignment(bc, HPos.LEFT);
+                setValignment(bc, VPos.TOP);*/
             }
+
+            // add right label
+            /*l = new Label("" + (SIZE - i));
+            // l.setTextAlignment(TextAlignment.RIGHT); // Only works on multi-line text
+            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+            add(l, SIZE + 1, i + 1);
+            setValignment(l, VPos.CENTER);
+            setHalignment(l, HPos.RIGHT);*/
         }
+        // Add bottom labels
+        /*for(int i = 0; i < this.SIZE; i++) {
+            Label l = new Label("" + (char)('A' + i));
+            l.setTextAlignment(TextAlignment.CENTER);   // Only works on multi-line text
+            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
+            add(l, i + 1, SIZE + 1);
+            setValignment(l, VPos.TOP);
+            setHalignment(l, HPos.CENTER);
+        }*/
 
         // Set up listeners
         setOnMouseMoved(e -> {
@@ -273,11 +312,8 @@ public class BoardPane extends GridPane {
 
                     if (col != null && row != null) {
                         BoardCell targetBC = (BoardCell) target;
-                        // this.board.printDebugInfo(col, row);
-                        System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
-                        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());
+                        // printDebugInfo();
 
-                        // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
                         if (this.board.getCurColor() == StoneColor.BLACK) {
                             targetBC.hoverBlack();
                         } else {
@@ -334,7 +370,21 @@ public class BoardPane extends GridPane {
             // TODO: Keyboard input?
         });
 
+        ChangeListener myCL = new ChangeListener() {
+            @Override
+            public void changed(ObservableValue observableValue, Object o, Object t1) {
+                if(getFirstBC().widthProperty().get() == getFirstBC().heightProperty().get()) {
+                    Bounds newBounds = (Bounds)t1;
+                    fireActualChange(newBounds);
+                } else {
+                    System.out.println("WIDTH AND HEIGHT DIFFERENT: " + getFirstBC().widthProperty().get() + "/" + getFirstBC().heightProperty().get());
+                }
+            }
+        };
 
+        // getFirstBC().widthProperty().addListener(myCL);
+        // getFirstBC().heightProperty().addListener(myCL);
+        getFirstBC().boundsInParentProperty().addListener(myCL);
     }
 
     public void setBoard(Board board) {
@@ -400,11 +450,75 @@ public class BoardPane extends GridPane {
     }
 
     public boolean showsCoordinates() {
-        return false;
-        // TODO: Implement
+        return showsCoordinates;
     }
 
-    public void setShowsCoordinates() {
-        // TODO: Implement
+    public void setShowsCoordinates(boolean showsCoordinates) {
+        this.showsCoordinates = showsCoordinates;
+    }
+
+    public BoardCell getFirstBC() {
+        return (BoardCell)getChildren().get(0);
+    }
+
+    public double getTotalContentWidth() {
+        BoardCell firstBC = getFirstBC();
+        return firstBC.getWidth()*SIZE;
+    }
+
+    public double getTotalContentHeight() {
+        BoardCell firstBC = getFirstBC();
+        return firstBC.getHeight()*SIZE;
+    }
+
+    public double getDeadWidth() {
+        return getWidth() - getTotalContentWidth();
+    }
+
+    public double getDeadHeight() {
+        return getHeight() - getTotalContentHeight();
+    }
+
+    public double getDeadWidthAtLeft() {
+        BoardCell firstBC = getFirstBC();
+        return firstBC.getBoundsInParent().getMinX();
+    }
+
+    public double getDeadWidthAtRight() {
+        return getDeadWidth() - getDeadWidthAtLeft();
+    }
+
+    public double getDeadHeightAtTop() {
+        BoardCell firstBC = getFirstBC();
+        return firstBC.getBoundsInParent().getMinY();
+    }
+
+    public double getDeadHeightAtBottom() {
+        return getDeadHeight() - getDeadHeightAtTop();
+    }
+
+    public void printDebugInfo() {
+        BoardCell targetBC = getFirstBC();
+        // this.board.printDebugInfo(col, row);
+        System.out.println("width/height: " + getWidth() + "/" + getHeight());
+        /*System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
+        System.out.println("MinWidth/Height: " + getMinWidth() + "/" + getMinHeight());*/
+        System.out.println("Actual width/height: " + getTotalContentWidth() + "/" + getTotalContentHeight());
+        System.out.println("Dead width/height: " + getDeadWidth() + "/" + getDeadHeight());
+        System.out.println("Dead width/height at left/right/top/bottom: " + getDeadWidthAtLeft() + "/" + getDeadWidthAtRight() + "/" + getDeadHeightAtTop() + "/" + getDeadHeightAtBottom());
+        System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
+        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());
+        // System.out.println("Cell bounds in local: " + targetBC.getBoundsInLocal());
+        System.out.println("Cell bounds in parent: " + targetBC.getBoundsInParent());
+
+        // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
+    }
+
+    public void addActualChangeListener(ChangeListener l) {
+        actualChangeListeners.add(l);
+    }
+
+    private void fireActualChange(Bounds newVal) {
+        actualChangeListeners.forEach(l -> l.changed(null, null, newVal));
     }
 }

@@ -1,6 +1,8 @@
 package pr_se.gogame.view_controller;
 
 import javafx.application.Application;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.NumberBinding;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -46,17 +48,28 @@ public class GoApplication extends Application {
         // Altered by Gerald to add the BoardPane
         Board board = new Board(19);
         final String path = "file:src/main/resources/pr_se/gogame/";
-        BoardPane boardPane = new BoardPane(board,
+        /*BoardPane boardPane = new BoardPane(board,
+                path+"tile_0.png",
+                path+"tile_0.png",
+                path+"stone_0_square.png",
+                path+"stone_1.png");*/
+        /*BoardSuperPane bsp = new BoardSuperPane(board,
+                path+"tile_0.png",
+                path+"tile_0.png",
+                path+"stone_0_square.png",
+                path+"stone_1.png");*/
+        BoardSuperPane2 bsp = new BoardSuperPane2(board,
                 path+"tile_0.png",
                 path+"tile_0.png",
                 path+"stone_0_square.png",
                 path+"stone_1.png");
         BorderPane root = new BorderPane();
-        root.setCenter(boardPane);
+        root.setCenter(bsp);
+        final NumberBinding BSP_ASPECT_RATIO = Bindings.min(root.widthProperty(), root.heightProperty().subtract(menuBar.heightProperty()));
+        bsp.maxWidthProperty().bind(BSP_ASPECT_RATIO);
+        bsp.maxHeightProperty().bind(BSP_ASPECT_RATIO);
 
         root.setTop(vBox);
-
-
 
         Scene scene = new Scene(root, 960, 600);
 
@@ -66,6 +79,20 @@ public class GoApplication extends Application {
         // Same as before from here on
         stage.setScene(scene);
         stage.show();
+
+        System.out.println("root width/height: " + root.getWidth() + "/" + root.getHeight());
+        System.out.println("menuBar width/height: " + menuBar.getWidth() + "/" + menuBar.getHeight());
+        System.out.println("bsp width/height: " + bsp.getWidth() + "/" + bsp.getHeight());
+        System.out.println("-------------------------------------------------------------");
+
+        System.out.println("------------------Before fitting it snuggly:");
+        bsp.printDebugInfo();
+        // bsp.fitItSnuggly();
+        System.out.println("------------------After fitting it snuggly:");
+        bsp.printDebugInfo();
+        VBox test = (VBox)bsp.getChildren().get(4);
+        // test.setPrefWidth(test.getPrefWidth() + 1);
+        // test.setPrefWidth(test.getPrefWidth() - 1);
     }
 
     private Parent createContent() {
