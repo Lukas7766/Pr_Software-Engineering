@@ -33,7 +33,7 @@ public class BoardSuperPane2 extends AnchorPane {
         coordsAbove.setBackground(new Background(new BackgroundFill(Color.CYAN, null, null)));
         coordsBelow.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
         coordsLeft.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
-        coordsRight.setBackground(new Background(new BackgroundFill(Color.BLUE, null, null)));
+        coordsRight.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK, null, null)));
 
         bp = new BoardPane(board, tile0, tile1, stone0, stone1);
 
@@ -91,9 +91,9 @@ public class BoardSuperPane2 extends AnchorPane {
         getChildren().add(coordsLeft);
         getChildren().add(coordsRight);
 
-        System.out.println("bL: " + coordsLeft.minWidthProperty().get());
+        /*System.out.println("bL: " + coordsLeft.minWidthProperty().get());
         System.out.println("bA: " + coordsAbove.minWidthProperty().get());
-        System.out.println("bR: " + coordsRight.minWidthProperty().get());
+        System.out.println("bR: " + coordsRight.minWidthProperty().get());*/
     }
 
     public void fitItSnuggly() {
@@ -101,12 +101,12 @@ public class BoardSuperPane2 extends AnchorPane {
             @Override
             public void changed(ObservableValue<? extends Number> observableValue, Number number, Number t1) {
                 double offset = t1.doubleValue();
-                System.out.println("Right anchor before: " + getRightAnchor(bp));
-                System.out.println("-----------------Debug info just before: ");
-                bp.printDebugInfo();
-                System.out.println("Setting it to " + offset);
+                // System.out.println("Right anchor before: " + getRightAnchor(bp));
+                // System.out.println("-----------------Debug info just before: ");
+                // bp.printDebugInfo();
+                // System.out.println("Setting it to " + offset);
                 setRightAnchor(bp, offset);
-                System.out.println("Right anchor now: " + getRightAnchor(bp));
+                // System.out.println("Right anchor now: " + getRightAnchor(bp));
             }
         });
 
@@ -126,17 +126,10 @@ public class BoardSuperPane2 extends AnchorPane {
         });
 
         bp.addActualChangeListener((o, n, t) -> {
-            /*System.out.println("-----------------Actual Board size has changed:");
-            bp.printDebugInfo();
-            System.out.println("Dead width now: " + bp.getDeadWidthAtRight());
-            System.out.println("Offset is " + getRightAnchor(bp));*/
-
-            // System.out.println("******* Right bar is currently at: " + getRightAnchor(coordsRight));
             double newRightAnchor = bp.getDeadWidthAtRight() + getRightAnchor(bp);
             setRightAnchor(coordsRight, newRightAnchor - coordsRight.getWidth());
             setRightAnchor(coordsAbove, newRightAnchor);
             setRightAnchor(coordsBelow, newRightAnchor);
-            // System.out.println("******* Right bar is afterwards at: " + getRightAnchor(coordsRight));
 
             double newLeftAnchor = bp.getDeadWidthAtLeft() + getLeftAnchor(bp);
             setLeftAnchor(coordsLeft, newLeftAnchor - coordsLeft.getWidth());

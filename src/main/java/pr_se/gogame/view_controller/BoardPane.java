@@ -332,7 +332,7 @@ public class BoardPane extends GridPane {
                     Bounds newBounds = (Bounds)t1;
                     fireActualChange(newBounds);
                 } else {
-                    System.out.println("WIDTH AND HEIGHT DIFFERENT: " + getFirstBC().widthProperty().get() + "/" + getFirstBC().heightProperty().get());
+                    // System.out.println("WIDTH AND HEIGHT DIFFERENT: " + getFirstBC().widthProperty().get() + "/" + getFirstBC().heightProperty().get());
                 }
             }
         };

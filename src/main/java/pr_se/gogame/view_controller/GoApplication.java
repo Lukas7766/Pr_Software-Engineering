@@ -76,13 +76,16 @@ public class GoApplication extends Application {
         stage.show();
 
         // Or is it?
-        System.out.println("root width/height: " + root.getWidth() + "/" + root.getHeight());
+        /*System.out.println("root width/height: " + root.getWidth() + "/" + root.getHeight());
         System.out.println("menuBar width/height: " + menuBar.getWidth() + "/" + menuBar.getHeight());
         System.out.println("bsp width/height: " + bsp.getWidth() + "/" + bsp.getHeight());
-        System.out.println("-------------------------------------------------------------");
+        System.out.println("-------------------------------------------------------------");*/
 
         // bsp.printDebugInfo();
         VBox test = (VBox)bsp.getChildren().get(4);
+
+        root.widthProperty().addListener((o, n, t) -> System.out.println("New width: " + t));
+        root.heightProperty().addListener((o, n, t) -> System.out.println("New height: " + t));
     }
 
     private Parent createContent() {
