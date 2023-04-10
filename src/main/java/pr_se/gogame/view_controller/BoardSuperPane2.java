@@ -122,12 +122,28 @@ public class BoardSuperPane2 extends AnchorPane {
             bp.printDebugInfo();
             System.out.println("Dead width now: " + bp.getDeadWidthAtRight());
             System.out.println("Offset is " + getRightAnchor(bp));
+
             System.out.println("******* Right bar is currently at: " + getRightAnchor(coordsRight));
-            setRightAnchor(coordsRight, (bp.getDeadWidthAtRight() + getRightAnchor(bp)) - coordsRight.getWidth());
+            double newRightAnchor = bp.getDeadWidthAtRight() + getRightAnchor(bp);
+            setRightAnchor(coordsRight, newRightAnchor - coordsRight.getWidth());
+            setRightAnchor(coordsAbove, newRightAnchor);
+            setRightAnchor(coordsBelow, newRightAnchor);
             System.out.println("******* Right bar is afterwards at: " + getRightAnchor(coordsRight));
-            setLeftAnchor(coordsLeft, (bp.getDeadWidthAtLeft() + getLeftAnchor(bp)) - coordsLeft.getWidth());
-            setTopAnchor(coordsAbove, (bp.getDeadHeightAtTop() + getTopAnchor(bp)) - coordsAbove.getHeight());
-            setBottomAnchor(coordsBelow, (bp.getDeadHeightAtBottom() + getBottomAnchor(bp)) - coordsBelow.getHeight());
+
+            double newLeftAnchor = bp.getDeadWidthAtLeft() + getLeftAnchor(bp);
+            setLeftAnchor(coordsLeft, newLeftAnchor - coordsLeft.getWidth());
+            setLeftAnchor(coordsAbove, newLeftAnchor);
+            setLeftAnchor(coordsBelow, newLeftAnchor);
+
+            double newTopAnchor = bp.getDeadHeightAtTop() + getTopAnchor(bp);
+            setTopAnchor(coordsAbove, newTopAnchor - coordsAbove.getHeight());
+            setTopAnchor(coordsLeft, newTopAnchor);
+            setTopAnchor(coordsRight, newTopAnchor);
+
+            double newBottomAnchor = bp.getDeadHeightAtBottom() + getBottomAnchor(bp);
+            setBottomAnchor(coordsBelow, newBottomAnchor - coordsBelow.getHeight());
+            setBottomAnchor(coordsLeft, newBottomAnchor);
+            setBottomAnchor(coordsRight, newBottomAnchor);
         });
     }
 

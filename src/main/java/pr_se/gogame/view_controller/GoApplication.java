@@ -66,8 +66,8 @@ public class GoApplication extends Application {
         BorderPane root = new BorderPane();
         root.setCenter(bsp);
         final NumberBinding BSP_ASPECT_RATIO = Bindings.min(root.widthProperty(), root.heightProperty().subtract(menuBar.heightProperty()));
-        bsp.maxWidthProperty().bind(BSP_ASPECT_RATIO);
-        bsp.maxHeightProperty().bind(BSP_ASPECT_RATIO);
+        /*bsp.maxWidthProperty().bind(BSP_ASPECT_RATIO);
+        bsp.maxHeightProperty().bind(BSP_ASPECT_RATIO);*/
 
         root.setTop(vBox);
 
@@ -87,10 +87,10 @@ public class GoApplication extends Application {
         System.out.println("-------------------------------------------------------------");
 
         System.out.println("------------------Before fitting it snuggly:");
-        bsp.printDebugInfo();
+        // bsp.printDebugInfo();
         // bsp.fitItSnuggly();
         System.out.println("------------------After fitting it snuggly:");
-        bsp.printDebugInfo();
+        // bsp.printDebugInfo();
         VBox test = (VBox)bsp.getChildren().get(4);
     }
 
