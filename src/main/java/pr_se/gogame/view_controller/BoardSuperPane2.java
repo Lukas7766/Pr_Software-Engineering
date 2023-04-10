@@ -6,10 +6,12 @@ import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import pr_se.gogame.model.Board;
+import javafx.scene.text.Font;
 
 public class BoardSuperPane2 extends AnchorPane {
 
@@ -43,30 +45,30 @@ public class BoardSuperPane2 extends AnchorPane {
             Label aboveLabel = new Label("" + (char)('A' + i));
             aboveLabel.setMaxWidth(Double.MAX_VALUE);
             aboveLabel.setAlignment(Pos.BOTTOM_CENTER);
-            final DoubleProperty ABOVE_FONT_SIZE = new SimpleDoubleProperty(0);
+            /*final DoubleProperty ABOVE_FONT_SIZE = new SimpleDoubleProperty(0);
             ABOVE_FONT_SIZE.bind(coordsAbove.widthProperty().divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(aboveLabel.textProperty())));
-            aboveLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", ABOVE_FONT_SIZE));
+            aboveLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", ABOVE_FONT_SIZE));*/
 
             Label belowLabel = new Label("" + (char)('A' + i));
             belowLabel.setMaxWidth(Double.MAX_VALUE);
             belowLabel.setAlignment(Pos.TOP_CENTER);
-            final DoubleProperty BELOW_FONT_SIZE = new SimpleDoubleProperty(0);
+            /*final DoubleProperty BELOW_FONT_SIZE = new SimpleDoubleProperty(0);
             BELOW_FONT_SIZE.bind(coordsBelow.widthProperty().divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(belowLabel.textProperty())));
-            belowLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", BELOW_FONT_SIZE));
+            belowLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", BELOW_FONT_SIZE));*/
 
             Label leftLabel = new Label("" + (BOARD_SIZE - i));
             leftLabel.setMaxHeight(Double.MAX_VALUE);
             leftLabel.setAlignment(Pos.CENTER_RIGHT);
-            final DoubleProperty LEFT_FONT_SIZE = new SimpleDoubleProperty(0);
+            /*final DoubleProperty LEFT_FONT_SIZE = new SimpleDoubleProperty(0);
             LEFT_FONT_SIZE.bind(coordsLeft.heightProperty().divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(leftLabel.textProperty())));
-            leftLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", LEFT_FONT_SIZE));
+            leftLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", LEFT_FONT_SIZE));*/
 
             Label rightLabel = new Label("" + (BOARD_SIZE - i));
             rightLabel.setMaxHeight(Double.MAX_VALUE);
             rightLabel.setAlignment(Pos.CENTER_LEFT);
-            final DoubleProperty RIGHT_FONT_SIZE = new SimpleDoubleProperty(0);
+            /*final DoubleProperty RIGHT_FONT_SIZE = new SimpleDoubleProperty(0);
             RIGHT_FONT_SIZE.bind(coordsRight.heightProperty().divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(rightLabel.textProperty())));
-            rightLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", RIGHT_FONT_SIZE));
+            rightLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", RIGHT_FONT_SIZE));*/
 
             coordsAbove.getChildren().add(aboveLabel);
             coordsBelow.getChildren().add(belowLabel);
@@ -90,10 +92,6 @@ public class BoardSuperPane2 extends AnchorPane {
         getChildren().add(coordsBelow);
         getChildren().add(coordsLeft);
         getChildren().add(coordsRight);
-
-        /*System.out.println("bL: " + coordsLeft.minWidthProperty().get());
-        System.out.println("bA: " + coordsAbove.minWidthProperty().get());
-        System.out.println("bR: " + coordsRight.minWidthProperty().get());*/
     }
 
     public void fitItSnuggly() {
@@ -136,6 +134,19 @@ public class BoardSuperPane2 extends AnchorPane {
             setLeftAnchor(coordsAbove, newLeftAnchor);
             setLeftAnchor(coordsBelow, newLeftAnchor);
 
+            for(Node node : coordsAbove.getChildren()) {
+                Label l = (Label)node;
+                double newFontSize = (coordsAbove.getWidth() / 2) / this.BOARD_SIZE - l.getText().length();
+                Font f = new Font(newFontSize);
+                l.setFont(f);
+            }
+            for(Node node : coordsBelow.getChildren()) {
+                Label l = (Label)node;
+                double newFontSize = (coordsBelow.getWidth() / 2) / this.BOARD_SIZE - l.getText().length();
+                Font f = new Font(newFontSize);
+                l.setFont(f);
+            }
+
             double newTopAnchor = bp.getDeadHeightAtTop() + getTopAnchor(bp);
             setTopAnchor(coordsAbove, newTopAnchor - coordsAbove.getHeight());
             setTopAnchor(coordsLeft, newTopAnchor);
@@ -145,6 +156,19 @@ public class BoardSuperPane2 extends AnchorPane {
             setBottomAnchor(coordsBelow, newBottomAnchor - coordsBelow.getHeight());
             setBottomAnchor(coordsLeft, newBottomAnchor);
             setBottomAnchor(coordsRight, newBottomAnchor);
+
+            for(Node node : coordsLeft.getChildren()) {
+                Label l = (Label)node;
+                double newFontSize = (coordsLeft.getHeight() / 2) / this.BOARD_SIZE - l.getText().length();
+                Font f = new Font(newFontSize);
+                l.setFont(f);
+            }
+            for(Node node : coordsRight.getChildren()) {
+                Label l = (Label)node;
+                double newFontSize = (coordsRight.getHeight() / 2) / this.BOARD_SIZE - l.getText().length();
+                Font f = new Font(newFontSize);
+                l.setFont(f);
+            }
         });
     }
 
