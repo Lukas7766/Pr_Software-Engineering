@@ -3,11 +3,15 @@ package pr_se.gogame.view_controller;
 import javafx.application.Application;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
@@ -53,16 +57,16 @@ public class GoApplication extends Application {
                 path+"tile_0.png",
                 path+"stone_0_square.png",
                 path+"stone_1.png");*/
-        /*BoardSuperPane bsp = new BoardSuperPane(board,
-                path+"tile_0.png",
-                path+"tile_0.png",
-                path+"stone_0_square.png",
-                path+"stone_1.png");*/
-        BoardSuperPane2 bsp = new BoardSuperPane2(board,
+        BoardSuperPane bsp = new BoardSuperPane(board,
                 path+"tile_0.png",
                 path+"tile_0.png",
                 path+"stone_0_square.png",
                 path+"stone_1.png");
+        /*BoardSuperPane2 bsp = new BoardSuperPane2(board,
+                path+"tile_0.png",
+                path+"tile_0.png",
+                path+"stone_0_square.png",
+                path+"stone_1.png");*/
         BorderPane root = new BorderPane();
         root.setCenter(bsp);
         final NumberBinding BSP_ASPECT_RATIO = Bindings.min(root.widthProperty(), root.heightProperty().subtract(menuBar.heightProperty()));
@@ -86,13 +90,23 @@ public class GoApplication extends Application {
         System.out.println("-------------------------------------------------------------");
 
         System.out.println("------------------Before fitting it snuggly:");
-        bsp.printDebugInfo();
+        // bsp.printDebugInfo();
         // bsp.fitItSnuggly();
         System.out.println("------------------After fitting it snuggly:");
-        bsp.printDebugInfo();
-        VBox test = (VBox)bsp.getChildren().get(4);
+        // bsp.printDebugInfo();
+        // VBox test = (VBox)bsp.getChildren().get(4);
         // test.setPrefWidth(test.getPrefWidth() + 1);
         // test.setPrefWidth(test.getPrefWidth() - 1);
+
+        /*Button testButton = new Button("Test resizing");
+        testButton.addEventHandler(MouseEvent.MOUSE_CLICKED, new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+                bsp.getBp().resizeAroundChildren();
+            }
+        });
+
+        root.setRight(testButton);*/
     }
 
     private Parent createContent() {

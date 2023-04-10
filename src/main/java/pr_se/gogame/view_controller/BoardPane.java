@@ -1,8 +1,10 @@
 package pr_se.gogame.view_controller;
 
+import javafx.beans.InvalidationListener;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.DoublePropertyBase;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -57,7 +59,7 @@ public class BoardPane extends GridPane {
         private boolean isSelected = false;
         private boolean isSet = false;
 
-        public BoardCell(Image tile) {
+        private BoardCell(Image tile) {
             this.setMinSize(0, 0);
 
             BackgroundSize bgSz = new BackgroundSize(
@@ -255,51 +257,14 @@ public class BoardPane extends GridPane {
 
         // setGridLinesVisible(true);
 
-        // Add top labels
-        /*for(int i = 0; i < this.SIZE; i++) {
-            Label l = new Label("" + (char)('A' + i));
-            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-            // l.setTextAlignment(TextAlignment.CENTER); // Only works on multi-line text
-            add(l, i + 1, 0);
-            setValignment(l, VPos.BOTTOM);
-            setHalignment(l, HPos.CENTER);
-        }*/
-        // Fill the grid
+        // Fill the grid with BoardCells [of alternating tiles]
         for(int i = 0; i < this.SIZE; i++) {
-            // add left label
-            /*Label l = new Label("" + (SIZE - i));
-            // l.setTextAlignment(TextAlignment.RIGHT); // Only works on multi-line text
-            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-            add(l, 0, i + 1);
-            setValignment(l, VPos.CENTER);
-            setHalignment(l, HPos.RIGHT);*/
-
-            // add BoardCells [of alternating tiles]
             for(int j = 0; j < this.SIZE; j++) {
                 BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2]);
                 add(bc, j/* + 1*/, i/* + 1*/);
                 setMargin(bc, new Insets(0, 0, 0, 0));
-                /*setHalignment(bc, HPos.LEFT);
-                setValignment(bc, VPos.TOP);*/
             }
-
-            // add right label
-            /*l = new Label("" + (SIZE - i));
-            // l.setTextAlignment(TextAlignment.RIGHT); // Only works on multi-line text
-            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-            add(l, SIZE + 1, i + 1);
-            setValignment(l, VPos.CENTER);
-            setHalignment(l, HPos.RIGHT);*/
         }
-        // Add bottom labels
-        /*for(int i = 0; i < this.SIZE; i++) {
-            Label l = new Label("" + (char)('A' + i));
-            l.setTextAlignment(TextAlignment.CENTER);   // Only works on multi-line text
-            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-            add(l, i + 1, SIZE + 1);
-            setValignment(l, VPos.TOP);
-            setHalignment(l, HPos.CENTER);
-        }*/
 
         // Set up listeners
         setOnMouseMoved(e -> {
@@ -370,22 +335,79 @@ public class BoardPane extends GridPane {
             // TODO: Keyboard input?
         });
 
+        /*maxHeightProperty().bind(Bindings.createDoubleBinding(() -> getTotalContentHeight()));
+        maxWidthProperty().bind(Bindings.createDoubleBinding(() -> getTotalContentHeight()));*/
+
+        DoubleProperty actualWidth = new DoublePropertyBase() {
+            @Override
+            public Object getBean() {
+                return null;
+            }
+
+            @Override
+            public String getName() {
+                return null;
+            }
+        };
+
+        DoubleProperty actualHeight = new DoublePropertyBase() {
+            @Override
+            public Object getBean() {
+                return null;
+            }
+
+            @Override
+            public String getName() {
+                return null;
+            }
+        };
+
         ChangeListener myCL = new ChangeListener() {
             @Override
             public void changed(ObservableValue observableValue, Object o, Object t1) {
                 if(getFirstBC().widthProperty().get() == getFirstBC().heightProperty().get()) {
                     Bounds newBounds = (Bounds)t1;
                     fireActualChange(newBounds);
+                    actualWidth.set(getTotalContentWidth());
+                    actualHeight.set(getTotalContentHeight());
                 } else {
-                    System.out.println("WIDTH AND HEIGHT DIFFERENT: " + getFirstBC().widthProperty().get() + "/" + getFirstBC().heightProperty().get());
+                    // System.out.println("WIDTH AND HEIGHT DIFFERENT: " + getFirstBC().widthProperty().get() + "/" + getFirstBC().heightProperty().get());
                 }
             }
         };
 
-        // getFirstBC().widthProperty().addListener(myCL);
-        // getFirstBC().heightProperty().addListener(myCL);
         getFirstBC().boundsInParentProperty().addListener(myCL);
+
+        /*boundsInParentProperty().addListener((o, n, t) -> {
+            double cellAR = CELL_ASPECT_RATIO.getValue().doubleValue();
+            if(t.getMinX() >= cellAR && t.getMinY() >= cellAR) {
+                setMaxWidth(getMaxWidth() + (t.getMinX() / cellAR) * cellAR);
+                setMaxHeight(getMaxHeight() + (t.getMinY() / cellAR) * cellAR);
+            } else {
+                setMaxWidth(getTotalContentWidth());
+                setMaxHeight(getTotalContentWidth());
+            }
+        });*/
+
+        /*maxWidthProperty().bind(actualWidth);
+        maxHeightProperty().bind(actualHeight);*/
+        /*prefWidthProperty().bind(actualWidth);
+        prefHeightProperty().bind(actualHeight);*/
+
+        /*setMaxWidth(Region.USE_COMPUTED_SIZE);
+        setMaxHeight(Region.USE_COMPUTED_SIZE);*/
     }
+
+    /*@Override
+    public double computeMaxHeight(double width) {
+        return getTotalContentHeight();
+    }
+
+    @Override
+    public double computeMaxWidth(double height) {
+        return getTotalContentWidth();
+    }*/
+
 
     public void setBoard(Board board) {
         this.board = board;
@@ -521,4 +543,11 @@ public class BoardPane extends GridPane {
     private void fireActualChange(Bounds newVal) {
         actualChangeListeners.forEach(l -> l.changed(null, null, newVal));
     }
+
+    /*public void resizeAroundChildren() {
+        System.out.println("bounds in parent before: " + getBoundsInParent());
+        setMaxWidth(getTotalContentWidth());
+        setMaxHeight(getTotalContentHeight());
+        System.out.println("bounds in parent after: " + getBoundsInParent());
+    }*/
 }

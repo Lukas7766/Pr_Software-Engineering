@@ -154,16 +154,15 @@ public class BoardSuperPane2 extends AnchorPane {
 
         bp.addActualChangeListener((o, n, t) -> {
             // if(counter == 0) {
-                System.out.println("-----------------Actual Board size has changed:");
+                /*System.out.println("-----------------Actual Board size has changed:");
                 bp.printDebugInfo();
                 System.out.println("Dead width now: " + bp.getDeadWidthAtRight());
                 System.out.println("Offset is " + getRightAnchor(bp));
-                // setRightAnchor(bp, getRightAnchor(bp) - bp.getDeadWidthAtRight());
                 System.out.println("******* Right bar is currently at: " + getRightAnchor(coordsRight));
                 setRightAnchor(coordsRight, (bp.getDeadWidthAtRight() + getRightAnchor(bp)) - coordsRight.getWidth());
                 System.out.println("******* Right bar is afterwards at: " + getRightAnchor(coordsRight));
                 setLeftAnchor(coordsLeft, (bp.getDeadWidthAtLeft() + getLeftAnchor(bp)) - coordsLeft.getWidth());
-                counter++;
+                counter++;*/
             // }
         });
     }
@@ -172,5 +171,9 @@ public class BoardSuperPane2 extends AnchorPane {
 
     public void printDebugInfo() {
         bp.printDebugInfo();
+    }
+
+    public BoardPane getBp() {
+        return this.bp;
     }
 }

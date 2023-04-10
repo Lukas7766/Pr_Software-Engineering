@@ -35,14 +35,11 @@ public class BoardSuperPane extends BorderPane {
         coordsRight.setBackground(new Background(new BackgroundFill(Color.BLUE, null, null)));
 
         bp = new BoardPane(board, tile0, tile1, stone0, stone1);
-        // bp.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
         final NumberBinding BOARD_ASPECT_RATIO = Bindings.min(
             widthProperty().subtract(coordsLeft.widthProperty()).subtract(coordsRight.widthProperty()),
             heightProperty().subtract(coordsAbove.heightProperty()).subtract(coordsBelow.heightProperty()));
-        bp.maxHeightProperty().bind(BOARD_ASPECT_RATIO);
-        bp.maxWidthProperty().bind(BOARD_ASPECT_RATIO);
-        /*bp.prefWidthProperty().bind(bp.widthProperty());
-        bp.prefHeightProperty().bind(bp.heightProperty());*/
+        /*bp.maxHeightProperty().bind(BOARD_ASPECT_RATIO);
+        bp.maxWidthProperty().bind(BOARD_ASPECT_RATIO);*/
         this.setCenter(bp);
 
         for(int i = 0; i < this.BOARD_SIZE; i++) {
@@ -89,10 +86,11 @@ public class BoardSuperPane extends BorderPane {
         System.out.println("bL: " + coordsLeft.minWidthProperty().get());
         System.out.println("bA: " + coordsAbove.minWidthProperty().get());
         System.out.println("bR: " + coordsRight.minWidthProperty().get());
-        // maxWidthProperty().bind(coordsLeft.maxWidthProperty().add(coordsAbove.maxWidthProperty()).add(coordsRight.maxWidthProperty()));
-
-        // coordsRight.prefWidthProperty().bind(this.widthProperty().subtract(bp.widthProperty()).subtract(coordsLeft.widthProperty()));
 
         coordsRight.setMinWidth(100);
+    }
+
+    public BoardPane getBp() {
+        return this.bp;
     }
 }
