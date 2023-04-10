@@ -328,8 +328,8 @@ public class BoardPane extends GridPane {
         ChangeListener myCL = new ChangeListener() {
             @Override
             public void changed(ObservableValue observableValue, Object o, Object t1) {
-                if(getFirstBC().widthProperty().get() == getFirstBC().heightProperty().get()) {
-                    Bounds newBounds = (Bounds)t1;
+                if(getChildren().size() == SIZE*SIZE && getFirstBC().widthProperty().get() == getFirstBC().heightProperty().get()) {
+                    Bounds newBounds = getFirstBC().getBoundsInParent();
                     fireActualChange(newBounds);
                 } else {
                     // System.out.println("WIDTH AND HEIGHT DIFFERENT: " + getFirstBC().widthProperty().get() + "/" + getFirstBC().heightProperty().get());
@@ -338,6 +338,7 @@ public class BoardPane extends GridPane {
         };
 
         getFirstBC().boundsInParentProperty().addListener(myCL);
+        // boundsInParentProperty().addListener(myCL);
     }
 
     public void setBoard(Board board) {

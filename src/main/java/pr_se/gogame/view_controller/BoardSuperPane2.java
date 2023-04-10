@@ -1,8 +1,5 @@
 package pr_se.gogame.view_controller;
 
-import javafx.beans.binding.Bindings;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
@@ -45,30 +42,18 @@ public class BoardSuperPane2 extends AnchorPane {
             Label aboveLabel = new Label("" + (char)('A' + i));
             aboveLabel.setMaxWidth(Double.MAX_VALUE);
             aboveLabel.setAlignment(Pos.BOTTOM_CENTER);
-            /*final DoubleProperty ABOVE_FONT_SIZE = new SimpleDoubleProperty(0);
-            ABOVE_FONT_SIZE.bind(coordsAbove.widthProperty().divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(aboveLabel.textProperty())));
-            aboveLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", ABOVE_FONT_SIZE));*/
 
             Label belowLabel = new Label("" + (char)('A' + i));
             belowLabel.setMaxWidth(Double.MAX_VALUE);
             belowLabel.setAlignment(Pos.TOP_CENTER);
-            /*final DoubleProperty BELOW_FONT_SIZE = new SimpleDoubleProperty(0);
-            BELOW_FONT_SIZE.bind(coordsBelow.widthProperty().divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(belowLabel.textProperty())));
-            belowLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", BELOW_FONT_SIZE));*/
 
             Label leftLabel = new Label("" + (BOARD_SIZE - i));
             leftLabel.setMaxHeight(Double.MAX_VALUE);
             leftLabel.setAlignment(Pos.CENTER_RIGHT);
-            /*final DoubleProperty LEFT_FONT_SIZE = new SimpleDoubleProperty(0);
-            LEFT_FONT_SIZE.bind(coordsLeft.heightProperty().divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(leftLabel.textProperty())));
-            leftLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", LEFT_FONT_SIZE));*/
 
             Label rightLabel = new Label("" + (BOARD_SIZE - i));
             rightLabel.setMaxHeight(Double.MAX_VALUE);
             rightLabel.setAlignment(Pos.CENTER_LEFT);
-            /*final DoubleProperty RIGHT_FONT_SIZE = new SimpleDoubleProperty(0);
-            RIGHT_FONT_SIZE.bind(coordsRight.heightProperty().divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(rightLabel.textProperty())));
-            rightLabel.styleProperty().bind(Bindings.concat("-fx-font-size: ", RIGHT_FONT_SIZE));*/
 
             coordsAbove.getChildren().add(aboveLabel);
             coordsBelow.getChildren().add(belowLabel);
@@ -124,52 +109,43 @@ public class BoardSuperPane2 extends AnchorPane {
         });
 
         bp.addActualChangeListener((o, n, t) -> {
-            double newRightAnchor = bp.getDeadWidthAtRight() + getRightAnchor(bp);
-            setRightAnchor(coordsRight, newRightAnchor - coordsRight.getWidth());
-            setRightAnchor(coordsAbove, newRightAnchor);
-            setRightAnchor(coordsBelow, newRightAnchor);
+            if(getRightAnchor(bp) != null && getLeftAnchor(bp) != null && getTopAnchor(bp) != null && getBottomAnchor(bp) != null) {
+                double newRightAnchor = bp.getDeadWidthAtRight() + getRightAnchor(bp);
+                setRightAnchor(coordsRight, newRightAnchor - coordsRight.getWidth());
+                setRightAnchor(coordsAbove, newRightAnchor);
+                setRightAnchor(coordsBelow, newRightAnchor);
 
-            double newLeftAnchor = bp.getDeadWidthAtLeft() + getLeftAnchor(bp);
-            setLeftAnchor(coordsLeft, newLeftAnchor - coordsLeft.getWidth());
-            setLeftAnchor(coordsAbove, newLeftAnchor);
-            setLeftAnchor(coordsBelow, newLeftAnchor);
+                double newLeftAnchor = bp.getDeadWidthAtLeft() + getLeftAnchor(bp);
+                setLeftAnchor(coordsLeft, newLeftAnchor - coordsLeft.getWidth());
+                setLeftAnchor(coordsAbove, newLeftAnchor);
+                setLeftAnchor(coordsBelow, newLeftAnchor);
 
-            for(Node node : coordsAbove.getChildren()) {
-                Label l = (Label)node;
-                double newFontSize = (coordsAbove.getWidth() / 2) / this.BOARD_SIZE - l.getText().length();
-                Font f = new Font(newFontSize);
-                l.setFont(f);
-            }
-            for(Node node : coordsBelow.getChildren()) {
-                Label l = (Label)node;
-                double newFontSize = (coordsBelow.getWidth() / 2) / this.BOARD_SIZE - l.getText().length();
-                Font f = new Font(newFontSize);
-                l.setFont(f);
-            }
+                updateFontSize(coordsAbove, coordsAbove.getWidth());
+                updateFontSize(coordsBelow, coordsBelow.getWidth());
 
-            double newTopAnchor = bp.getDeadHeightAtTop() + getTopAnchor(bp);
-            setTopAnchor(coordsAbove, newTopAnchor - coordsAbove.getHeight());
-            setTopAnchor(coordsLeft, newTopAnchor);
-            setTopAnchor(coordsRight, newTopAnchor);
+                double newTopAnchor = bp.getDeadHeightAtTop() + getTopAnchor(bp);
+                setTopAnchor(coordsAbove, newTopAnchor - coordsAbove.getHeight());
+                setTopAnchor(coordsLeft, newTopAnchor);
+                setTopAnchor(coordsRight, newTopAnchor);
 
-            double newBottomAnchor = bp.getDeadHeightAtBottom() + getBottomAnchor(bp);
-            setBottomAnchor(coordsBelow, newBottomAnchor - coordsBelow.getHeight());
-            setBottomAnchor(coordsLeft, newBottomAnchor);
-            setBottomAnchor(coordsRight, newBottomAnchor);
+                double newBottomAnchor = bp.getDeadHeightAtBottom() + getBottomAnchor(bp);
+                setBottomAnchor(coordsBelow, newBottomAnchor - coordsBelow.getHeight());
+                setBottomAnchor(coordsLeft, newBottomAnchor);
+                setBottomAnchor(coordsRight, newBottomAnchor);
 
-            for(Node node : coordsLeft.getChildren()) {
-                Label l = (Label)node;
-                double newFontSize = (coordsLeft.getHeight() / 2) / this.BOARD_SIZE - l.getText().length();
-                Font f = new Font(newFontSize);
-                l.setFont(f);
-            }
-            for(Node node : coordsRight.getChildren()) {
-                Label l = (Label)node;
-                double newFontSize = (coordsRight.getHeight() / 2) / this.BOARD_SIZE - l.getText().length();
-                Font f = new Font(newFontSize);
-                l.setFont(f);
+                updateFontSize(coordsLeft, coordsLeft.getHeight());
+                updateFontSize(coordsRight, coordsRight.getHeight());
             }
         });
+    }
+
+    private void updateFontSize(Pane coords, double dimension) {
+        for(Node node : coords.getChildren()) {
+            Label l = (Label)node;
+            double newFontSize = (dimension / 2) / this.BOARD_SIZE - l.getText().length();
+            Font f = new Font(newFontSize);
+            l.setFont(f);
+        }
     }
 
     // TODO: Remove in finished product
