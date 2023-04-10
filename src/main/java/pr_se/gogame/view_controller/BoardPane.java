@@ -93,9 +93,6 @@ public class BoardPane extends GridPane {
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
 
             getChildren().add(this.LABEL);
-
-            /*this.prefWidthProperty().bind(BLACK_STONE.fitWidthProperty());
-            this.prefHeightProperty().bind(BLACK_STONE.fitHeightProperty());*/
         }
 
         private ImageView getCellImageView(Image i) {
@@ -213,17 +210,12 @@ public class BoardPane extends GridPane {
         public Label getLabel() {
             return LABEL;
         }
-    }
+    } // private class BoardCell
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the board (as those might be changed during a game).
     public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
         setBoard(board);
         this.SIZE = board.getSize();
-        /*
-         * We have to subtract the width/height of the labels (if present) from the width/height of the BoardPane
-         * before division, if (and only if) labels are displayed.
-         */
-        // Bindings.subtract(widthProperty(), widthProperty der längsten Labels);
         final NumberBinding CELL_ASPECT_RATIO = Bindings.min(widthProperty(), heightProperty()).divide(SIZE);
         ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);
 
@@ -255,51 +247,14 @@ public class BoardPane extends GridPane {
 
         // setGridLinesVisible(true);
 
-        // Add top labels
-        /*for(int i = 0; i < this.SIZE; i++) {
-            Label l = new Label("" + (char)('A' + i));
-            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-            // l.setTextAlignment(TextAlignment.CENTER); // Only works on multi-line text
-            add(l, i + 1, 0);
-            setValignment(l, VPos.BOTTOM);
-            setHalignment(l, HPos.CENTER);
-        }*/
-        // Fill the grid
+        // Fill the grid with oardCells [of alternating tiles]
         for(int i = 0; i < this.SIZE; i++) {
-            // add left label
-            /*Label l = new Label("" + (SIZE - i));
-            // l.setTextAlignment(TextAlignment.RIGHT); // Only works on multi-line text
-            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-            add(l, 0, i + 1);
-            setValignment(l, VPos.CENTER);
-            setHalignment(l, HPos.RIGHT);*/
-
-            // add BoardCells [of alternating tiles]
             for(int j = 0; j < this.SIZE; j++) {
                 BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2]);
-                add(bc, j/* + 1*/, i/* + 1*/);
+                add(bc, j, i);
                 setMargin(bc, new Insets(0, 0, 0, 0));
-                /*setHalignment(bc, HPos.LEFT);
-                setValignment(bc, VPos.TOP);*/
             }
-
-            // add right label
-            /*l = new Label("" + (SIZE - i));
-            // l.setTextAlignment(TextAlignment.RIGHT); // Only works on multi-line text
-            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-            add(l, SIZE + 1, i + 1);
-            setValignment(l, VPos.CENTER);
-            setHalignment(l, HPos.RIGHT);*/
         }
-        // Add bottom labels
-        /*for(int i = 0; i < this.SIZE; i++) {
-            Label l = new Label("" + (char)('A' + i));
-            l.setTextAlignment(TextAlignment.CENTER);   // Only works on multi-line text
-            l.setBackground(new Background(new BackgroundFill(Color.WHITE, null, null)));
-            add(l, i + 1, SIZE + 1);
-            setValignment(l, VPos.TOP);
-            setHalignment(l, HPos.CENTER);
-        }*/
 
         // Set up listeners
         setOnMouseMoved(e -> {
@@ -495,21 +450,22 @@ public class BoardPane extends GridPane {
         return getDeadHeight() - getDeadHeightAtTop();
     }
 
+    // TODO: Remove in finished product
     public void printDebugInfo() {
         BoardCell targetBC = getFirstBC();
-        // this.board.printDebugInfo(col, row);
+        //this.board.printDebugInfo(col, row);
         System.out.println("width/height: " + getWidth() + "/" + getHeight());
-        /*System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
-        System.out.println("MinWidth/Height: " + getMinWidth() + "/" + getMinHeight());*/
+        //System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
+        //System.out.println("MinWidth/Height: " + getMinWidth() + "/" + getMinHeight());
         System.out.println("Actual width/height: " + getTotalContentWidth() + "/" + getTotalContentHeight());
         System.out.println("Dead width/height: " + getDeadWidth() + "/" + getDeadHeight());
         System.out.println("Dead width/height at left/right/top/bottom: " + getDeadWidthAtLeft() + "/" + getDeadWidthAtRight() + "/" + getDeadHeightAtTop() + "/" + getDeadHeightAtBottom());
         System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
         System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());
-        // System.out.println("Cell bounds in local: " + targetBC.getBoundsInLocal());
+        //System.out.println("Cell bounds in local: " + targetBC.getBoundsInLocal());
         System.out.println("Cell bounds in parent: " + targetBC.getBoundsInParent());
 
-        // System.out.println("Hover over " + col + " " + row);    // TODO: Remove in finished product
+        //System.out.println("Hover over " + col + " " + row);
     }
 
     public void addActualChangeListener(ChangeListener l) {

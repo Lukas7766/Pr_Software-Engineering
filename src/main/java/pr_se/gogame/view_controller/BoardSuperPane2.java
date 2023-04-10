@@ -147,6 +147,7 @@ public class BoardSuperPane2 extends AnchorPane {
         });
     }
 
+    // TODO: Remove in finished product
     public void printDebugInfo() {
         bp.printDebugInfo();
     }

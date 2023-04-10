@@ -48,11 +48,6 @@ public class GoApplication extends Application {
         // Altered by Gerald to add the BoardPane
         Board board = new Board(19);
         final String path = "file:src/main/resources/pr_se/gogame/";
-        /*BoardPane boardPane = new BoardPane(board,
-                path+"tile_0.png",
-                path+"tile_0.png",
-                path+"stone_0_square.png",
-                path+"stone_1.png");*/
         /*BoardSuperPane bsp = new BoardSuperPane(board,
                 path+"tile_0.png",
                 path+"tile_0.png",
@@ -85,11 +80,7 @@ public class GoApplication extends Application {
         System.out.println("menuBar width/height: " + menuBar.getWidth() + "/" + menuBar.getHeight());
         System.out.println("bsp width/height: " + bsp.getWidth() + "/" + bsp.getHeight());
         System.out.println("-------------------------------------------------------------");
-
-        System.out.println("------------------Before fitting it snuggly:");
-        // bsp.printDebugInfo();
-        // bsp.fitItSnuggly();
-        System.out.println("------------------After fitting it snuggly:");
+        
         // bsp.printDebugInfo();
         VBox test = (VBox)bsp.getChildren().get(4);
     }
