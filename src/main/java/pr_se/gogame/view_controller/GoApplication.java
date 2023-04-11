@@ -5,14 +5,14 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.Pane;
-import javafx.scene.layout.StackPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
@@ -50,15 +50,24 @@ public class GoApplication extends Application {
         BorderPane root = new BorderPane();
 
         // Altered by Gerald to add the BoardPane
-        Board board = new Board(19);
+        Board board = new Board(5);
         final String path = "file:src/main/resources/pr_se/gogame/";
-        BoardSuperPane bsp = new BoardSuperPane(board,
+
+        BoardPane bsp = new BoardPane(board,
                 path+"tile_0.png",
                 path+"tile_0.png",
                 path+"stone_0_square.png",
-                path+"stone_1.png");
-        final NumberBinding BSP_ASPECT_RATIO = Bindings.min(root.widthProperty(), root.heightProperty().subtract(menuBar.heightProperty()));
-        /*bsp.maxWidthProperty().bind(BSP_ASPECT_RATIO);
+                path+"stone_1.png",
+                Bindings.min(root.widthProperty(), root.widthProperty()),
+                Bindings.min(root.heightProperty(), root.heightProperty()));
+
+        /*BoardSuperPane bsp = new BoardSuperPane(board,
+                path+"tile_0.png",
+                path+"tile_0.png",
+                path+"stone_0_square.png",
+                path+"stone_1.png");*/
+        /*final NumberBinding BSP_ASPECT_RATIO = Bindings.min(root.widthProperty(), root.heightProperty().subtract(menuBar.heightProperty()));
+        bsp.maxWidthProperty().bind(BSP_ASPECT_RATIO);
         bsp.maxHeightProperty().bind(BSP_ASPECT_RATIO);*/
         /*BoardSuperPane2 bsp = new BoardSuperPane2(board,
                 path+"tile_0.png",
@@ -75,13 +84,45 @@ public class GoApplication extends Application {
         dummyPane.getChildren().add(bsp);
         Rectangle testRectangle = new Rectangle();
         // testRectangle.widthProperty().bind(bsp.getCoordsLeft().widthProperty().add(bsp.getCoordsAbove().widthProperty()).add(bsp.getCoordsRight().widthProperty()));
-        testRectangle.heightProperty().bind(bsp.getCoordsAbove().heightProperty().add(bsp.getCoordsLeft().heightProperty()).add(bsp.getCoordsBelow().heightProperty()));
-        root.setCenter(dummyPane);
+        // testRectangle.heightProperty().bind(bsp.getCoordsAbove().heightProperty().add(bsp.getCoordsLeft().heightProperty()).add(bsp.getCoordsBelow().heightProperty()));
+        // root.setCenter(dummyPane);
         // root.setLeft(testRectangle);
 
+        BoardPane2 bp2 = new BoardPane2(board,
+            path+"tile_0.png",
+            path+"tile_0.png",
+            path+"stone_0_square.png",
+            path+"stone_1.png");
+
+        // root.setCenter(bp2);
         root.setTop(vBox);
 
-        Scene scene = new Scene(root, 960, 600);
+        StackPane visualAidV = new StackPane();
+        visualAidV.setBackground(new Background(new BackgroundFill(Color.PINK, null, null)));
+
+        Label l = new Label("Hello");
+        visualAidV.getChildren().add(l);
+
+        StackPane visualAidH = new StackPane();
+        visualAidH.setBackground(new Background(new BackgroundFill(Color.GREENYELLOW, null, null)));
+
+        Label m = new Label("Hello");
+        visualAidH.getChildren().add(m);
+
+        Image i = new Image(path + "stone_0_square.png");
+        ImageView iv = new ResizableImageView(i);
+        iv.setPreserveRatio(true);
+
+        StackPane visualAidC = new StackPane();
+        visualAidC.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
+        visualAidC.getChildren().add(iv);
+
+        BorderPane pane = new BorderPane();
+        pane.setCenter(visualAidC);
+        pane.setLeft(visualAidV);
+        pane.setTop(visualAidH);
+
+        Scene scene = new Scene(pane, 960, 600);
 
         stage.setMinWidth(320);
         stage.setMinHeight(200);
