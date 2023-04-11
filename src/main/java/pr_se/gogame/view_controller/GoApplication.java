@@ -42,15 +42,15 @@ public class GoApplication extends Application {
         Board board = new Board(19);
         final String path = "file:src/main/resources/pr_se/gogame/";
 
-        BoardPane2 bp2 = new BoardPane2(board,
+        BoardPane bp = new BoardPane(board,
             path+"tile_0.png",
             path+"tile_0.png",
             path+"stone_0_square.png",
             path+"stone_1.png");
-        bp2.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
+        bp.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
 
         root.setTop(vBox);
-        root.setCenter(bp2);
+        root.setCenter(bp);
 
         Scene scene = new Scene(root, 960, 600);
 

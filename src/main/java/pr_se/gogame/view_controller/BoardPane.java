@@ -20,7 +20,7 @@ import javafx.geometry.Pos;
  * View/Controller
  * Board that uses image files for its tiles and stones
  */
-public class BoardPane2 extends GridPane {
+public class BoardPane extends GridPane {
 
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
     private boolean showsMoveNumbers = true;
@@ -35,7 +35,7 @@ public class BoardPane2 extends GridPane {
     private BoardCell lastBC = null;
     private BoardCell selectionBC = null;
 
-    public BoardPane2(Board board, String tile0, String tile1, String stone0, String stone1) {
+    public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
         setBoard(board);
         this.SIZE = board.getSize();
 
