@@ -16,6 +16,10 @@ import pr_se.gogame.model.Board;
 import pr_se.gogame.model.StoneColor;
 import javafx.geometry.Pos;
 
+/**
+ * View/Controller
+ * Board that uses image files for its tiles and stones
+ */
 public class BoardPane2 extends GridPane {
 
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
