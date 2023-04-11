@@ -3,6 +3,9 @@ package pr_se.gogame.view_controller;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
+/**
+ * Inspired by https://www.reddit.com/r/JavaFX/comments/l2yzwg/resize_imageview_to_fit_parent_pane/
+ */
 public class ResizableImageView extends ImageView {
 
     public ResizableImageView() {

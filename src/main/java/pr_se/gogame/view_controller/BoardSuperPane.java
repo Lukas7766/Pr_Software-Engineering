@@ -2,10 +2,8 @@ package pr_se.gogame.view_controller;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
-import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -15,7 +13,7 @@ import pr_se.gogame.model.Board;
 public class BoardSuperPane extends OrbitalBorderPane {
 
     private int BOARD_SIZE;
-    BoardPane bp;
+    BoardPane2 bp;
     VBox coordsRight, coordsLeft;
     HBox coordsAbove, coordsBelow;
 
@@ -35,17 +33,17 @@ public class BoardSuperPane extends OrbitalBorderPane {
         coordsLeft.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
         coordsRight.setBackground(new Background(new BackgroundFill(Color.BEIGE, null, null)));
 
-        bp = new BoardPane(
+        bp = new BoardPane2(
             board,
             tile0,
             tile1,
             stone0,
-            stone1,
+            stone1
             // widthProperty().subtract(this.BOARD_SIZE * 2),
-            Bindings.min(widthProperty(), widthProperty()),
+            // Bindings.min(widthProperty(), widthProperty()),
             // widthProperty().subtract(coordsLeft.widthProperty()).subtract(coordsRight.widthProperty()),
             // heightProperty().subtract(this.BOARD_SIZE * 2)
-            Bindings.min(heightProperty(), heightProperty())
+            // Bindings.min(heightProperty(), heightProperty())
             // heightProperty().subtract(coordsAbove.heightProperty()).subtract(coordsBelow.heightProperty())
         );
         /*final NumberBinding BOARD_ASPECT_RATIO = Bindings.min(
@@ -53,6 +51,7 @@ public class BoardSuperPane extends OrbitalBorderPane {
             heightProperty().subtract(coordsAbove.heightProperty()).subtract(coordsBelow.heightProperty()));
         bp.maxHeightProperty().bind(BOARD_ASPECT_RATIO);
         bp.maxWidthProperty().bind(BOARD_ASPECT_RATIO);*/
+        bp.setBackground(new Background(new BackgroundFill(Color.RED, null, null)));
         setCenter(bp);
 
         for(int i = 0; i < this.BOARD_SIZE; i++) {
@@ -146,7 +145,7 @@ public class BoardSuperPane extends OrbitalBorderPane {
         return BOARD_SIZE;
     }
 
-    public BoardPane getBp() {
+    public BoardPane2 getBp() {
         return bp;
     }
 

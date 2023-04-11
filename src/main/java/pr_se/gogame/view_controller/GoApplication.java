@@ -53,19 +53,11 @@ public class GoApplication extends Application {
         Board board = new Board(5);
         final String path = "file:src/main/resources/pr_se/gogame/";
 
-        BoardPane bsp = new BoardPane(board,
+        BoardSuperPane bsp = new BoardSuperPane(board,
                 path+"tile_0.png",
                 path+"tile_0.png",
                 path+"stone_0_square.png",
-                path+"stone_1.png",
-                Bindings.min(root.widthProperty(), root.widthProperty()),
-                Bindings.min(root.heightProperty(), root.heightProperty()));
-
-        /*BoardSuperPane bsp = new BoardSuperPane(board,
-                path+"tile_0.png",
-                path+"tile_0.png",
-                path+"stone_0_square.png",
-                path+"stone_1.png");*/
+                path+"stone_1.png");
         /*final NumberBinding BSP_ASPECT_RATIO = Bindings.min(root.widthProperty(), root.heightProperty().subtract(menuBar.heightProperty()));
         bsp.maxWidthProperty().bind(BSP_ASPECT_RATIO);
         bsp.maxHeightProperty().bind(BSP_ASPECT_RATIO);*/
@@ -93,21 +85,22 @@ public class GoApplication extends Application {
             path+"tile_0.png",
             path+"stone_0_square.png",
             path+"stone_1.png");
+        bp2.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
 
-        // root.setCenter(bp2);
+        root.setCenter(bsp);
         root.setTop(vBox);
 
-        StackPane visualAidV = new StackPane();
-        visualAidV.setBackground(new Background(new BackgroundFill(Color.PINK, null, null)));
+        StackPane visualAidLeft = new StackPane();
+        visualAidLeft.setBackground(new Background(new BackgroundFill(Color.PINK, null, null)));
 
-        Label l = new Label("Hello");
-        visualAidV.getChildren().add(l);
+        Label l = new Label("Left");
+        visualAidLeft.getChildren().add(l);
 
-        StackPane visualAidH = new StackPane();
-        visualAidH.setBackground(new Background(new BackgroundFill(Color.GREENYELLOW, null, null)));
+        StackPane visualAidTop = new StackPane();
+        visualAidTop.setBackground(new Background(new BackgroundFill(Color.GREENYELLOW, null, null)));
 
-        Label m = new Label("Hello");
-        visualAidH.getChildren().add(m);
+        Label m = new Label("Top");
+        visualAidTop.getChildren().add(m);
 
         Image i = new Image(path + "stone_0_square.png");
         ImageView iv = new ResizableImageView(i);
@@ -118,11 +111,14 @@ public class GoApplication extends Application {
         visualAidC.getChildren().add(iv);
 
         BorderPane pane = new BorderPane();
-        pane.setCenter(visualAidC);
-        pane.setLeft(visualAidV);
-        pane.setTop(visualAidH);
+        // pane.setCenter(visualAidC);
+        pane.setCenter(bp2);
+        pane.setLeft(visualAidLeft);
+        pane.setTop(visualAidTop);
 
+        // Scene scene = new Scene(root, 960, 600);
         Scene scene = new Scene(pane, 960, 600);
+        // Scene scene = new Scene(bp2, 960, 600);
 
         stage.setMinWidth(320);
         stage.setMinHeight(200);
