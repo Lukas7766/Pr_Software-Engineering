@@ -4,7 +4,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 
 /**
- * Inspired by https://www.reddit.com/r/JavaFX/comments/l2yzwg/resize_imageview_to_fit_parent_pane/
+ * Inspired by <a href="https://www.reddit.com/r/JavaFX/comments/l2yzwg/resize_imageview_to_fit_parent_pane/">...</a>
  */
 public class ResizableImageView extends ImageView {
 

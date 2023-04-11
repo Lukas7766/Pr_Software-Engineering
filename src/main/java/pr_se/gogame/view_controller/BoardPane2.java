@@ -20,6 +20,7 @@ public class BoardPane2 extends GridPane {
 
     private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
     private boolean showsMoveNumbers = true;
+    private boolean showsCoordinates = true;
 
     private final int SIZE;
     private Board board;
@@ -27,8 +28,8 @@ public class BoardPane2 extends GridPane {
     private final Image[] tiles = new Image [2];
     private final Image[] stones = new Image [2];
 
-    private BoardPane2.BoardCell lastBC = null;
-    private BoardPane2.BoardCell selectionBC = null;
+    private BoardCell lastBC = null;
+    private BoardCell selectionBC = null;
 
     public BoardPane2(Board board, String tile0, String tile1, String stone0, String stone1) {
         setBoard(board);
@@ -145,7 +146,7 @@ public class BoardPane2 extends GridPane {
         // Fill the grid with alternating tiles
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {
-                BoardPane2.BoardCell bc = new BoardPane2.BoardCell(tiles[(j % 2 + i % 2) % 2]);
+                BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2]);
                 bc.prefWidthProperty().bind(MAX_CELL_DIM);
                 bc.prefHeightProperty().bind(MAX_CELL_DIM);
                 add(bc, j + 1, i + 1);
@@ -161,8 +162,8 @@ public class BoardPane2 extends GridPane {
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
-                    if (col != null && row != null && target instanceof BoardPane2.BoardCell) {
-                        BoardPane2.BoardCell targetBC = (BoardPane2.BoardCell) target;
+                    if (col != null && row != null && target instanceof BoardCell) {
+                        BoardCell targetBC = (BoardCell)target;
                         // printDebugInfo();
 
                         if (this.board.getCurColor() == StoneColor.BLACK) {
@@ -231,7 +232,7 @@ public class BoardPane2 extends GridPane {
         board.addListener(new GoListener() {
             @Override
             public void stoneSet(StoneSetEvent e) {
-                BoardPane2.BoardCell destinationBC = (BoardPane2.BoardCell) getChildren().get(e.getRow() * SIZE + e.getCol() + 4);
+                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * SIZE + e.getCol() + 4);
                 destinationBC.getLabel().setText("" + e.getMoveNumber());
 
                 if(e.getColor() == StoneColor.BLACK) {
@@ -243,14 +244,14 @@ public class BoardPane2 extends GridPane {
 
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
-                BoardPane2.BoardCell destinationBC = (BoardPane2.BoardCell) getChildren().get(e.getRow() * SIZE + e.getCol() + 4);
+                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * SIZE + e.getCol() + 4);
 
                 destinationBC.unset();
             }
 
             @Override
             public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-                BoardPane2.BoardCell destinationBC = (BoardPane2.BoardCell) getChildren().get(y * SIZE + x);
+                BoardCell destinationBC = (BoardCell) getChildren().get(y * SIZE + x);
                 destinationBC.getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
         });
@@ -271,27 +272,25 @@ public class BoardPane2 extends GridPane {
         }
     }
 
-    // overridden parent methods
-    /*@Override
-    public void resize(double width, double height) {
-        width -= width % SIZE;
-        height -= height % SIZE;
-
-        double dim = Math.min(width, height);
-
-        super.resize(dim, dim);
-
-        /*double myWidth = getChildren().get(0).getLayoutBounds().getWidth() * SIZE;
-        double myHeight = getChildren().get(0).getLayoutBounds().getHeight() * SIZE;*/
-
-        /*setMaxWidth(Math.min(myWidth, myHeight));
-        setMaxHeight(Math.min(myWidth, myHeight));*/
-    // }
-
     private void makeLabelSizeDynamic(Label l, ReadOnlyDoubleProperty dimProperty) {
         final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
         FONT_SIZE.bind(dimProperty.divide(100.0 / (this.SIZE * 2.5)).divide(this.SIZE).subtract(Bindings.length(l.textProperty())));
         l.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
+    }
+
+    // TODO: Remove in finished product
+    public void printDebugInfo() {
+        BoardCell targetBC = (BoardCell)getChildren().get(4);
+        //this.board.printDebugInfo(col, row);
+        System.out.println("width/height: " + getWidth() + "/" + getHeight());
+        //System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
+        //System.out.println("MinWidth/Height: " + getMinWidth() + "/" + getMinHeight());
+        System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
+        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());
+        //System.out.println("Cell bounds in local: " + targetBC.getBoundsInLocal());
+        System.out.println("Cell bounds in parent: " + targetBC.getBoundsInParent());
+
+        //System.out.println("Hover over " + col + " " + row);
     }
 
     private class BoardCell extends StackPane {
