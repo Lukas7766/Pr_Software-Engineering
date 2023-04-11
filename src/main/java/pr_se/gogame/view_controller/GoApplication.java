@@ -63,6 +63,12 @@ public class GoApplication extends Application {
                 path+"tile_0.png",
                 path+"stone_0_square.png",
                 path+"stone_1.png");*/
+        StackPane dummyPane = new StackPane();
+        dummyPane.minWidthProperty().bind(bsp.getCoordsLeft().widthProperty().add(bsp.getCoordsAbove().widthProperty()).add(bsp.getCoordsRight().widthProperty()));
+        dummyPane.minHeightProperty().bind(bsp.getCoordsAbove().heightProperty().add(bsp.getCoordsLeft().heightProperty()).add(bsp.getCoordsBelow().heightProperty()));
+        dummyPane.maxWidthProperty().bind(dummyPane.minWidthProperty());
+        dummyPane.maxHeightProperty().bind(dummyPane.minHeightProperty());
+        // dummyPane.getChildren().add(bsp);
         root.setCenter(bsp);
 
         root.setTop(vBox);

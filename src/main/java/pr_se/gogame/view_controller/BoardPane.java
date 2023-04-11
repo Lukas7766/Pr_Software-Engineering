@@ -334,6 +334,8 @@ public class BoardPane extends GridPane {
 
         maxWidthProperty().bind(getFirstBC().getBlackStone().fitWidthProperty().multiply(this.SIZE));
         maxHeightProperty().bind(getFirstBC().getBlackStone().fitHeightProperty().multiply(this.SIZE));
+        minWidthProperty().bind(maxWidthProperty());
+        minHeightProperty().bind(maxHeightProperty());
     }
 
     public void setBoard(Board board) {

@@ -5,6 +5,7 @@ import javafx.beans.binding.NumberBinding;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
+import javafx.scene.chart.NumberAxis;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
@@ -40,10 +41,12 @@ public class BoardSuperPane extends OrbitalBorderPane {
             tile1,
             stone0,
             stone1,
-            //Bindings.min(widthProperty(), widthProperty()),
-            widthProperty().subtract(coordsLeft.widthProperty()).subtract(coordsRight.widthProperty()),
-            //Bindings.min(heightProperty(), heightProperty())
-            heightProperty().subtract(coordsAbove.heightProperty()).subtract(coordsBelow.heightProperty())
+            // widthProperty().subtract(this.BOARD_SIZE * 2),
+            Bindings.min(widthProperty(), widthProperty()),
+            // widthProperty().subtract(coordsLeft.widthProperty()).subtract(coordsRight.widthProperty()),
+            // heightProperty().subtract(this.BOARD_SIZE * 2)
+            Bindings.min(heightProperty(), heightProperty())
+            // heightProperty().subtract(coordsAbove.heightProperty()).subtract(coordsBelow.heightProperty())
         );
         /*final NumberBinding BOARD_ASPECT_RATIO = Bindings.min(
             widthProperty().subtract(coordsLeft.widthProperty()).subtract(coordsRight.widthProperty()),
@@ -93,12 +96,14 @@ public class BoardSuperPane extends OrbitalBorderPane {
         setBottom(coordsBelow);
         setLeft(coordsLeft);
         setRight(coordsRight);
+        /*NumberAxis na = new NumberAxis(0.0, 19.0, 1.0);
+        setRight(na);*/
 
         // setAlignment(bp, Pos.CENTER);
-        setAlignment(coordsAbove, Pos.BOTTOM_CENTER);
-        setAlignment(coordsBelow, Pos.TOP_CENTER);
-        setAlignment(coordsLeft, Pos.CENTER_RIGHT);
-        setAlignment(coordsRight, Pos.CENTER_LEFT);
+        setAlignment(getTop(), Pos.BOTTOM_CENTER);
+        setAlignment(getBottom(), Pos.TOP_CENTER);
+        setAlignment(getLeft(), Pos.CENTER_RIGHT);
+        setAlignment(getRight(), Pos.CENTER_LEFT);
 
         /*coordsAbove.setPadding(new Insets(10.0, 0, 0, 0));
         coordsRight.setPadding(new Insets(0, 10.0, 0, 0));
@@ -135,5 +140,29 @@ public class BoardSuperPane extends OrbitalBorderPane {
             Font f = new Font(newFontSize);
             l.setFont(f);
         }
+    }
+
+    public int getBOARD_SIZE() {
+        return BOARD_SIZE;
+    }
+
+    public BoardPane getBp() {
+        return bp;
+    }
+
+    public VBox getCoordsRight() {
+        return coordsRight;
+    }
+
+    public VBox getCoordsLeft() {
+        return coordsLeft;
+    }
+
+    public HBox getCoordsAbove() {
+        return coordsAbove;
+    }
+
+    public HBox getCoordsBelow() {
+        return coordsBelow;
     }
 }
