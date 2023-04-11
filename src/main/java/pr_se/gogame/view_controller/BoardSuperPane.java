@@ -105,10 +105,10 @@ public class BoardSuperPane extends OrbitalBorderPane {
         coordsBelow.setPadding(new Insets(0, 0, 10.0, 0));
         coordsLeft.setPadding(new Insets(0, 0, 0, 10.0));*/
 
-        setMargin(coordsAbove, new Insets(10.0, 0, 0, 0));
+        /*setMargin(coordsAbove, new Insets(10.0, 0, 0, 0));
         setMargin(coordsRight, new Insets(0, 10.0, 0, 0));
         setMargin(coordsBelow, new Insets(0, 0, 10.0, 0));
-        setMargin(coordsLeft, new Insets(0, 0, 0, 10.0));
+        setMargin(coordsLeft, new Insets(0, 0, 0, 10.0));*/
 
     }
 
