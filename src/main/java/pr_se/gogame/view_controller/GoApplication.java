@@ -8,10 +8,12 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.Pane;
 import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
+import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Board;
@@ -63,13 +65,19 @@ public class GoApplication extends Application {
                 path+"tile_0.png",
                 path+"stone_0_square.png",
                 path+"stone_1.png");*/
-        StackPane dummyPane = new StackPane();
-        dummyPane.minWidthProperty().bind(bsp.getCoordsLeft().widthProperty().add(bsp.getCoordsAbove().widthProperty()).add(bsp.getCoordsRight().widthProperty()));
+        Pane dummyPane = new StackPane();
+        /*dummyPane.minWidthProperty().bind(bsp.getCoordsLeft().widthProperty().add(bsp.getCoordsAbove().widthProperty()).add(bsp.getCoordsRight().widthProperty()));
         dummyPane.minHeightProperty().bind(bsp.getCoordsAbove().heightProperty().add(bsp.getCoordsLeft().heightProperty()).add(bsp.getCoordsBelow().heightProperty()));
-        dummyPane.maxWidthProperty().bind(dummyPane.minWidthProperty());
-        dummyPane.maxHeightProperty().bind(dummyPane.minHeightProperty());
-        // dummyPane.getChildren().add(bsp);
-        root.setCenter(bsp);
+        dummyPane.prefWidthProperty().bind(root.widthProperty().subtract(bsp.getCoordsLeft().widthProperty()).subtract(bsp.getCoordsRight().widthProperty()));
+        dummyPane.prefHeightProperty().bind(root.heightProperty().subtract(bsp.getCoordsAbove().heightProperty()).subtract(bsp.getCoordsBelow().heightProperty()));
+        dummyPane.maxWidthProperty().bind(Bindings.createDoubleBinding(() -> 960.0));
+        dummyPane.maxHeightProperty().bind(Bindings.createDoubleBinding(() -> 600.0));*/
+        dummyPane.getChildren().add(bsp);
+        Rectangle testRectangle = new Rectangle();
+        // testRectangle.widthProperty().bind(bsp.getCoordsLeft().widthProperty().add(bsp.getCoordsAbove().widthProperty()).add(bsp.getCoordsRight().widthProperty()));
+        testRectangle.heightProperty().bind(bsp.getCoordsAbove().heightProperty().add(bsp.getCoordsLeft().heightProperty()).add(bsp.getCoordsBelow().heightProperty()));
+        root.setCenter(dummyPane);
+        // root.setLeft(testRectangle);
 
         root.setTop(vBox);
 
