@@ -3,6 +3,7 @@ package pr_se.gogame.view_controller;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
@@ -45,6 +46,9 @@ public class BoardPane extends GridPane {
     private BoardCell selectionBC = null;
 
     private final NumberBinding ROUNDED_CELL_ASPECT_RATIO; // Instantiate only once per BoardPane, as it's the same for all contained BoarcCells
+
+    private final NumberBinding parentWidth;
+    private final NumberBinding parentHeight;
 
     private class BoardCell extends StackPane {
         private final ImageView TILE;
@@ -213,10 +217,13 @@ public class BoardPane extends GridPane {
     } // private class BoardCell
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images and even the board (as those might be changed during a game).
-    public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
+    public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1, NumberBinding parentWidth, NumberBinding parentHeight) {
+        this.parentWidth = parentWidth;
+        this.parentHeight = parentHeight;
+
         setBoard(board);
         this.SIZE = board.getSize();
-        final NumberBinding CELL_ASPECT_RATIO = Bindings.min(widthProperty(), heightProperty()).divide(SIZE);
+        final NumberBinding CELL_ASPECT_RATIO = Bindings.min(this.parentWidth, this.parentHeight).divide(SIZE);
         ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
@@ -325,20 +332,8 @@ public class BoardPane extends GridPane {
             // TODO: Keyboard input?
         });
 
-        /*ChangeListener myCL = new ChangeListener() {
-            @Override
-            public void changed(ObservableValue observableValue, Object o, Object t1) {
-                if(getChildren().size() == SIZE*SIZE && getFirstBC().widthProperty().get() == getFirstBC().heightProperty().get()) {
-                    Bounds newBounds = getFirstBC().getBoundsInParent();
-                    fireActualChange(newBounds);
-                } else {
-                    // System.out.println("WIDTH AND HEIGHT DIFFERENT: " + getFirstBC().widthProperty().get() + "/" + getFirstBC().heightProperty().get());
-                }
-            }
-        };*/
-
-        // getFirstBC().boundsInParentProperty().addListener(myCL);
-        // boundsInParentProperty().addListener(myCL);
+        maxWidthProperty().bind(getFirstBC().getBlackStone().fitWidthProperty().multiply(this.SIZE));
+        maxHeightProperty().bind(getFirstBC().getBlackStone().fitHeightProperty().multiply(this.SIZE));
     }
 
     public void setBoard(Board board) {

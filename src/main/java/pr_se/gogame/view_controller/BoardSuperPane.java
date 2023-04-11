@@ -1,11 +1,8 @@
 package pr_se.gogame.view_controller;
 
 import javafx.beans.binding.Bindings;
-import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.NumberBinding;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -14,9 +11,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import pr_se.gogame.model.Board;
 
-import java.util.Objects;
-
-public class BoardSuperPane extends BorderPane {
+public class BoardSuperPane extends OrbitalBorderPane {
 
     private int BOARD_SIZE;
     BoardPane bp;
@@ -37,9 +32,19 @@ public class BoardSuperPane extends BorderPane {
         coordsAbove.setBackground(new Background(new BackgroundFill(Color.CYAN, null, null)));
         coordsBelow.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
         coordsLeft.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
-        coordsRight.setBackground(new Background(new BackgroundFill(Color.BLUE, null, null)));
+        coordsRight.setBackground(new Background(new BackgroundFill(Color.BEIGE, null, null)));
 
-        bp = new BoardPane(board, tile0, tile1, stone0, stone1);
+        bp = new BoardPane(
+            board,
+            tile0,
+            tile1,
+            stone0,
+            stone1,
+            //Bindings.min(widthProperty(), widthProperty()),
+            widthProperty().subtract(coordsLeft.widthProperty()).subtract(coordsRight.widthProperty()),
+            //Bindings.min(heightProperty(), heightProperty())
+            heightProperty().subtract(coordsAbove.heightProperty()).subtract(coordsBelow.heightProperty())
+        );
         /*final NumberBinding BOARD_ASPECT_RATIO = Bindings.min(
             widthProperty().subtract(coordsLeft.widthProperty()).subtract(coordsRight.widthProperty()),
             heightProperty().subtract(coordsAbove.heightProperty()).subtract(coordsBelow.heightProperty()));
@@ -94,6 +99,17 @@ public class BoardSuperPane extends BorderPane {
         setAlignment(coordsBelow, Pos.TOP_CENTER);
         setAlignment(coordsLeft, Pos.CENTER_RIGHT);
         setAlignment(coordsRight, Pos.CENTER_LEFT);
+
+        /*coordsAbove.setPadding(new Insets(10.0, 0, 0, 0));
+        coordsRight.setPadding(new Insets(0, 10.0, 0, 0));
+        coordsBelow.setPadding(new Insets(0, 0, 10.0, 0));
+        coordsLeft.setPadding(new Insets(0, 0, 0, 10.0));*/
+
+        setMargin(coordsAbove, new Insets(10.0, 0, 0, 0));
+        setMargin(coordsRight, new Insets(0, 10.0, 0, 0));
+        setMargin(coordsBelow, new Insets(0, 0, 10.0, 0));
+        setMargin(coordsLeft, new Insets(0, 0, 0, 10.0));
+
     }
 
     @Override
@@ -104,61 +120,6 @@ public class BoardSuperPane extends BorderPane {
         updateFontSize(coordsRight, coordsRight.getHeight());
 
         super.layoutChildren();
-
-        if(true) {
-            getTop().resizeRelocate(
-                getCenter().getLayoutX(),
-                getCenter().getLayoutY() - getTop().getLayoutBounds().getHeight(),
-                getCenter().getLayoutBounds().getWidth(),
-                getTop().getLayoutBounds().getHeight());
-
-            getBottom().resizeRelocate(
-                getCenter().getLayoutX(),
-                getCenter().getBoundsInParent().getMaxY(),
-                getCenter().getLayoutBounds().getWidth(),
-                getBottom().getLayoutBounds().getHeight());
-
-            getLeft().resizeRelocate(
-                getCenter().getLayoutX() - getLeft().getLayoutBounds().getWidth(),
-                getCenter().getLayoutY(),
-                getLeft().getLayoutBounds().getWidth(),
-                getCenter().getLayoutBounds().getHeight());
-
-            getRight().resizeRelocate(
-                getCenter().getBoundsInParent().getMaxX(),
-                getCenter().getLayoutY(),
-                getRight().getLayoutBounds().getWidth(),
-                getCenter().getLayoutBounds().getHeight());
-        } else {
-            layoutChildrenHack();
-        }
-
-    }
-
-    private void layoutChildrenHack() {
-        getTop().resizeRelocate(
-            bp.getLayoutX() + bp.getDeadWidthAtLeft(),
-            bp.getLayoutY() + bp.getDeadHeightAtTop() - getTop().getLayoutBounds().getHeight(),
-            bp.getTotalContentWidth(),
-            getTop().getLayoutBounds().getHeight());
-
-        getBottom().resizeRelocate(
-            bp.getLayoutX() + bp.getDeadWidthAtLeft(),
-            bp.getBoundsInParent().getMaxY() - bp.getDeadHeightAtBottom(),
-            bp.getTotalContentWidth(),
-            getBottom().getLayoutBounds().getHeight());
-
-        getLeft().resizeRelocate(
-            bp.getLayoutX() + bp.getDeadWidthAtLeft() - getLeft().getLayoutBounds().getWidth(),
-            bp.getLayoutY() + bp.getDeadHeightAtTop(),
-            getLeft().getLayoutBounds().getWidth(),
-            bp.getTotalContentHeight());
-
-        getRight().resizeRelocate(
-            bp.getBoundsInParent().getMaxX() - bp.getDeadWidthAtRight(),
-            bp.getLayoutY() + bp.getDeadHeightAtTop(),
-            getRight().getLayoutBounds().getWidth(),
-            bp.getTotalContentHeight());
     }
 
     /*private void makeLabelSizeDynamic(Label l, ReadOnlyDoubleProperty dimProperty) {

@@ -34,7 +34,7 @@ public class BoardSuperPane2 extends AnchorPane {
         coordsLeft.setBackground(new Background(new BackgroundFill(Color.GREEN, null, null)));
         coordsRight.setBackground(new Background(new BackgroundFill(Color.LIGHTPINK, null, null)));
 
-        bp = new BoardPane(board, tile0, tile1, stone0, stone1);
+        bp = null; // new BoardPane(board, tile0, tile1, stone0, stone1);
 
         getChildren().add(bp);
 
