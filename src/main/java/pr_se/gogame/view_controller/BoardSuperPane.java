@@ -3,10 +3,15 @@ package pr_se.gogame.view_controller;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.binding.NumberBinding;
+import javafx.beans.property.DoubleProperty;
+import javafx.beans.property.ReadOnlyDoubleProperty;
+import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
+import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.scene.text.Font;
 import pr_se.gogame.model.Board;
 
 import java.util.Objects;
@@ -35,29 +40,33 @@ public class BoardSuperPane extends BorderPane {
         coordsRight.setBackground(new Background(new BackgroundFill(Color.BLUE, null, null)));
 
         bp = new BoardPane(board, tile0, tile1, stone0, stone1);
-        // bp.setMinSize(Region.USE_PREF_SIZE, Region.USE_PREF_SIZE);
-        final NumberBinding BOARD_ASPECT_RATIO = Bindings.min(
+        /*final NumberBinding BOARD_ASPECT_RATIO = Bindings.min(
             widthProperty().subtract(coordsLeft.widthProperty()).subtract(coordsRight.widthProperty()),
             heightProperty().subtract(coordsAbove.heightProperty()).subtract(coordsBelow.heightProperty()));
         bp.maxHeightProperty().bind(BOARD_ASPECT_RATIO);
-        bp.maxWidthProperty().bind(BOARD_ASPECT_RATIO);
-        /*bp.prefWidthProperty().bind(bp.widthProperty());
-        bp.prefHeightProperty().bind(bp.heightProperty());*/
-        this.setCenter(bp);
+        bp.maxWidthProperty().bind(BOARD_ASPECT_RATIO);*/
+        setCenter(bp);
 
         for(int i = 0; i < this.BOARD_SIZE; i++) {
             Label aboveLabel = new Label("" + (char)('A' + i));
             aboveLabel.setMaxWidth(Double.MAX_VALUE);
             aboveLabel.setAlignment(Pos.BOTTOM_CENTER);
+            // makeLabelSizeDynamic(aboveLabel, coordsAbove.widthProperty());
+
             Label belowLabel = new Label("" + (char)('A' + i));
             belowLabel.setMaxWidth(Double.MAX_VALUE);
             belowLabel.setAlignment(Pos.TOP_CENTER);
+            // makeLabelSizeDynamic(belowLabel, coordsBelow.widthProperty());
+
             Label leftLabel = new Label("" + (BOARD_SIZE - i));
             leftLabel.setMaxHeight(Double.MAX_VALUE);
             leftLabel.setAlignment(Pos.CENTER_RIGHT);
+            // makeLabelSizeDynamic(leftLabel, coordsLeft.heightProperty());
+
             Label rightLabel = new Label("" + (BOARD_SIZE - i));
             rightLabel.setMaxHeight(Double.MAX_VALUE);
             rightLabel.setAlignment(Pos.CENTER_LEFT);
+            // makeLabelSizeDynamic(rightLabel, coordsRight.heightProperty());
 
             coordsAbove.getChildren().add(aboveLabel);
             coordsBelow.getChildren().add(belowLabel);
@@ -70,10 +79,10 @@ public class BoardSuperPane extends BorderPane {
             coordsRight.setVgrow(rightLabel, Priority.ALWAYS);
         }
 
-        coordsAbove.maxWidthProperty().bind(bp.widthProperty());
+        /*coordsAbove.maxWidthProperty().bind(bp.widthProperty());
         coordsBelow.maxWidthProperty().bind(bp.widthProperty());
         coordsLeft.maxHeightProperty().bind(bp.heightProperty());
-        coordsRight.maxHeightProperty().bind(bp.heightProperty());
+        coordsRight.maxHeightProperty().bind(bp.heightProperty());*/
 
         setTop(coordsAbove);
         setBottom(coordsBelow);
@@ -85,14 +94,85 @@ public class BoardSuperPane extends BorderPane {
         setAlignment(coordsBelow, Pos.TOP_CENTER);
         setAlignment(coordsLeft, Pos.CENTER_RIGHT);
         setAlignment(coordsRight, Pos.CENTER_LEFT);
+    }
 
-        System.out.println("bL: " + coordsLeft.minWidthProperty().get());
-        System.out.println("bA: " + coordsAbove.minWidthProperty().get());
-        System.out.println("bR: " + coordsRight.minWidthProperty().get());
-        // maxWidthProperty().bind(coordsLeft.maxWidthProperty().add(coordsAbove.maxWidthProperty()).add(coordsRight.maxWidthProperty()));
+    @Override
+    protected void layoutChildren() {
+        updateFontSize(coordsAbove, coordsAbove.getWidth());
+        updateFontSize(coordsBelow, coordsBelow.getWidth());
+        updateFontSize(coordsLeft, coordsLeft.getHeight());
+        updateFontSize(coordsRight, coordsRight.getHeight());
 
-        // coordsRight.prefWidthProperty().bind(this.widthProperty().subtract(bp.widthProperty()).subtract(coordsLeft.widthProperty()));
+        super.layoutChildren();
 
-        coordsRight.setMinWidth(100);
+        if(true) {
+            getTop().resizeRelocate(
+                getCenter().getLayoutX(),
+                getCenter().getLayoutY() - getTop().getLayoutBounds().getHeight(),
+                getCenter().getLayoutBounds().getWidth(),
+                getTop().getLayoutBounds().getHeight());
+
+            getBottom().resizeRelocate(
+                getCenter().getLayoutX(),
+                getCenter().getBoundsInParent().getMaxY(),
+                getCenter().getLayoutBounds().getWidth(),
+                getBottom().getLayoutBounds().getHeight());
+
+            getLeft().resizeRelocate(
+                getCenter().getLayoutX() - getLeft().getLayoutBounds().getWidth(),
+                getCenter().getLayoutY(),
+                getLeft().getLayoutBounds().getWidth(),
+                getCenter().getLayoutBounds().getHeight());
+
+            getRight().resizeRelocate(
+                getCenter().getBoundsInParent().getMaxX(),
+                getCenter().getLayoutY(),
+                getRight().getLayoutBounds().getWidth(),
+                getCenter().getLayoutBounds().getHeight());
+        } else {
+            layoutChildrenHack();
+        }
+
+    }
+
+    private void layoutChildrenHack() {
+        getTop().resizeRelocate(
+            bp.getLayoutX() + bp.getDeadWidthAtLeft(),
+            bp.getLayoutY() + bp.getDeadHeightAtTop() - getTop().getLayoutBounds().getHeight(),
+            bp.getTotalContentWidth(),
+            getTop().getLayoutBounds().getHeight());
+
+        getBottom().resizeRelocate(
+            bp.getLayoutX() + bp.getDeadWidthAtLeft(),
+            bp.getBoundsInParent().getMaxY() - bp.getDeadHeightAtBottom(),
+            bp.getTotalContentWidth(),
+            getBottom().getLayoutBounds().getHeight());
+
+        getLeft().resizeRelocate(
+            bp.getLayoutX() + bp.getDeadWidthAtLeft() - getLeft().getLayoutBounds().getWidth(),
+            bp.getLayoutY() + bp.getDeadHeightAtTop(),
+            getLeft().getLayoutBounds().getWidth(),
+            bp.getTotalContentHeight());
+
+        getRight().resizeRelocate(
+            bp.getBoundsInParent().getMaxX() - bp.getDeadWidthAtRight(),
+            bp.getLayoutY() + bp.getDeadHeightAtTop(),
+            getRight().getLayoutBounds().getWidth(),
+            bp.getTotalContentHeight());
+    }
+
+    /*private void makeLabelSizeDynamic(Label l, ReadOnlyDoubleProperty dimProperty) {
+        final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
+        FONT_SIZE.bind(dimProperty.divide(2).divide(this.BOARD_SIZE).subtract(Bindings.length(l.textProperty())));
+        l.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
+    }*/
+
+    private void updateFontSize(Pane coords, double dimension) {
+        for(Node node : coords.getChildren()) {
+            Label l = (Label)node;
+            double newFontSize = (dimension / 2) / this.BOARD_SIZE - l.getText().length();
+            Font f = new Font(newFontSize);
+            l.setFont(f);
+        }
     }
 }

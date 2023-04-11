@@ -45,24 +45,25 @@ public class GoApplication extends Application {
 
         VBox vBox = new VBox(menuBar);
 
+        BorderPane root = new BorderPane();
+
         // Altered by Gerald to add the BoardPane
         Board board = new Board(19);
         final String path = "file:src/main/resources/pr_se/gogame/";
-        /*BoardSuperPane bsp = new BoardSuperPane(board,
-                path+"tile_0.png",
-                path+"tile_0.png",
-                path+"stone_0_square.png",
-                path+"stone_1.png");*/
-        BoardSuperPane2 bsp = new BoardSuperPane2(board,
+        BoardSuperPane bsp = new BoardSuperPane(board,
                 path+"tile_0.png",
                 path+"tile_0.png",
                 path+"stone_0_square.png",
                 path+"stone_1.png");
-        BorderPane root = new BorderPane();
-        root.setCenter(bsp);
         final NumberBinding BSP_ASPECT_RATIO = Bindings.min(root.widthProperty(), root.heightProperty().subtract(menuBar.heightProperty()));
         /*bsp.maxWidthProperty().bind(BSP_ASPECT_RATIO);
         bsp.maxHeightProperty().bind(BSP_ASPECT_RATIO);*/
+        /*BoardSuperPane2 bsp = new BoardSuperPane2(board,
+                path+"tile_0.png",
+                path+"tile_0.png",
+                path+"stone_0_square.png",
+                path+"stone_1.png");*/
+        root.setCenter(bsp);
 
         root.setTop(vBox);
 
@@ -82,7 +83,7 @@ public class GoApplication extends Application {
         System.out.println("-------------------------------------------------------------");*/
 
         // bsp.printDebugInfo();
-        VBox test = (VBox)bsp.getChildren().get(4);
+        // VBox test = (VBox)bsp.getChildren().get(4);
 
         root.widthProperty().addListener((o, n, t) -> System.out.println("New width: " + t));
         root.heightProperty().addListener((o, n, t) -> System.out.println("New height: " + t));

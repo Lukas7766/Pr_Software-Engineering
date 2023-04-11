@@ -325,7 +325,7 @@ public class BoardPane extends GridPane {
             // TODO: Keyboard input?
         });
 
-        ChangeListener myCL = new ChangeListener() {
+        /*ChangeListener myCL = new ChangeListener() {
             @Override
             public void changed(ObservableValue observableValue, Object o, Object t1) {
                 if(getChildren().size() == SIZE*SIZE && getFirstBC().widthProperty().get() == getFirstBC().heightProperty().get()) {
@@ -335,9 +335,9 @@ public class BoardPane extends GridPane {
                     // System.out.println("WIDTH AND HEIGHT DIFFERENT: " + getFirstBC().widthProperty().get() + "/" + getFirstBC().heightProperty().get());
                 }
             }
-        };
+        };*/
 
-        getFirstBC().boundsInParentProperty().addListener(myCL);
+        // getFirstBC().boundsInParentProperty().addListener(myCL);
         // boundsInParentProperty().addListener(myCL);
     }
 
