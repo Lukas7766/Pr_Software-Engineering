@@ -64,26 +64,21 @@ public class BoardPane extends GridPane {
         VBox rightLabels = new VBox();
 
         // divvy up the available area ahead of time to avoid cyclic dependencies
-        // final NumberBinding CELL_ASPECT_RATIO = Bindings.min(widthProperty().subtract(leftLabels.widthProperty()).subtract(rightLabels.widthProperty()), heightProperty().subtract(topLabels.heightProperty()).subtract(bottomLabels.heightProperty())).divide(SIZE);
-        final NumberBinding MAX_CELL_WIDTH = widthProperty().subtract(widthProperty().multiply(0.1)).divide(SIZE);                                                          // Get maximum width if all cells are equally wide
+        final NumberBinding MAX_CELL_WIDTH = widthProperty().subtract(widthProperty().multiply(0.1)).divide(SIZE);               // Get maximum width if all cells are equally wide
         final NumberBinding MAX_CELL_WIDTH_INT = Bindings.createIntegerBinding(() -> MAX_CELL_WIDTH.intValue(), MAX_CELL_WIDTH);    // round down
-        final NumberBinding MAX_CELL_HEIGHT = heightProperty().subtract(heightProperty().multiply(0.1)).divide(SIZE);                                                        // Get maximum height if all cells are equally wide
+        final NumberBinding MAX_CELL_HEIGHT = heightProperty().subtract(heightProperty().multiply(0.1)).divide(SIZE);            // Get maximum height if all cells are equally wide
         final NumberBinding MAX_CELL_HEIGHT_INT = Bindings.createIntegerBinding(() -> MAX_CELL_HEIGHT.intValue(), MAX_CELL_HEIGHT); // round down
 
-        final NumberBinding MAX_CELL_DIM = Bindings.min(MAX_CELL_WIDTH_INT, MAX_CELL_HEIGHT_INT);                                   // Use whatever is smaller AFTER the division
+        final NumberBinding MAX_CELL_DIM = Bindings.min(MAX_CELL_WIDTH_INT, MAX_CELL_HEIGHT_INT);                                   // Use whatever is smaller after the division
         final NumberBinding MAX_CELL_DIM_INT = Bindings.createIntegerBinding(() -> MAX_CELL_DIM.intValue(), MAX_CELL_DIM);          // round down
 
         final NumberBinding HORIZONTAL_COORDINATE_HEIGHT = heightProperty().subtract(MAX_CELL_DIM_INT.multiply(SIZE)).divide(2);  // Get no. unused pixels at top/bottom
         final NumberBinding VERTICAL_COORDINATE_WIDTH = widthProperty().subtract(MAX_CELL_DIM_INT.multiply(SIZE)).divide(2);      // Get no. unused pixels at left/right
 
-        topLabels.setMinWidth(0);
-        topLabels.setMinHeight(0);
-        bottomLabels.setMinWidth(0);
-        bottomLabels.setMinHeight(0);
-        leftLabels.setMinWidth(0);
-        leftLabels.setMinHeight(0);
-        rightLabels.setMinWidth(0);
-        rightLabels.setMinHeight(0);
+        topLabels.setMinSize(0, 0);
+        bottomLabels.setMinSize(0, 0);
+        leftLabels.setMinSize(0, 0);
+        rightLabels.setMinSize(0, 0);
 
         topLabels.prefHeightProperty().bind(HORIZONTAL_COORDINATE_HEIGHT);
         bottomLabels.prefHeightProperty().bind(HORIZONTAL_COORDINATE_HEIGHT);
@@ -94,9 +89,6 @@ public class BoardPane extends GridPane {
         bottomLabels.maxHeightProperty().bind(HORIZONTAL_COORDINATE_HEIGHT);
         leftLabels.maxWidthProperty().bind(VERTICAL_COORDINATE_WIDTH);
         rightLabels.maxWidthProperty().bind(VERTICAL_COORDINATE_WIDTH);
-
-        /*final NumberBinding CELL_ASPECT_RATIO = Bindings.min(widthProperty().subtract(leftLabels.widthProperty()).subtract(rightLabels.widthProperty()), heightProperty().subtract(topLabels.heightProperty()).subtract(bottomLabels.heightProperty())).divide(SIZE);
-        final NumberBinding ROUNDED_CELL_ASPECT_RATIO = Bindings.createIntegerBinding(() -> CELL_ASPECT_RATIO.intValue(), CELL_ASPECT_RATIO);*/
 
         // populate the coordinate axes
         for(int i = 0; i < this.SIZE; i++) {
@@ -125,10 +117,10 @@ public class BoardPane extends GridPane {
             leftLabels.getChildren().add(l);
             rightLabels.getChildren().add(r);
 
-            topLabels.setHgrow(t, Priority.ALWAYS);
-            bottomLabels.setHgrow(b, Priority.ALWAYS);
-            leftLabels.setVgrow(l, Priority.ALWAYS);
-            rightLabels.setVgrow(r, Priority.ALWAYS);
+            HBox.setHgrow(t, Priority.ALWAYS);
+            HBox.setHgrow(b, Priority.ALWAYS);
+            VBox.setVgrow(l, Priority.ALWAYS);
+            VBox.setVgrow(r, Priority.ALWAYS);
         }
 
         // put the coordinate axes in first to mess up the indexing as little as possible;
@@ -166,8 +158,7 @@ public class BoardPane extends GridPane {
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
-                    if (col != null && row != null && target instanceof BoardCell) {
-                        BoardCell targetBC = (BoardCell)target;
+                    if (col != null && row != null && target instanceof BoardCell targetBC) {   // IntelliJ suggested the "instanceof BoardCell targetBC"; it's called a "pattern variable"
                         // printDebugInfo();
 
                         if (this.board.getCurColor() == StoneColor.BLACK) {
@@ -266,9 +257,9 @@ public class BoardPane extends GridPane {
     // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
     public void confirmMove() {
         if(selectionBC != null) {
-            Integer col = getColumnIndex(selectionBC) - 1;
-            Integer row = getRowIndex(selectionBC) - 1;
-            if(col != null && row != null) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
+            int col = getColumnIndex(selectionBC) - 1;
+            int row = getRowIndex(selectionBC) - 1;
+            if(col >= 0 && row >= 0) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
                 board.setStone(col, row, board.getCurColor());
             } else {
                 System.out.println("Confirmation outside of actual board on " + lastBC); // TODO: Remove in finished product
@@ -290,7 +281,6 @@ public class BoardPane extends GridPane {
         //System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
         //System.out.println("MinWidth/Height: " + getMinWidth() + "/" + getMinHeight());
         System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
-        System.out.println("Black Stone size: " + targetBC.getBlackStone().getFitWidth() + "/" + targetBC.getBlackStone().getFitHeight());
         //System.out.println("Cell bounds in local: " + targetBC.getBoundsInLocal());
         System.out.println("Cell bounds in parent: " + targetBC.getBoundsInParent());
 
