@@ -50,7 +50,7 @@ public class BoardPane extends GridPane {
     public BoardPane(Game game, String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
         this.game = game;
         setBoard(new Board(game.getSize()));
-        this.SIZE = BOARD.getSize();
+        this.SIZE = board.getSize();
 
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
