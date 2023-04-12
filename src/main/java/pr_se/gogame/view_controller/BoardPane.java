@@ -3,7 +3,6 @@ package pr_se.gogame.view_controller;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
@@ -37,6 +36,8 @@ public class BoardPane extends GridPane {
     private BoardCell lastBC = null;
     private BoardCell selectionBC = null;
 
+    private final NumberBinding MAX_CELL_DIM_INT;
+
     public BoardPane(Board board, String tile0, String tile1, String edge, String corner, String stone0, String stone1) {
         setBoard(board);
         this.SIZE = board.getSize();
@@ -61,74 +62,49 @@ public class BoardPane extends GridPane {
                 true);      // backgroundLoading
         stones[1] = new Image(stone1, true);
 
-        // divvy up the available area ahead of time to avoid cyclic dependencies
-        final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(SIZE + 2);               // Get maximum width if all cells are equally wide
-        final NumberBinding MAX_CELL_WIDTH_INT = Bindings.createIntegerBinding(() -> MAX_CELL_WIDTH.intValue(), MAX_CELL_WIDTH);    // round down
-        final NumberBinding MAX_CELL_HEIGHT = heightProperty().divide(SIZE + 2);            // Get maximum height if all cells are equally wide
-        final NumberBinding MAX_CELL_HEIGHT_INT = Bindings.createIntegerBinding(() -> MAX_CELL_HEIGHT.intValue(), MAX_CELL_HEIGHT); // round down
+        // determine cell size
+        final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(SIZE + 2);                                                 // Get maximum width if all cells are equally wide
+        final NumberBinding MAX_CELL_WIDTH_INT = Bindings.createIntegerBinding(MAX_CELL_WIDTH::intValue, MAX_CELL_WIDTH);        // round down
+        final NumberBinding MAX_CELL_HEIGHT = heightProperty().divide(SIZE + 2);                                              // Get maximum height if all cells are equally wide
+        final NumberBinding MAX_CELL_HEIGHT_INT = Bindings.createIntegerBinding(MAX_CELL_HEIGHT::intValue, MAX_CELL_HEIGHT);    // round down
 
-        final NumberBinding MAX_CELL_DIM = Bindings.min(MAX_CELL_WIDTH_INT, MAX_CELL_HEIGHT_INT);                                   // Use whatever is smaller after the division
-        final NumberBinding MAX_CELL_DIM_INT = Bindings.createIntegerBinding(() -> MAX_CELL_DIM.intValue(), MAX_CELL_DIM);          // round down
+        final NumberBinding MAX_CELL_DIM = Bindings.min(MAX_CELL_WIDTH_INT, MAX_CELL_HEIGHT_INT);                               // Use whatever is smaller after the division
+        MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM);                                 // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
         BoardCell corner1 = new BoardCell(this.corner, false);
-        corner1.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-        corner1.prefHeightProperty().bind(MAX_CELL_DIM_INT);
-        BoardCell corner2 = new BoardCell(this.corner, false);
-        corner2.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-        corner2.prefHeightProperty().bind(MAX_CELL_DIM_INT);
-        BoardCell corner3 = new BoardCell(this.corner, false);
-        corner3.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-        corner3.prefHeightProperty().bind(MAX_CELL_DIM_INT);
-        BoardCell corner4 = new BoardCell(this.corner, false);
-        corner4.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-        corner4.prefHeightProperty().bind(MAX_CELL_DIM_INT);
-
         add(corner1, 0, 0);
+        BoardCell corner2 = new BoardCell(this.corner, false);
         add(corner2, SIZE + 1, 0);
+        BoardCell corner3 = new BoardCell(this.corner, false);
         add(corner3, 0, SIZE + 1);
+        BoardCell corner4 = new BoardCell(this.corner, false);
         add(corner4, SIZE + 1, SIZE + 1);
-
+        
         // populate the coordinate axes
         for(int i = 0; i < this.SIZE; i++) {
             // top
             BoardCell t = new BoardCell(this.edge, false);
             t.getLabel().setText("" + (char)('A' + i));
             t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
-            t.getLabel().setMaxHeight(Double.MAX_VALUE);
-            t.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-            t.prefHeightProperty().bind(MAX_CELL_DIM_INT);
-            /*t.setMaxWidth(Double.MAX_VALUE);
-            t.setAlignment(Pos.BOTTOM_CENTER);*/
-            // makeLabelSizeDynamic(t, topLabels.widthProperty());
+            add(t, i + 1, 0);
 
             // bottom
             BoardCell b = new BoardCell(this.edge, false);
             b.getLabel().setText("" + (char)('A' + i));
             b.getLabel().setAlignment(Pos.TOP_CENTER);
-            b.getLabel().setMaxHeight(Double.MAX_VALUE);
-            b.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-            b.prefHeightProperty().bind(MAX_CELL_DIM_INT);
+            add(b, i + 1, SIZE + 1);
 
             // left
             BoardCell l = new BoardCell(this.edge, false);
             l.getLabel().setText("" + (SIZE - i));
             l.getLabel().setAlignment(Pos.CENTER_RIGHT);
-            l.getLabel().setMaxWidth(Double.MAX_VALUE);
-            l.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-            l.prefHeightProperty().bind(MAX_CELL_DIM_INT);
+            add(l, 0, i + 1);
 
             // right
             BoardCell r = new BoardCell(this.edge, false);
             r.getLabel().setText("" + (SIZE - i));
             r.getLabel().setAlignment(Pos.CENTER_LEFT);
-            r.getLabel().setMaxWidth(Double.MAX_VALUE);
-            r.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-            r.prefHeightProperty().bind(MAX_CELL_DIM_INT);
-
-            add(t, i + 1, 0);
-            add(b, i + 1, SIZE + 1);
-            add(l, 0, i + 1);
             add(r, SIZE + 1, i + 1);
         }
 
@@ -136,8 +112,6 @@ public class BoardPane extends GridPane {
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {
                 BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2], true);
-                bc.prefWidthProperty().bind(MAX_CELL_DIM_INT);
-                bc.prefHeightProperty().bind(MAX_CELL_DIM_INT);
                 add(bc, j + 1, i + 1);
             }
         }
@@ -151,7 +125,7 @@ public class BoardPane extends GridPane {
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
-                    if (col != null && row != null && target instanceof BoardCell targetBC) {   // IntelliJ suggested the "instanceof BoardCell targetBC"; it's called a "pattern variable"
+                    if (col != null && row != null && target instanceof BoardCell targetBC && targetBC.isPlayable()) {   // IntelliJ suggested the "instanceof BoardCell targetBC"; it's called a "pattern variable"
                         // printDebugInfo();
 
                         if (this.board.getCurColor() == StoneColor.BLACK) {
@@ -167,8 +141,10 @@ public class BoardPane extends GridPane {
                         //System.out.println("Removed hover!");               // TODO: Remove in finished product
                         lastBC = targetBC;
                     } else if(lastBC != null) {
+                        if(lastBC.isPlayable()) {
+                            lastBC.unhover();
+                        }
                         //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
-                        lastBC.unhover();
                         lastBC = null;
                     }
                 }
@@ -260,12 +236,6 @@ public class BoardPane extends GridPane {
         }
     }
 
-    private void makeLabelSizeDynamic(Label l, ReadOnlyDoubleProperty dimProperty) {
-        final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
-        FONT_SIZE.bind(dimProperty.divide(100.0 / (this.SIZE * 2.5)).divide(this.SIZE).subtract(Bindings.length(l.textProperty())));
-        l.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
-    }
-
     // TODO: Remove in finished product
     public void printDebugInfo() {
         BoardCell targetBC = (BoardCell)getChildren().get(4 + SIZE * 4);
@@ -280,6 +250,55 @@ public class BoardPane extends GridPane {
         //System.out.println("Hover over " + col + " " + row);
     }
 
+    // Getters and Setters
+    public boolean needsMoveConfirmation() {
+        return needsMoveConfirmation;
+    }
+
+    public void setMoveConfirmation(boolean needsMoveConfirmation) {
+        this.needsMoveConfirmation = needsMoveConfirmation;
+    }
+
+    public boolean showsMoveNumbers() {
+        return showsMoveNumbers;
+    }
+
+    public void setShowsMoveNumbers(boolean showsMoveNumbers) {
+        this.showsMoveNumbers = showsMoveNumbers;
+    }
+
+    public boolean showsCoordinates() {
+        return showsCoordinates;
+    }
+
+    public void setShowsCoordinates(boolean showsCoordinates) {
+        this.showsCoordinates = showsCoordinates;
+    }
+
+    public int getSIZE() {
+        return SIZE;
+    }
+
+    public Board getBoard() {
+        return board;
+    }
+
+    public Image[] getTiles() {
+        return tiles;
+    }
+
+    public Image[] getStones() {
+        return stones;
+    }
+
+    public Image getEdge() {
+        return edge;
+    }
+
+    public Image getCorner() {
+        return corner;
+    }
+
     private class BoardCell extends StackPane {
         private final ResizableImageView BLACK_HOVER;
         private final ResizableImageView WHITE_HOVER;
@@ -287,11 +306,13 @@ public class BoardPane extends GridPane {
         private final ResizableImageView WHITE_STONE;
         private final Label LABEL;
 
-        private final boolean isPlayable = false;
+        private final boolean isPlayable;
         private boolean isSelected = false;
         private boolean isSet = false;
 
         private BoardCell(Image tile, boolean isPlayable) {
+            this.isPlayable = isPlayable;
+
             this.setMinSize(0, 0);
 
             BackgroundSize bgSz = new BackgroundSize(
@@ -328,12 +349,17 @@ public class BoardPane extends GridPane {
                 this.LABEL.setVisible(false);
             }
             this.LABEL.setMinSize(0, 0);
+            this.LABEL.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            this.LABEL.setAlignment(Pos.CENTER);
 
             final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
-            FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty()))); // Binding it to widthProperty() of the BoardCell causes the numbers to flicker
+            FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty()))); // Binding it to [this.]widthProperty() of the BoardCell causes the numbers to flicker
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
 
             getChildren().add(this.LABEL);
+
+            prefWidthProperty().bind(MAX_CELL_DIM_INT);
+            prefHeightProperty().bind(MAX_CELL_DIM_INT);
         }
 
         private ResizableImageView getCellImageView(Image i) {
