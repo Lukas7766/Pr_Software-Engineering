@@ -73,14 +73,18 @@ public class BoardPane extends GridPane {
 
         // put the axes' corners in first to mess up the indexing as little as possible;
         BoardCell corner1 = new BoardCell(this.corner, false);
+        corner1.getLabel().setVisible(false);
         add(corner1, 0, 0);
         BoardCell corner2 = new BoardCell(this.corner, false);
+        corner2.getLabel().setVisible(false);
         add(corner2, SIZE + 1, 0);
         BoardCell corner3 = new BoardCell(this.corner, false);
+        corner3.getLabel().setVisible(false);
         add(corner3, 0, SIZE + 1);
         BoardCell corner4 = new BoardCell(this.corner, false);
+        corner4.getLabel().setVisible(false);
         add(corner4, SIZE + 1, SIZE + 1);
-        
+
         // populate the coordinate axes
         for(int i = 0; i < this.SIZE; i++) {
             // top
@@ -117,16 +121,16 @@ public class BoardPane extends GridPane {
         }
 
         // Set up listeners
-        setOnMouseMoved(e -> {
+        setOnMouseMoved(e -> {                                                  // TODO: Should this be handled by the BoardCells themselves?
             Node target = (Node)e.getTarget();
-            // System.out.println("Target is of class " + target.getClass());   // TODO: Remove in finished product
             if(target != null) {
-                if(target != lastBC) {                                 // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
+                if(target != lastBC) {                                          // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
                     Integer col = getColumnIndex(target);
                     Integer row = getRowIndex(target);
 
-                    if (col != null && row != null && target instanceof BoardCell targetBC && targetBC.isPlayable()) {   // IntelliJ suggested the "instanceof BoardCell targetBC"; it's called a "pattern variable"
-                        // printDebugInfo();
+                    if (col != null && row != null) {
+                        BoardCell targetBC = (BoardCell)target;
+                        // printDebugInfo();                                     // TODO: Remove in finished product
 
                         if (this.board.getCurColor() == StoneColor.BLACK) {
                             targetBC.hoverBlack();
@@ -134,16 +138,13 @@ public class BoardPane extends GridPane {
                             targetBC.hoverWhite();
                         }
 
-                        // Remove old hover                                    // TODO: Remove in finished product
+                        // Remove old hover
                         if(lastBC != null) {
                             lastBC.unhover();
                         }
-                        //System.out.println("Removed hover!");               // TODO: Remove in finished product
                         lastBC = targetBC;
                     } else if(lastBC != null) {
-                        if(lastBC.isPlayable()) {
-                            lastBC.unhover();
-                        }
+                        lastBC.unhover();
                         //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
                         lastBC = null;
                     }
@@ -306,7 +307,7 @@ public class BoardPane extends GridPane {
         private final ResizableImageView WHITE_STONE;
         private final Label LABEL;
 
-        private final boolean isPlayable;
+        private final boolean isPlayable;               // TODO: Should probably be implemented using inheritance, shouldn't it?
         private boolean isSelected = false;
         private boolean isSet = false;
 
@@ -353,13 +354,17 @@ public class BoardPane extends GridPane {
             this.LABEL.setAlignment(Pos.CENTER);
 
             final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
-            FONT_SIZE.bind(BLACK_STONE.fitWidthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty()))); // Binding it to [this.]widthProperty() of the BoardCell causes the numbers to flicker
+            FONT_SIZE.bind(this.LABEL.widthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty())));
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
 
             getChildren().add(this.LABEL);
 
             prefWidthProperty().bind(MAX_CELL_DIM_INT);
             prefHeightProperty().bind(MAX_CELL_DIM_INT);
+
+            if(!isPlayable) {
+                setMouseTransparent(true);
+            }
         }
 
         private ResizableImageView getCellImageView(Image i) {
