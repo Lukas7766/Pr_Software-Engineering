@@ -5,6 +5,7 @@ import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.ReadOnlyDoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -14,7 +15,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.Board;
 import pr_se.gogame.model.StoneColor;
-import javafx.geometry.Pos;
 
 /**
  * View/Controller
@@ -31,11 +31,13 @@ public class BoardPane extends GridPane {
 
     private final Image[] tiles = new Image [2];
     private final Image[] stones = new Image [2];
+    private final Image edge;
+    private final Image corner;
 
     private BoardCell lastBC = null;
     private BoardCell selectionBC = null;
 
-    public BoardPane(Board board, String tile0, String tile1, String stone0, String stone1) {
+    public BoardPane(Board board, String tile0, String tile1, String edge, String corner, String stone0, String stone1) {
         setBoard(board);
         this.SIZE = board.getSize();
 
@@ -51,98 +53,89 @@ public class BoardPane extends GridPane {
                 SMOOTH_IMAGES,      // smooth
                 true);              // backgroundLoading
         tiles[1] = new Image(tile1, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
+        this.edge = new Image(edge, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
+        this.corner = new Image(corner, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
 
         stones[0] = new Image(
                 stone0,     // URL
                 true);      // backgroundLoading
         stones[1] = new Image(stone1, true);
 
-        // create coordinate axes
-        HBox topLabels = new HBox();
-        HBox bottomLabels = new HBox();
-        VBox leftLabels = new VBox();
-        VBox rightLabels = new VBox();
-
         // divvy up the available area ahead of time to avoid cyclic dependencies
-        final NumberBinding MAX_CELL_WIDTH = widthProperty().subtract(widthProperty().multiply(0.1)).divide(SIZE);               // Get maximum width if all cells are equally wide
+        final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(SIZE + 2);               // Get maximum width if all cells are equally wide
         final NumberBinding MAX_CELL_WIDTH_INT = Bindings.createIntegerBinding(() -> MAX_CELL_WIDTH.intValue(), MAX_CELL_WIDTH);    // round down
-        final NumberBinding MAX_CELL_HEIGHT = heightProperty().subtract(heightProperty().multiply(0.1)).divide(SIZE);            // Get maximum height if all cells are equally wide
+        final NumberBinding MAX_CELL_HEIGHT = heightProperty().divide(SIZE + 2);            // Get maximum height if all cells are equally wide
         final NumberBinding MAX_CELL_HEIGHT_INT = Bindings.createIntegerBinding(() -> MAX_CELL_HEIGHT.intValue(), MAX_CELL_HEIGHT); // round down
 
         final NumberBinding MAX_CELL_DIM = Bindings.min(MAX_CELL_WIDTH_INT, MAX_CELL_HEIGHT_INT);                                   // Use whatever is smaller after the division
         final NumberBinding MAX_CELL_DIM_INT = Bindings.createIntegerBinding(() -> MAX_CELL_DIM.intValue(), MAX_CELL_DIM);          // round down
 
-        final NumberBinding HORIZONTAL_COORDINATE_HEIGHT = heightProperty().subtract(MAX_CELL_DIM_INT.multiply(SIZE)).divide(2);  // Get no. unused pixels at top/bottom
-        final NumberBinding VERTICAL_COORDINATE_WIDTH = widthProperty().subtract(MAX_CELL_DIM_INT.multiply(SIZE)).divide(2);      // Get no. unused pixels at left/right
+        // put the axes' corners in first to mess up the indexing as little as possible;
+        BoardCell corner1 = new BoardCell(this.corner, false);
+        corner1.prefWidthProperty().bind(MAX_CELL_DIM_INT);
+        corner1.prefHeightProperty().bind(MAX_CELL_DIM_INT);
+        BoardCell corner2 = new BoardCell(this.corner, false);
+        corner2.prefWidthProperty().bind(MAX_CELL_DIM_INT);
+        corner2.prefHeightProperty().bind(MAX_CELL_DIM_INT);
+        BoardCell corner3 = new BoardCell(this.corner, false);
+        corner3.prefWidthProperty().bind(MAX_CELL_DIM_INT);
+        corner3.prefHeightProperty().bind(MAX_CELL_DIM_INT);
+        BoardCell corner4 = new BoardCell(this.corner, false);
+        corner4.prefWidthProperty().bind(MAX_CELL_DIM_INT);
+        corner4.prefHeightProperty().bind(MAX_CELL_DIM_INT);
 
-        topLabels.setMinSize(0, 0);
-        bottomLabels.setMinSize(0, 0);
-        leftLabels.setMinSize(0, 0);
-        rightLabels.setMinSize(0, 0);
-
-        topLabels.prefHeightProperty().bind(HORIZONTAL_COORDINATE_HEIGHT);
-        bottomLabels.prefHeightProperty().bind(HORIZONTAL_COORDINATE_HEIGHT);
-        leftLabels.prefWidthProperty().bind(VERTICAL_COORDINATE_WIDTH);
-        rightLabels.prefWidthProperty().bind(VERTICAL_COORDINATE_WIDTH);
-
-        topLabels.maxHeightProperty().bind(HORIZONTAL_COORDINATE_HEIGHT);
-        bottomLabels.maxHeightProperty().bind(HORIZONTAL_COORDINATE_HEIGHT);
-        leftLabels.maxWidthProperty().bind(VERTICAL_COORDINATE_WIDTH);
-        rightLabels.maxWidthProperty().bind(VERTICAL_COORDINATE_WIDTH);
+        add(corner1, 0, 0);
+        add(corner2, SIZE + 1, 0);
+        add(corner3, 0, SIZE + 1);
+        add(corner4, SIZE + 1, SIZE + 1);
 
         // populate the coordinate axes
         for(int i = 0; i < this.SIZE; i++) {
-            Label t = new Label("" + (char)('A' + i));
-            t.setMaxWidth(Double.MAX_VALUE);
-            t.setAlignment(Pos.BOTTOM_CENTER);
-            makeLabelSizeDynamic(t, topLabels.widthProperty());
+            // top
+            BoardCell t = new BoardCell(this.edge, false);
+            t.getLabel().setText("" + (char)('A' + i));
+            t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
+            t.getLabel().setMaxHeight(Double.MAX_VALUE);
+            t.prefWidthProperty().bind(MAX_CELL_DIM_INT);
+            t.prefHeightProperty().bind(MAX_CELL_DIM_INT);
+            /*t.setMaxWidth(Double.MAX_VALUE);
+            t.setAlignment(Pos.BOTTOM_CENTER);*/
+            // makeLabelSizeDynamic(t, topLabels.widthProperty());
 
-            Label b = new Label("" + (char)('A' + i));
-            b.setMaxWidth(Double.MAX_VALUE);
-            b.setAlignment(Pos.TOP_CENTER);
-            makeLabelSizeDynamic(b, bottomLabels.widthProperty());
+            // bottom
+            BoardCell b = new BoardCell(this.edge, false);
+            b.getLabel().setText("" + (char)('A' + i));
+            b.getLabel().setAlignment(Pos.TOP_CENTER);
+            b.getLabel().setMaxHeight(Double.MAX_VALUE);
+            b.prefWidthProperty().bind(MAX_CELL_DIM_INT);
+            b.prefHeightProperty().bind(MAX_CELL_DIM_INT);
 
-            Label l = new Label("" + (SIZE - i));
-            l.setMaxHeight(Double.MAX_VALUE);
-            l.setAlignment(Pos.CENTER_RIGHT);
-            makeLabelSizeDynamic(l, leftLabels.heightProperty());
+            // left
+            BoardCell l = new BoardCell(this.edge, false);
+            l.getLabel().setText("" + (SIZE - i));
+            l.getLabel().setAlignment(Pos.CENTER_RIGHT);
+            l.getLabel().setMaxWidth(Double.MAX_VALUE);
+            l.prefWidthProperty().bind(MAX_CELL_DIM_INT);
+            l.prefHeightProperty().bind(MAX_CELL_DIM_INT);
 
-            Label r = new Label("" + (SIZE - i));
-            r.setMaxHeight(Double.MAX_VALUE);
-            r.setAlignment(Pos.CENTER_LEFT);
-            makeLabelSizeDynamic(r, rightLabels.heightProperty());
+            // right
+            BoardCell r = new BoardCell(this.edge, false);
+            r.getLabel().setText("" + (SIZE - i));
+            r.getLabel().setAlignment(Pos.CENTER_LEFT);
+            r.getLabel().setMaxWidth(Double.MAX_VALUE);
+            r.prefWidthProperty().bind(MAX_CELL_DIM_INT);
+            r.prefHeightProperty().bind(MAX_CELL_DIM_INT);
 
-            topLabels.getChildren().add(t);
-            bottomLabels.getChildren().add(b);
-            leftLabels.getChildren().add(l);
-            rightLabels.getChildren().add(r);
-
-            HBox.setHgrow(t, Priority.ALWAYS);
-            HBox.setHgrow(b, Priority.ALWAYS);
-            VBox.setVgrow(l, Priority.ALWAYS);
-            VBox.setVgrow(r, Priority.ALWAYS);
+            add(t, i + 1, 0);
+            add(b, i + 1, SIZE + 1);
+            add(l, 0, i + 1);
+            add(r, SIZE + 1, i + 1);
         }
-
-        // put the coordinate axes in first to mess up the indexing as little as possible;
-        topLabels.setAlignment(Pos.BOTTOM_CENTER);
-        bottomLabels.setAlignment(Pos.TOP_CENTER);
-        leftLabels.setAlignment(Pos.CENTER_RIGHT);
-        rightLabels.setAlignment(Pos.CENTER_LEFT);
-
-        setHgrow(topLabels, Priority.ALWAYS);
-        setHgrow(bottomLabels, Priority.ALWAYS);
-        setVgrow(leftLabels, Priority.ALWAYS);
-        setVgrow(rightLabels, Priority.ALWAYS);
-
-        add(topLabels, 1, 0, SIZE, 1);
-        add(bottomLabels, 1, SIZE + 1, SIZE, 1);
-        add(leftLabels, 0, 1, 1, SIZE);
-        add(rightLabels, SIZE + 1, 1, 1, SIZE);
 
         // Fill the grid with alternating tiles
         for(int i = 0; i < this.SIZE; i++) {
             for(int j = 0; j < this.SIZE; j++) {
-                BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2]);
+                BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2], true);
                 bc.prefWidthProperty().bind(MAX_CELL_DIM_INT);
                 bc.prefHeightProperty().bind(MAX_CELL_DIM_INT);
                 add(bc, j + 1, i + 1);
@@ -227,7 +220,7 @@ public class BoardPane extends GridPane {
         board.addListener(new GoListener() {
             @Override
             public void stoneSet(StoneSetEvent e) {
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * SIZE + e.getCol() + 4);
+                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * SIZE + e.getCol() + 4 + SIZE * 4);
                 destinationBC.getLabel().setText("" + e.getMoveNumber());
 
                 if(e.getColor() == StoneColor.BLACK) {
@@ -239,14 +232,14 @@ public class BoardPane extends GridPane {
 
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * SIZE + e.getCol() + 4);
+                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * SIZE + e.getCol() + 4 + SIZE * 4);
 
                 destinationBC.unset();
             }
 
             @Override
             public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-                BoardCell destinationBC = (BoardCell) getChildren().get(y * SIZE + x);
+                BoardCell destinationBC = (BoardCell) getChildren().get(y * SIZE + x + 4 + SIZE * 4);
                 destinationBC.getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
         });
@@ -275,7 +268,7 @@ public class BoardPane extends GridPane {
 
     // TODO: Remove in finished product
     public void printDebugInfo() {
-        BoardCell targetBC = (BoardCell)getChildren().get(4);
+        BoardCell targetBC = (BoardCell)getChildren().get(4 + SIZE * 4);
         //this.board.printDebugInfo(col, row);
         System.out.println("width/height: " + getWidth() + "/" + getHeight());
         //System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
@@ -294,10 +287,11 @@ public class BoardPane extends GridPane {
         private final ResizableImageView WHITE_STONE;
         private final Label LABEL;
 
+        private final boolean isPlayable = false;
         private boolean isSelected = false;
         private boolean isSet = false;
 
-        private BoardCell(Image tile) {
+        private BoardCell(Image tile, boolean isPlayable) {
             this.setMinSize(0, 0);
 
             BackgroundSize bgSz = new BackgroundSize(
@@ -310,20 +304,29 @@ public class BoardPane extends GridPane {
             BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
             this.setBackground(new Background(bgImg));
 
-            this.BLACK_HOVER = getCellImageView(stones[0]);
-            getChildren().add(this.BLACK_HOVER);
+            //if(isPlayable) {
+                this.BLACK_HOVER = getCellImageView(stones[0]);
+                getChildren().add(this.BLACK_HOVER);
 
-            this.WHITE_HOVER = getCellImageView(stones[1]);
-            getChildren().add(this.WHITE_HOVER);
+                this.WHITE_HOVER = getCellImageView(stones[1]);
+                getChildren().add(this.WHITE_HOVER);
 
-            this.BLACK_STONE = getCellImageView(stones[0]);
-            getChildren().add(this.BLACK_STONE);
+                this.BLACK_STONE = getCellImageView(stones[0]);
+                getChildren().add(this.BLACK_STONE);
 
-            this.WHITE_STONE = getCellImageView(stones[1]);
-            getChildren().add(this.WHITE_STONE);
+                this.WHITE_STONE = getCellImageView(stones[1]);
+                getChildren().add(this.WHITE_STONE);
+            /*} else {
+                this.BLACK_HOVER = null;
+                this.WHITE_HOVER = null;
+                this.BLACK_STONE = null;
+                this.WHITE_STONE = null;
+            }*/
 
             this.LABEL = new Label("0");
-            this.LABEL.setVisible(false);
+            if(isPlayable) {
+                this.LABEL.setVisible(false);
+            }
             this.LABEL.setMinSize(0, 0);
 
             final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
@@ -421,6 +424,10 @@ public class BoardPane extends GridPane {
         }
 
         // Getters
+        public boolean isPlayable() {
+            return isPlayable;
+        }
+
         public ImageView getBlackHover() {
             return BLACK_HOVER;
         }

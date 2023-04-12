@@ -42,7 +42,7 @@ public class GoApplication extends Application {
         Board board = new Board(19);
         final String path = "file:src/main/resources/pr_se/gogame/";
 
-        BoardPane2 bp = new BoardPane2(board,
+        BoardPane bp = new BoardPane(board,
             path+"tile_0.png",
             path+"tile_0.png",
             path+"edge.png",
