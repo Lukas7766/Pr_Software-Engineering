@@ -11,38 +11,31 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Board;
+import pr_se.gogame.model.Game;
 
 public class GoApplication extends Application {
+
+    private static final int WIDTH = 760;
+    private static final int HEIGHT = 580;
+
     @Override
     public void start(Stage stage) throws Exception {
         stage.setTitle("Go Game - App");
-
-        //Menu test - start
-        Menu files = new Menu();
-        files.setText("files");
-
-        MenuItem importFile = new MenuItem();
-        importFile.setText("import file");
-        files.getItems().add(importFile);
-
-        MenuItem exportFile = new MenuItem();
-        exportFile.setText("export file");
-        files.getItems().add(exportFile);
-        exportFile.setOnAction(e -> System.out.println("hihi"));
-
-        MenuBar menuBar = new MenuBar();
-        menuBar.getMenus().add(files);
-        //Menu test - end
-
-        VBox vBox = new VBox(menuBar);
+        Game game = new Game();
 
         BorderPane root = new BorderPane();
 
         // Altered by Gerald to add the BoardPane
-        Board board = new Board(19);
+        //Board board = new Board(19);
         final String path = "file:src/main/resources/pr_se/gogame/";
 
-        BoardPane bp = new BoardPane(board,
+        BoardPane boardPane = new BoardPane(game,
+                path + "tile_0.png",
+                path + "tile_1.png",
+                path + "stone_0.png",
+                path + "stone_1.png");
+                
+                BoardPane bp = new BoardPane(board,
             path+"tile_0.png",
             path+"tile_0.png",
             path+"edge.png",
@@ -51,24 +44,17 @@ public class GoApplication extends Application {
             path+"stone_1.png");
         bp.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
 
-        root.setTop(vBox);
-        root.setCenter(bp);
+        BorderPane root = new BorderPane();
+        root.setCenter(boardPane);
+        root.setTop(new HeaderPane(this, stage, game));
+        root.setLeft(new SidePane(game));
 
-        Scene scene = new Scene(root, 960, 600);
+        Scene scene = new Scene(root, WIDTH, HEIGHT);
+        stage.setMinHeight(HEIGHT + 40);
+        stage.setMinWidth(WIDTH + 20);
 
-        stage.setMinWidth(320);
-        stage.setMinHeight(200);
-
-        root.widthProperty().addListener((o, n, t) -> System.out.println("New width: " + t));
-        root.heightProperty().addListener((o, n, t) -> System.out.println("New height: " + t));
-
-        // Same as before from here on
         stage.setScene(scene);
         stage.show();
-    }
-
-    private Parent createContent() {
-        return new StackPane(new Text("Hello World"));
     }
 
     public static void main(String[] args) {

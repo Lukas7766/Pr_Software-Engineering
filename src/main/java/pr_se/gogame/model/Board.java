@@ -1,5 +1,7 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.view_controller.GameEvent;
+import pr_se.gogame.view_controller.GameListener;
 import pr_se.gogame.view_controller.GoListener;
 import pr_se.gogame.view_controller.StoneRemovedEvent;
 import pr_se.gogame.view_controller.StoneSetEvent;
@@ -152,6 +154,7 @@ public class Board implements BoardInterface {
         }
     }
 
+
     private void fireStoneRemoved(int x, int y) {
         StoneRemovedEvent e = new StoneRemovedEvent(x, y);
 
@@ -217,4 +220,5 @@ public class Board implements BoardInterface {
     public StoneColor getCurColor() {
         return curColor;
     }
+
 }

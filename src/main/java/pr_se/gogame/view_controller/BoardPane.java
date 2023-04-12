@@ -13,6 +13,8 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.Board;
+import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
 
 /**
@@ -28,6 +30,11 @@ public class BoardPane extends GridPane {
     private final int SIZE;
     private Board board;
 
+    private final Game game;
+    /*
+     * Custom resources
+     */
+
     private final Image[] tiles = new Image [2];
     private final Image[] stones = new Image [2];
     private final Image edge;
@@ -38,9 +45,13 @@ public class BoardPane extends GridPane {
 
     private final NumberBinding MAX_CELL_DIM_INT;
 
-    public BoardPane(Board board, String tile0, String tile1, String edge, String corner, String stone0, String stone1) {
-        setBoard(board);
-        this.SIZE = board.getSize();
+
+    // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
+    public BoardPane(Game game, String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
+        this.game = game;
+        setBoard(new Board(game.getSize()));
+        this.SIZE = BOARD.getSize();
+
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
         final int DEFAULT_IMAGE_SIZE = 128;
@@ -61,6 +72,7 @@ public class BoardPane extends GridPane {
                 stone0,     // URL
                 true);      // backgroundLoading
         stones[1] = new Image(stone1, true);
+
 
         // determine cell size
         final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(SIZE + 2);                                                 // Get maximum width if all cells are equally wide
@@ -84,6 +96,13 @@ public class BoardPane extends GridPane {
         BoardCell corner4 = new BoardCell(this.corner, false);
         corner4.getLabel().setVisible(false);
         add(corner4, SIZE + 1, SIZE + 1);
+        
+        
+                game.addListener(l -> {
+            if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
+            System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
+        }); //ToDo: full Event integration
+        
 
         // populate the coordinate axes
         for(int i = 0; i < this.SIZE; i++) {
@@ -186,6 +205,7 @@ public class BoardPane extends GridPane {
         setOnKeyPressed((e) -> {
             // TODO: Keyboard input?
         });
+
 
         // Layout of this BoardPane
         setAlignment(Pos.CENTER);
