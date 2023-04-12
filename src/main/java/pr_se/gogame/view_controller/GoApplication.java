@@ -40,7 +40,9 @@ public class GoApplication extends Application {
 
         root.setCenter(bp);
         root.setTop(new HeaderPane(this, stage, game));
-        root.setLeft(new SidePane(game));
+        SidePane sp = new SidePane(game);
+        // sp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
+        root.setLeft(sp);
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         stage.setMinHeight(HEIGHT + 40);

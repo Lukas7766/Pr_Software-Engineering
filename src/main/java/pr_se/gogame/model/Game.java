@@ -13,10 +13,12 @@ public class Game implements GameInterface {
     private final List<GameListener> listeners;
     private int size = 19;
     private int komi = 0;
+    private Board board;
 
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
+        this.board = new Board(this.size, this.komi);
     }
 
     public void initGame() {
@@ -30,6 +32,7 @@ public class Game implements GameInterface {
         this.komi = komi;
         this.gameCommand = gameCommand;
         System.out.println("newGame, Size: " + size + " Komi: " + komi);
+        this.board = new Board(this.size, this.komi);
         fireNewGame(gameCommand, size, komi);
     }
 
@@ -96,6 +99,11 @@ public class Game implements GameInterface {
     @Override
     public void confirmChoice() {
         System.out.println("confirmChoice");
+    }
+
+    @Override
+    public Board getBoard() {
+        return this.board;
     }
 
     private void fireNewGame(GameCommand gameCommand,int size, int komi) {

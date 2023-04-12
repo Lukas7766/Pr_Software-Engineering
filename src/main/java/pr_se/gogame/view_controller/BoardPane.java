@@ -12,10 +12,7 @@ import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
-import pr_se.gogame.model.Board;
-import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameCommand;
-import pr_se.gogame.model.StoneColor;
+import pr_se.gogame.model.*;
 
 /**
  * View/Controller
@@ -27,7 +24,7 @@ public class BoardPane extends GridPane {
     private boolean showsMoveNumbers = true;
     private boolean showsCoordinates = true;
 
-    private final int SIZE;
+    private int size;
     private Board board;
 
     private final Game game;
@@ -37,21 +34,32 @@ public class BoardPane extends GridPane {
 
     private final Image[] tiles = new Image [2];
     private final Image[] stones = new Image [2];
-    private final Image edge;
-    private final Image corner;
+    private Image edge;
+    private Image corner;
 
     private BoardCell lastBC = null;
     private BoardCell selectionBC = null;
 
-    private final NumberBinding MAX_CELL_DIM_INT;
+    private NumberBinding MAX_CELL_DIM_INT;
 
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
     public BoardPane(Game game, String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
         this.game = game;
-        setBoard(new Board(game.getSize()));
-        this.SIZE = board.getSize();
+        game.addListener(l -> {
+            if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
+            System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
 
+            init(tile0, tile1, edge, corner, stone0, stone1);
+        }); //ToDo: full Event integration
+        init(tile0, tile1, edge, corner, stone0, stone1);
+    }
+
+    private void init(String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
+        getChildren().removeAll(getChildren());
+
+        setBoard(this.game.getBoard());
+        this.size = board.getSize();
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
         final int DEFAULT_IMAGE_SIZE = 128;
@@ -75,9 +83,9 @@ public class BoardPane extends GridPane {
 
 
         // determine cell size
-        final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(SIZE + 2);                                                 // Get maximum width if all cells are equally wide
+        final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(size + 2);                                                 // Get maximum width if all cells are equally wide
         final NumberBinding MAX_CELL_WIDTH_INT = Bindings.createIntegerBinding(MAX_CELL_WIDTH::intValue, MAX_CELL_WIDTH);        // round down
-        final NumberBinding MAX_CELL_HEIGHT = heightProperty().divide(SIZE + 2);                                              // Get maximum height if all cells are equally wide
+        final NumberBinding MAX_CELL_HEIGHT = heightProperty().divide(size + 2);                                              // Get maximum height if all cells are equally wide
         final NumberBinding MAX_CELL_HEIGHT_INT = Bindings.createIntegerBinding(MAX_CELL_HEIGHT::intValue, MAX_CELL_HEIGHT);    // round down
 
         final NumberBinding MAX_CELL_DIM = Bindings.min(MAX_CELL_WIDTH_INT, MAX_CELL_HEIGHT_INT);                               // Use whatever is smaller after the division
@@ -89,23 +97,16 @@ public class BoardPane extends GridPane {
         add(corner1, 0, 0);
         BoardCell corner2 = new BoardCell(this.corner, false);
         corner2.getLabel().setVisible(false);
-        add(corner2, SIZE + 1, 0);
+        add(corner2, size + 1, 0);
         BoardCell corner3 = new BoardCell(this.corner, false);
         corner3.getLabel().setVisible(false);
-        add(corner3, 0, SIZE + 1);
+        add(corner3, 0, size + 1);
         BoardCell corner4 = new BoardCell(this.corner, false);
         corner4.getLabel().setVisible(false);
-        add(corner4, SIZE + 1, SIZE + 1);
-        
-        
-                game.addListener(l -> {
-            if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
-            System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
-        }); //ToDo: full Event integration
-        
+        add(corner4, size + 1, size + 1);
 
         // populate the coordinate axes
-        for(int i = 0; i < this.SIZE; i++) {
+        for(int i = 0; i < this.size; i++) {
             // top
             BoardCell t = new BoardCell(this.edge, false);
             t.getLabel().setText("" + (char)('A' + i));
@@ -116,24 +117,24 @@ public class BoardPane extends GridPane {
             BoardCell b = new BoardCell(this.edge, false);
             b.getLabel().setText("" + (char)('A' + i));
             b.getLabel().setAlignment(Pos.TOP_CENTER);
-            add(b, i + 1, SIZE + 1);
+            add(b, i + 1, size + 1);
 
             // left
             BoardCell l = new BoardCell(this.edge, false);
-            l.getLabel().setText("" + (SIZE - i));
+            l.getLabel().setText("" + (size - i));
             l.getLabel().setAlignment(Pos.CENTER_RIGHT);
             add(l, 0, i + 1);
 
             // right
             BoardCell r = new BoardCell(this.edge, false);
-            r.getLabel().setText("" + (SIZE - i));
+            r.getLabel().setText("" + (size - i));
             r.getLabel().setAlignment(Pos.CENTER_LEFT);
-            add(r, SIZE + 1, i + 1);
+            add(r, size + 1, i + 1);
         }
 
         // Fill the grid with alternating tiles
-        for(int i = 0; i < this.SIZE; i++) {
-            for(int j = 0; j < this.SIZE; j++) {
+        for(int i = 0; i < this.size; i++) {
+            for(int j = 0; j < this.size; j++) {
                 BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2], true);
                 add(bc, j + 1, i + 1);
             }
@@ -217,7 +218,7 @@ public class BoardPane extends GridPane {
         board.addListener(new GoListener() {
             @Override
             public void stoneSet(StoneSetEvent e) {
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * SIZE + e.getCol() + 4 + SIZE * 4);
+                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
                 destinationBC.getLabel().setText("" + e.getMoveNumber());
 
                 if(e.getColor() == StoneColor.BLACK) {
@@ -229,14 +230,14 @@ public class BoardPane extends GridPane {
 
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * SIZE + e.getCol() + 4 + SIZE * 4);
+                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
 
                 destinationBC.unset();
             }
 
             @Override
             public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-                BoardCell destinationBC = (BoardCell) getChildren().get(y * SIZE + x + 4 + SIZE * 4);
+                BoardCell destinationBC = (BoardCell) getChildren().get(y * size + x + 4 + size * 4);
                 destinationBC.getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
         });
@@ -259,7 +260,7 @@ public class BoardPane extends GridPane {
 
     // TODO: Remove in finished product
     public void printDebugInfo() {
-        BoardCell targetBC = (BoardCell)getChildren().get(4 + SIZE * 4);
+        BoardCell targetBC = (BoardCell)getChildren().get(4 + size * 4);
         //this.board.printDebugInfo(col, row);
         System.out.println("width/height: " + getWidth() + "/" + getHeight());
         //System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
@@ -296,8 +297,8 @@ public class BoardPane extends GridPane {
         this.showsCoordinates = showsCoordinates;
     }
 
-    public int getSIZE() {
-        return SIZE;
+    public int getSize() {
+        return size;
     }
 
     public Board getBoard() {

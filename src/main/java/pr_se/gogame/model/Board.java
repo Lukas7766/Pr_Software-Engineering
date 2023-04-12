@@ -15,6 +15,7 @@ import java.util.*;
  */
 public class Board implements BoardInterface {
     private final int SIZE;
+    private final int KOMI;
     private final LinkedList<GoListener> listeners;
 
     private final StoneGroupPointer[][] board;
@@ -28,8 +29,9 @@ public class Board implements BoardInterface {
     private int lastDebugX = 0;
     private int lastDebugY = 0;
 
-    public Board(int size) {
+    public Board(int size, int komi) {
         this.SIZE = size;
+        this.KOMI = komi;
         listeners = new LinkedList<>();
         this.board = new StoneGroupPointer[SIZE][SIZE];
         moveNumber = 1;

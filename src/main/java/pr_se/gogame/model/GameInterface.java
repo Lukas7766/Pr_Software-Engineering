@@ -32,4 +32,6 @@ public interface GameInterface {
     GameCommand getGameState();
 
     void confirmChoice();
+
+    Board getBoard();
 }
