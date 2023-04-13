@@ -22,7 +22,8 @@ public class Game implements GameInterface {
     }
 
     public void initGame() {
-       fireInitGame(GameCommand.INIT);
+        this.gameCommand = GameCommand.INIT;
+        fireGameCommand(gameCommand);
     }
 
 
@@ -33,7 +34,7 @@ public class Game implements GameInterface {
         this.gameCommand = gameCommand;
         System.out.println("newGame, Size: " + size + " Komi: " + komi);
         this.board = new Board(this.size, this.komi);
-        fireNewGame(gameCommand, size, komi);
+        fireNewGame(this.gameCommand, this.size, this.komi);
     }
 
 
@@ -99,6 +100,8 @@ public class Game implements GameInterface {
     @Override
     public void confirmChoice() {
         System.out.println("confirmChoice");
+        this.gameCommand = GameCommand.CONFIRMCHOICE;
+        fireGameCommand(gameCommand);
     }
 
     @Override
@@ -106,19 +109,18 @@ public class Game implements GameInterface {
         return this.board;
     }
 
-    private void fireNewGame(GameCommand gameCommand,int size, int komi) {
-        GameEvent e = new GameEvent(gameCommand,size, komi);
+    private void fireNewGame(GameCommand gameCommand, int size, int komi) {
+        GameEvent e = new GameEvent(gameCommand, size, komi);
         for (GameListener l : listeners) {
             l.gameCommand(e);
         }
     }
 
-    private void fireInitGame(GameCommand init) {
-        GameEvent e = new GameEvent(GameCommand.INIT);
-        for (GameListener l : listeners){
+    private void fireGameCommand(GameCommand command) {
+        GameEvent e = new GameEvent(command);
+        for (GameListener l : listeners) {
             l.gameCommand(e);
         }
     }
-
 
 }

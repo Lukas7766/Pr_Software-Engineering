@@ -9,6 +9,7 @@ import javafx.scene.shape.Rectangle;
 import javafx.scene.text.*;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
+import pr_se.gogame.model.StoneColor;
 
 public class SidePane extends StackPane {
 
@@ -36,18 +37,23 @@ public class SidePane extends StackPane {
         this.getChildren().add(gameSetting);
 
         game.addListener(l -> {
-            if(l.getGameCommand() == GameCommand.INIT){
-                if(!this.getChildren().contains(gameSetting)) {
-                    //this.getChildren().add(mainBox);
-                    this.getChildren().add(gameSetting);
-                    this.getChildren().remove(gameInfo);
-                }
-            } else {
-                //this.getChildren().remove(mainBox);
-                this.getChildren().remove(gameSetting);
-                this.getChildren().add(gameInfo);
+            if (l.getGameCommand() != GameCommand.INIT) return;
+            if (!this.getChildren().contains(gameSetting)) {
+                //this.getChildren().add(mainBox);
+                this.getChildren().add(gameSetting);
+                this.getChildren().remove(gameInfo);
             }
         });
+
+        game.addListener(l -> {
+            if (!(l.getGameCommand() == GameCommand.BLACKSTARTS || l.getGameCommand() == GameCommand.WHITSTARTS)) return;
+
+            //this.getChildren().remove(mainBox);
+            this.getChildren().remove(gameSetting);
+            this.getChildren().add(gameInfo);
+
+        });
+
 
     }
 
@@ -62,8 +68,8 @@ public class SidePane extends StackPane {
         playerInfo.getChildren().add(currentPlayer);
 
         Label actualPlayer = new Label();
-        actualPlayer.setFont(Font.font(null,FontWeight.NORMAL,13));
-        actualPlayer.setText(GameCommand.BLACKsTURN.toString());
+        actualPlayer.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        actualPlayer.setText(game.getBoard().getCurColor() == StoneColor.BLACK ? "Black" : "White");
         playerInfo.getChildren().add(actualPlayer);
 
         infoPane.getChildren().add(playerInfo);
@@ -72,9 +78,29 @@ public class SidePane extends StackPane {
             GameCommand command = l.getGameCommand();
             if (!(command.equals(GameCommand.BLACKsTURN) || command.equals(GameCommand.WHITEsTURN))) return;
 
-            currentPlayer.setText("Current Player: " + ((command == GameCommand.BLACKsTURN) ? "Black":"White"));
+
 
         });*/
+
+        game.addListener(l -> {
+            if (!(l.getGameCommand() == GameCommand.BLACKSTARTS || l.getGameCommand() == GameCommand.WHITSTARTS)) return;
+            game.getBoard().addListener(new GoListener() {
+                @Override
+                public void stoneSet(StoneSetEvent e) {
+                    actualPlayer.setText((e.getColor() == StoneColor.WHITE) ? "Black":"White");
+                }
+
+                @Override
+                public void stoneRemoved(StoneRemovedEvent e) {
+
+                }
+
+                @Override
+                public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
+
+                }
+            });
+        });
 
         Pane spring1 = new Pane();
         spring1.minHeightProperty().bind(currentPlayer.heightProperty());
