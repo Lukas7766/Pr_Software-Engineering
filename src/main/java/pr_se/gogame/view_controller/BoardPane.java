@@ -46,12 +46,18 @@ public class BoardPane extends GridPane {
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
     public BoardPane(Game game, String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
         this.game = game;
+
         game.addListener(l -> {
-            if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
+            if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) {
+                this.setMouseTransparent(true);
+                return;
+            }
+            this.setMouseTransparent(false);
             System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
 
             init(tile0, tile1, edge, corner, stone0, stone1);
-        }); //ToDo: full Event integration
+        });
+        this.setMouseTransparent(true);
         init(tile0, tile1, edge, corner, stone0, stone1);
     }
 
