@@ -25,7 +25,7 @@ public class GoApplication extends Application {
         final String path = "src/main/resources/pr_se/gogame/";
 
         // TODO: In the end product, the archive could be chosen by the user (though a default should still be set) and changed at runtime
-        BoardPane bp = new BoardPane(game, path+"debug.zip");
+        BoardPane bp = new BoardPane(game, path+"default.zip");
         bp.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
 
         root.setCenter(bp);
