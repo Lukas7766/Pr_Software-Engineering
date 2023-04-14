@@ -14,6 +14,12 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.*;
 
+import java.io.InputStream;
+import java.util.Objects;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
 /**
  * View/Controller
  * Board that uses image files for its tiles and stones
@@ -32,7 +38,7 @@ public class BoardPane extends GridPane {
      * Custom resources
      */
 
-    private final Image[] tiles = new Image [2];
+    private Image tile;
     private final Image[] stones = new Image [2];
     private Image edge;
     private Image corner;
@@ -44,42 +50,62 @@ public class BoardPane extends GridPane {
 
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
-    public BoardPane(Game game, String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
+    public BoardPane(Game game, String graphics) {
         this.game = game;
         game.addListener(l -> {
             if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
             System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
 
-            init(tile0, tile1, edge, corner, stone0, stone1);
+            init(graphics);
         }); //ToDo: full Event integration
-        init(tile0, tile1, edge, corner, stone0, stone1);
+        init(graphics);
     }
 
-    private void init(String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
+    private void init(String graphics) {
         getChildren().removeAll(getChildren());
 
         setBoard(this.game.getBoard());
         this.size = board.getSize();
 
-        // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
-        final int DEFAULT_IMAGE_SIZE = 128;
-        final boolean SMOOTH_IMAGES = false;
+        try (ZipFile zip = new ZipFile(graphics)) {
+            ZipEntry tileEntry = zip.getEntry("tile.png");
+            ZipEntry cornerEntry = zip.getEntry("corner.png");
+            ZipEntry edgeEntry = zip.getEntry("edge.png");
+            ZipEntry stone0Entry = zip.getEntry("stone_0.png");
+            ZipEntry stone1Entry = zip.getEntry("stone_1.png");
 
-        tiles[0] = new Image(
-                tile0,              // URL
-                DEFAULT_IMAGE_SIZE, // requestedWidth
-                DEFAULT_IMAGE_SIZE, // requestedHeight
-                true,               // preserveRation
-                SMOOTH_IMAGES,      // smooth
-                true);              // backgroundLoading
-        tiles[1] = new Image(tile1, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
-        this.edge = new Image(edge, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
-        this.corner = new Image(corner, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
+            if(Stream.of(tileEntry, cornerEntry, edgeEntry, stone0Entry, stone1Entry).anyMatch(Objects::isNull)) {
+                throw new IllegalStateException("ERROR: Graphics pack " + graphics + " is missing files!");
+            }
 
-        stones[0] = new Image(
-                stone0,     // URL
-                true);      // backgroundLoading
-        stones[1] = new Image(stone1, true);
+            try (InputStream tileIS = zip.getInputStream(tileEntry);
+                InputStream cornerIS = zip.getInputStream(cornerEntry);
+                InputStream edgeIS = zip.getInputStream(edgeEntry);
+                InputStream stone0IS = zip.getInputStream(stone0Entry);
+                InputStream stone1IS = zip.getInputStream(stone1Entry)
+            ) {
+                final int DEFAULT_IMAGE_SIZE = 128;
+                final boolean SMOOTH_IMAGES = false;
+
+                tile = new Image(
+                        tileIS,             // is (:InputStream)
+                        DEFAULT_IMAGE_SIZE, // requestedWidth
+                        DEFAULT_IMAGE_SIZE, // requestedHeight
+                        true,               // preserveRation
+                        SMOOTH_IMAGES);     // smooth
+                this.edge = new Image(edgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.corner = new Image(cornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+
+                stones[0] = new Image(stone0IS);
+                stones[1] = new Image(stone1IS);
+            } catch (Exception e) {
+                System.err.println("ERROR: Couldn't read file from graphics pack " + graphics + "!");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.err.println("ERROR: Couldn't open graphics pack " + graphics + "!");
+            e.printStackTrace();
+        }
 
 
         // determine cell size
@@ -135,7 +161,7 @@ public class BoardPane extends GridPane {
         // Fill the grid with alternating tiles
         for(int i = 0; i < this.size; i++) {
             for(int j = 0; j < this.size; j++) {
-                BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2], true);
+                BoardCell bc = new BoardCell(tile, true);
                 add(bc, j + 1, i + 1);
             }
         }
@@ -305,8 +331,8 @@ public class BoardPane extends GridPane {
         return board;
     }
 
-    public Image[] getTiles() {
-        return tiles;
+    public Image getTile() {
+        return tile;
     }
 
     public Image[] getStones() {

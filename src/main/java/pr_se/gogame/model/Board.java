@@ -1,14 +1,15 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.view_controller.GameEvent;
-import pr_se.gogame.view_controller.GameListener;
 import pr_se.gogame.view_controller.GoListener;
 import pr_se.gogame.view_controller.StoneRemovedEvent;
 import pr_se.gogame.view_controller.StoneSetEvent;
 
-import static pr_se.gogame.model.StoneColor.*;
+import java.util.HashSet;
+import java.util.LinkedList;
+import java.util.Set;
 
-import java.util.*;
+import static pr_se.gogame.model.StoneColor.BLACK;
+import static pr_se.gogame.model.StoneColor.WHITE;
 
 /**
  * Model Dummy (for now)
