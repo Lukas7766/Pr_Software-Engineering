@@ -152,19 +152,16 @@ public class Board implements BoardInterface {
             }*/
 
             // Update UI
-            fireStoneSet(x, y, color, moveNumber);
+            fireStoneSet(x, y, color);
             moveNumber++;
-        } else {
-            // Update UI
-            fireStoneSet(x, y, color, 0);
-        }
 
-        // Update current player color
-        // TODO: Remove and delegate to Game
-        if(color == WHITE) {
-            curColor = BLACK;
-        } else {
-            curColor = WHITE;
+            // Update current player color
+            // TODO: Remove and delegate to Game
+            if(color == WHITE) {
+                curColor = BLACK;
+            } else {
+                curColor = WHITE;
+            }
         }
     }
 
@@ -201,8 +198,8 @@ public class Board implements BoardInterface {
     }
 
     // Private methods
-    private void fireStoneSet(int x, int y, StoneColor c, int moveNumber) {
-        StoneSetEvent e = new StoneSetEvent(x, y, c, moveNumber);
+    private void fireStoneSet(int x, int y, StoneColor c) {
+        StoneSetEvent e = new StoneSetEvent(x, y, c, this.moveNumber);
 
         for(GoListener l : listeners) {
             l.stoneSet(e);

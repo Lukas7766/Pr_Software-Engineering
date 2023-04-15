@@ -265,10 +265,12 @@ public class BoardPane extends GridPane {
         board.addListener(new GoListener() {
             @Override
             public void stoneSet(StoneSetEvent e) {
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
-                if(e.getMoveNumber() >= 1) {
-                    destinationBC.getLabel().setText("" + e.getMoveNumber());
+                if(e == null) {
+                    throw new NullPointerException();
                 }
+
+                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
+                destinationBC.getLabel().setText("" + e.getMoveNumber());
 
                 if(e.getColor() == BLACK) {
                     destinationBC.setBlack();
@@ -279,6 +281,10 @@ public class BoardPane extends GridPane {
 
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
+                if(e == null) {
+                    throw new NullPointerException();
+                }
+
                 BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
 
                 destinationBC.unset();
@@ -513,7 +519,7 @@ public class BoardPane extends GridPane {
         private void set(ImageView iv) {
             deselect();
             iv.setVisible(true);
-            if(showsMoveNumbers && Integer.parseInt(this.LABEL.getText()) >= 1) {
+            if(showsMoveNumbers) {
                 PixelReader p = iv.getImage().getPixelReader();
                 if(p == null) {
                     throw new NullPointerException("Can't get stone color");
