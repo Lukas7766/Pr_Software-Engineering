@@ -44,7 +44,7 @@ public class Board implements BoardInterface {
         *
         * TODO: This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
         *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. Thus, it should be possible
-        * for a ruleset to override this.
+        *  for a ruleset to override this.
         */
         switch (komi) {
             case 9:
@@ -109,7 +109,6 @@ public class Board implements BoardInterface {
 
         // Get neighbors
         Set<StoneGroup> surroundingSGs = getSurroundingStoneGroups(x, y);
-        System.out.println("No. neighbor groups: " + surroundingSGs.size());
 
         Set<Position> newStoneLiberties = getLibertiesAt(x, y);
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);

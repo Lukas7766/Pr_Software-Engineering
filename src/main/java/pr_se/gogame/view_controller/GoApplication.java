@@ -28,11 +28,11 @@ public class GoApplication extends Application {
 
         // TODO: In the end product, the archive could be chosen by the user (though a default should still be set) and changed at runtime
         BoardPane bp = new BoardPane(game, path+"default.zip");
-        bp.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
+        // bp.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
 
         Button test = new Button("Change graphics set");
         test.setOnAction((e) -> {
-            bp.setGraphics(path + "debug.zip");
+            bp.setShowsCoordinates(!bp.showsCoordinates());
         });
 
         root.setCenter(bp);

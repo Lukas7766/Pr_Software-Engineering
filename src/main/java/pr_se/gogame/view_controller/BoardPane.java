@@ -52,7 +52,6 @@ public class BoardPane extends GridPane {
 
     private String graphics;
 
-    // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
     public BoardPane(Game game, String graphics) {
         if(game == null || graphics == null) {
             throw new NullPointerException();
@@ -139,9 +138,6 @@ public class BoardPane extends GridPane {
                 /*
                  * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
                  * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
-                 *
-                 * TODO:    Maybe move this into a method, as it (or something similar) might be necessary when
-                 *          switching graphic sets during a game.
                  */
                 StoneColor c = this.board.getColorAt(j, i);
                 if(c != null) {
@@ -150,6 +146,7 @@ public class BoardPane extends GridPane {
                     } else {
                         bc.setWhite();
                     }
+                    bc.getLabel().setVisible(false);
                 }
                 add(bc, j + 1, i + 1);
             }
@@ -165,7 +162,6 @@ public class BoardPane extends GridPane {
 
                     if (col != null && row != null) {
                         BoardCell targetBC = (BoardCell)target;
-                        // printDebugInfo();                                     // TODO: Remove in finished product
 
                         if (this.board.getCurColor() == BLACK) {
                             targetBC.hoverBlack();
@@ -266,7 +262,6 @@ public class BoardPane extends GridPane {
         });
     }
 
-    // TODO: Call this from the main UI if moves are to be confirmed.
     // TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse might be on the board during confirmation)
     // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
     public void confirmMove() {
@@ -279,20 +274,6 @@ public class BoardPane extends GridPane {
                 System.out.println("Confirmation outside of actual board on " + lastBC); // TODO: Remove in finished product
             }
         }
-    }
-
-    // TODO: Remove in finished product
-    public void printDebugInfo() {
-        BoardCell targetBC = (BoardCell)getChildren().get(4 + size * 4);
-        //this.board.printDebugInfo(col, row);
-        System.out.println("width/height: " + getWidth() + "/" + getHeight());
-        //System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
-        //System.out.println("MinWidth/Height: " + getMinWidth() + "/" + getMinHeight());
-        System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
-        //System.out.println("Cell bounds in local: " + targetBC.getBoundsInLocal());
-        System.out.println("Cell bounds in parent: " + targetBC.getBoundsInParent());
-
-        //System.out.println("Hover over " + col + " " + row);
     }
 
     // Getters and Setters
@@ -310,6 +291,13 @@ public class BoardPane extends GridPane {
 
     public void setShowsMoveNumbers(boolean showsMoveNumbers) {
         this.showsMoveNumbers = showsMoveNumbers;
+
+        for(int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++) {
+                BoardCell bc = (BoardCell)getChildren().get(4 + size * 4 + i * size + j);
+                bc.getLabel().setVisible(this.showsMoveNumbers);
+            }
+        }
     }
 
     public boolean showsCoordinates() {
@@ -318,6 +306,11 @@ public class BoardPane extends GridPane {
 
     public void setShowsCoordinates(boolean showsCoordinates) {
         this.showsCoordinates = showsCoordinates;
+
+        for(int i = 0; i < size * 4; i++) {
+            BoardCell bc = (BoardCell)getChildren().get(4 + i);
+            bc.getLabel().setVisible(this.showsCoordinates);
+        }
     }
 
     public void setGraphics(String graphics) {
