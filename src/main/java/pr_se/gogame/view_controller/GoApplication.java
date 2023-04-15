@@ -7,6 +7,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Menu;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.MenuItem;
+import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -27,6 +28,8 @@ public class GoApplication extends Application {
         BorderPane root = new BorderPane();
 
         final String path = "file:src/main/resources/pr_se/gogame/";
+
+        stage.getIcons().add(new Image(path+"go.png"));
 
         BoardPane bp = new BoardPane(game,
                 path + "tile_0.png",

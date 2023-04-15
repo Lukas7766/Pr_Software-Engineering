@@ -26,12 +26,17 @@ import pr_se.gogame.model.StoneColor;
  */
 public class SidePane extends StackPane {
 
+    private final int maxCustomBoardSize = 26;
+    private final int minCustomBoardSize = 0;
+    private final int maxKomiAmount = 9;
+    private final int minKomiAmount = 0;
     private final Game game;
     private final Color backColor;
 
     /**
-     * Constructor to create a ned SidePane
-     * @param game instance of the actual game object
+     * Constructor to create a SidePane
+     *
+     * @param game instance of actual game -> needed for triggering and observing changes in model
      */
     public SidePane(Color backColor, Game game) {
         this.backColor = backColor;
@@ -66,9 +71,10 @@ public class SidePane extends StackPane {
 
     /**
      * GameInfomations contains a mechanism to show relevant information based on current GameCommand <br>
-     * At least it contains: <br>
+     * contains at least: <br>
      * -> Current Player <br>
      * -> Turn Explanation <br>
+     *
      * @return a VBox which contains items to show relevant game info.
      */
     private VBox gameInfo() {
@@ -145,6 +151,7 @@ public class SidePane extends StackPane {
      * At least it contains: <br>
      * -> Board size options <br>
      * -> Komi spinner <br>
+     *
      * @return a GridPane which contains items for creating a new game.
      */
     private GridPane newGame() {
@@ -191,7 +198,7 @@ public class SidePane extends StackPane {
         gridPane.add(normal, 0, 4);
         gridPane.add(custom, 0, 5);
 
-        Spinner<Integer> customSize = new Spinner<>(9, 25, 9, 1);
+        Spinner<Integer> customSize = new Spinner<>(minCustomBoardSize, maxCustomBoardSize, minCustomBoardSize, 1);
         customSize.setDisable(true);
         customSize.setMaxSize(55, 15);
         SpinnerValueFactory.IntegerSpinnerValueFactory customSizeIntFactory =
@@ -212,7 +219,7 @@ public class SidePane extends StackPane {
         komi.setPadding(new Insets(5));
         gridPane.add(komi, 0, 6);
 
-        Spinner<Integer> komiCnt = new Spinner<>(0, 9, 0, 1);
+        Spinner<Integer> komiCnt = new Spinner<>(minKomiAmount, maxKomiAmount, minKomiAmount, 1);
         //customSize.setDisable(true);
         komiCnt.setMaxSize(55, 15);
         SpinnerValueFactory.IntegerSpinnerValueFactory komiIntFactory =

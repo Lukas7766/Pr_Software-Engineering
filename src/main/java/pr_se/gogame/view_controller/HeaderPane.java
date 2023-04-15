@@ -22,14 +22,44 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+/**
+ * This class contains the controller and view function of the game header panel.<br>
+ * It is recommended to place the panel on the top of the application.
+ */
 public class HeaderPane extends VBox {
 
+    /**
+     * Background color of pane
+     */
     private final Color backColor;
+
+    /**
+     * Instance of application
+     */
     private final Application app;
+
+    /**
+     * Instance of stage
+     */
     private final Stage stage;
+
+    /**
+     * Instance of game
+     */
     private final Game game;
+
+    /**
+     * List of FileChooser Extensions
+     */
     private final HashSet<FileChooser.ExtensionFilter> filterList;
 
+    /**
+     * Constructor to create a Header Pane
+     * @param backcolor Background Color
+     * @param app instance of actual application -> needed to open URL in Browser
+     * @param stage instance of actual stage -> needed to show file dialog
+     * @param game instance of actual game -> needed for triggering and observing changes in model
+     */
     public HeaderPane(Color backcolor, Application app, Stage stage, Game game) {
         this.backColor = backcolor;
         this.app = app;
@@ -48,8 +78,20 @@ public class HeaderPane extends VBox {
 
         this.getChildren().add(menuBar);
         this.getChildren().add(shortMenu());
+
+        //ToDo exceeding competence -> onCloseAction
+        stage.setOnCloseRequest(e -> onCloseAction());
     }
 
+    /**
+     * The short menu contains at least: <br>
+     * -> playback control buttons <br>
+     * -> pass button <br>
+     * -> resign button <br>
+     * -> score game button <br>
+     * -> confirm move button
+     * @return a horizontal box layout object which includes all needed elements of the short menu
+     */
     private HBox shortMenu() {
         HBox lane = new HBox();
         lane.setPrefHeight(35);
@@ -92,7 +134,6 @@ public class HeaderPane extends VBox {
             playbackControlList.forEach(e -> e.setDisable(false));
 
         });
-
 
         lane.getChildren().add(playbackControl);
 
@@ -141,6 +182,14 @@ public class HeaderPane extends VBox {
 
     }
 
+    /** Creates the file section for the menu bar <br>
+     * contains at least: <br>
+     * -> New Game <br>
+     * -> Import Game <br>
+     * -> Export Game <br>
+     * -> Exit Game
+     * @return the file section for the menu bar
+     */
     private Menu fileSection() {
         Menu files = new Menu();
         files.setText("File");
@@ -171,7 +220,7 @@ public class HeaderPane extends VBox {
         MenuItem exitGameItem = new MenuItem();
         exitGameItem.setText("Exit Game");
         files.getItems().add(exitGameItem);
-        exitGameItem.setOnAction(e -> onCloseAction());
+        exitGameItem.setOnAction(e -> onCloseAction()); //ToDo exceeding competence -> onCloseAction
 
 
         SeparatorMenuItem sep1 = new SeparatorMenuItem();
@@ -183,35 +232,25 @@ public class HeaderPane extends VBox {
         return files;
     }
 
-    private void onCloseAction() {
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Close Go Game");
-        alert.setHeaderText("Do you really want to close your Game?");
-        alert.setContentText("Choose your option:");
-        alert.initOwner(stage);
-
-        ButtonType noSaveBtn = new ButtonType("without save");
-        ButtonType saveBtn = new ButtonType("with save");
-        ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(saveBtn, noSaveBtn, cancelBtn);
-
-        Optional<ButtonType> btnResult = alert.showAndWait();
-
-        if (btnResult.get() == noSaveBtn) {
-            Platform.exit();
-        } else if (btnResult.get() == saveBtn) {
-            if (game.saveGame()) Platform.exit();
-            else throw new RuntimeException();
-        }
-    }
-
+    /** Creates the game section for the menu bar <br>
+     * contains at least: <br>
+     * -> Pass <br>
+     * -> Resign <br>
+     * -> Score Game
+     * @return the game section for the menu bar
+     */
     private Menu gameSection() {
         Menu menu = new Menu();
         menu.setText("Game");
 
         List<MenuItem> gameSectionItems = new ArrayList<>();
+
+        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Show Move Numbers");
+        gameSectionItems.add(showMoveNumbersCBtn);
+        showMoveNumbersCBtn.setSelected(false);
+        showMoveNumbersCBtn.setOnAction(e -> {
+            System.out.println(showMoveNumbersCBtn.isSelected());
+        });
 
         MenuItem passItem = new MenuItem();
         passItem.setText("Pass");
@@ -249,6 +288,12 @@ public class HeaderPane extends VBox {
         return menu;
     }
 
+    /** Creates the help section for the menu bar <br>
+     * contains at least: <br>
+     * -> Help -> Link to WebSite <br>
+     * -> About us -> Information ab the developer
+     * @return the help section for the menu bar
+     */
     private Menu helpSection() {
         Menu menu = new Menu();
         menu.setText("Help");
@@ -278,6 +323,12 @@ public class HeaderPane extends VBox {
         return menu;
     }
 
+    /** Creates a parameterizes File Dialog
+     *
+     * @param isSave true for saving a file, false for opening a file
+     * @param filter pass list of Extension Filters
+     * @return where to save or open the FILE
+     */
     private File fileDialog(boolean isSave, HashSet<FileChooser.ExtensionFilter> filter) {
 
         FileChooser fileChooser = new FileChooser();
@@ -285,5 +336,34 @@ public class HeaderPane extends VBox {
         if (filter != null && !filter.isEmpty()) filter.forEach(i -> fileChooser.getExtensionFilters().add(i));
 
         return (isSave) ? fileChooser.showSaveDialog(stage) : fileChooser.showOpenDialog(stage);
+    }
+
+    /** Handles the on close action <br>
+     * -> without save <br>
+     * -> with save <br>
+     * -> cancel <br>
+     */
+    private void onCloseAction() { //ToDo exceeding competence -> onCloseAction
+
+        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+        alert.setTitle("Close Go Game");
+        alert.setHeaderText("Do you really want to close your Game?");
+        alert.setContentText("Choose your option:");
+        alert.initOwner(stage);
+
+        ButtonType noSaveBtn = new ButtonType("without save");
+        ButtonType saveBtn = new ButtonType("with save");
+        ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+
+        alert.getButtonTypes().setAll(saveBtn, noSaveBtn, cancelBtn);
+
+        Optional<ButtonType> btnResult = alert.showAndWait();
+
+        if (btnResult.get() == noSaveBtn) {
+            Platform.exit();
+        } else if (btnResult.get() == saveBtn) {
+            if (game.saveGame()) Platform.exit();
+            else throw new RuntimeException();
+        }
     }
 }
