@@ -125,8 +125,7 @@ public class Board implements BoardInterface {
             return; // TODO: throw a custom exception?
         }
 
-        // Get neighbors
-        // Set<StoneGroup> surroundingSGs = getSurroundingStoneGroups(x, y);
+        // Get neighbors at these x and y coordinates
         Set<StoneGroup> surroundingSGs = getSurroundings(
             x,
             y,
@@ -134,7 +133,7 @@ public class Board implements BoardInterface {
             (localX, localY) -> board[localX][localY].getStoneGroup()
         );
 
-        // Set<Position> newStoneLiberties = getLibertiesAt(x, y);
+        // Get liberties at these x and y coordinates
         Set<Position> newStoneLiberties = getSurroundings(
             x,
             y,
@@ -198,7 +197,14 @@ public class Board implements BoardInterface {
     public void removeStone(int x, int y) {
         board[x][y] = null;
 
-        for(StoneGroup sg : getSurroundingStoneGroups(x, y)) {
+        Set<StoneGroup> surroundingSGs = getSurroundings(
+                x,
+                y,
+                (sgp) -> sgp != null,
+                (localX, localY) -> board[localX][localY].getStoneGroup()
+        );
+
+        for(StoneGroup sg : surroundingSGs) {
             sg.addLiberty(new Position(x, y));
         }
 
@@ -253,64 +259,6 @@ public class Board implements BoardInterface {
         for(GoListener l : listeners) {
             l.stoneRemoved(e);
         }
-    }
-
-    /**
-     * Returns the Stone Groups surrounding this coordinate
-     * @param x Horizontal coordinate from 0 to size-1, starting on the left
-     * @param y Vertical coordinate from 0 to size-1, starting on the top
-     * @return a Set of at most four unique Stone groups that are above, below, to the left and right of the provided x and y coordinate.
-     */
-    private Set<StoneGroup> getSurroundingStoneGroups(int x, int y) {
-        if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
-            throw new IllegalArgumentException();
-        }
-
-        Set<StoneGroup> existingGroups = new HashSet<>();
-
-        if(y > 0 && board[x][y - 1] != null) {
-            existingGroups.add(board[x][y - 1].getStoneGroup());
-        }
-        if(y < SIZE - 1 && board[x][y + 1] != null) {
-            existingGroups.add(board[x][y + 1].getStoneGroup());
-        }
-        if(x > 0 && board[x - 1][y] != null) {
-            existingGroups.add(board[x - 1][y].getStoneGroup());
-        }
-        if(x < SIZE - 1 && board[x + 1][y] != null) {
-            existingGroups.add(board[x + 1][y].getStoneGroup());
-        }
-
-        return existingGroups;
-    }
-
-    /**
-     * Returns the liberties surrounding this coordinate
-     * @param x Horizontal coordinate from 0 to size-1, starting on the left
-     * @param y Vertical coordinate from 0 to size-1, starting on the top
-     * @return a Set of at most four unique and unoccupied Positions that are above, below, to the left and right of the provided x and y coordinate.
-     */
-    private Set<Position> getLibertiesAt(int x, int y) {
-        if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
-            throw new IllegalArgumentException();
-        }
-
-        Set<Position> liberties = new HashSet<>();
-
-        if(y > 0 && board[x][y - 1] == null) {
-            liberties.add(new Position(x, y - 1));
-        }
-        if(y < SIZE - 1 && board[x][y + 1] == null) {
-            liberties.add(new Position(x, y + 1));
-        }
-        if(x > 0 && board[x - 1][y] == null) {
-            liberties.add(new Position(x - 1, y));
-        }
-        if(x < SIZE - 1 && board[x + 1][y] == null) {
-            liberties.add(new Position(x + 1, y));
-        }
-
-        return liberties;
     }
 
     /**
