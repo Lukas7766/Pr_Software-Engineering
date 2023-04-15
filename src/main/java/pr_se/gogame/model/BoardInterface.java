@@ -2,6 +2,8 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.GoListener;
 
+import java.util.LinkedList;
+
 public interface BoardInterface {
     /**
      * Adds the supplied GoListener
@@ -31,4 +33,25 @@ public interface BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      */
     public void removeStone(int x, int y);
+
+    // Getters
+    public int getSize();
+
+    public StoneColor getCurColor();
+
+    public StoneColor getColorAt(int x, int y);
+
+    public Game getGAME();
+
+    public int getSIZE();
+
+    public LinkedList<GoListener> getListeners();
+
+    public StoneGroupPointer[][] getBoard();
+
+    public int getMoveNumber();
+
+    public int getLastDebugX();
+
+    public int getLastDebugY();
 }

@@ -7,6 +7,8 @@ import pr_se.gogame.view_controller.StoneSetEvent;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.function.BiFunction;
+import java.util.function.Predicate;
 
 import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
@@ -124,9 +126,21 @@ public class Board implements BoardInterface {
         }
 
         // Get neighbors
-        Set<StoneGroup> surroundingSGs = getSurroundingStoneGroups(x, y);
+        // Set<StoneGroup> surroundingSGs = getSurroundingStoneGroups(x, y);
+        Set<StoneGroup> surroundingSGs = getSurroundings(
+            x,
+            y,
+            (sgp) -> sgp != null,
+            (localX, localY) -> board[localX][localY].getStoneGroup()
+        );
 
-        Set<Position> newStoneLiberties = getLibertiesAt(x, y);
+        // Set<Position> newStoneLiberties = getLibertiesAt(x, y);
+        Set<Position> newStoneLiberties = getSurroundings(
+            x,
+            y,
+            (sgp) -> sgp == null,
+            (localX, localY) -> new Position(localX, localY)
+        );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
         StoneGroup firstSameColorGroup = null;
@@ -161,10 +175,10 @@ public class Board implements BoardInterface {
             }
 
             // TODO: Call ruleset method instead, because some rulesets (e.g., New Zealand) permit suicide.
-            /*if (board[x][y] == null) {
+            if (board[x][y] == null) {
                 System.out.println("SUICIDE DETECTED!!!");
-                return;
-            }*/
+                // return;
+            }
 
             // Update UI
             fireStoneSet(x, y, color);
@@ -299,6 +313,42 @@ public class Board implements BoardInterface {
         return liberties;
     }
 
+    /**
+     *
+     * @return a Set of at most four unique and unoccupied Positions that are above, below, to the left and right of the provided x and y coordinate.
+     */
+    /**
+     * Checks the space above, below, to the right and left of the one marked by x and y for StoneGroupPointers
+     * fulfilling the predicate check, returning a Set of at most four elements that have been converted by conversion.
+     * @param x Horizontal coordinate from 0 to size-1, starting on the left
+     * @param y Vertical coordinate from 0 to size-1, starting on the top
+     * @param check the condition that a surrounding tile has to fulfill to be added ot the returned Set
+     * @param conversion a BiFunction taking an x and y coordinate from this method and returning something caller-defined based on those coordinates
+     * @return a Set of at most four unique elements converted by conversion that are above, below, to the left and right of the provided x and y coordinate and fulfill check
+     */
+    private Set getSurroundings(int x, int y, Predicate<StoneGroupPointer> check, BiFunction<Integer, Integer, ?> conversion) {
+        if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
+            throw new IllegalArgumentException();
+        }
+
+        Set surroundings = new HashSet<>();
+
+        if(y > 0 && check.test(board[x][y - 1])) {
+            surroundings.add(conversion.apply(x, y - 1));
+        }
+        if(y < SIZE - 1 && check.test(board[x][y + 1])) {
+            surroundings.add(conversion.apply(x, y + 1));
+        }
+        if(x > 0 && check.test(board[x - 1][y])) {
+            surroundings.add(conversion.apply(x - 1, y));
+        }
+        if(x < SIZE - 1 && check.test(board[x + 1][y])) {
+            surroundings.add(conversion.apply(x + 1, y));
+        }
+
+        return surroundings;
+    }
+
     // Getters and Setters
     public int getSize() {
         return SIZE;
@@ -316,4 +366,31 @@ public class Board implements BoardInterface {
         }
     }
 
+    public Game getGAME() {
+        return GAME;
+    }
+
+    public int getSIZE() {
+        return SIZE;
+    }
+
+    public LinkedList<GoListener> getListeners() {
+        return listeners;
+    }
+
+    public StoneGroupPointer[][] getBoard() {
+        return board;
+    }
+
+    public int getMoveNumber() {
+        return moveNumber;
+    }
+
+    public int getLastDebugX() {
+        return lastDebugX;
+    }
+
+    public int getLastDebugY() {
+        return lastDebugY;
+    }
 }

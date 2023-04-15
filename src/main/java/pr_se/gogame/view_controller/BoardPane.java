@@ -58,7 +58,7 @@ public class BoardPane extends GridPane {
 
     // Custom resources
     /**
-     * Path of the graphics pack zip-file
+     * Absolute path of the graphics pack zip-file
      */
     private String graphicsPath;
     /**
@@ -205,6 +205,8 @@ public class BoardPane extends GridPane {
                     Integer row = getRowIndex(target);
 
                     if (col != null && row != null) {
+                        board.printDebugInfo(col - 1, row - 1);                         // TODO: Remove by final release
+
                         PlayableBoardCell targetBC = (PlayableBoardCell)target;
 
                         if (this.board.getCurColor() == BLACK) {
@@ -543,10 +545,6 @@ public class BoardPane extends GridPane {
          * whether this PlayableBoardCell is currently selected
          */
         private boolean isSelected = false;
-        /**
-         * whether this PlayableBoardCell currently has a stone set
-         */
-        private boolean isSet = false;
 
         /**
          * Instance of the global Image of the Black stone; used for hovering and selection
@@ -622,7 +620,7 @@ public class BoardPane extends GridPane {
          * BoardPane's showsMoveNumbers attributes
          */
         public void showMoveNumber() {
-            LABEL.setVisible(isSet && CURRENTLY_SET_STONE != null && showsMoveNumbers);
+            LABEL.setVisible(CURRENTLY_SET_STONE != null && showsMoveNumbers);
         }
 
         /**
@@ -643,7 +641,7 @@ public class BoardPane extends GridPane {
 
         /**
          * Removes all hover indicators on this PlayableBoardCell, unless it is selected (to remove a selection
-         * indicator, call deselect() instead.
+         * indicator, call deselect() instead).
          */
         public void unhover() {
             if(!isSelected) {
@@ -659,7 +657,7 @@ public class BoardPane extends GridPane {
          */
         private void hover(ImageView iv) {
             unhover();              // might be unnecessary
-            if(!isSet && !isSelected) {
+            if(CURRENTLY_SET_STONE == null && !isSelected) {
                 iv.setOpacity(0.5);
                 iv.setVisible(true);
             }
@@ -724,7 +722,6 @@ public class BoardPane extends GridPane {
             WHITE_STONE.setVisible(false);
             LABEL.setVisible(false);
             CURRENTLY_SET_STONE = null;
-            isSet = false;
         }
 
         /**
@@ -735,7 +732,6 @@ public class BoardPane extends GridPane {
             deselect();
             iv.setVisible(true);
             CURRENTLY_SET_STONE = iv;
-            isSet = true;
             if(showsMoveNumbers) {
                 updateLabelColor();
             }
@@ -761,7 +757,7 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Sets the text color of this PlayableBoardCell's label to the the inverse of the stone that is currently set.
+         * Sets the text color of this PlayableBoardCell's label to the inverse of the stone that is currently set.
          */
         private void updateLabelColor() {
             PixelReader p = CURRENTLY_SET_STONE.getImage().getPixelReader();
