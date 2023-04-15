@@ -12,7 +12,8 @@ import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
 
 /**
- * Model Dummy (for now)
+ * Model
+ * Go Board internal logic
  */
 public class Board implements BoardInterface {
     /**

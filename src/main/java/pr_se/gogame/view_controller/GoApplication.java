@@ -3,11 +3,8 @@ package pr_se.gogame.view_controller;
 import javafx.application.Application;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.layout.Background;
-import javafx.scene.layout.BackgroundFill;
-import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
-import javafx.scene.paint.Color;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 
@@ -29,16 +26,20 @@ public class GoApplication extends Application {
         // TODO: In the end product, the archive could be chosen by the user (though a default should still be set) and changed at runtime
         BoardPane bp = new BoardPane(game, path+"default.zip");
 
-        Button test = new Button("Change graphics set");
-        test.setOnAction((e) -> {
-            bp.setGraphics(path + "debug.zip");
-        });
+        Button changeGFX = new Button("Change graphics set");
+        changeGFX.setOnAction((e) -> bp.setGraphicsPath(path + "inverted.zip"));
+        Button toggleCoords = new Button("Toggle Coordinates");
+        toggleCoords.setOnAction((e) -> bp.setShowsCoordinates(!bp.showsCoordinates()));
+        Button toggleMoveNos = new Button("Toggle Move Numbers");
+        toggleMoveNos.setOnAction((e) -> bp.setShowsMoveNumbers(!bp.showsMoveNumbers()));
+        VBox debugButtons = new VBox();
+        debugButtons.getChildren().addAll(changeGFX, toggleCoords, toggleMoveNos);
 
         root.setCenter(bp);
         root.setTop(new HeaderPane(this, stage, game));
         SidePane sp = new SidePane(game);
         root.setLeft(sp);
-        root.setRight(test);
+        root.setRight(debugButtons);
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         stage.setMinHeight(HEIGHT + 40);

@@ -24,7 +24,7 @@ import static pr_se.gogame.model.StoneColor.*;
 
 /**
  * View/Controller
- * Board that uses image files for its tiles and stones
+ * Go Board graphical representation that uses image files for its tiles and stones
  */
 public class BoardPane extends GridPane {
     /**
@@ -60,7 +60,7 @@ public class BoardPane extends GridPane {
     /**
      * Path of the graphics pack zip-file
      */
-    private String graphics;
+    private String graphicsPath;
     /**
      * Background Image (not to be confused with BackgroundImage) for playable BoardCells
      */
@@ -95,17 +95,17 @@ public class BoardPane extends GridPane {
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
-     * @param graphics the absolute path of the graphics pack zip-file
+     * @param graphicsPath the absolute path of the graphics pack zip-file
      */
-    public BoardPane(Game game, String graphics) {
-        if(game == null || graphics == null) {
+    public BoardPane(Game game, String graphicsPath) {
+        if(game == null || graphicsPath == null) {
             throw new NullPointerException();
         }
 
         setMouseTransparent(true);
 
         this.game = game;
-        this.graphics = graphics;
+        this.graphicsPath = graphicsPath;
 
         game.addListener(l -> {
             if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
@@ -115,7 +115,7 @@ public class BoardPane extends GridPane {
             init();
         }); //ToDo: full Event integration
 
-        loadGraphics(graphics);
+        loadGraphics(graphicsPath);
         init();
     }
 
@@ -281,7 +281,7 @@ public class BoardPane extends GridPane {
                     throw new NullPointerException();
                 }
 
-                PlayableBoardCell destinationBC = (PlayableBoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
+                PlayableBoardCell destinationBC = getPlayableCell(e.getCol(), e.getRow());
                 destinationBC.getLabel().setText("" + e.getMoveNumber());
 
                 if(e.getColor() == BLACK) {
@@ -297,15 +297,12 @@ public class BoardPane extends GridPane {
                     throw new NullPointerException();
                 }
 
-                PlayableBoardCell destinationBC = (PlayableBoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
-
-                destinationBC.unset();
+                getPlayableCell(e.getCol(), e.getRow()).unset();
             }
 
             @Override
             public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-                PlayableBoardCell destinationBC = (PlayableBoardCell) getChildren().get(4 + size * 4 + y * size + x);
-                destinationBC.getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
+                getPlayableCell(x, y).getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
         });
     }
@@ -350,8 +347,7 @@ public class BoardPane extends GridPane {
 
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
-                PlayableBoardCell bc = (PlayableBoardCell)getChildren().get(4 + size * 4 + i * size + j);
-                bc.showMoveNumber();
+                getPlayableCell(j, i).showMoveNumber();
             }
         }
     }
@@ -369,14 +365,14 @@ public class BoardPane extends GridPane {
         }
     }
 
-    public void setGraphics(String graphics) {
-        if(graphics == null) {
+    public void setGraphicsPath(String graphicsPath) {
+        if(graphicsPath == null) {
             throw new NullPointerException();
         }
 
-        this.graphics = graphics;
+        this.graphicsPath = graphicsPath;
 
-        loadGraphics(graphics);
+        loadGraphics(graphicsPath);
 
         for(int i = 0; i < 4; i++) {
             BoardCell bc = (BoardCell)getChildren().get(i);
@@ -391,8 +387,7 @@ public class BoardPane extends GridPane {
             }
             // center
             for(int j = 0; j < size; j++) {
-                PlayableBoardCell bc = (PlayableBoardCell)getChildren().get(4 + size * 4 + i * size + j);
-                bc.updateImages();
+                getPlayableCell(j, i).updateImages();
             }
         }
     }
@@ -422,13 +417,12 @@ public class BoardPane extends GridPane {
     }
 
     // private methods
-
     /**
      * loads the image files from the specified graphics pack into memory
-     * @param graphics the absolute path of the graphics pack to be loaded
+     * @param graphicsPath the absolute path of the graphics pack to be loaded
      */
-    private void loadGraphics(String graphics) {
-        try (ZipFile zip = new ZipFile(graphics)) {
+    private void loadGraphics(String graphicsPath) {
+        try (ZipFile zip = new ZipFile(graphicsPath)) {
             ZipEntry tileEntry = zip.getEntry("tile.png");
             ZipEntry cornerEntry = zip.getEntry("corner.png");
             ZipEntry edgeEntry = zip.getEntry("edge.png");
@@ -436,7 +430,7 @@ public class BoardPane extends GridPane {
             ZipEntry stone1Entry = zip.getEntry("stone_1.png");
 
             if(Stream.of(tileEntry, cornerEntry, edgeEntry, stone0Entry, stone1Entry).anyMatch(Objects::isNull)) {
-                throw new IllegalStateException("ERROR: Graphics pack " + graphics + " is missing files!");
+                throw new IllegalStateException("ERROR: Graphics pack " + graphicsPath + " is missing files!");
             }
 
             try (InputStream tileIS = zip.getInputStream(tileEntry);
@@ -460,14 +454,22 @@ public class BoardPane extends GridPane {
                 stones[0] = new Image(stone0IS);
                 stones[1] = new Image(stone1IS);
             } catch (Exception e) {
-                System.err.println("ERROR: Couldn't read file from graphics pack " + graphics + "!");
+                System.err.println("ERROR: Couldn't read file from graphics pack " + graphicsPath + "!");
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            System.err.println("ERROR: Couldn't open graphics pack " + graphics + "!");
+            System.err.println("ERROR: Couldn't open graphics pack " + graphicsPath + "!");
             e.printStackTrace();
         }
     }
+
+    private PlayableBoardCell getPlayableCell(int x, int y) {
+        if(x < 0 || x >= size || y < 0 || y >= size) {
+            throw new IllegalArgumentException();
+        }
+        return (PlayableBoardCell)getChildren().get(4 + size * 4 + y * size + x);
+    }
+
 
     /**
      * Base class for all Cells of the board. Only has a background and label. Use for edges and corners. For the
@@ -562,6 +564,10 @@ public class BoardPane extends GridPane {
          * Instance of the global Image of the Black stone, used for setting
          */
         private final ResizableImageView WHITE_STONE;
+        /**
+         * Pointer to the ImageView of the currently set stone, if any
+         */
+        private ResizableImageView CURRENTLY_SET_STONE;
 
         /**
          * Creates a new PlayableBoardCell with the specified background Image, images for the black and white
@@ -582,6 +588,8 @@ public class BoardPane extends GridPane {
             this.WHITE_STONE = getCellImageView(stones[1]);
             getChildren().add(this.WHITE_STONE);
 
+            this.CURRENTLY_SET_STONE = null;
+
             this.LABEL.setVisible(false);
             this.LABEL.setAlignment(Pos.CENTER);
             this.LABEL.toFront();
@@ -590,34 +598,31 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
-         * @param i the image to be instantiated
-         * @return a properly instantiated instance of the provided Image
-         */
-        private ResizableImageView getCellImageView(Image i) {
-            if(i == null) {
-                throw new NullPointerException();
-            }
-
-            ResizableImageView iv = new ResizableImageView(i);
-            iv.setPreserveRatio(true);
-            iv.setMouseTransparent(true);
-            iv.setSmooth(false);
-            iv.setVisible(false);
-
-            return iv;
-        }
-
-        /**
          * Changes all Images used by this PlayableBoardCell to the current global Images from the graphics pack.
          * Call this after loading a different graphics pack
          */
         public void updateImages() {
             setBackgroundImage(tile);
+            if(CURRENTLY_SET_STONE != null) {
+                if(CURRENTLY_SET_STONE == BLACK_STONE) {
+                    CURRENTLY_SET_STONE.setImage(stones[0]);
+                } else {
+                    CURRENTLY_SET_STONE.setImage(stones[1]);
+                }
+                updateLabelColor();
+            }
             BLACK_STONE.setImage(stones[0]);
             BLACK_HOVER.setImage(stones[0]);
             WHITE_STONE.setImage(stones[1]);
             WHITE_HOVER.setImage(stones[1]);
+        }
+
+        /**
+         * Updates the showing of the move number (i.e., the label) according to its own set status and the global
+         * BoardPane's showsMoveNumbers attributes
+         */
+        public void showMoveNumber() {
+            LABEL.setVisible(isSet && CURRENTLY_SET_STONE != null && showsMoveNumbers);
         }
 
         /**
@@ -718,6 +723,7 @@ public class BoardPane extends GridPane {
             BLACK_STONE.setVisible(false);
             WHITE_STONE.setVisible(false);
             LABEL.setVisible(false);
+            CURRENTLY_SET_STONE = null;
             isSet = false;
         }
 
@@ -725,26 +731,45 @@ public class BoardPane extends GridPane {
          * Makes this PlayableBoardCell display an opaque provided ImageView to indicate that a stone has been set.
          * @param iv the ImageView to be displayed
          */
-        private void set(ImageView iv) {
+        private void set(ResizableImageView iv) {
             deselect();
             iv.setVisible(true);
-            if(showsMoveNumbers) {
-                PixelReader p = iv.getImage().getPixelReader();
-                if(p == null) {
-                    throw new NullPointerException("Can't get stone color");
-                }
-                LABEL.setTextFill(p.getColor((int)(iv.getImage().getWidth() / 2), (int)(iv.getImage().getHeight() / 2)).invert());
-                LABEL.setVisible(true);
-            }
+            CURRENTLY_SET_STONE = iv;
             isSet = true;
+            if(showsMoveNumbers) {
+                updateLabelColor();
+            }
         }
 
         /**
-         * Updates the showing of the move number (i.e., the label) according to its own set status and the global
-         * BoardPane's showsMoveNumbers attributes
+         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
+         * @param i the image to be instantiated
+         * @return a properly instantiated instance of the provided Image
          */
-        public void showMoveNumber() {
-            LABEL.setVisible(isSet && showsMoveNumbers);
+        private ResizableImageView getCellImageView(Image i) {
+            if(i == null) {
+                throw new NullPointerException();
+            }
+
+            ResizableImageView iv = new ResizableImageView(i);
+            iv.setPreserveRatio(true);
+            iv.setMouseTransparent(true);
+            iv.setSmooth(false);
+            iv.setVisible(false);
+
+            return iv;
+        }
+
+        /**
+         * Sets the text color of this PlayableBoardCell's label to the the inverse of the stone that is currently set.
+         */
+        private void updateLabelColor() {
+            PixelReader p = CURRENTLY_SET_STONE.getImage().getPixelReader();
+            if(p == null) {
+                throw new NullPointerException("Can't get stone color");
+            }
+            LABEL.setTextFill(p.getColor((int)(CURRENTLY_SET_STONE.getImage().getWidth() / 2), (int)(CURRENTLY_SET_STONE.getImage().getHeight() / 2)).invert());
+            LABEL.setVisible(true);
         }
     } // private class PlayableBoardCell extends BoardCell
 }
