@@ -3,14 +3,12 @@ package pr_se.gogame.view_controller;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
-import javafx.scene.effect.DisplacementMap;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
@@ -26,13 +24,14 @@ import java.util.stream.Stream;
 
 public class HeaderPane extends VBox {
 
+    private final Color backColor;
     private final Application app;
     private final Stage stage;
-
     private final Game game;
     private final HashSet<FileChooser.ExtensionFilter> filterList;
 
-    public HeaderPane(Application app, Stage stage, Game game) {
+    public HeaderPane(Color backcolor, Application app, Stage stage, Game game) {
+        this.backColor = backcolor;
         this.app = app;
         this.stage = stage;
         this.game = game;
@@ -40,135 +39,97 @@ public class HeaderPane extends VBox {
         this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.goGame"))
                 .collect(Collectors.toCollection(HashSet::new));
 
-        //Header Lane 1 ###################################################################################
+        this.setSpacing(5);
+
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileSection());
         menuBar.getMenus().add(gameSection());
         menuBar.getMenus().add(helpSection());
-        menuBar.setBackground(Background.fill(Color.LIGHTGRAY));
 
-        Rectangle rL1 = new Rectangle();
-        rL1.setFill(Color.LIGHTGRAY);
-        rL1.setHeight(25);
-
-        StackPane lane1 = new StackPane();
-
-        lane1.setMinSize(0, 0); //necessary to keep padding working -> scale up does but scale down doesn't
-        lane1.getChildren().add(rL1);
-        lane1.getChildren().add(menuBar);
-
-        this.getChildren().add(lane1);
-
-        lane1.setPadding(new Insets(5, 5, 2.5, 5)); //top, right, bottom, left
-        rL1.widthProperty().bind(lane1.widthProperty().subtract(10));
-
-        //Header Lane 2 ###################################################################################
-        Rectangle rL2 = new Rectangle();
-        rL2.setFill(Color.LIGHTGRAY);
-        rL2.setHeight(35);
-
-        StackPane lane2 = new StackPane();
-
-        lane2.setMinSize(0, 0);//necessary to keep padding working -> scale up does but scale down doesn't
-        lane2.getChildren().add(rL2);
-
-        lane2.getChildren().add(shortMenu());
-
-
-        this.getChildren().add(lane2);
-
-        lane2.setPadding(new Insets(2.5, 5, 2.5, 5)); //top, right, bottom, left
-        rL2.widthProperty().bind(lane2.widthProperty().subtract(10));
+        this.getChildren().add(menuBar);
+        this.getChildren().add(shortMenu());
     }
 
-    private HBox shortMenu(){
+    private HBox shortMenu() {
         HBox lane = new HBox();
+        lane.setPrefHeight(35);
+
+        lane.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(0, 5, 0, 5))));
 
         List<Button> playbackControlList = new ArrayList<>();
 
 
         HBox playbackControl = new HBox();
-        playbackControl.setAlignment(Pos.CENTER_LEFT);
-        playbackControl.setPadding(new Insets(0,0,0,5));
-
+        playbackControl.setPrefWidth(250);
+        playbackControl.setAlignment(Pos.CENTER);
+        playbackControl.setSpacing(5);
 
         Button fastBackward = new Button();
         fastBackward.setText("<<");
         fastBackward.setFocusTraversable(false);
         playbackControlList.add(fastBackward);
-        //playbackControl.getChildren().add(fastBackward);
 
         Button backward = new Button();
         backward.setText("<");
         backward.setFocusTraversable(false);
         playbackControlList.add(backward);
-        //playbackControl.getChildren().add(backward);
 
         Button forward = new Button();
         forward.setText(">");
         forward.setFocusTraversable(false);
         playbackControlList.add(forward);
-        //playbackControl.getChildren().add(forward);
 
         Button fastForward = new Button();
         fastForward.setText(">>");
         fastForward.setFocusTraversable(false);
         playbackControlList.add(fastForward);
-        //playbackControl.getChildren().add(fastForward);
 
         playbackControl.getChildren().addAll(playbackControlList);
         playbackControlList.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.PLAYBACK){
-                playbackControlList.forEach(e -> e.setDisable(false));
-            } else
-                playbackControlList.forEach(e -> e.setDisable(true));
-        });
+            if (l.getGameCommand() != GameCommand.PLAYBACK) return;
+            playbackControlList.forEach(e -> e.setDisable(false));
 
+        });
 
 
         lane.getChildren().add(playbackControl);
 
         HBox gameShortCards = new HBox();
-        gameShortCards.setAlignment(Pos.CENTER_LEFT);
+        gameShortCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
+        gameShortCards.setAlignment(Pos.CENTER);
         gameShortCards.setSpacing(25);
-        gameShortCards.setPadding(new Insets(0,0,0,135));
+
         List<Button> gameShortCardList = new ArrayList<>();
 
         Button pass = new Button("Pass");
         pass.setFocusTraversable(false);
         pass.setOnAction(e -> game.pass());
         gameShortCardList.add(pass);
-        //gameShortCards.getChildren().add(pass);
 
         Button resign = new Button("Resign");
         resign.setFocusTraversable(false);
         resign.setOnAction(e -> game.resign());
         gameShortCardList.add(resign);
-        //gameShortCards.getChildren().add(resign);
-
 
         Button scoreGame = new Button("Score Game");
         scoreGame.setFocusTraversable(false);
         scoreGame.setOnAction(e -> game.scoreGame());
         gameShortCardList.add(scoreGame);
-        //gameShortCards.getChildren().add(scoreGame);
 
         Button confirm = new Button("Confirm");
         confirm.setFocusTraversable(false);
         confirm.setOnAction(e -> game.confirmChoice());
         gameShortCardList.add(confirm);
-        //gameShortCards.getChildren().add(confirm);
 
         gameShortCards.getChildren().addAll(gameShortCardList);
         gameShortCardList.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT){
+            if (l.getGameCommand() == GameCommand.INIT) {
                 gameShortCardList.forEach(e -> e.setDisable(true));
-            }
-            else {
+            } else {
                 gameShortCardList.forEach(e -> e.setDisable(false));
             }
 
@@ -274,10 +235,9 @@ public class HeaderPane extends VBox {
         gameSectionItems.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT){
+            if (l.getGameCommand() == GameCommand.INIT) {
                 gameSectionItems.forEach(e -> e.setDisable(true));
-            }
-            else {
+            } else {
                 gameSectionItems.forEach(e -> e.setDisable(false));
             }
         });

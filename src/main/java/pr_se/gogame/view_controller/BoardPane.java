@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.Label;
@@ -75,6 +76,7 @@ public class BoardPane extends GridPane {
 
         setBoard(this.game.getBoard());
         this.size = board.getSize();
+        this.setPadding(new Insets(7.5,7.5,7.5,5.5));
 
         // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
         final int DEFAULT_IMAGE_SIZE = 128;

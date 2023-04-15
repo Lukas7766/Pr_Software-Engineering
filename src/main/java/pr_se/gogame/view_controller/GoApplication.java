@@ -1,6 +1,7 @@
 package pr_se.gogame.view_controller;
 
 import javafx.application.Application;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Menu;
@@ -26,20 +27,22 @@ public class GoApplication extends Application {
         BorderPane root = new BorderPane();
 
         final String path = "file:src/main/resources/pr_se/gogame/";
-                
+
         BoardPane bp = new BoardPane(game,
-            path+"tile_0.png",
-            path+"tile_0.png",
-            path+"edge.png",
-            path+"corner.png",
-            path+"stone_0_square.png",
-            path+"stone_1.png");
-        bp.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
+                path + "tile_0.png",
+                path + "tile_0.png",
+                path + "edge.png",
+                path + "corner.png",
+                path + "stone_0_square.png",
+                path + "stone_1.png");
+        bp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(5), new Insets(5, 5, 5, 2.5))));
+
+        HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, stage, game);
+
+        SidePane sp = new SidePane(Color.LIGHTGRAY, game);
 
         root.setCenter(bp);
-        root.setTop(new HeaderPane(this, stage, game));
-        SidePane sp = new SidePane(game);
-        //sp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
+        root.setTop(hp);
         root.setLeft(sp);
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
