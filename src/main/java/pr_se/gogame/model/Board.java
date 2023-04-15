@@ -15,21 +15,36 @@ import static pr_se.gogame.model.StoneColor.WHITE;
  * Model Dummy (for now)
  */
 public class Board implements BoardInterface {
+    /**
+     * the Game that this Board belongs to
+     */
     private final Game GAME;
+    /**
+     * the number of rows and columns of this board
+     */
     private final int SIZE;
+    /**
+     * the View listeners that have been registered with this Board
+     */
     private final LinkedList<GoListener> listeners;
-
+    /**
+     * the actual board
+     */
     private final StoneGroupPointer[][] board;
 
-    // TODO: Should this be moved to game?
+    // TODO: Likely to be removed (or definitely moved to game).
     private int moveNumber;
-
-    // Likely to be removed (or definitely moved to game).
     private StoneColor curColor = BLACK;
 
     private int lastDebugX = 0;
     private int lastDebugY = 0;
 
+    /**
+     * Creates a new Board belonging to the specified Game, containing handicap stones of the specified beginner color
+     * (only if the Game has a handicap set)
+     * @param game the Game that this Board belongs to
+     * @param beginner which color player gets to start (handicap stones will be of this color)
+     */
     public Board(Game game, StoneColor beginner) {
         this.GAME = game;
         this.SIZE = game.getSize();
@@ -197,6 +212,13 @@ public class Board implements BoardInterface {
     }
 
     // Private methods
+
+    /**
+     * Notifies all listeners that a stone has been set.
+     * @param x Horizontal coordinate from 0 to size-1, starting on the left
+     * @param y Vertical coordinate from 0 to size-1, starting on the top
+     * @param c the StoneColor of the stone that has been set
+     */
     private void fireStoneSet(int x, int y, StoneColor c) {
         StoneSetEvent e = new StoneSetEvent(x, y, c, this.moveNumber);
 
@@ -205,7 +227,11 @@ public class Board implements BoardInterface {
         }
     }
 
-
+    /**
+     * Notifies all listeners that a stone has been removed.
+     * @param x Horizontal coordinate from 0 to size-1, starting on the left
+     * @param y Vertical coordinate from 0 to size-1, starting on the top
+     */
     private void fireStoneRemoved(int x, int y) {
         StoneRemovedEvent e = new StoneRemovedEvent(x, y);
 
@@ -214,12 +240,19 @@ public class Board implements BoardInterface {
         }
     }
 
+    /**
+     * Returns the Stone Groups surrounding this coordinate
+     * @param x Horizontal coordinate from 0 to size-1, starting on the left
+     * @param y Vertical coordinate from 0 to size-1, starting on the top
+     * @return a Set of at most four unique Stone groups that are above, below, to the left and right of the provided x and y coordinate.
+     */
     private Set<StoneGroup> getSurroundingStoneGroups(int x, int y) {
         if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();
         }
 
         Set<StoneGroup> existingGroups = new HashSet<>();
+
         if(y > 0 && board[x][y - 1] != null) {
             existingGroups.add(board[x][y - 1].getStoneGroup());
         }
@@ -236,18 +269,12 @@ public class Board implements BoardInterface {
         return existingGroups;
     }
 
-    private StoneGroup getStoneGroupAt(int x, int y) {
-        if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
-            throw new IllegalArgumentException();
-        }
-
-        if(board[x][y] != null) {
-            return board[x][y].getStoneGroup();
-        }
-
-        return null;
-    }
-
+    /**
+     * Returns the liberties surrounding this coordinate
+     * @param x Horizontal coordinate from 0 to size-1, starting on the left
+     * @param y Vertical coordinate from 0 to size-1, starting on the top
+     * @return a Set of at most four unique and unoccupied Positions that are above, below, to the left and right of the provided x and y coordinate.
+     */
     private Set<Position> getLibertiesAt(int x, int y) {
         if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();
@@ -255,10 +282,18 @@ public class Board implements BoardInterface {
 
         Set<Position> liberties = new HashSet<>();
 
-        if(y > 0 && board[x][y - 1] == null) liberties.add(new Position(x, y - 1));
-        if(y < SIZE - 1 && board[x][y + 1] == null) liberties.add(new Position(x, y + 1));
-        if(x > 0 && board[x - 1][y] == null) liberties.add(new Position(x - 1, y));
-        if(x < SIZE - 1 && board[x + 1][y] == null) liberties.add(new Position(x + 1, y));
+        if(y > 0 && board[x][y - 1] == null) {
+            liberties.add(new Position(x, y - 1));
+        }
+        if(y < SIZE - 1 && board[x][y + 1] == null) {
+            liberties.add(new Position(x, y + 1));
+        }
+        if(x > 0 && board[x - 1][y] == null) {
+            liberties.add(new Position(x - 1, y));
+        }
+        if(x < SIZE - 1 && board[x + 1][y] == null) {
+            liberties.add(new Position(x + 1, y));
+        }
 
         return liberties;
     }
