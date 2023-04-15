@@ -79,13 +79,8 @@ public class BoardPane extends GridPane {
         loadGraphics(graphics);
 
         // determine cell size
-        final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(size + 2);                                                 // Get maximum width if all cells are equally wide
-        final NumberBinding MAX_CELL_WIDTH_INT = Bindings.createIntegerBinding(MAX_CELL_WIDTH::intValue, MAX_CELL_WIDTH);        // round down
-        final NumberBinding MAX_CELL_HEIGHT = heightProperty().divide(size + 2);                                              // Get maximum height if all cells are equally wide
-        final NumberBinding MAX_CELL_HEIGHT_INT = Bindings.createIntegerBinding(MAX_CELL_HEIGHT::intValue, MAX_CELL_HEIGHT);    // round down
-
-        final NumberBinding MAX_CELL_DIM = Bindings.min(MAX_CELL_WIDTH_INT, MAX_CELL_HEIGHT_INT);                               // Use whatever is smaller after the division
-        MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM);                                 // round down
+        final NumberBinding MAX_CELL_DIM = Bindings.min(widthProperty().divide(size + 2), heightProperty().divide(size + 2));
+        MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM);                                     // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
         BoardCell corner1 = new BoardCell(this.corner);
