@@ -15,8 +15,8 @@ import static pr_se.gogame.model.StoneColor.WHITE;
  * Model Dummy (for now)
  */
 public class Board implements BoardInterface {
+    private final Game GAME;
     private final int SIZE;
-    private final int KOMI;
     private final LinkedList<GoListener> listeners;
 
     private final StoneGroupPointer[][] board;
@@ -30,12 +30,59 @@ public class Board implements BoardInterface {
     private int lastDebugX = 0;
     private int lastDebugY = 0;
 
-    public Board(int size, int komi) {
-        this.SIZE = size;
-        this.KOMI = komi;
+    public Board(Game game, StoneColor beginner) {
+        this.GAME = game;
+        this.SIZE = game.getSize();
         listeners = new LinkedList<>();
         this.board = new StoneGroupPointer[SIZE][SIZE];
         moveNumber = 1;
+
+        int komi = game.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
+
+        /*
+        * Handle handicap stones (After research, I don't think that komi actually means "number of handicap stones").
+        *
+        * TODO: This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
+        *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. Thus, it should be possible
+        * for a ruleset to override this.
+        */
+        switch (komi) {
+            case 9:
+                setStone(SIZE/2, SIZE/2, beginner, true);
+                komi--;                                                     // set remaining no. to 8
+            case 8:
+                setStone(SIZE / 2, 3, beginner, true);
+                setStone(SIZE / 2, SIZE - 4, beginner, true);
+                komi-=2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
+            default: break;
+        }
+
+        switch (komi) {
+            case 7:
+                setStone(SIZE / 2, SIZE / 2, beginner, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
+                komi--;
+            case 6:
+                setStone(SIZE - 4, SIZE / 2, beginner, true);
+                setStone(3, SIZE / 2, beginner, true);
+                komi -= 2;
+            default:
+                break;
+        }
+
+        switch (komi) {
+            case 5:
+                setStone(SIZE / 2, SIZE / 2, beginner, true);
+            case 4:
+                setStone(3, 3, beginner, true);
+            case 3:
+                setStone(SIZE - 4, SIZE - 4, beginner, true);
+            case 2:
+                setStone(SIZE - 4, 3, beginner, true);
+                setStone(3, SIZE - 4, beginner, true);
+            default: break;
+        }
+
+
     }
 
     @Override
@@ -49,7 +96,7 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public void setStone(int x, int y, StoneColor color) {
+    public void setStone(int x, int y, StoneColor color, boolean prepareMode) {
         // Are the coordinates invalid?
         if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();
@@ -89,23 +136,28 @@ public class Board implements BoardInterface {
         }
         board[x][y] = firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
 
-        for(StoneGroup sg : surroundingSGs) {
-            if ((sg.getStoneColor() != color || sg == firstSameColorGroup) && sg.getLiberties().size() == 0) {
-                for (Position p : sg.getLocations()) {
-                    removeStone(p.X, p.Y);
+        if(!prepareMode) {
+            for (StoneGroup sg : surroundingSGs) {
+                if ((sg.getStoneColor() != color || sg == firstSameColorGroup) && sg.getLiberties().size() == 0) {
+                    for (Position p : sg.getLocations()) {
+                        removeStone(p.X, p.Y);
+                    }
                 }
             }
+
+            // TODO: Call ruleset method instead, because some rulesets (e.g., New Zealand) permit suicide.
+            /*if (board[x][y] == null) {
+                System.out.println("SUICIDE DETECTED!!!");
+                return;
+            }*/
+
+            // Update UI
+            fireStoneSet(x, y, color, moveNumber);
+            moveNumber++;
+        } else {
+            // Update UI
+            fireStoneSet(x, y, color, 0);
         }
-
-        if(board[x][y] == null) {
-            System.out.println("SUICIDE DETECTED!!!");
-            return;
-        }
-
-        // Update UI
-        fireStoneSet(x, y, color);
-
-        moveNumber++;
 
         // Update current player color
         // TODO: Remove and delegate to Game
@@ -149,7 +201,7 @@ public class Board implements BoardInterface {
     }
 
     // Private methods
-    private void fireStoneSet(int x, int y, StoneColor c) {
+    private void fireStoneSet(int x, int y, StoneColor c, int moveNumber) {
         StoneSetEvent e = new StoneSetEvent(x, y, c, moveNumber);
 
         for(GoListener l : listeners) {
@@ -222,6 +274,14 @@ public class Board implements BoardInterface {
 
     public StoneColor getCurColor() {
         return curColor;
+    }
+
+    public StoneColor getColorAt(int x, int y) {
+        if(board[x][y] != null) {
+            return board[x][y].getStoneGroup().getStoneColor();
+        } else {
+            return null;
+        }
     }
 
 }

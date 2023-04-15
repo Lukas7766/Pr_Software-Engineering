@@ -13,7 +13,7 @@ public interface BoardInterface {
      * @param x: Horizontal coordinate from 0 to size-1, starting on the left
      * @param y: Vertical coordinate from 0 to size-1, starting on the top
      */
-    public void setStone(int x, int y, StoneColor color);
+    public void setStone(int x, int y, StoneColor color, boolean prepareMode);
 
     public void removeStone(int x, int y);
 }

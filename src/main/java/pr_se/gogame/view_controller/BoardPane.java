@@ -20,6 +20,8 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
+import static pr_se.gogame.model.StoneColor.*;
+
 /**
  * View/Controller
  * Board that uses image files for its tiles and stones
@@ -51,6 +53,10 @@ public class BoardPane extends GridPane {
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
     public BoardPane(Game game, String graphics) {
+        if(game == null || graphics == null) {
+            throw new NullPointerException();
+        }
+
         this.game = game;
         game.addListener(l -> {
             if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
@@ -158,10 +164,25 @@ public class BoardPane extends GridPane {
             add(r, size + 1, i + 1);
         }
 
-        // Fill the grid with alternating tiles
+        // Fill the grid with tiles
         for(int i = 0; i < this.size; i++) {
             for(int j = 0; j < this.size; j++) {
                 BoardCell bc = new BoardCell(tile, true);
+                /*
+                 * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
+                 * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
+                 *
+                 * TODO:    Maybe move this into a method, as it (or something similar) might be necessary when
+                 *          switching graphic sets during a game.
+                 */
+                StoneColor c = this.board.getColorAt(j, i);
+                if(c != null) {
+                    if(c == BLACK) {
+                        bc.setBlack();
+                    } else {
+                        bc.setWhite();
+                    }
+                }
                 add(bc, j + 1, i + 1);
             }
         }
@@ -178,7 +199,7 @@ public class BoardPane extends GridPane {
                         BoardCell targetBC = (BoardCell)target;
                         // printDebugInfo();                                     // TODO: Remove in finished product
 
-                        if (this.board.getCurColor() == StoneColor.BLACK) {
+                        if (this.board.getCurColor() == BLACK) {
                             targetBC.hoverBlack();
                         } else {
                             targetBC.hoverWhite();
@@ -208,7 +229,7 @@ public class BoardPane extends GridPane {
                         selectionBC.deselect();
                     }
                     selectionBC = lastBC;
-                    if(board.getCurColor() == StoneColor.BLACK) {
+                    if(board.getCurColor() == BLACK) {
                         selectionBC.selectBlack();
                     } else {
                         selectionBC.selectWhite();
@@ -245,9 +266,11 @@ public class BoardPane extends GridPane {
             @Override
             public void stoneSet(StoneSetEvent e) {
                 BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
-                destinationBC.getLabel().setText("" + e.getMoveNumber());
+                if(e.getMoveNumber() >= 1) {
+                    destinationBC.getLabel().setText("" + e.getMoveNumber());
+                }
 
-                if(e.getColor() == StoneColor.BLACK) {
+                if(e.getColor() == BLACK) {
                     destinationBC.setBlack();
                 } else {
                     destinationBC.setWhite();
@@ -277,7 +300,7 @@ public class BoardPane extends GridPane {
             int col = getColumnIndex(selectionBC) - 1;
             int row = getRowIndex(selectionBC) - 1;
             if(col >= 0 && row >= 0) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
-                board.setStone(col, row, board.getCurColor());
+                board.setStone(col, row, board.getCurColor(), false);
             } else {
                 System.out.println("Confirmation outside of actual board on " + lastBC); // TODO: Remove in finished product
             }
@@ -490,7 +513,7 @@ public class BoardPane extends GridPane {
         private void set(ImageView iv) {
             deselect();
             iv.setVisible(true);
-            if(showsMoveNumbers) {
+            if(showsMoveNumbers && Integer.parseInt(this.LABEL.getText()) >= 1) {
                 PixelReader p = iv.getImage().getPixelReader();
                 if(p == null) {
                     throw new NullPointerException("Can't get stone color");
