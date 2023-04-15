@@ -130,7 +130,7 @@ public class Board implements BoardInterface {
             x,
             y,
             (sgp) -> sgp != null,
-            (localX, localY) -> board[localX][localY].getStoneGroup()
+            (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
         // Get liberties at these x and y coordinates
@@ -138,7 +138,7 @@ public class Board implements BoardInterface {
             x,
             y,
             (sgp) -> sgp == null,
-            (localX, localY) -> new Position(localX, localY)
+            (neighborX, neighborY) -> new Position(neighborX, neighborY)
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
@@ -162,7 +162,8 @@ public class Board implements BoardInterface {
             firstSameColorGroup = newGroup;
             surroundingSGs.add(newGroup);
         }
-        board[x][y] = firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
+        board[x][y] =
+            firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
 
         if(!prepareMode) {
             for (StoneGroup sg : surroundingSGs) {
@@ -201,7 +202,7 @@ public class Board implements BoardInterface {
                 x,
                 y,
                 (sgp) -> sgp != null,
-                (localX, localY) -> board[localX][localY].getStoneGroup()
+                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
         for(StoneGroup sg : surroundingSGs) {
@@ -261,10 +262,6 @@ public class Board implements BoardInterface {
         }
     }
 
-    /**
-     *
-     * @return a Set of at most four unique and unoccupied Positions that are above, below, to the left and right of the provided x and y coordinate.
-     */
     /**
      * Checks the space above, below, to the right and left of the one marked by x and y for StoneGroupPointers
      * fulfilling the predicate check, returning a Set of at most four elements that have been converted by conversion.

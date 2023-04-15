@@ -131,7 +131,10 @@ public class BoardPane extends GridPane {
         this.size = board.getSize();
 
         // determine cell size
-        final NumberBinding MAX_CELL_DIM = Bindings.min(widthProperty().divide(size + 2), heightProperty().divide(size + 2));
+        final NumberBinding MAX_CELL_DIM = Bindings.min(
+            widthProperty().divide(size + 2),
+            heightProperty().divide(size + 2)
+        );
         MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM);                                     // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
@@ -197,7 +200,7 @@ public class BoardPane extends GridPane {
         }
 
         // Set up listeners
-        setOnMouseMoved(e -> {                                                  // TODO: Should this be handled by the BoardCells themselves?
+        setOnMouseMoved(e -> {                                                   // TODO: Should this be handled by the BoardCells themselves?
             Node target = (Node)e.getTarget();
             if(target != null) {
                 if(target != lastPBC) {                                          // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
@@ -205,7 +208,7 @@ public class BoardPane extends GridPane {
                     Integer row = getRowIndex(target);
 
                     if (col != null && row != null) {
-                        board.printDebugInfo(col - 1, row - 1);                         // TODO: Remove by final release
+                        board.printDebugInfo(col - 1, row - 1);            // TODO: Remove by final release
 
                         PlayableBoardCell targetBC = (PlayableBoardCell)target;
 
@@ -323,7 +326,7 @@ public class BoardPane extends GridPane {
         if(selectionPBC != null) {
             int col = getColumnIndex(selectionPBC) - 1;
             int row = getRowIndex(selectionPBC) - 1;
-            if(col >= 0 && row >= 0) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
+            if(col >= 0 && row >= 0) {
                 board.setStone(col, row, board.getCurColor(), false);
             } else {
                 System.out.println("Confirmation outside of actual board on " + lastPBC); // TODO: Remove in finished product
@@ -488,9 +491,6 @@ public class BoardPane extends GridPane {
          * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
          */
         private BoardCell(Image tile) {
-            this.setMinSize(0, 0);
-            setBackgroundImage(tile);
-
             this.LABEL = new Label("0");
             this.LABEL.setMinSize(0, 0);
             this.LABEL.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -501,14 +501,17 @@ public class BoardPane extends GridPane {
 
             getChildren().add(this.LABEL);
 
+            setBackgroundImage(tile);
+
+            this.setMinSize(0, 0);
             prefWidthProperty().bind(MAX_CELL_DIM_INT);
             prefHeightProperty().bind(MAX_CELL_DIM_INT);
-
             setMouseTransparent(true);
         }
 
         /**
-         * Properly sets up the background image for this BoardCell
+         * Properly sets up the background image for this BoardCell. Call this for each BoardCell after changing
+         * the graphics pack (PlayableBoardCells call this automatically in their updateImages() method)
          * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
          */
         public void setBackgroundImage(Image tile) {
@@ -528,6 +531,22 @@ public class BoardPane extends GridPane {
                 bgSz
             );
             this.setBackground(new Background(bgImg));
+            updateLabelColor();
+        }
+
+        /**
+         * Sets the text color of this BoardCell's label to the inverse of its background tile's center color
+         */
+        private void updateLabelColor() {
+            Image bgImg = getBackground().getImages().get(0).getImage();
+
+            PixelReader p = bgImg.getPixelReader();
+            if(p == null) {
+                throw new NullPointerException("Can't get tile background color");
+            }
+            LABEL.setTextFill(
+                p.getColor((int)(bgImg.getWidth() / 2), (int)(bgImg.getHeight() / 2)).invert()
+            );
         }
 
         // Getters
@@ -597,7 +616,7 @@ public class BoardPane extends GridPane {
 
         /**
          * Changes all Images used by this PlayableBoardCell to the current global Images from the graphics pack.
-         * Call this after loading a different graphics pack
+         * Call this for each PlayableBoardCell after loading a different graphics pack
          */
         public void updateImages() {
             setBackgroundImage(tile);
@@ -734,6 +753,7 @@ public class BoardPane extends GridPane {
             CURRENTLY_SET_STONE = iv;
             if(showsMoveNumbers) {
                 updateLabelColor();
+                LABEL.setVisible(true);
             }
         }
 
@@ -757,15 +777,19 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Sets the text color of this PlayableBoardCell's label to the inverse of the stone that is currently set.
+         * Sets the text color of this PlayableBoardCell's label to the inverse of the center color of the stone that
+         * is currently set.
          */
         private void updateLabelColor() {
-            PixelReader p = CURRENTLY_SET_STONE.getImage().getPixelReader();
-            if(p == null) {
-                throw new NullPointerException("Can't get stone color");
+            if(CURRENTLY_SET_STONE != null) {
+                PixelReader p = CURRENTLY_SET_STONE.getImage().getPixelReader();
+                if(p == null) {
+                    throw new NullPointerException("Can't get stone color");
+                }
+                LABEL.setTextFill(p.getColor((int)(CURRENTLY_SET_STONE.getImage().getWidth() / 2), (int)(CURRENTLY_SET_STONE.getImage().getHeight() / 2)).invert());
+            } else {
+                super.updateLabelColor();
             }
-            LABEL.setTextFill(p.getColor((int)(CURRENTLY_SET_STONE.getImage().getWidth() / 2), (int)(CURRENTLY_SET_STONE.getImage().getHeight() / 2)).invert());
-            LABEL.setVisible(true);
         }
     } // private class PlayableBoardCell extends BoardCell
 }
