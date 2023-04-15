@@ -259,8 +259,12 @@ public class BoardPane extends GridPane {
         });
     }
 
-    // TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse might be on the board during confirmation)
-    // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
+    /*
+     * TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse
+     *  might be on the board during confirmation)
+     * TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether
+     *  this is really the responsibility of the view.
+     */
     public void confirmMove() {
         if(selectionBC != null) {
             int col = getColumnIndex(selectionBC) - 1;
@@ -291,8 +295,8 @@ public class BoardPane extends GridPane {
 
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
-                BoardCell bc = (BoardCell)getChildren().get(4 + size * 4 + i * size + j);
-                bc.getLabel().setVisible(this.showsMoveNumbers);
+                PlayableBoardCell bc = (PlayableBoardCell)getChildren().get(4 + size * 4 + i * size + j);
+                bc.showMoveNumber();
             }
         }
     }
@@ -321,19 +325,19 @@ public class BoardPane extends GridPane {
 
         for(int i = 0; i < 4; i++) {
             BoardCell bc = (BoardCell)getChildren().get(i);
-            bc.setBackgroundImage(corner);                  // I could just replace this with updateImages(), but this way we'll save one unnecessary method call.
+            bc.setBackgroundImage(corner);
         }
 
         for(int i = 0; i < size; i++) {
             // edges
             for(int j = 0; j < 4; j++) {
                 BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
-                bc.setBackgroundImage(edge);               // Same as with corner
+                bc.setBackgroundImage(edge);
             }
-            // centre
+            // center
             for(int j = 0; j < size; j++) {
-                BoardCell bc = (BoardCell)getChildren().get(4 + size * 4 + i * size + j);
-                bc.updateImages(tile);
+                PlayableBoardCell bc = (PlayableBoardCell)getChildren().get(4 + size * 4 + i * size + j);
+                bc.updateImages();
             }
         }
     }
@@ -430,18 +434,21 @@ public class BoardPane extends GridPane {
 
         public void setBackgroundImage(Image tile) {
             BackgroundSize bgSz = new BackgroundSize(
-                    100,     // width
-                    100,        // height
-                    true,       // widthAsPercentage
-                    true,       // heightAsPercentage
-                    false,      // contain
-                    true);      // cover
-            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
+                100,     // width
+                100,        // height
+                true,       // widthAsPercentage
+                true,       // heightAsPercentage
+                false,      // contain
+                true        // cover
+            );
+            BackgroundImage bgImg = new BackgroundImage(
+                tile,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                bgSz
+            );
             this.setBackground(new Background(bgImg));
-        }
-
-        public void updateImages(Image tile) {
-            setBackgroundImage(tile);
         }
 
         // Getters
@@ -477,6 +484,7 @@ public class BoardPane extends GridPane {
 
             this.LABEL.setVisible(false);
             this.LABEL.setAlignment(Pos.CENTER);
+            this.LABEL.toFront();
 
             setMouseTransparent(false);
         }
@@ -496,8 +504,7 @@ public class BoardPane extends GridPane {
         }
 
         public void updateImages() {
-            super.updateImages(tile);
-
+            setBackgroundImage(tile);
             BLACK_STONE.setImage(stones[0]);
             BLACK_HOVER.setImage(stones[0]);
             WHITE_STONE.setImage(stones[1]);
@@ -571,10 +578,14 @@ public class BoardPane extends GridPane {
                 if(p == null) {
                     throw new NullPointerException("Can't get stone color");
                 }
-                this.LABEL.setTextFill(p.getColor((int)(iv.getImage().getWidth() / 2), (int)(iv.getImage().getHeight() / 2)).invert());
-                this.LABEL.setVisible(true);
+                LABEL.setTextFill(p.getColor((int)(iv.getImage().getWidth() / 2), (int)(iv.getImage().getHeight() / 2)).invert());
+                LABEL.setVisible(true);
             }
             isSet = true;
+        }
+
+        public void showMoveNumber() {
+            LABEL.setVisible(isSet && showsMoveNumbers);
         }
     } // private class PlayableBoardCell extends BoardCell
 }
