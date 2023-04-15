@@ -108,7 +108,9 @@ public class BoardPane extends GridPane {
         this.graphicsPath = graphicsPath;
 
         game.addListener(l -> {
-            if(l.getGameCommand() != GameCommand.BLACKSTARTS && l.getGameCommand() != GameCommand.WHITSTARTS) return;
+            if(l.getGameCommand() != GameCommand.BLACKSTARTS && l.getGameCommand() != GameCommand.WHITSTARTS) {
+                return;
+            }
             System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
 
             setMouseTransparent(false);
