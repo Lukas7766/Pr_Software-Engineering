@@ -36,21 +36,18 @@ public class BoardPane extends GridPane {
     private Board board;
 
     private final Game game;
-    /*
-     * Custom resources
-     */
 
+    // Custom resources
+    private String graphics;
     private Image tile;
     private final Image[] stones = new Image [2];
     private Image edge;
     private Image corner;
 
-    private BoardCell lastBC = null;
-    private BoardCell selectionBC = null;
+    private PlayableBoardCell lastBC = null;
+    private PlayableBoardCell selectionBC = null;
 
     private NumberBinding MAX_CELL_DIM_INT;
-
-    private String graphics;
 
     public BoardPane(Game game, String graphics) {
         if(game == null || graphics == null) {
@@ -91,41 +88,41 @@ public class BoardPane extends GridPane {
         MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM);                                 // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
-        BoardCell corner1 = new BoardCell(this.corner, false);
+        BoardCell corner1 = new BoardCell(this.corner);
         corner1.getLabel().setVisible(false);
         add(corner1, 0, 0);
-        BoardCell corner2 = new BoardCell(this.corner, false);
+        BoardCell corner2 = new BoardCell(this.corner);
         corner2.getLabel().setVisible(false);
         add(corner2, size + 1, 0);
-        BoardCell corner3 = new BoardCell(this.corner, false);
+        BoardCell corner3 = new BoardCell(this.corner);
         corner3.getLabel().setVisible(false);
         add(corner3, 0, size + 1);
-        BoardCell corner4 = new BoardCell(this.corner, false);
+        BoardCell corner4 = new BoardCell(this.corner);
         corner4.getLabel().setVisible(false);
         add(corner4, size + 1, size + 1);
 
         // populate the coordinate axes
         for(int i = 0; i < this.size; i++) {
             // top
-            BoardCell t = new BoardCell(this.edge, false);
+            BoardCell t = new BoardCell(this.edge);
             t.getLabel().setText("" + (char)('A' + i));
             t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
             add(t, i + 1, 0);
 
             // bottom
-            BoardCell b = new BoardCell(this.edge, false);
+            BoardCell b = new BoardCell(this.edge);
             b.getLabel().setText("" + (char)('A' + i));
             b.getLabel().setAlignment(Pos.TOP_CENTER);
             add(b, i + 1, size + 1);
 
             // left
-            BoardCell l = new BoardCell(this.edge, false);
+            BoardCell l = new BoardCell(this.edge);
             l.getLabel().setText("" + (size - i));
             l.getLabel().setAlignment(Pos.CENTER_RIGHT);
             add(l, 0, i + 1);
 
             // right
-            BoardCell r = new BoardCell(this.edge, false);
+            BoardCell r = new BoardCell(this.edge);
             r.getLabel().setText("" + (size - i));
             r.getLabel().setAlignment(Pos.CENTER_LEFT);
             add(r, size + 1, i + 1);
@@ -134,7 +131,7 @@ public class BoardPane extends GridPane {
         // Fill the grid with tiles
         for(int i = 0; i < this.size; i++) {
             for(int j = 0; j < this.size; j++) {
-                BoardCell bc = new BoardCell(tile, true);
+                PlayableBoardCell bc = new PlayableBoardCell();
                 /*
                  * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
                  * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
@@ -161,7 +158,7 @@ public class BoardPane extends GridPane {
                     Integer row = getRowIndex(target);
 
                     if (col != null && row != null) {
-                        BoardCell targetBC = (BoardCell)target;
+                        PlayableBoardCell targetBC = (PlayableBoardCell)target;
 
                         if (this.board.getCurColor() == BLACK) {
                             targetBC.hoverBlack();
@@ -233,7 +230,7 @@ public class BoardPane extends GridPane {
                     throw new NullPointerException();
                 }
 
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
+                PlayableBoardCell destinationBC = (PlayableBoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
                 destinationBC.getLabel().setText("" + e.getMoveNumber());
 
                 if(e.getColor() == BLACK) {
@@ -249,7 +246,7 @@ public class BoardPane extends GridPane {
                     throw new NullPointerException();
                 }
 
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
+                PlayableBoardCell destinationBC = (PlayableBoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
 
                 destinationBC.unset();
             }
@@ -409,47 +406,15 @@ public class BoardPane extends GridPane {
     }
 
     private class BoardCell extends StackPane {
-        private final ResizableImageView BLACK_HOVER;
-        private final ResizableImageView WHITE_HOVER;
-        private final ResizableImageView BLACK_STONE;
-        private final ResizableImageView WHITE_STONE;
-        private final Label LABEL;
+        protected final Label LABEL;
 
-        private final boolean isPlayable;               // TODO: Should probably be implemented using inheritance, shouldn't it?
-        private boolean isSelected = false;
-        private boolean isSet = false;
-
-        private BoardCell(Image tile, boolean isPlayable) {
-            this.isPlayable = isPlayable;
+        private BoardCell(Image tile) {
             this.setMinSize(0, 0);
             setBackgroundImage(tile);
 
-            //if(isPlayable) {
-                this.BLACK_HOVER = getCellImageView(stones[0]);
-                getChildren().add(this.BLACK_HOVER);
-
-                this.WHITE_HOVER = getCellImageView(stones[1]);
-                getChildren().add(this.WHITE_HOVER);
-
-                this.BLACK_STONE = getCellImageView(stones[0]);
-                getChildren().add(this.BLACK_STONE);
-
-                this.WHITE_STONE = getCellImageView(stones[1]);
-                getChildren().add(this.WHITE_STONE);
-            /*} else {
-                this.BLACK_HOVER = null;
-                this.WHITE_HOVER = null;
-                this.BLACK_STONE = null;
-                this.WHITE_STONE = null;
-            }*/
-
             this.LABEL = new Label("0");
-            if(isPlayable) {
-                this.LABEL.setVisible(false);
-            }
             this.LABEL.setMinSize(0, 0);
             this.LABEL.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            this.LABEL.setAlignment(Pos.CENTER);
 
             final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
             FONT_SIZE.bind(this.LABEL.widthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty())));
@@ -460,9 +425,60 @@ public class BoardPane extends GridPane {
             prefWidthProperty().bind(MAX_CELL_DIM_INT);
             prefHeightProperty().bind(MAX_CELL_DIM_INT);
 
-            if(!isPlayable) {
-                setMouseTransparent(true);
-            }
+            setMouseTransparent(true);
+        }
+
+        public void setBackgroundImage(Image tile) {
+            BackgroundSize bgSz = new BackgroundSize(
+                    100,     // width
+                    100,        // height
+                    true,       // widthAsPercentage
+                    true,       // heightAsPercentage
+                    false,      // contain
+                    true);      // cover
+            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
+            this.setBackground(new Background(bgImg));
+        }
+
+        public void updateImages(Image tile) {
+            setBackgroundImage(tile);
+        }
+
+        // Getters
+        public Label getLabel() {
+            return LABEL;
+        }
+    } // private class BoardCell
+
+    private class PlayableBoardCell extends BoardCell {
+
+        private boolean isSelected = false;
+        private boolean isSet = false;
+
+        private final ResizableImageView BLACK_HOVER;
+        private final ResizableImageView WHITE_HOVER;
+        private final ResizableImageView BLACK_STONE;
+        private final ResizableImageView WHITE_STONE;
+
+        private PlayableBoardCell() {
+            super(tile);
+
+            this.BLACK_HOVER = getCellImageView(stones[0]);
+            getChildren().add(this.BLACK_HOVER);
+
+            this.WHITE_HOVER = getCellImageView(stones[1]);
+            getChildren().add(this.WHITE_HOVER);
+
+            this.BLACK_STONE = getCellImageView(stones[0]);
+            getChildren().add(this.BLACK_STONE);
+
+            this.WHITE_STONE = getCellImageView(stones[1]);
+            getChildren().add(this.WHITE_STONE);
+
+            this.LABEL.setVisible(false);
+            this.LABEL.setAlignment(Pos.CENTER);
+
+            setMouseTransparent(false);
         }
 
         private ResizableImageView getCellImageView(Image i) {
@@ -477,6 +493,15 @@ public class BoardPane extends GridPane {
             iv.setVisible(false);
 
             return iv;
+        }
+
+        public void updateImages() {
+            super.updateImages(tile);
+
+            BLACK_STONE.setImage(stones[0]);
+            BLACK_HOVER.setImage(stones[0]);
+            WHITE_STONE.setImage(stones[1]);
+            WHITE_HOVER.setImage(stones[1]);
         }
 
         public void hoverWhite() {
@@ -551,50 +576,5 @@ public class BoardPane extends GridPane {
             }
             isSet = true;
         }
-
-        public void setBackgroundImage(Image tile) {
-            BackgroundSize bgSz = new BackgroundSize(
-                    100,     // width
-                    100,        // height
-                    true,       // widthAsPercentage
-                    true,       // heightAsPercentage
-                    false,      // contain
-                    true);      // cover
-            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
-            this.setBackground(new Background(bgImg));
-        }
-
-        public void updateImages(Image tile) {
-            setBackgroundImage(tile);
-            BLACK_STONE.setImage(stones[0]);
-            BLACK_HOVER.setImage(stones[0]);
-            WHITE_STONE.setImage(stones[1]);
-            WHITE_HOVER.setImage(stones[1]);
-        }
-
-        // Getters
-        public boolean isPlayable() {
-            return isPlayable;
-        }
-
-        public ImageView getBlackHover() {
-            return BLACK_HOVER;
-        }
-
-        public ImageView getWhiteHover() {
-            return WHITE_HOVER;
-        }
-
-        public ImageView getBlackStone() {
-            return BLACK_STONE;
-        }
-
-        public ImageView getWhiteStone() {
-            return WHITE_STONE;
-        }
-
-        public Label getLabel() {
-            return LABEL;
-        }
-    } // private class BoardCell
+    } // private class PlayableBoardCell extends BoardCell
 }

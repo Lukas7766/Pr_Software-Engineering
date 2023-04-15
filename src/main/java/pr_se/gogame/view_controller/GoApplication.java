@@ -32,7 +32,7 @@ public class GoApplication extends Application {
 
         Button test = new Button("Change graphics set");
         test.setOnAction((e) -> {
-            bp.setShowsCoordinates(!bp.showsCoordinates());
+            bp.setShowsMoveNumbers(!bp.showsMoveNumbers());
         });
 
         root.setCenter(bp);
