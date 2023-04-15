@@ -50,6 +50,7 @@ public class BoardPane extends GridPane {
 
     private NumberBinding MAX_CELL_DIM_INT;
 
+    private String graphics;
 
     // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
     public BoardPane(Game game, String graphics) {
@@ -57,62 +58,29 @@ public class BoardPane extends GridPane {
             throw new NullPointerException();
         }
 
+        setMouseTransparent(true);
+
         this.game = game;
+        this.graphics = graphics;
+
         game.addListener(l -> {
             if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
             System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
 
-            init(graphics);
+            setMouseTransparent(false);
+            init();
         }); //ToDo: full Event integration
-        init(graphics);
+
+        init();
     }
 
-    private void init(String graphics) {
+    private void init() {
         getChildren().removeAll(getChildren());
 
         setBoard(this.game.getBoard());
         this.size = board.getSize();
 
-        try (ZipFile zip = new ZipFile(graphics)) {
-            ZipEntry tileEntry = zip.getEntry("tile.png");
-            ZipEntry cornerEntry = zip.getEntry("corner.png");
-            ZipEntry edgeEntry = zip.getEntry("edge.png");
-            ZipEntry stone0Entry = zip.getEntry("stone_0.png");
-            ZipEntry stone1Entry = zip.getEntry("stone_1.png");
-
-            if(Stream.of(tileEntry, cornerEntry, edgeEntry, stone0Entry, stone1Entry).anyMatch(Objects::isNull)) {
-                throw new IllegalStateException("ERROR: Graphics pack " + graphics + " is missing files!");
-            }
-
-            try (InputStream tileIS = zip.getInputStream(tileEntry);
-                InputStream cornerIS = zip.getInputStream(cornerEntry);
-                InputStream edgeIS = zip.getInputStream(edgeEntry);
-                InputStream stone0IS = zip.getInputStream(stone0Entry);
-                InputStream stone1IS = zip.getInputStream(stone1Entry)
-            ) {
-                final int DEFAULT_IMAGE_SIZE = 128;
-                final boolean SMOOTH_IMAGES = false;
-
-                tile = new Image(
-                        tileIS,             // is (:InputStream)
-                        DEFAULT_IMAGE_SIZE, // requestedWidth
-                        DEFAULT_IMAGE_SIZE, // requestedHeight
-                        true,               // preserveRation
-                        SMOOTH_IMAGES);     // smooth
-                this.edge = new Image(edgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                this.corner = new Image(cornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-
-                stones[0] = new Image(stone0IS);
-                stones[1] = new Image(stone1IS);
-            } catch (Exception e) {
-                System.err.println("ERROR: Couldn't read file from graphics pack " + graphics + "!");
-                e.printStackTrace();
-            }
-        } catch (Exception e) {
-            System.err.println("ERROR: Couldn't open graphics pack " + graphics + "!");
-            e.printStackTrace();
-        }
-
+        loadGraphics(graphics);
 
         // determine cell size
         final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(size + 2);                                                 // Get maximum width if all cells are equally wide
@@ -352,6 +320,34 @@ public class BoardPane extends GridPane {
         this.showsCoordinates = showsCoordinates;
     }
 
+    public void setGraphics(String graphics) {
+        if(graphics == null) {
+            throw new NullPointerException();
+        }
+
+        this.graphics = graphics;
+
+        loadGraphics(graphics);
+
+        for(int i = 0; i < 4; i++) {
+            BoardCell bc = (BoardCell)getChildren().get(i);
+            bc.setBackgroundImage(corner);                  // I could just replace this with updateImages(), but this way we'll save one unnecessary method call.
+        }
+
+        for(int i = 0; i < size; i++) {
+            // edges
+            for(int j = 0; j < 4; j++) {
+                BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
+                bc.setBackgroundImage(edge);               // Same as with corner
+            }
+            // centre
+            for(int j = 0; j < size; j++) {
+                BoardCell bc = (BoardCell)getChildren().get(4 + size * 4 + i * size + j);
+                bc.updateImages(tile);
+            }
+        }
+    }
+
     public int getSize() {
         return size;
     }
@@ -376,6 +372,49 @@ public class BoardPane extends GridPane {
         return corner;
     }
 
+    // private methods
+    private void loadGraphics(String graphics) {
+        try (ZipFile zip = new ZipFile(graphics)) {
+            ZipEntry tileEntry = zip.getEntry("tile.png");
+            ZipEntry cornerEntry = zip.getEntry("corner.png");
+            ZipEntry edgeEntry = zip.getEntry("edge.png");
+            ZipEntry stone0Entry = zip.getEntry("stone_0.png");
+            ZipEntry stone1Entry = zip.getEntry("stone_1.png");
+
+            if(Stream.of(tileEntry, cornerEntry, edgeEntry, stone0Entry, stone1Entry).anyMatch(Objects::isNull)) {
+                throw new IllegalStateException("ERROR: Graphics pack " + graphics + " is missing files!");
+            }
+
+            try (InputStream tileIS = zip.getInputStream(tileEntry);
+                 InputStream cornerIS = zip.getInputStream(cornerEntry);
+                 InputStream edgeIS = zip.getInputStream(edgeEntry);
+                 InputStream stone0IS = zip.getInputStream(stone0Entry);
+                 InputStream stone1IS = zip.getInputStream(stone1Entry)
+            ) {
+                final int DEFAULT_IMAGE_SIZE = 128;
+                final boolean SMOOTH_IMAGES = false;
+
+                tile = new Image(
+                        tileIS,             // is (:InputStream)
+                        DEFAULT_IMAGE_SIZE, // requestedWidth
+                        DEFAULT_IMAGE_SIZE, // requestedHeight
+                        true,               // preserveRation
+                        SMOOTH_IMAGES);     // smooth
+                this.edge = new Image(edgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.corner = new Image(cornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+
+                stones[0] = new Image(stone0IS);
+                stones[1] = new Image(stone1IS);
+            } catch (Exception e) {
+                System.err.println("ERROR: Couldn't read file from graphics pack " + graphics + "!");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.err.println("ERROR: Couldn't open graphics pack " + graphics + "!");
+            e.printStackTrace();
+        }
+    }
+
     private class BoardCell extends StackPane {
         private final ResizableImageView BLACK_HOVER;
         private final ResizableImageView WHITE_HOVER;
@@ -389,18 +428,8 @@ public class BoardPane extends GridPane {
 
         private BoardCell(Image tile, boolean isPlayable) {
             this.isPlayable = isPlayable;
-
             this.setMinSize(0, 0);
-
-            BackgroundSize bgSz = new BackgroundSize(
-                    100,     // width
-                    100,        // height
-                    true,       // widthAsPercentage
-                    true,       // heightAsPercentage
-                    false,      // contain
-                    true);      // cover
-            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
-            this.setBackground(new Background(bgImg));
+            setBackgroundImage(tile);
 
             //if(isPlayable) {
                 this.BLACK_HOVER = getCellImageView(stones[0]);
@@ -528,6 +557,26 @@ public class BoardPane extends GridPane {
                 this.LABEL.setVisible(true);
             }
             isSet = true;
+        }
+
+        public void setBackgroundImage(Image tile) {
+            BackgroundSize bgSz = new BackgroundSize(
+                    100,     // width
+                    100,        // height
+                    true,       // widthAsPercentage
+                    true,       // heightAsPercentage
+                    false,      // contain
+                    true);      // cover
+            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
+            this.setBackground(new Background(bgImg));
+        }
+
+        public void updateImages(Image tile) {
+            setBackgroundImage(tile);
+            BLACK_STONE.setImage(stones[0]);
+            BLACK_HOVER.setImage(stones[0]);
+            WHITE_STONE.setImage(stones[1]);
+            WHITE_HOVER.setImage(stones[1]);
         }
 
         // Getters

@@ -2,8 +2,10 @@ package pr_se.gogame.view_controller;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.BackgroundSize;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
@@ -28,10 +30,16 @@ public class GoApplication extends Application {
         BoardPane bp = new BoardPane(game, path+"default.zip");
         bp.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
 
+        Button test = new Button("Change graphics set");
+        test.setOnAction((e) -> {
+            bp.setGraphics(path + "debug.zip");
+        });
+
         root.setCenter(bp);
         root.setTop(new HeaderPane(this, stage, game));
         SidePane sp = new SidePane(game);
         root.setLeft(sp);
+        root.setRight(test);
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         stage.setMinHeight(HEIGHT + 40);
