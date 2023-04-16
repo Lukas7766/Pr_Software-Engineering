@@ -18,7 +18,7 @@ public class Game implements GameInterface {
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
-        this.board = new Board(this.size, this.komi);
+        this.board = new Board(this, StoneColor.BLACK);
     }
 
     public void initGame() {
@@ -33,8 +33,8 @@ public class Game implements GameInterface {
         this.komi = komi;
         this.gameCommand = gameCommand;
         System.out.println("newGame, Size: " + size + " Komi: " + komi);
-        this.board = new Board(this.size, this.komi);
-        fireNewGame(this.gameCommand, this.size, this.komi);
+        this.board = new Board(this, StoneColor.BLACK);
+        fireNewGame(gameCommand, size, komi);
     }
 
 
