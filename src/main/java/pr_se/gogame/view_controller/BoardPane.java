@@ -551,6 +551,12 @@ public class BoardPane extends GridPane {
 
             setMouseTransparent(false);
 
+            // Set up listeners
+            // If this is enabled, dragging from outside the actual playable board doesn't work (might be desirable)
+            /*setOnDragDetected((e) -> {
+                startFullDrag();
+            });*/
+
             setOnMouseEntered((e) -> {
                 if (board.getCurColor() == BLACK) {
                     hoverBlack();
@@ -558,11 +564,6 @@ public class BoardPane extends GridPane {
                     hoverWhite();
                 }
             });
-
-            // If this is enabled, dragging from outside the actual playable board doesn't work (might be desirable)
-            /*setOnDragDetected((e) -> {
-                startFullDrag();
-            });*/
 
             setOnMouseDragEntered(getOnMouseEntered());
 
