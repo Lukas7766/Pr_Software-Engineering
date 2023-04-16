@@ -27,7 +27,7 @@ import pr_se.gogame.model.StoneColor;
 public class SidePane extends StackPane {
 
     private final int maxCustomBoardSize = 26;
-    private final int minCustomBoardSize = 0;
+    private final int minCustomBoardSize = 5;
     private final int maxKomiAmount = 9;
     private final int minKomiAmount = 0;
     private final Game game;

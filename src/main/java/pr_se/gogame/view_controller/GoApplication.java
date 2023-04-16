@@ -29,11 +29,12 @@ public class GoApplication extends Application {
         BorderPane root = new BorderPane();
 
 
-        final String path = "src/main/resources/pr_se/gogame/";
+        final String iconPath = "file:src/main/resources/pr_se/gogame/";
         
-        stage.getIcons().add(new Image(path+"go.png"));
+        stage.getIcons().add(new Image(iconPath+"go.png"));
 
         // TODO: In the end product, the archive could be chosen by the user (though a default should still be set) and changed at runtime
+        final String path = "src/main/resources/pr_se/gogame/";
         BoardPane bp = new BoardPane(game, path+"default.zip");
         bp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(5), new Insets(5, 5, 5, 2.5))));
 

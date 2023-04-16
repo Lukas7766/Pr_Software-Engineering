@@ -91,8 +91,7 @@ public class BoardPane extends GridPane {
      * NumberBinding for the width and height of all BoardCells
      */
     private NumberBinding MAX_CELL_DIM_INT;
-
-
+    
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
@@ -109,13 +108,22 @@ public class BoardPane extends GridPane {
         this.graphicsPath = graphicsPath;
 
         game.addListener(l -> {
-            if(l.getGameCommand() != GameCommand.BLACKSTARTS && l.getGameCommand() != GameCommand.WHITSTARTS) {
-                return;
-            }
-            System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
+            switch(l.getGameCommand()) {
+                case CONFIRMCHOICE:
+                    confirmMove();
+                    break;
+                case INIT:
+                    setMouseTransparent(true);
+                    break;
+                case WHITSTARTS:
+                case BLACKSTARTS:
+                    System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
 
-            setMouseTransparent(false);
-            init();
+                    setMouseTransparent(false);
+                    init();
+                default: return;
+            }
+
         }); //ToDo: full Event integration
 
         loadGraphics(graphicsPath);
