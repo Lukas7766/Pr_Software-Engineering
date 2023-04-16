@@ -6,7 +6,7 @@ import java.nio.file.Path;
 
 public interface GameInterface {
 
-    boolean saveGame();
+    boolean saveGame(Path path);
 
     void initGame();
     void newGame(GameCommand gameCommand, int size, int komi);

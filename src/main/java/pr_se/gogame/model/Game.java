@@ -39,7 +39,7 @@ public class Game implements GameInterface {
 
 
     @Override
-    public boolean saveGame() {
+    public boolean saveGame(Path path) {
         return true;
     }
 
@@ -94,7 +94,7 @@ public class Game implements GameInterface {
 
     @Override
     public GameCommand getGameState() {
-        return null;
+        return gameCommand;
     }
 
     @Override

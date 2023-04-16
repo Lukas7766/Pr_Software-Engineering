@@ -1,5 +1,6 @@
 package pr_se.gogame.view_controller;
 
+import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -74,13 +75,14 @@ public class HeaderPane extends VBox {
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileSection());
         menuBar.getMenus().add(gameSection());
+        menuBar.getMenus().add(viewSection());
         menuBar.getMenus().add(helpSection());
 
         this.getChildren().add(menuBar);
         this.getChildren().add(shortMenu());
 
         //ToDo exceeding competence -> onCloseAction
-        stage.setOnCloseRequest(e -> onCloseAction());
+        stage.setOnCloseRequest(this::onCloseAction);
     }
 
     /**
@@ -245,11 +247,13 @@ public class HeaderPane extends VBox {
 
         List<MenuItem> gameSectionItems = new ArrayList<>();
 
-        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Show Move Numbers");
-        gameSectionItems.add(showMoveNumbersCBtn);
-        showMoveNumbersCBtn.setSelected(false);
-        showMoveNumbersCBtn.setOnAction(e -> {
-            System.out.println(showMoveNumbersCBtn.isSelected());
+        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move confirmation required");
+        gameSectionItems.add(moveConfirmationRequired);
+        moveConfirmationRequired.setSelected(true);
+        moveConfirmationRequired.setOnAction(e -> {
+            if (moveConfirmationRequired.isSelected()) {
+                System.out.println();
+            }
         });
 
         MenuItem passItem = new MenuItem();
@@ -284,6 +288,28 @@ public class HeaderPane extends VBox {
         SeparatorMenuItem sep = new SeparatorMenuItem();
 
         menu.getItems().add(2, sep);
+
+        return menu;
+    }
+
+    /** Creates the view section for the menu bar <br>
+     * contains at least: <br>
+     * ->
+     * @return the view section for the menu bar
+     */
+    private Menu viewSection() {
+        Menu menu = new Menu();
+        menu.setText("View");
+
+        List<MenuItem> viewSectionItems = new ArrayList<>();
+
+        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Show Move Numbers");
+        viewSectionItems.add(showMoveNumbersCBtn);
+        showMoveNumbersCBtn.setSelected(false);
+        showMoveNumbersCBtn.setOnAction(e -> {
+            System.out.println(showMoveNumbersCBtn.isSelected());
+        });
+            menu.getItems().addAll(viewSectionItems);
 
         return menu;
     }
@@ -323,6 +349,7 @@ public class HeaderPane extends VBox {
         return menu;
     }
 
+
     /** Creates a parameterizes File Dialog
      *
      * @param isSave true for saving a file, false for opening a file
@@ -344,7 +371,18 @@ public class HeaderPane extends VBox {
      * -> cancel <br>
      */
     private void onCloseAction() { //ToDo exceeding competence -> onCloseAction
+        onCloseAction(null);
+    }
+    /** Handles the on close action<br>
+     * -> without save <br>
+     * -> with save <br>
+     * -> cancel <br>
+     * @param e Event
+     */
+    private void onCloseAction(Event e) {
 
+        if(game.getGameState()==GameCommand.INIT) return;
+        System.out.println(game.getGameState());
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Close Go Game");
         alert.setHeaderText("Do you really want to close your Game?");
@@ -362,8 +400,19 @@ public class HeaderPane extends VBox {
         if (btnResult.get() == noSaveBtn) {
             Platform.exit();
         } else if (btnResult.get() == saveBtn) {
-            if (game.saveGame()) Platform.exit();
-            else throw new RuntimeException();
+
+            File f = fileDialog(true, filterList);
+            if (f != null) {
+                if (game.saveGame(f.toPath())) Platform.exit();
+            }
+            System.out.println("Info");
+            Alert info = new Alert(Alert.AlertType.INFORMATION);
+            info.setTitle("Close Go Game - Info");
+            info.setHeaderText("Saving your game didn't work.");
+            info.setContentText("Try it again!");
+            info.initOwner(stage);
+            info.showAndWait();
+            if(e != null) e.consume();
         }
     }
 }
