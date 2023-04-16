@@ -1,16 +1,11 @@
 package pr_se.gogame.view_controller;
 
 import javafx.application.Application;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
-import javafx.scene.layout.*;
-import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
+import javafx.scene.control.Button;
+import javafx.scene.layout.BorderPane;
+import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import pr_se.gogame.model.Board;
 import pr_se.gogame.model.Game;
 
 public class GoApplication extends Application {
@@ -26,23 +21,25 @@ public class GoApplication extends Application {
         BorderPane root = new BorderPane();
 
         // Altered by Gerald to add the BoardPane
-        //Board board = new Board(19);
-        final String path = "file:src/main/resources/pr_se/gogame/";
-                
-        BoardPane bp = new BoardPane(game,
-            path+"tile_0.png",
-            path+"tile_0.png",
-            path+"edge.png",
-            path+"corner.png",
-            path+"stone_0_square.png",
-            path+"stone_1.png");
-        bp.setBackground(new Background(new BackgroundFill(Color.YELLOW, null, null)));
+        final String path = "src/main/resources/pr_se/gogame/";
+
+        // TODO: In the end product, the archive could be chosen by the user (though a default should still be set) and changed at runtime
+        BoardPane bp = new BoardPane(game, path+"default.zip");
+
+        Button changeGFX = new Button("Change graphics set");
+        changeGFX.setOnAction((e) -> bp.setGraphicsPath(path + "inverted.zip"));
+        Button toggleCoords = new Button("Toggle Coordinates");
+        toggleCoords.setOnAction((e) -> bp.setShowsCoordinates(!bp.showsCoordinates()));
+        Button toggleMoveNos = new Button("Toggle Move Numbers");
+        toggleMoveNos.setOnAction((e) -> bp.setShowsMoveNumbers(!bp.showsMoveNumbers()));
+        VBox debugButtons = new VBox();
+        debugButtons.getChildren().addAll(changeGFX, toggleCoords, toggleMoveNos);
 
         root.setCenter(bp);
         root.setTop(new HeaderPane(this, stage, game));
         SidePane sp = new SidePane(game);
-        // sp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, null, null)));
         root.setLeft(sp);
+        root.setRight(debugButtons);
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         stage.setMinHeight(HEIGHT + 40);
@@ -50,6 +47,14 @@ public class GoApplication extends Application {
 
         stage.setScene(scene);
         stage.show();
+
+        /*
+         * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,
+         * except, for some reason, the menu bar. This might be desirable.
+         */
+        scene.setOnDragDetected((e) -> {
+            scene.startFullDrag();
+        });
     }
 
     public static void main(String[] args) {
