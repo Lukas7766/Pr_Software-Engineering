@@ -554,34 +554,6 @@ public class BoardPane extends GridPane {
                 }
             });
 
-            // Only this Drag Event Listener works
-            /*setOnMouseDragged((e) -> {
-                System.out.println("A");
-            });*/
-
-            // None of these seem to fire
-            /*
-            setOnDragEntered((e) -> {
-                System.out.println("HUCH");
-            });
-
-            setOnDragOver((e) -> {
-                System.out.println("HUCH");
-            });
-
-            setOnDragExited((e) -> {
-                System.out.println("HUCH");
-            });
-
-            setOnMouseDragReleased((e) -> {
-                System.out.println("B");
-            });
-
-            setOnDragDone((e) -> {
-                System.out.println("C");
-            });
-            */
-
             setOnMouseExited((e) -> {
                 if(!e.isPrimaryButtonDown()) {
                     unhover();
