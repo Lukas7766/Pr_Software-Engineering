@@ -91,7 +91,7 @@ public class BoardPane extends GridPane {
      * NumberBinding for the width and height of all BoardCells
      */
     private NumberBinding MAX_CELL_DIM_INT;
-    
+
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
