@@ -47,6 +47,14 @@ public class GoApplication extends Application {
 
         stage.setScene(scene);
         stage.show();
+
+        /*
+         * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,
+         * except, for some reason, the menu bar. This might be desirable.
+         */
+        scene.setOnDragDetected((e) -> {
+            scene.startFullDrag();
+        });
     }
 
     public static void main(String[] args) {

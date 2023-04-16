@@ -196,6 +196,11 @@ public class BoardPane extends GridPane {
         }
 
         // Set up listeners
+        // If this is active, dragging from within this BoardPane but outside the actual playble board works (might be desirable)
+        /*setOnDragDetected((e) -> {
+            startFullDrag();
+        });*/
+
         setOnKeyPressed((e) -> {
             // TODO: Keyboard input?
         });
@@ -554,13 +559,20 @@ public class BoardPane extends GridPane {
                 }
             });
 
+            // If this is enabled, dragging from outside the actual playable board doesn't work (might be desirable)
+            /*setOnDragDetected((e) -> {
+                startFullDrag();
+            });*/
+
+            setOnMouseDragEntered(getOnMouseEntered());
+
             setOnMouseExited((e) -> {
-                if(!e.isPrimaryButtonDown()) {
-                    unhover();
-                }
+                unhover();
             });
 
-            this.setOnMouseReleased((e) -> {
+            setOnMouseDragExited(getOnMouseExited());
+
+            setOnMouseClicked((e) -> {
                 if (selectionPBC != null) {
                     selectionPBC.deselect();
                 }
@@ -576,6 +588,8 @@ public class BoardPane extends GridPane {
                     confirmMove();
                 }
             });
+
+            setOnMouseDragReleased(getOnMouseClicked());
         }
 
         /**
