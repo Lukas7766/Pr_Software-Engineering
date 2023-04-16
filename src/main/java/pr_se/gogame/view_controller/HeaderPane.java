@@ -54,12 +54,19 @@ public class HeaderPane extends VBox {
      */
     private final HashSet<FileChooser.ExtensionFilter> filterList;
 
+    private final List<Button> playbackControlList = new ArrayList<>();
+
+    List<Button> gameShortCardList = new ArrayList<>();
+
+    List<MenuItem> gameSectionItems = new ArrayList<>();
+
     /**
      * Constructor to create a Header Pane
+     *
      * @param backcolor Background Color
-     * @param app instance of actual application -> needed to open URL in Browser
-     * @param stage instance of actual stage -> needed to show file dialog
-     * @param game instance of actual game -> needed for triggering and observing changes in model
+     * @param app       instance of actual application -> needed to open URL in Browser
+     * @param stage     instance of actual stage -> needed to show file dialog
+     * @param game      instance of actual game -> needed for triggering and observing changes in model
      */
     public HeaderPane(Color backcolor, Application app, Stage stage, Game game) {
         this.backColor = backcolor;
@@ -92,6 +99,7 @@ public class HeaderPane extends VBox {
      * -> resign button <br>
      * -> score game button <br>
      * -> confirm move button
+     *
      * @return a horizontal box layout object which includes all needed elements of the short menu
      */
     private HBox shortMenu() {
@@ -99,9 +107,6 @@ public class HeaderPane extends VBox {
         lane.setPrefHeight(35);
 
         lane.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(0, 5, 0, 5))));
-
-        List<Button> playbackControlList = new ArrayList<>();
-
 
         HBox playbackControl = new HBox();
         playbackControl.setPrefWidth(250);
@@ -144,7 +149,6 @@ public class HeaderPane extends VBox {
         gameShortCards.setAlignment(Pos.CENTER);
         gameShortCards.setSpacing(25);
 
-        List<Button> gameShortCardList = new ArrayList<>();
 
         Button pass = new Button("Pass");
         pass.setFocusTraversable(false);
@@ -184,12 +188,14 @@ public class HeaderPane extends VBox {
 
     }
 
-    /** Creates the file section for the menu bar <br>
+    /**
+     * Creates the file section for the menu bar <br>
      * contains at least: <br>
      * -> New Game <br>
      * -> Import Game <br>
      * -> Export Game <br>
      * -> Exit Game
+     *
      * @return the file section for the menu bar
      */
     private Menu fileSection() {
@@ -234,25 +240,28 @@ public class HeaderPane extends VBox {
         return files;
     }
 
-    /** Creates the game section for the menu bar <br>
+    /**
+     * Creates the game section for the menu bar <br>
      * contains at least: <br>
      * -> Pass <br>
      * -> Resign <br>
      * -> Score Game
+     *
      * @return the game section for the menu bar
      */
     private Menu gameSection() {
         Menu menu = new Menu();
         menu.setText("Game");
 
-        List<MenuItem> gameSectionItems = new ArrayList<>();
-
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move confirmation required");
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(true);
         moveConfirmationRequired.setOnAction(e -> {
+            var k = this.gameShortCardList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
             if (moveConfirmationRequired.isSelected()) {
-                System.out.println();
+                k.ifPresent(button -> button.setVisible(true));
+            } else {
+                k.ifPresent(button -> button.setVisible(false));
             }
         });
 
@@ -292,9 +301,11 @@ public class HeaderPane extends VBox {
         return menu;
     }
 
-    /** Creates the view section for the menu bar <br>
+    /**
+     * Creates the view section for the menu bar <br>
      * contains at least: <br>
      * ->
+     *
      * @return the view section for the menu bar
      */
     private Menu viewSection() {
@@ -309,15 +320,17 @@ public class HeaderPane extends VBox {
         showMoveNumbersCBtn.setOnAction(e -> {
             System.out.println(showMoveNumbersCBtn.isSelected());
         });
-            menu.getItems().addAll(viewSectionItems);
+        menu.getItems().addAll(viewSectionItems);
 
         return menu;
     }
 
-    /** Creates the help section for the menu bar <br>
+    /**
+     * Creates the help section for the menu bar <br>
      * contains at least: <br>
      * -> Help -> Link to WebSite <br>
      * -> About us -> Information ab the developer
+     *
      * @return the help section for the menu bar
      */
     private Menu helpSection() {
@@ -350,7 +363,8 @@ public class HeaderPane extends VBox {
     }
 
 
-    /** Creates a parameterizes File Dialog
+    /**
+     * Creates a parameterizes File Dialog
      *
      * @param isSave true for saving a file, false for opening a file
      * @param filter pass list of Extension Filters
@@ -365,7 +379,8 @@ public class HeaderPane extends VBox {
         return (isSave) ? fileChooser.showSaveDialog(stage) : fileChooser.showOpenDialog(stage);
     }
 
-    /** Handles the on close action <br>
+    /**
+     * Handles the on close action <br>
      * -> without save <br>
      * -> with save <br>
      * -> cancel <br>
@@ -373,15 +388,18 @@ public class HeaderPane extends VBox {
     private void onCloseAction() { //ToDo exceeding competence -> onCloseAction
         onCloseAction(null);
     }
-    /** Handles the on close action<br>
+
+    /**
+     * Handles the on close action<br>
      * -> without save <br>
      * -> with save <br>
      * -> cancel <br>
+     *
      * @param e Event
      */
     private void onCloseAction(Event e) {
 
-        if(game.getGameState()==GameCommand.INIT) return;
+        if (game.getGameState() == GameCommand.INIT) return;
         System.out.println(game.getGameState());
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Close Go Game");
@@ -412,7 +430,7 @@ public class HeaderPane extends VBox {
             info.setContentText("Try it again!");
             info.initOwner(stage);
             info.showAndWait();
-            if(e != null) e.consume();
+            if (e != null) e.consume();
         }
     }
 }
