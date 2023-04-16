@@ -202,68 +202,17 @@ public class BoardPane extends GridPane {
         }
 
         // Set up listeners
-        /*setOnMouseMoved(e -> {                                                   // TODO: Should this be handled by the BoardCells themselves?
-            Node target = (Node)e.getTarget();
-            if(target != null) {
-                if(target != lastPBC) {                                          // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
-                    Integer col = getColumnIndex(target);
-                    Integer row = getRowIndex(target);
-
-                    if (col != null && row != null) {
-                        board.printDebugInfo(col - 1, row - 1);            // TODO: Remove by final release
-
-                        PlayableBoardCell targetBC = (PlayableBoardCell)target;
-
-                        if (this.board.getCurColor() == BLACK) {
-                            targetBC.hoverBlack();
-                        } else {
-                            targetBC.hoverWhite();
-                        }
-
-                        // Remove old hover
-                        if(lastPBC != null) {
-                            lastPBC.unhover();
-                        }
-                        lastPBC = targetBC;
-                    } else if(lastPBC != null) {
-                        lastPBC.unhover();
-                        //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
-                        lastPBC = null;
-                    }
-                }
+        setOnMouseReleased((e) -> {
+            if(board.getCurColor() == BLACK) {
+                selectionPBC.selectBlack();
             } else {
-                //System.out.println("Hover target is null!");                // TODO: Remove in finished product
-                lastPBC = null;
+                selectionPBC.selectWhite();
             }
-        });
 
-        setOnMouseClicked(e -> {
-            if(e.getButton() == MouseButton.PRIMARY) { // This check is only for testing independently of the main UI.
-                if (lastPBC != null) {
-                    if (selectionPBC != null) {
-                        selectionPBC.deselect();
-                    }
-                    selectionPBC = lastPBC;
-                    if(board.getCurColor() == BLACK) {
-                        selectionPBC.selectBlack();
-                    } else {
-                        selectionPBC.selectWhite();
-                    }
-
-                    lastPBC = null;
-
-                    if (!needsMoveConfirmation) {
-                        confirmMove();
-                    }
-                } else {
-                    System.out.println("Click outside of BoardPane"); // TODO: Remove in finished product
-                }
-            } else if(e.getButton() == MouseButton.SECONDARY && needsMoveConfirmation) { // Only for testing purposes
+            if (!needsMoveConfirmation) {
                 confirmMove();
             }
-
-
-        });*/
+        });
 
         setOnKeyPressed((e) -> {
             // TODO: Keyboard input?
@@ -632,26 +581,11 @@ public class BoardPane extends GridPane {
 
             setOnMousePressed((e) -> {
                 isPreSelected = true;
-                selectionPBC = this;
-            });
 
-            setOnMouseClicked((e) -> {
-                if(e.getButton() == MouseButton.PRIMARY) { // This check is only for testing independently of the main UI.
-                    if (selectionPBC != null) {
-                        selectionPBC.deselect();
-                    }
-                    selectionPBC = this;
-
-                    if(board.getCurColor() == BLACK) {
-                        selectBlack();
-                    } else {
-                        selectWhite();
-                    }
-
-                    if (!needsMoveConfirmation) {
-                        confirmMove();
-                    }
+                if (selectionPBC != null) {
+                    selectionPBC.deselect();
                 }
+                selectionPBC = this;
             });
         }
 
@@ -753,6 +687,7 @@ public class BoardPane extends GridPane {
          * @param iv the ImageView that is to be displayed
          */
         private void select(ImageView iv) {
+            isPreSelected = false;
             deselect();             // might be unnecessary
             iv.setOpacity(0.75);
             iv.setVisible(true);
