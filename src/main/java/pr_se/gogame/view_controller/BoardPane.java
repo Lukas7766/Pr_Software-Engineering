@@ -77,10 +77,6 @@ public class BoardPane extends GridPane {
     private Image corner;
 
     /**
-     * the last PlayableBoardCell that was hovered over
-     */
-    private PlayableBoardCell lastPBC = null;
-    /**
      * the currently selected PlayableBoardCell
      */
     private PlayableBoardCell selectionPBC = null;
@@ -266,7 +262,7 @@ public class BoardPane extends GridPane {
             if(col >= 0 && row >= 0) {
                 board.setStone(col, row, board.getCurColor(), false);
             } else {
-                System.out.println("Confirmation outside of actual board on " + lastPBC); // TODO: Remove in finished product
+                System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
             }
         }
     }
@@ -501,7 +497,6 @@ public class BoardPane extends GridPane {
          * whether this PlayableBoardCell is currently selected
          */
         private boolean isSelected = false;
-        private boolean isPreSelected = false;
 
         /**
          * Instance of the global Image of the Black stone; used for hovering and selection
@@ -559,17 +554,33 @@ public class BoardPane extends GridPane {
                 }
             });
 
-            setOnMouseDragEntered((e) -> {
+            // Only this Drag Event Listener works
+            /*setOnMouseDragged((e) -> {
+                System.out.println("A");
+            });*/
+
+            // None of these seem to fire
+            /*
+            setOnDragEntered((e) -> {
                 System.out.println("HUCH");
             });
 
-            setOnMouseDragOver((e) -> {
+            setOnDragOver((e) -> {
                 System.out.println("HUCH");
             });
 
-            setOnMouseDragExited((e) -> {
+            setOnDragExited((e) -> {
                 System.out.println("HUCH");
             });
+
+            setOnMouseDragReleased((e) -> {
+                System.out.println("B");
+            });
+
+            setOnDragDone((e) -> {
+                System.out.println("C");
+            });
+            */
 
             setOnMouseExited((e) -> {
                 if(!e.isPrimaryButtonDown()) {
@@ -577,7 +588,7 @@ public class BoardPane extends GridPane {
                 }
             });
 
-            setOnMouseReleased((e) -> {
+            this.setOnMouseReleased((e) -> {
                 if (selectionPBC != null) {
                     selectionPBC.deselect();
                 }
@@ -693,7 +704,6 @@ public class BoardPane extends GridPane {
          * @param iv the ImageView that is to be displayed
          */
         private void select(ImageView iv) {
-            isPreSelected = false;
             deselect();             // might be unnecessary
             iv.setOpacity(0.75);
             iv.setVisible(true);
