@@ -4,6 +4,7 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -28,7 +29,7 @@ public class BoardPane extends GridPane {
     /**
      * whether moves have to be confirmed separately, rather than immediately played
      */
-    private boolean needsMoveConfirmation = false;
+    private boolean needsMoveConfirmation = true;
 
     /**
      * whether move numbers are shown on the stones
@@ -44,6 +45,7 @@ public class BoardPane extends GridPane {
      * Number of PLAYABLE rows and columns of this board. Does not include the coordinate axes.
      */
     private int size;
+    
     /**
      * pointer to the board of the game.
      */
@@ -59,17 +61,21 @@ public class BoardPane extends GridPane {
      * Absolute path of the graphics pack zip-file
      */
     private String graphicsPath;
+    
     /**
      * Background Image (not to be confused with BackgroundImage) for playable BoardCells
      */
     private Image tile;
+    
     /**
      * Image used for the black and white stones
      */
     private final Image[] stones = new Image [2];
+    
     /**
      * Background Image (not to be confused with BackgroundImage) for the BoardPane's edges
      */
+     
     private Image edge;
     /**
      * Background Image (not to be confused with BackgroundImage) for the BoardPane's corners
@@ -85,6 +91,7 @@ public class BoardPane extends GridPane {
      * NumberBinding for the width and height of all BoardCells
      */
     private NumberBinding MAX_CELL_DIM_INT;
+
 
     /**
      *
@@ -125,6 +132,7 @@ public class BoardPane extends GridPane {
 
         setBoard(this.game.getBoard());
         this.size = board.getSize();
+        this.setPadding(new Insets(7.5,7.5,7.5,5.5));
 
         // determine cell size
         final NumberBinding MAX_CELL_DIM = Bindings.min(
@@ -148,7 +156,7 @@ public class BoardPane extends GridPane {
         add(corner4, size + 1, size + 1);
 
         // populate the coordinate axes
-        for(int i = 0; i < this.size; i++) {
+        for (int i = 0; i < this.size; i++) {
             // top
             BoardCell t = new BoardCell(this.edge);
             t.getLabel().setText("" + (char)('A' + i));
@@ -413,7 +421,6 @@ public class BoardPane extends GridPane {
         return (PlayableBoardCell)getChildren().get(4 + size * 4 + y * size + x);
     }
 
-
     /**
      * Base class for all Cells of the board. Only has a background and label. Use for edges and corners. For the
      * center tiles, use PlayableBoardCell instead.
@@ -642,7 +649,7 @@ public class BoardPane extends GridPane {
          * indicator, call deselect() instead).
          */
         public void unhover() {
-            if(!isSelected) {
+            if (!isSelected) {
                 BLACK_HOVER.setVisible(false);
                 WHITE_HOVER.setVisible(false);
             }
