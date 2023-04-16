@@ -5,12 +5,10 @@ import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.*;
 
@@ -202,18 +200,6 @@ public class BoardPane extends GridPane {
         }
 
         // Set up listeners
-        setOnMouseReleased((e) -> {
-            if(board.getCurColor() == BLACK) {
-                selectionPBC.selectBlack();
-            } else {
-                selectionPBC.selectWhite();
-            }
-
-            if (!needsMoveConfirmation) {
-                confirmMove();
-            }
-        });
-
         setOnKeyPressed((e) -> {
             // TODO: Keyboard input?
         });
@@ -573,19 +559,39 @@ public class BoardPane extends GridPane {
                 }
             });
 
+            setOnMouseDragEntered((e) -> {
+                System.out.println("HUCH");
+            });
+
+            setOnMouseDragOver((e) -> {
+                System.out.println("HUCH");
+            });
+
+            setOnMouseDragExited((e) -> {
+                System.out.println("HUCH");
+            });
+
             setOnMouseExited((e) -> {
-                if(!isPreSelected) {
+                if(!e.isPrimaryButtonDown()) {
                     unhover();
                 }
             });
 
-            setOnMousePressed((e) -> {
-                isPreSelected = true;
-
+            setOnMouseReleased((e) -> {
                 if (selectionPBC != null) {
                     selectionPBC.deselect();
                 }
                 selectionPBC = this;
+
+                if(board.getCurColor() == BLACK) {
+                    selectBlack();
+                } else {
+                    selectWhite();
+                }
+
+                if(!needsMoveConfirmation) {
+                    confirmMove();
+                }
             });
         }
 
