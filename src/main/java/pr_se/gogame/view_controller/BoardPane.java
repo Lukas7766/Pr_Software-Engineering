@@ -202,7 +202,7 @@ public class BoardPane extends GridPane {
         }
 
         // Set up listeners
-        setOnMouseMoved(e -> {                                                   // TODO: Should this be handled by the BoardCells themselves?
+        /*setOnMouseMoved(e -> {                                                   // TODO: Should this be handled by the BoardCells themselves?
             Node target = (Node)e.getTarget();
             if(target != null) {
                 if(target != lastPBC) {                                          // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
@@ -263,7 +263,7 @@ public class BoardPane extends GridPane {
             }
 
 
-        });
+        });*/
 
         setOnKeyPressed((e) -> {
             // TODO: Keyboard input?
@@ -566,6 +566,7 @@ public class BoardPane extends GridPane {
          * whether this PlayableBoardCell is currently selected
          */
         private boolean isSelected = false;
+        private boolean isPreSelected = false;
 
         /**
          * Instance of the global Image of the Black stone; used for hovering and selection
@@ -614,6 +615,44 @@ public class BoardPane extends GridPane {
             this.LABEL.toFront();
 
             setMouseTransparent(false);
+
+            setOnMouseEntered((e) -> {
+                if (board.getCurColor() == BLACK) {
+                    hoverBlack();
+                } else {
+                    hoverWhite();
+                }
+            });
+
+            setOnMouseExited((e) -> {
+                if(!isPreSelected) {
+                    unhover();
+                }
+            });
+
+            setOnMousePressed((e) -> {
+                isPreSelected = true;
+                selectionPBC = this;
+            });
+
+            setOnMouseClicked((e) -> {
+                if(e.getButton() == MouseButton.PRIMARY) { // This check is only for testing independently of the main UI.
+                    if (selectionPBC != null) {
+                        selectionPBC.deselect();
+                    }
+                    selectionPBC = this;
+
+                    if(board.getCurColor() == BLACK) {
+                        selectBlack();
+                    } else {
+                        selectWhite();
+                    }
+
+                    if (!needsMoveConfirmation) {
+                        confirmMove();
+                    }
+                }
+            });
         }
 
         /**
