@@ -74,7 +74,7 @@ public class HeaderPane extends VBox {
         this.stage = stage;
         this.game = game;
 
-        this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.goGame"))
+        this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
                 .collect(Collectors.toCollection(HashSet::new));
 
         this.setSpacing(5);
