@@ -231,7 +231,6 @@ public class BoardPane extends GridPane {
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
                 BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
-
                 destinationBC.unset();
             }
 
@@ -445,8 +444,10 @@ public class BoardPane extends GridPane {
             isSelected = true;
         }
 
+        //TODO: EDIT set functions for buffer
         private void setWhite() {
             set(WHITE_STONE);
+            System.out.println("weißgesetzt");
         }
 
         private void setBlack() {

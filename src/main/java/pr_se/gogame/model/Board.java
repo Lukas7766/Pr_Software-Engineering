@@ -8,6 +8,7 @@ import pr_se.gogame.view_controller.StoneSetEvent;
 
 import static pr_se.gogame.model.StoneColor.*;
 
+import java.nio.file.Path;
 import java.util.*;
 
 /**
@@ -19,6 +20,9 @@ public class Board implements BoardInterface {
     private final LinkedList<GoListener> listeners;
 
     private final StoneGroupPointer[][] board;
+
+    //TODO: Move this elsewere ?
+    private FileSaver fileSaver;
 
     // TODO: Should this be moved to game?
     private int moveNumber;
@@ -35,6 +39,7 @@ public class Board implements BoardInterface {
         listeners = new LinkedList<>();
         this.board = new StoneGroupPointer[SIZE][SIZE];
         moveNumber = 1;
+        this.fileSaver = new FileSaver("Black","White",String.valueOf(size));
     }
 
     @Override
@@ -101,6 +106,8 @@ public class Board implements BoardInterface {
             return;
         }
 
+        String saveCol = color == BLACK ? "B" : "W";
+        fileSaver.addStone(saveCol,x,y);
         // Update UI
         fireStoneSet(x, y, color);
 
@@ -118,7 +125,7 @@ public class Board implements BoardInterface {
     @Override
     public void removeStone(int x, int y) {
         board[x][y] = null;
-
+        fileSaver.removeStone(x,y);
         for(StoneGroup sg : getSurroundingStoneGroups(x, y)) {
             sg.addLiberty(new Position(x, y));
         }
@@ -212,6 +219,14 @@ public class Board implements BoardInterface {
         if(x < SIZE - 1 && board[x + 1][y] == null) liberties.add(new Position(x + 1, y));
 
         return liberties;
+    }
+
+    public boolean saveFile(Path path){
+       return fileSaver.saveFile(path);
+    }
+
+    public boolean importFile(Path path){
+        return FileSaver.importFile(path);
     }
 
     // Getters and Setters
