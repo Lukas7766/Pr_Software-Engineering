@@ -2,57 +2,84 @@ package pr_se.gogame.view_controller;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.*;
+import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.RadioButton;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.Button;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
-import javafx.scene.text.*;
+import javafx.scene.text.Text;
+import javafx.scene.text.TextFlow;
+import javafx.scene.text.TextAlignment;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
+import pr_se.gogame.model.StoneColor;
 
+/**
+ * This class contains the controller and view function of the game information panel.<br>
+ * It is recommended to place the panel on the left or right side of the application.
+ */
 public class SidePane extends StackPane {
 
+    private final int maxCustomBoardSize = 26;
+    private final int minCustomBoardSize = 5;
+    private final int maxKomiAmount = 9;
+    private final int minKomiAmount = 0;
     private final Game game;
+    private final Color backColor;
 
-    public SidePane(Game game) {
+    /**
+     * Constructor to create a SidePane
+     *
+     * @param game instance of actual game -> needed for triggering and observing changes in model
+     */
+    public SidePane(Color backColor, Game game) {
+        this.backColor = backColor;
         this.game = game;
 
-        Rectangle mainBox = new Rectangle();
-        mainBox.setFill(Color.LIGHTGRAY);
+        this.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
+        this.setMinWidth(250);
+        setPadding(new Insets(5, 5, 5, 5)); //top, right, bottom, left
 
-        //mainBox.setHeight(495);
-        mainBox.setWidth(250);
-        mainBox.heightProperty().bind(heightProperty().subtract(10));
-        //mainBox.widthProperty().bind(widthProperty());
-
-        setAlignment(mainBox, Pos.TOP_LEFT);
-        setPadding(new Insets(2.5, 5, 5, 5)); //top, right, bottom, left
-        setMinSize(0, 0);
-
-        this.getChildren().add(mainBox);
 
         GridPane gameSetting = newGame();
         VBox gameInfo = gameInfo();
         this.getChildren().add(gameSetting);
 
         game.addListener(l -> {
-            if(l.getGameCommand() == GameCommand.INIT){
-                if(!this.getChildren().contains(gameSetting)) {
-                    //this.getChildren().add(mainBox);
-                    this.getChildren().add(gameSetting);
-                    this.getChildren().remove(gameInfo);
-                }
-            } else {
-                //this.getChildren().remove(mainBox);
-                this.getChildren().remove(gameSetting);
-                this.getChildren().add(gameInfo);
+            if (l.getGameCommand() != GameCommand.INIT) return;
+            if (!this.getChildren().contains(gameSetting)) {
+                this.getChildren().add(gameSetting);
+                this.getChildren().remove(gameInfo);
             }
         });
 
+        game.addListener(l -> {
+            if (!(l.getGameCommand() == GameCommand.BLACKSTARTS || l.getGameCommand() == GameCommand.WHITSTARTS))
+                return;
+
+            this.getChildren().remove(gameSetting);
+            this.getChildren().add(gameInfo);
+
+        });
     }
 
+    /**
+     * GameInfomations contains a mechanism to show relevant information based on current GameCommand <br>
+     * contains at least: <br>
+     * -> Current Player <br>
+     * -> Turn Explanation <br>
+     *
+     * @return a VBox which contains items to show relevant game info.
+     */
     private VBox gameInfo() {
         VBox infoPane = new VBox();
+        infoPane.setPadding(new Insets(5));
 
         HBox playerInfo = new HBox();
 
@@ -62,57 +89,71 @@ public class SidePane extends StackPane {
         playerInfo.getChildren().add(currentPlayer);
 
         Label actualPlayer = new Label();
-        actualPlayer.setFont(Font.font(null,FontWeight.NORMAL,13));
-        actualPlayer.setText(GameCommand.BLACKsTURN.toString());
+        actualPlayer.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        actualPlayer.setText(game.getBoard().getCurColor() == StoneColor.BLACK ? "Black" : "White");
         playerInfo.getChildren().add(actualPlayer);
 
         infoPane.getChildren().add(playerInfo);
 
-        /*game.addListener(l -> {
-            GameCommand command = l.getGameCommand();
-            if (!(command.equals(GameCommand.BLACKsTURN) || command.equals(GameCommand.WHITEsTURN))) return;
+        game.addListener(l -> {
+            if (!(l.getGameCommand() == GameCommand.BLACKSTARTS || l.getGameCommand() == GameCommand.WHITSTARTS))
+                return;
+            game.getBoard().addListener(new GoListener() {
+                @Override
+                public void stoneSet(StoneSetEvent e) {
+                    actualPlayer.setText((e.getColor() == StoneColor.WHITE) ? "Black" : "White");
+                }
 
-            currentPlayer.setText("Current Player: " + ((command == GameCommand.BLACKsTURN) ? "Black":"White"));
+                @Override
+                public void stoneRemoved(StoneRemovedEvent e) {
 
-        });*/
+                }
+
+                @Override
+                public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
+
+                }
+            });
+        });
 
         Pane spring1 = new Pane();
         spring1.minHeightProperty().bind(currentPlayer.heightProperty());
         infoPane.getChildren().add(spring1);
 
+        //ToDo proper integration postponed to Sprint 2
         Label explanationLabel = new Label();
         explanationLabel.setFont(Font.font(null, FontWeight.BOLD, 13));
         explanationLabel.setText("Turn Explanation:");
         infoPane.getChildren().add(explanationLabel);
 
-
-        //TextArea area = new TextArea();
-        //area.setPrefHeight(250);
-        //area.setPrefWidth(250);
-        //area.setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit,\n sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.");////
-        //infoPane.getChildren().add(area);
-
         ScrollPane textArea = new ScrollPane();
+        textArea.setFitToWidth(true);
+        textArea.prefHeightProperty().bind(infoPane.heightProperty());
+        textArea.setPrefWidth(infoPane.getWidth());
 
         TextFlow textFlow = new TextFlow();
         textFlow.setPadding(new Insets(3));
         textFlow.setTextAlignment(TextAlignment.JUSTIFY);
-        textFlow.setPrefWidth(this.getWidth());
-        textFlow.prefHeightProperty().bind(heightProperty());
 
         Text explanation = new Text();
+        explanation.setFocusTraversable(false);
         explanation.setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.");//
         textFlow.getChildren().add(explanation);
 
         textArea.setContent(textFlow);
-        textArea.setFitToWidth(true);
-
         infoPane.getChildren().add(textArea);
-
 
         return infoPane;
     }
 
+    /**
+     * newGame creates a panel that is a dialog for creating a new game<br>
+     * At least it contains: <br>
+     * -> Board size options <br>
+     * -> Komi spinner <br>
+     *
+     * @return a GridPane which contains items for creating a new game.
+     */
     private GridPane newGame() {
 
         GridPane gridPane = new GridPane();
@@ -157,7 +198,7 @@ public class SidePane extends StackPane {
         gridPane.add(normal, 0, 4);
         gridPane.add(custom, 0, 5);
 
-        Spinner<Integer> customSize = new Spinner<>(9, 25, 9, 1);
+        Spinner<Integer> customSize = new Spinner<>(minCustomBoardSize, maxCustomBoardSize, minCustomBoardSize, 1);
         customSize.setDisable(true);
         customSize.setMaxSize(55, 15);
         SpinnerValueFactory.IntegerSpinnerValueFactory customSizeIntFactory =
@@ -171,14 +212,14 @@ public class SidePane extends StackPane {
             customSize.setDisable(t1.hashCode() != custom.hashCode());
             System.out.println(((RadioButton) t1).getText());
         });
-        //Komi
+        //Handicap //ToDo refactor naming
         Label komi = new Label();
         komi.setFont(Font.font(null, FontWeight.NORMAL, 13));
-        komi.setText("Komi");
+        komi.setText("Handicap");
         komi.setPadding(new Insets(5));
         gridPane.add(komi, 0, 6);
 
-        Spinner<Integer> komiCnt = new Spinner<>(0, 9, 0, 1);
+        Spinner<Integer> komiCnt = new Spinner<>(minKomiAmount, maxKomiAmount, minKomiAmount, 1);
         //customSize.setDisable(true);
         komiCnt.setMaxSize(55, 15);
         SpinnerValueFactory.IntegerSpinnerValueFactory komiIntFactory =

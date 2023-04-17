@@ -1,22 +1,37 @@
 package pr_se.gogame.model;
 
+/**
+ * Model
+ * Indirection layer for StoneGroups in Board; allows for merging Stone Groups with lower time complexity (as only
+ * the pointers have to be redirected)
+ */
 public class StoneGroupPointer {
+    /**
+     * the StoneGroup that this points to
+     */
     private StoneGroup stoneGroup;
 
     // TODO: Remove these debug variables
     private static int nextSerialNo = 0;
     public final int serialNo;
 
+    /**
+     * Creates a StoneGroupPointer pointing to the supplied StoneGroup
+     * @param stoneGroup the Stonegroup this points to
+     */
     public StoneGroupPointer(StoneGroup stoneGroup) {
         if(stoneGroup == null) { // Checking here as well to make stack-traces shorter.
             throw new NullPointerException();
         }
         setStoneGroup(stoneGroup);
         this.stoneGroup.addPointer(this);
+
+        // TODO: Remove this debug code
         serialNo = nextSerialNo;
         nextSerialNo++;
     }
 
+    // Getters and Setters
     public StoneGroup getStoneGroup() {
         return stoneGroup;
     }

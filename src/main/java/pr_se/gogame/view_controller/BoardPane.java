@@ -4,204 +4,218 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.Node;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
-import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.*;
 
+import java.io.InputStream;
+import java.util.Objects;
+import java.util.stream.Stream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
+
+import static pr_se.gogame.model.StoneColor.*;
+
 /**
  * View/Controller
- * Board that uses image files for its tiles and stones
+ * Go Board graphical representation that uses image files for its tiles and stones
  */
 public class BoardPane extends GridPane {
+    /**
+     * whether moves have to be confirmed separately, rather than immediately played
+     */
+    private boolean needsMoveConfirmation = true;
 
-    private boolean needsMoveConfirmation = false;  // whether moves have to be confirmed separately (TODO: might need a better name)
+    /**
+     * whether move numbers are shown on the stones
+     */
     private boolean showsMoveNumbers = true;
+
+    /**
+     * whether coordinates are shown on the sides of the board
+     */
     private boolean showsCoordinates = true;
 
+    /**
+     * Number of PLAYABLE rows and columns of this board. Does not include the coordinate axes.
+     */
     private int size;
+    
+    /**
+     * pointer to the board of the game.
+     */
     private Board board;
 
-    private final Game game;
-    /*
-     * Custom resources
+    /**
+     * the game that is being displayed by this BoardPane
      */
+    private final Game game;
 
-    private final Image[] tiles = new Image [2];
+    // Custom resources
+    /**
+     * Absolute path of the graphics pack zip-file
+     */
+    private String graphicsPath;
+    
+    /**
+     * Background Image (not to be confused with BackgroundImage) for playable BoardCells
+     */
+    private Image tile;
+    
+    /**
+     * Image used for the black and white stones
+     */
     private final Image[] stones = new Image [2];
+    
+    /**
+     * Background Image (not to be confused with BackgroundImage) for the BoardPane's edges
+     */
+     
     private Image edge;
+    /**
+     * Background Image (not to be confused with BackgroundImage) for the BoardPane's corners
+     */
     private Image corner;
 
-    private BoardCell lastBC = null;
-    private BoardCell selectionBC = null;
+    /**
+     * the currently selected PlayableBoardCell
+     */
+    private PlayableBoardCell selectionPBC = null;
 
+    /**
+     * NumberBinding for the width and height of all BoardCells
+     */
     private NumberBinding MAX_CELL_DIM_INT;
 
+    /**
+     *
+     * @param game the game that is to be displayed by this BoardPane
+     * @param graphicsPath the absolute path of the graphics pack zip-file
+     */
+    public BoardPane(Game game, String graphicsPath) {
+        if(game == null || graphicsPath == null) {
+            throw new NullPointerException();
+        }
 
-    // TODO: Maybe move constructor content into an init() method, especially with regards to loading images (as those might be changed during a game).
-    public BoardPane(Game game, String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
+        setMouseTransparent(true);
+
         this.game = game;
-        game.addListener(l -> {
-            if(!(l.getGameCommand().equals(GameCommand.WHITSTARTS) || l.getGameCommand().equals(GameCommand.BLACKSTARTS))) return;
-            System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
+        this.graphicsPath = graphicsPath;
 
-            init(tile0, tile1, edge, corner, stone0, stone1);
+        game.addListener(l -> {
+            switch(l.getGameCommand()) {
+                case CONFIRMCHOICE:
+                    confirmMove();
+                    break;
+                case INIT:
+                    setMouseTransparent(true);
+                    break;
+                case WHITSTARTS:
+                case BLACKSTARTS:
+                    System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
+
+                    setMouseTransparent(false);
+                    init();
+                default: return;
+            }
+
         }); //ToDo: full Event integration
-        init(tile0, tile1, edge, corner, stone0, stone1);
+
+        loadGraphics(graphicsPath);
+        init();
     }
 
-    private void init(String tile0, String tile1, String edge, String corner,  String stone0, String stone1) {
+    /**
+     * (Re-)Initialises this BoardPane for a new game. Called automatically by the constructor. Use this to start
+     * a new game, instead of creating a new BoardPane. This does not reload the graphics pack - use setGraphics()
+     * instead.
+     */
+    private void init() {
         getChildren().removeAll(getChildren());
 
         setBoard(this.game.getBoard());
         this.size = board.getSize();
-
-        // TODO: In the end product, the files would be chosen by the user (and perhaps packaged in an archive)
-        final int DEFAULT_IMAGE_SIZE = 128;
-        final boolean SMOOTH_IMAGES = false;
-
-        tiles[0] = new Image(
-                tile0,              // URL
-                DEFAULT_IMAGE_SIZE, // requestedWidth
-                DEFAULT_IMAGE_SIZE, // requestedHeight
-                true,               // preserveRation
-                SMOOTH_IMAGES,      // smooth
-                true);              // backgroundLoading
-        tiles[1] = new Image(tile1, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
-        this.edge = new Image(edge, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
-        this.corner = new Image(corner, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES, true);
-
-        stones[0] = new Image(
-                stone0,     // URL
-                true);      // backgroundLoading
-        stones[1] = new Image(stone1, true);
-
+        this.setPadding(new Insets(7.5,7.5,7.5,5.5));
 
         // determine cell size
-        final NumberBinding MAX_CELL_WIDTH = widthProperty().divide(size + 2);                                                 // Get maximum width if all cells are equally wide
-        final NumberBinding MAX_CELL_WIDTH_INT = Bindings.createIntegerBinding(MAX_CELL_WIDTH::intValue, MAX_CELL_WIDTH);        // round down
-        final NumberBinding MAX_CELL_HEIGHT = heightProperty().divide(size + 2);                                              // Get maximum height if all cells are equally wide
-        final NumberBinding MAX_CELL_HEIGHT_INT = Bindings.createIntegerBinding(MAX_CELL_HEIGHT::intValue, MAX_CELL_HEIGHT);    // round down
-
-        final NumberBinding MAX_CELL_DIM = Bindings.min(MAX_CELL_WIDTH_INT, MAX_CELL_HEIGHT_INT);                               // Use whatever is smaller after the division
-        MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM);                                 // round down
+        final NumberBinding MAX_CELL_DIM = Bindings.min(
+            widthProperty().divide(size + 2),
+            heightProperty().divide(size + 2)
+        );
+        MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM);                                     // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
-        BoardCell corner1 = new BoardCell(this.corner, false);
+        BoardCell corner1 = new BoardCell(this.corner);
         corner1.getLabel().setVisible(false);
         add(corner1, 0, 0);
-        BoardCell corner2 = new BoardCell(this.corner, false);
+        BoardCell corner2 = new BoardCell(this.corner);
         corner2.getLabel().setVisible(false);
         add(corner2, size + 1, 0);
-        BoardCell corner3 = new BoardCell(this.corner, false);
+        BoardCell corner3 = new BoardCell(this.corner);
         corner3.getLabel().setVisible(false);
         add(corner3, 0, size + 1);
-        BoardCell corner4 = new BoardCell(this.corner, false);
+        BoardCell corner4 = new BoardCell(this.corner);
         corner4.getLabel().setVisible(false);
         add(corner4, size + 1, size + 1);
 
         // populate the coordinate axes
-        for(int i = 0; i < this.size; i++) {
+        for (int i = 0; i < this.size; i++) {
             // top
-            BoardCell t = new BoardCell(this.edge, false);
+            BoardCell t = new BoardCell(this.edge);
             t.getLabel().setText("" + (char)('A' + i));
             t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
             add(t, i + 1, 0);
 
             // bottom
-            BoardCell b = new BoardCell(this.edge, false);
+            BoardCell b = new BoardCell(this.edge);
             b.getLabel().setText("" + (char)('A' + i));
             b.getLabel().setAlignment(Pos.TOP_CENTER);
             add(b, i + 1, size + 1);
 
             // left
-            BoardCell l = new BoardCell(this.edge, false);
+            BoardCell l = new BoardCell(this.edge);
             l.getLabel().setText("" + (size - i));
             l.getLabel().setAlignment(Pos.CENTER_RIGHT);
             add(l, 0, i + 1);
 
             // right
-            BoardCell r = new BoardCell(this.edge, false);
+            BoardCell r = new BoardCell(this.edge);
             r.getLabel().setText("" + (size - i));
             r.getLabel().setAlignment(Pos.CENTER_LEFT);
             add(r, size + 1, i + 1);
         }
 
-        // Fill the grid with alternating tiles
+        // Fill the grid with tiles
         for(int i = 0; i < this.size; i++) {
             for(int j = 0; j < this.size; j++) {
-                BoardCell bc = new BoardCell(tiles[(j % 2 + i % 2) % 2], true);
+                PlayableBoardCell bc = new PlayableBoardCell();
+                /*
+                 * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
+                 * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
+                 */
+                StoneColor c = this.board.getColorAt(j, i);
+                if(c != null) {
+                    if(c == BLACK) {
+                        bc.setBlack();
+                    } else {
+                        bc.setWhite();
+                    }
+                    bc.getLabel().setVisible(false);
+                }
                 add(bc, j + 1, i + 1);
             }
         }
 
         // Set up listeners
-        setOnMouseMoved(e -> {                                                  // TODO: Should this be handled by the BoardCells themselves?
-            Node target = (Node)e.getTarget();
-            if(target != null) {
-                if(target != lastBC) {                                          // TODO: This seems to fire a bit too readily, making the program run less efficiently. I am not sure why, though.
-                    Integer col = getColumnIndex(target);
-                    Integer row = getRowIndex(target);
-
-                    if (col != null && row != null) {
-                        BoardCell targetBC = (BoardCell)target;
-                        // printDebugInfo();                                     // TODO: Remove in finished product
-
-                        if (this.board.getCurColor() == StoneColor.BLACK) {
-                            targetBC.hoverBlack();
-                        } else {
-                            targetBC.hoverWhite();
-                        }
-
-                        // Remove old hover
-                        if(lastBC != null) {
-                            lastBC.unhover();
-                        }
-                        lastBC = targetBC;
-                    } else if(lastBC != null) {
-                        lastBC.unhover();
-                        //System.out.println("Hover target is not a cell!");  // TODO: Remove in finished product
-                        lastBC = null;
-                    }
-                }
-            } else {
-                //System.out.println("Hover target is null!");                // TODO: Remove in finished product
-                lastBC = null;
-            }
-        });
-
-        setOnMouseClicked(e -> {
-            if(e.getButton() == MouseButton.PRIMARY) { // This check is only for testing independently of the main UI.
-                if (lastBC != null) {
-                    if (selectionBC != null) {
-                        selectionBC.deselect();
-                    }
-                    selectionBC = lastBC;
-                    if(board.getCurColor() == StoneColor.BLACK) {
-                        selectionBC.selectBlack();
-                    } else {
-                        selectionBC.selectWhite();
-                    }
-
-                    lastBC = null;
-
-                    if (!needsMoveConfirmation) {
-                        confirmMove();
-                    }
-                } else {
-                    System.out.println("Click outside of BoardPane"); // TODO: Remove in finished product
-                }
-            } else if(e.getButton() == MouseButton.SECONDARY && needsMoveConfirmation) { // Only for testing purposes
-                confirmMove();
-            }
-
-
-        });
+        // If this is active, dragging from within this BoardPane but outside the actual playble board works (might be desirable)
+        /*setOnDragDetected((e) -> {
+            startFullDrag();
+        });*/
 
         setOnKeyPressed((e) -> {
             // TODO: Keyboard input?
@@ -212,16 +226,24 @@ public class BoardPane extends GridPane {
         setAlignment(Pos.CENTER);
     }
 
+    /**
+     * Sets the board that this BoardPane is listening to, as well as adding listeners to it in the first place.
+     * @param board the board that this BoardPane is listening to
+     */
     public void setBoard(Board board) {
         this.board = board;
 
         board.addListener(new GoListener() {
             @Override
             public void stoneSet(StoneSetEvent e) {
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
+                if(e == null) {
+                    throw new NullPointerException();
+                }
+
+                PlayableBoardCell destinationBC = getPlayableCell(e.getCol(), e.getRow());
                 destinationBC.getLabel().setText("" + e.getMoveNumber());
 
-                if(e.getColor() == StoneColor.BLACK) {
+                if(e.getColor() == BLACK) {
                     destinationBC.setBlack();
                 } else {
                     destinationBC.setWhite();
@@ -230,45 +252,40 @@ public class BoardPane extends GridPane {
 
             @Override
             public void stoneRemoved(StoneRemovedEvent e) {
-                BoardCell destinationBC = (BoardCell)getChildren().get(e.getRow() * size + e.getCol() + 4 + size * 4);
-                destinationBC.unset();
+                if(e == null) {
+                    throw new NullPointerException();
+                }
+
+                getPlayableCell(e.getCol(), e.getRow()).unset();
             }
 
             @Override
             public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-                BoardCell destinationBC = (BoardCell) getChildren().get(y * size + x + 4 + size * 4);
-                destinationBC.getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
+                getPlayableCell(x, y).getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
         });
     }
 
-    // TODO: Call this from the main UI if moves are to be confirmed.
-    // TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse might be on the board during confirmation)
-    // TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether this is really the responsibility of the view.
+    /*
+     * TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse
+     *  might be on the board during confirmation)
+     * TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether
+     *  this is really the responsibility of the view.
+     */
+    /**
+     * If moves are to be confirmed, calling this method confirms a move on the currently selected PlayableBoardCell,
+     * calling the board's setStone() method.
+     */
     public void confirmMove() {
-        if(selectionBC != null) {
-            int col = getColumnIndex(selectionBC) - 1;
-            int row = getRowIndex(selectionBC) - 1;
-            if(col >= 0 && row >= 0) { // Remember to account for the inclusion of labels in the grid, which could potentially be at either end.
-                board.setStone(col, row, board.getCurColor());
+        if(selectionPBC != null) {
+            int col = getColumnIndex(selectionPBC) - 1;
+            int row = getRowIndex(selectionPBC) - 1;
+            if(col >= 0 && row >= 0) {
+                board.setStone(col, row, board.getCurColor(), false);
             } else {
-                System.out.println("Confirmation outside of actual board on " + lastBC); // TODO: Remove in finished product
+                System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
             }
         }
-    }
-
-    // TODO: Remove in finished product
-    public void printDebugInfo() {
-        BoardCell targetBC = (BoardCell)getChildren().get(4 + size * 4);
-        //this.board.printDebugInfo(col, row);
-        System.out.println("width/height: " + getWidth() + "/" + getHeight());
-        //System.out.println("prefWidth/prefHeight: " + getPrefWidth() + "/" + getPrefHeight());
-        //System.out.println("MinWidth/Height: " + getMinWidth() + "/" + getMinHeight());
-        System.out.println("BoardCell size: " + targetBC.getWidth() + "/" + targetBC.getHeight());
-        //System.out.println("Cell bounds in local: " + targetBC.getBoundsInLocal());
-        System.out.println("Cell bounds in parent: " + targetBC.getBoundsInParent());
-
-        //System.out.println("Hover over " + col + " " + row);
     }
 
     // Getters and Setters
@@ -286,6 +303,12 @@ public class BoardPane extends GridPane {
 
     public void setShowsMoveNumbers(boolean showsMoveNumbers) {
         this.showsMoveNumbers = showsMoveNumbers;
+
+        for(int i = 0; i < size; i++) {
+            for(int j = 0; j < size; j++) {
+                getPlayableCell(j, i).showMoveNumber();
+            }
+        }
     }
 
     public boolean showsCoordinates() {
@@ -294,6 +317,38 @@ public class BoardPane extends GridPane {
 
     public void setShowsCoordinates(boolean showsCoordinates) {
         this.showsCoordinates = showsCoordinates;
+
+        for(int i = 0; i < size * 4; i++) {
+            BoardCell bc = (BoardCell)getChildren().get(4 + i);
+            bc.getLabel().setVisible(this.showsCoordinates);
+        }
+    }
+
+    public void setGraphicsPath(String graphicsPath) {
+        if(graphicsPath == null) {
+            throw new NullPointerException();
+        }
+
+        this.graphicsPath = graphicsPath;
+
+        loadGraphics(graphicsPath);
+
+        for(int i = 0; i < 4; i++) {
+            BoardCell bc = (BoardCell)getChildren().get(i);
+            bc.setBackgroundImage(corner);
+        }
+
+        for(int i = 0; i < size; i++) {
+            // edges
+            for(int j = 0; j < 4; j++) {
+                BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
+                bc.setBackgroundImage(edge);
+            }
+            // center
+            for(int j = 0; j < size; j++) {
+                getPlayableCell(j, i).updateImages();
+            }
+        }
     }
 
     public int getSize() {
@@ -304,8 +359,8 @@ public class BoardPane extends GridPane {
         return board;
     }
 
-    public Image[] getTiles() {
-        return tiles;
+    public Image getTile() {
+        return tile;
     }
 
     public Image[] getStones() {
@@ -320,58 +375,78 @@ public class BoardPane extends GridPane {
         return corner;
     }
 
-    private class BoardCell extends StackPane {
-        private final ResizableImageView BLACK_HOVER;
-        private final ResizableImageView WHITE_HOVER;
-        private final ResizableImageView BLACK_STONE;
-        private final ResizableImageView WHITE_STONE;
-        private final Label LABEL;
+    // private methods
+    /**
+     * loads the image files from the specified graphics pack into memory
+     * @param graphicsPath the absolute path of the graphics pack to be loaded
+     */
+    private void loadGraphics(String graphicsPath) {
+        try (ZipFile zip = new ZipFile(graphicsPath)) {
+            ZipEntry tileEntry = zip.getEntry("tile.png");
+            ZipEntry cornerEntry = zip.getEntry("corner.png");
+            ZipEntry edgeEntry = zip.getEntry("edge.png");
+            ZipEntry stone0Entry = zip.getEntry("stone_0.png");
+            ZipEntry stone1Entry = zip.getEntry("stone_1.png");
 
-        private final boolean isPlayable;               // TODO: Should probably be implemented using inheritance, shouldn't it?
-        private boolean isSelected = false;
-        private boolean isSet = false;
-
-        private BoardCell(Image tile, boolean isPlayable) {
-            this.isPlayable = isPlayable;
-
-            this.setMinSize(0, 0);
-
-            BackgroundSize bgSz = new BackgroundSize(
-                    100,     // width
-                    100,        // height
-                    true,       // widthAsPercentage
-                    true,       // heightAsPercentage
-                    false,      // contain
-                    true);      // cover
-            BackgroundImage bgImg = new BackgroundImage(tile, BackgroundRepeat.NO_REPEAT, BackgroundRepeat.NO_REPEAT, BackgroundPosition.CENTER, bgSz);
-            this.setBackground(new Background(bgImg));
-
-            //if(isPlayable) {
-                this.BLACK_HOVER = getCellImageView(stones[0]);
-                getChildren().add(this.BLACK_HOVER);
-
-                this.WHITE_HOVER = getCellImageView(stones[1]);
-                getChildren().add(this.WHITE_HOVER);
-
-                this.BLACK_STONE = getCellImageView(stones[0]);
-                getChildren().add(this.BLACK_STONE);
-
-                this.WHITE_STONE = getCellImageView(stones[1]);
-                getChildren().add(this.WHITE_STONE);
-            /*} else {
-                this.BLACK_HOVER = null;
-                this.WHITE_HOVER = null;
-                this.BLACK_STONE = null;
-                this.WHITE_STONE = null;
-            }*/
-
-            this.LABEL = new Label("0");
-            if(isPlayable) {
-                this.LABEL.setVisible(false);
+            if(Stream.of(tileEntry, cornerEntry, edgeEntry, stone0Entry, stone1Entry).anyMatch(Objects::isNull)) {
+                throw new IllegalStateException("ERROR: Graphics pack " + graphicsPath + " is missing files!");
             }
+
+            try (InputStream tileIS = zip.getInputStream(tileEntry);
+                 InputStream cornerIS = zip.getInputStream(cornerEntry);
+                 InputStream edgeIS = zip.getInputStream(edgeEntry);
+                 InputStream stone0IS = zip.getInputStream(stone0Entry);
+                 InputStream stone1IS = zip.getInputStream(stone1Entry)
+            ) {
+                final int DEFAULT_IMAGE_SIZE = 128;
+                final boolean SMOOTH_IMAGES = false;
+
+                tile = new Image(
+                        tileIS,             // is (:InputStream)
+                        DEFAULT_IMAGE_SIZE, // requestedWidth
+                        DEFAULT_IMAGE_SIZE, // requestedHeight
+                        true,               // preserveRation
+                        SMOOTH_IMAGES);     // smooth
+                this.edge = new Image(edgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.corner = new Image(cornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+
+                stones[0] = new Image(stone0IS);
+                stones[1] = new Image(stone1IS);
+            } catch (Exception e) {
+                System.err.println("ERROR: Couldn't read file from graphics pack " + graphicsPath + "!");
+                e.printStackTrace();
+            }
+        } catch (Exception e) {
+            System.err.println("ERROR: Couldn't open graphics pack " + graphicsPath + "!");
+            e.printStackTrace();
+        }
+    }
+
+    private PlayableBoardCell getPlayableCell(int x, int y) {
+        if(x < 0 || x >= size || y < 0 || y >= size) {
+            throw new IllegalArgumentException();
+        }
+        return (PlayableBoardCell)getChildren().get(4 + size * 4 + y * size + x);
+    }
+
+    /**
+     * Base class for all Cells of the board. Only has a background and label. Use for edges and corners. For the
+     * center tiles, use PlayableBoardCell instead.
+     */
+    private class BoardCell extends StackPane {
+        /**
+         * the Label to be displayed by this BoardCell
+         */
+        protected final Label LABEL;
+
+        /**
+         * Creates a new BoardCell with the specified background Image, as well as a visible label
+         * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
+         */
+        private BoardCell(Image tile) {
+            this.LABEL = new Label("0");
             this.LABEL.setMinSize(0, 0);
             this.LABEL.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
-            this.LABEL.setAlignment(Pos.CENTER);
 
             final DoubleProperty FONT_SIZE = new SimpleDoubleProperty(0);
             FONT_SIZE.bind(this.LABEL.widthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty())));
@@ -379,14 +454,310 @@ public class BoardPane extends GridPane {
 
             getChildren().add(this.LABEL);
 
+            setBackgroundImage(tile);
+
+            this.setMinSize(0, 0);
             prefWidthProperty().bind(MAX_CELL_DIM_INT);
             prefHeightProperty().bind(MAX_CELL_DIM_INT);
+            setMouseTransparent(true);
+        }
 
-            if(!isPlayable) {
-                setMouseTransparent(true);
+        /**
+         * Properly sets up the background image for this BoardCell. Call this for each BoardCell after changing
+         * the graphics pack (PlayableBoardCells call this automatically in their updateImages() method)
+         * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
+         */
+        public void setBackgroundImage(Image tile) {
+            BackgroundSize bgSz = new BackgroundSize(
+                100,     // width
+                100,        // height
+                true,       // widthAsPercentage
+                true,       // heightAsPercentage
+                false,      // contain
+                true        // cover
+            );
+            BackgroundImage bgImg = new BackgroundImage(
+                tile,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundRepeat.NO_REPEAT,
+                BackgroundPosition.CENTER,
+                bgSz
+            );
+            this.setBackground(new Background(bgImg));
+            updateLabelColor();
+        }
+
+        /**
+         * Sets the text color of this BoardCell's label to the inverse of its background tile's center color
+         */
+        private void updateLabelColor() {
+            Image bgImg = getBackground().getImages().get(0).getImage();
+
+            PixelReader p = bgImg.getPixelReader();
+            if(p == null) {
+                throw new NullPointerException("Can't get tile background color");
+            }
+            LABEL.setTextFill(
+                p.getColor((int)(bgImg.getWidth() / 2), (int)(bgImg.getHeight() / 2)).invert()
+            );
+        }
+
+        // Getters
+        public Label getLabel() {
+            return LABEL;
+        }
+    } // private class BoardCell
+
+    /**
+     * Class for all PLAYABLE Cells of the board. Has Images for the black and white stones and hovers.
+     */
+    private class PlayableBoardCell extends BoardCell {
+
+        /**
+         * whether this PlayableBoardCell is currently selected
+         */
+        private boolean isSelected = false;
+
+        /**
+         * Instance of the global Image of the Black stone; used for hovering and selection
+         */
+        private final ResizableImageView BLACK_HOVER;
+        /**
+         * Instance of the global Image of the white stone; used for hovering and selection
+         */
+        private final ResizableImageView WHITE_HOVER;
+        /**
+         * Instance of the global Image of the Black stone, used for setting
+         */
+        private final ResizableImageView BLACK_STONE;
+        /**
+         * Instance of the global Image of the Black stone, used for setting
+         */
+        private final ResizableImageView WHITE_STONE;
+        /**
+         * Pointer to the ImageView of the currently set stone, if any
+         */
+        private ResizableImageView CURRENTLY_SET_STONE;
+
+        /**
+         * Creates a new PlayableBoardCell with the specified background Image, images for the black and white
+         * stones and hovers, as well as an invisible label
+         */
+        private PlayableBoardCell() {
+            super(tile);
+
+            this.BLACK_HOVER = getCellImageView(stones[0]);
+            getChildren().add(this.BLACK_HOVER);
+
+            this.WHITE_HOVER = getCellImageView(stones[1]);
+            getChildren().add(this.WHITE_HOVER);
+
+            this.BLACK_STONE = getCellImageView(stones[0]);
+            getChildren().add(this.BLACK_STONE);
+
+            this.WHITE_STONE = getCellImageView(stones[1]);
+            getChildren().add(this.WHITE_STONE);
+
+            this.CURRENTLY_SET_STONE = null;
+
+            this.LABEL.setVisible(false);
+            this.LABEL.setAlignment(Pos.CENTER);
+            this.LABEL.toFront();
+
+            setMouseTransparent(false);
+
+            // Set up listeners
+            // If this is enabled, dragging from outside the actual playable board doesn't work (might be desirable)
+            /*setOnDragDetected((e) -> {
+                startFullDrag();
+            });*/
+
+            setOnMouseEntered((e) -> {
+                if (board.getCurColor() == BLACK) {
+                    hoverBlack();
+                } else {
+                    hoverWhite();
+                }
+            });
+
+            setOnMouseDragEntered(getOnMouseEntered());
+
+            setOnMouseExited((e) -> {
+                unhover();
+            });
+
+            setOnMouseDragExited(getOnMouseExited());
+
+            setOnMouseClicked((e) -> {
+                if (selectionPBC != null) {
+                    selectionPBC.deselect();
+                }
+                selectionPBC = this;
+
+                if(board.getCurColor() == BLACK) {
+                    selectBlack();
+                } else {
+                    selectWhite();
+                }
+
+                if(!needsMoveConfirmation) {
+                    confirmMove();
+                }
+            });
+
+            setOnMouseDragReleased(getOnMouseClicked());
+        }
+
+        /**
+         * Changes all Images used by this PlayableBoardCell to the current global Images from the graphics pack.
+         * Call this for each PlayableBoardCell after loading a different graphics pack
+         */
+        public void updateImages() {
+            setBackgroundImage(tile);
+            if(CURRENTLY_SET_STONE != null) {
+                if(CURRENTLY_SET_STONE == BLACK_STONE) {
+                    CURRENTLY_SET_STONE.setImage(stones[0]);
+                } else {
+                    CURRENTLY_SET_STONE.setImage(stones[1]);
+                }
+                updateLabelColor();
+            }
+            BLACK_STONE.setImage(stones[0]);
+            BLACK_HOVER.setImage(stones[0]);
+            WHITE_STONE.setImage(stones[1]);
+            WHITE_HOVER.setImage(stones[1]);
+        }
+
+        /**
+         * Updates the showing of the move number (i.e., the label) according to its own set status and the global
+         * BoardPane's showsMoveNumbers attributes
+         */
+        public void showMoveNumber() {
+            LABEL.setVisible(CURRENTLY_SET_STONE != null && showsMoveNumbers);
+        }
+
+        /**
+         * Makes this PlayableBoardCell display a translucent version of the white stone to indicate that it is being
+         * hovered over and can be selected with a left click
+         */
+        public void hoverWhite() {
+            hover(WHITE_HOVER);
+        }
+
+        /**
+         * Makes this PlayableBoardCell display a translucent version of the black stone to indicate that it is being
+         * hovered over and can be selected with a left click
+         */
+        public void hoverBlack() {
+            hover(BLACK_HOVER);
+        }
+
+        /**
+         * Removes all hover indicators on this PlayableBoardCell, unless it is selected (to remove a selection
+         * indicator, call deselect() instead).
+         */
+        public void unhover() {
+            if (!isSelected) {
+                BLACK_HOVER.setVisible(false);
+                WHITE_HOVER.setVisible(false);
             }
         }
 
+        /**
+         * Makes this PlayableBoardCell display a translucent version of the provided ImageView to indicate that it is
+         * being hovered over and can be selected with a left click
+         * @param iv the ImageView to be displayed
+         */
+        private void hover(ImageView iv) {
+            unhover();              // might be unnecessary
+            if(CURRENTLY_SET_STONE == null && !isSelected) {
+                iv.setOpacity(0.5);
+                iv.setVisible(true);
+            }
+        }
+
+        /**
+         * Makes this PlayableBoardCell display a translucent but slightly more opaque than just hovered version of the
+         * white stone to indicate that it is currently selected.
+         */
+        public void selectWhite() {
+            select(WHITE_HOVER);
+        }
+
+        /**
+         * Makes this PlayableBoardCell display a translucent but slightly more opaque than just hovered version of the
+         * black stone to indicate that it is currently selected.
+         */
+        public void selectBlack() {
+            select(BLACK_HOVER);
+        }
+
+        /**
+         * Removes all selection indicators on this PlayableBoardCell.
+         */
+        public void deselect() {
+            isSelected = false;
+            unhover();
+        }
+
+        /**
+         * Makes this PlayableBoardCell display a translucent but slightly more opaque than just hovered version of the
+         * provided ImageView to indicate that it is currently selected.
+         * @param iv the ImageView that is to be displayed
+         */
+        private void select(ImageView iv) {
+            deselect();             // might be unnecessary
+            iv.setOpacity(0.75);
+            iv.setVisible(true);
+            isSelected = true;
+        }
+
+
+        /**
+         * Makes this PlayableBoardCell display an opaque white stone to indicate that one has been set.
+         */
+        private void setWhite() {
+            set(WHITE_STONE);
+            System.out.println("weißgesetzt");
+        }
+
+        /**
+         * Makes this PlayableBoardCell display an opaque black stone to indicate that one has been set.
+         */
+        private void setBlack() {
+            set(BLACK_STONE);
+        }
+
+        /**
+         * Removes all set AND all selection indicators on this PlayableBoardCell.
+         */
+        public void unset() {
+            deselect();
+            BLACK_STONE.setVisible(false);
+            WHITE_STONE.setVisible(false);
+            LABEL.setVisible(false);
+            CURRENTLY_SET_STONE = null;
+        }
+
+        /**
+         * Makes this PlayableBoardCell display an opaque provided ImageView to indicate that a stone has been set.
+         * @param iv the ImageView to be displayed
+         */
+        private void set(ResizableImageView iv) {
+            deselect();
+            iv.setVisible(true);
+            CURRENTLY_SET_STONE = iv;
+            if(showsMoveNumbers) {
+                updateLabelColor();
+                LABEL.setVisible(true);
+            }
+        }
+
+        /**
+         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
+         * @param i the image to be instantiated
+         * @return a properly instantiated instance of the provided Image
+         */
         private ResizableImageView getCellImageView(Image i) {
             if(i == null) {
                 throw new NullPointerException();
@@ -401,104 +772,20 @@ public class BoardPane extends GridPane {
             return iv;
         }
 
-        public void hoverWhite() {
-            hover(WHITE_HOVER);
-        }
-
-        public void hoverBlack() {
-            hover(BLACK_HOVER);
-        }
-
-        public void unhover() {
-            if(!isSelected) {
-                BLACK_HOVER.setVisible(false);
-                WHITE_HOVER.setVisible(false);
-            }
-        }
-
-        private void hover(ImageView iv) {
-            unhover();              // might be unnecessary
-            if(!isSet && !isSelected) {
-                iv.setOpacity(0.5);
-                iv.setVisible(true);
-            }
-        }
-
-        public void selectWhite() {
-            select(WHITE_HOVER);
-        }
-
-        public void selectBlack() {
-            select(BLACK_HOVER);
-        }
-
-        public void deselect() {
-            isSelected = false;
-            unhover();
-        }
-
-        private void select(ImageView iv) {
-            deselect();             // might be unnecessary
-            iv.setOpacity(0.75);
-            iv.setVisible(true);
-            isSelected = true;
-        }
-
-        //TODO: EDIT set functions for buffer
-        private void setWhite() {
-            set(WHITE_STONE);
-            System.out.println("weißgesetzt");
-        }
-
-        private void setBlack() {
-            set(BLACK_STONE);
-        }
-
-        public void unset() {
-            deselect();
-            BLACK_STONE.setVisible(false);
-            WHITE_STONE.setVisible(false);
-            LABEL.setVisible(false);
-            isSet = false;
-        }
-
-        private void set(ImageView iv) {
-            deselect();
-            iv.setVisible(true);
-            if(showsMoveNumbers) {
-                PixelReader p = iv.getImage().getPixelReader();
+        /**
+         * Sets the text color of this PlayableBoardCell's label to the inverse of the center color of the stone that
+         * is currently set.
+         */
+        private void updateLabelColor() {
+            if(CURRENTLY_SET_STONE != null) {
+                PixelReader p = CURRENTLY_SET_STONE.getImage().getPixelReader();
                 if(p == null) {
                     throw new NullPointerException("Can't get stone color");
                 }
-                this.LABEL.setTextFill(p.getColor((int)(iv.getImage().getWidth() / 2), (int)(iv.getImage().getHeight() / 2)).invert());
-                this.LABEL.setVisible(true);
+                LABEL.setTextFill(p.getColor((int)(CURRENTLY_SET_STONE.getImage().getWidth() / 2), (int)(CURRENTLY_SET_STONE.getImage().getHeight() / 2)).invert());
+            } else {
+                super.updateLabelColor();
             }
-            isSet = true;
         }
-
-        // Getters
-        public boolean isPlayable() {
-            return isPlayable;
-        }
-
-        public ImageView getBlackHover() {
-            return BLACK_HOVER;
-        }
-
-        public ImageView getWhiteHover() {
-            return WHITE_HOVER;
-        }
-
-        public ImageView getBlackStone() {
-            return BLACK_STONE;
-        }
-
-        public ImageView getWhiteStone() {
-            return WHITE_STONE;
-        }
-
-        public Label getLabel() {
-            return LABEL;
-        }
-    } // private class BoardCell
+    } // private class PlayableBoardCell extends BoardCell
 }
