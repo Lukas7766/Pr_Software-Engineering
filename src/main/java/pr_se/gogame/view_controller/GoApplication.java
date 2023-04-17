@@ -35,8 +35,8 @@ public class GoApplication extends Application {
 
         // TODO: In the end product, the archive could be chosen by the user (though a default should still be set) and changed at runtime
         final String path = "src/main/resources/pr_se/gogame/";
-        BoardPane bp = new BoardPane(game, path+"default.zip");
-        bp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(5), new Insets(5, 5, 5, 2.5))));
+        BoardPane bp = new BoardPane(game, path+"debug.zip");
+        // bp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(5), null/*new Insets(5, 5, 5, 2.5)*/)));
 
         Button changeGFX = new Button("Change graphics set");
         changeGFX.setOnAction((e) -> bp.setGraphicsPath(path + "inverted.zip"));

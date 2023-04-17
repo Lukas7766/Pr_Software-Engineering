@@ -140,14 +140,14 @@ public class BoardPane extends GridPane {
 
         setBoard(this.game.getBoard());
         this.size = board.getSize();
-        this.setPadding(new Insets(7.5,7.5,7.5,5.5));
+        // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); No, don't to that, it breaks the cells' aspect ratio (even equal insets on all four sides will)
 
         // determine cell size
         final NumberBinding MAX_CELL_DIM = Bindings.min(
             widthProperty().divide(size + 2),
             heightProperty().divide(size + 2)
         );
-        MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM);                                     // round down
+        MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM); // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
         BoardCell corner1 = new BoardCell(this.corner);
