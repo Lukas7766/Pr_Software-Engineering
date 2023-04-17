@@ -3,6 +3,7 @@ package pr_se.gogame.model;
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +15,9 @@ public class Game implements GameInterface {
     private int size = 19;
     private int komi = 0;
     private Board board;
+
+
+
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -45,14 +49,14 @@ public class Game implements GameInterface {
 
     @Override
     public boolean importGame(Path path) {
-        System.out.println(path);
-        return true;
+        //TODO: Das board überchreiben od nd
+        return FileSaver.importFile(path);
     }
 
     @Override
     public boolean exportGame(Path path) {
-        System.out.println(path);
-        return true;
+        System.out.println("saved a file");
+        return board.saveFile(path);
     }
 
     @Override
@@ -122,5 +126,4 @@ public class Game implements GameInterface {
             l.gameCommand(e);
         }
     }
-
 }

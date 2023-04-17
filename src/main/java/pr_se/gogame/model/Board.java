@@ -10,8 +10,11 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import static pr_se.gogame.model.StoneColor.BLACK;
-import static pr_se.gogame.model.StoneColor.WHITE;
+import static pr_se.gogame.model.StoneColor.*;
+
+import java.nio.file.Path;
+import java.util.*;
+
 
 /**
  * Model
@@ -35,8 +38,13 @@ public class Board implements BoardInterface {
      */
     private final StoneGroupPointer[][] board;
 
-    // TODO: Likely to be removed (or definitely moved to game).
+    //TODO: Move this elsewere ?
+    private FileSaver fileSaver;
+
+    // TODO: Should this be moved to game?
     private int moveNumber;
+
+    // Likely to be removed (or definitely moved to game).
     private StoneColor curColor = BLACK;
 
     private int lastDebugX = 0;
@@ -54,6 +62,7 @@ public class Board implements BoardInterface {
         listeners = new LinkedList<>();
         this.board = new StoneGroupPointer[SIZE][SIZE];
         moveNumber = 1;
+        this.fileSaver = new FileSaver("Black","White",String.valueOf(SIZE));
 
         int komi = game.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
 
@@ -116,39 +125,39 @@ public class Board implements BoardInterface {
     @Override
     public void setStone(int x, int y, StoneColor color, boolean prepareMode) {
         // Are the coordinates invalid?
-        if(x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
+        if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();
         }
 
         // Is the space already occupied?
-        if(board[x][y] != null) {
+        if (board[x][y] != null) {
             return; // TODO: throw a custom exception?
         }
 
         // Get neighbors at these x and y coordinates
         Set<StoneGroup> surroundingSGs = getSurroundings(
-            x,
-            y,
-            (sgp) -> sgp != null,
-            (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+                x,
+                y,
+                (sgp) -> sgp != null,
+                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
         // Get liberties at these x and y coordinates
         Set<Position> newStoneLiberties = getSurroundings(
-            x,
-            y,
-            (sgp) -> sgp == null,
-            (neighborX, neighborY) -> new Position(neighborX, neighborY)
+                x,
+                y,
+                (sgp) -> sgp == null,
+                (neighborX, neighborY) -> new Position(neighborX, neighborY)
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
         StoneGroup firstSameColorGroup = null;
 
-        for(StoneGroup sg : surroundingSGs) {
-            if(sg != null) {
+        for (StoneGroup sg : surroundingSGs) {
+            if (sg != null) {
                 sg.removeLiberty(new Position(x, y));
-                if(sg.getStoneColor() == color) {
-                    if(firstSameColorGroup != null) {
+                if (sg.getStoneColor() == color) {
+                    if (firstSameColorGroup != null) {
                         firstSameColorGroup.mergeWithStoneGroup(sg);
                     } else {
                         sg.mergeWithStoneGroup(newGroup);
@@ -158,14 +167,14 @@ public class Board implements BoardInterface {
             }
         }
 
-        if(firstSameColorGroup == null) {
+        if (firstSameColorGroup == null) {
             firstSameColorGroup = newGroup;
             surroundingSGs.add(newGroup);
         }
         board[x][y] =
-            firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
+                firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
 
-        if(!prepareMode) {
+        if (!prepareMode) {
             for (StoneGroup sg : surroundingSGs) {
                 if ((sg.getStoneColor() != color || sg == firstSameColorGroup) && sg.getLiberties().size() == 0) {
                     for (Position p : sg.getLocations()) {
@@ -180,13 +189,21 @@ public class Board implements BoardInterface {
                 // return;
             }
 
+            if (board[x][y] == null) {
+                System.out.println("SUICIDE DETECTED!!!");
+                //return;
+            }
+
+            String saveCol = color == BLACK ? "B" : "W";
+            fileSaver.addStone(saveCol, x, y);
             // Update UI
             fireStoneSet(x, y, color);
+
             moveNumber++;
 
             // Update current player color
             // TODO: Remove and delegate to Game
-            if(color == WHITE) {
+            if (color == WHITE) {
                 curColor = BLACK;
             } else {
                 curColor = WHITE;
@@ -197,6 +214,7 @@ public class Board implements BoardInterface {
     @Override
     public void removeStone(int x, int y) {
         board[x][y] = null;
+        fileSaver.removeStone(x,y);
 
         Set<StoneGroup> surroundingSGs = getSurroundings(
                 x,
@@ -292,6 +310,14 @@ public class Board implements BoardInterface {
         }
 
         return surroundings;
+    }
+
+    public boolean saveFile(Path path){
+       return fileSaver.saveFile(path);
+    }
+
+    public boolean importFile(Path path){
+        return FileSaver.importFile(path);
     }
 
     // Getters and Setters
