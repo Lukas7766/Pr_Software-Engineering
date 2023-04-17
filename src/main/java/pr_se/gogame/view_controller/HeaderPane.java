@@ -387,6 +387,7 @@ public class HeaderPane extends VBox {
      */
     private void onCloseAction() { //ToDo exceeding competence -> onCloseAction
         onCloseAction(null);
+
     }
 
     /**
@@ -399,7 +400,10 @@ public class HeaderPane extends VBox {
      */
     private void onCloseAction(Event e) {
 
-        if (game.getGameState() == GameCommand.INIT) return;
+        if (game.getGameState() == GameCommand.INIT) {
+            Platform.exit();
+            System.exit(0);
+        }
         System.out.println(game.getGameState());
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Close Go Game");
@@ -415,22 +419,32 @@ public class HeaderPane extends VBox {
 
         Optional<ButtonType> btnResult = alert.showAndWait();
 
-        if (btnResult.get() == noSaveBtn) {
-            Platform.exit();
-        } else if (btnResult.get() == saveBtn) {
-
-            File f = fileDialog(true, filterList);
-            if (f != null) {
-                if (game.saveGame(f.toPath())) Platform.exit();
+        btnResult.ifPresent(er -> {
+            switch (er.getText()) {
+                case "without save" -> Platform.exit();
+                case "with save" -> {
+                    File f = fileDialog(true, filterList);
+                    if (f != null) {
+                        if (game.saveGame(f.toPath())) {
+                            Platform.exit();
+                            System.exit(0);
+                        }
+                    }
+                    System.out.println("Info");
+                    Alert info = new Alert(Alert.AlertType.INFORMATION);
+                    info.setTitle("Close Go Game - Info");
+                    info.setHeaderText("Saving your game didn't work.");
+                    info.setContentText("Try it again!");
+                    info.initOwner(stage);
+                    info.showAndWait();
+                    if (e != null) e.consume();
+                }
+                case "Cancel" ->  {if (e != null) e.consume();}
             }
-            System.out.println("Info");
-            Alert info = new Alert(Alert.AlertType.INFORMATION);
-            info.setTitle("Close Go Game - Info");
-            info.setHeaderText("Saving your game didn't work.");
-            info.setContentText("Try it again!");
-            info.initOwner(stage);
-            info.showAndWait();
-            if (e != null) e.consume();
-        }
+        });
+
+
+
+
     }
 }

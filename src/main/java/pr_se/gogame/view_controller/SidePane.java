@@ -212,10 +212,10 @@ public class SidePane extends StackPane {
             customSize.setDisable(t1.hashCode() != custom.hashCode());
             System.out.println(((RadioButton) t1).getText());
         });
-        //Komi
+        //Handicap //ToDo refactor naming
         Label komi = new Label();
         komi.setFont(Font.font(null, FontWeight.NORMAL, 13));
-        komi.setText("Komi");
+        komi.setText("Handicap");
         komi.setPadding(new Insets(5));
         gridPane.add(komi, 0, 6);
 
