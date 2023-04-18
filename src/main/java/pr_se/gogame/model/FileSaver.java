@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+ //TODO: Einbinden wenn Game mit x geschlossen wird
 public class FileSaver {
     private String namePlayerOne;
 
@@ -52,7 +52,11 @@ public class FileSaver {
         this.filepath = filepath;
     }
 
+
     public boolean addStone(String color, int x, int y) {
+        //TODO: closing bracket
+        //TODO: closing bracket when game gets closed with x
+        //TODO: maybe a way of having the closing bracket in the string constantly
         if (this.count == 4) {
             buffer += color + "[" + calculateCoordinates(x, y) + "];\n";
             count = 0;
