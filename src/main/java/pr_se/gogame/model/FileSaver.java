@@ -30,7 +30,10 @@ public class FileSaver {
     private String filetext = "(;%s%s%s%s%s";
 
     public static void main(String[] args) {
-        importFile(Path.of("C:\\Users\\lukas\\Downloads\\test\\test.sgf"));
+        //importFile(Path.of("C:\\Users\\lukas\\Downloads\\test\\test.sgf"));
+        FileSaver test = new FileSaver("Black","White","19");
+        test.addStone("B",0,0);
+        test.addStone("W",0,1);
     }
 
     public FileSaver(String namePlayerOne, String namePlayerTwo, String size) {
@@ -58,12 +61,12 @@ public class FileSaver {
         //TODO: closing bracket when game gets closed with x
         //TODO: maybe a way of having the closing bracket in the string constantly
         if (this.count == 4) {
-            buffer += color + "[" + calculateCoordinates(x, y) + "];\n";
+            buffer += color + "[" + calculateCoordinates(x, y,Integer.parseInt(size)) + "];\n";
             count = 0;
             System.out.println(buffer);
             return true;
         } else {
-            buffer += color + "[" + calculateCoordinates(x, y) + "];";
+            buffer += color + "[" + calculateCoordinates(x, y,Integer.parseInt(size)) + "];";
             count++;
             System.out.println(buffer);
             return true;
@@ -72,12 +75,12 @@ public class FileSaver {
 
     public boolean removeStone(int x, int y) {
         if (this.count == 3) {
-            buffer += "AE[" + calculateCoordinates(x, y) + "];\n";
+            buffer += "AE[" + calculateCoordinates(x, y,Integer.parseInt(size)) + "];\n";
             count = 0;
             System.out.println(buffer);
             return true;
         } else {
-            buffer += "AE[" + calculateCoordinates(x, y) + "];";
+            buffer += "AE[" + calculateCoordinates(x, y,Integer.parseInt(size)) + "];";
             count++;
             System.out.println(buffer);
             return true;
@@ -132,8 +135,15 @@ public class FileSaver {
         return false;
     }
 
-    private static String calculateCoordinates(int x, int y) {
-        return (char) (x + 97) + String.valueOf((char) (y + 97));
+     /**
+      * Calculates the coordinates for the sgf File
+      * @param x column of Stone
+      * @param y row of Stone
+      * @param size The board size
+      * @return The x and y-axis in letter format
+      */
+    private static String calculateCoordinates(int x, int y,int size) {
+        return (char) (x + 97) + String.valueOf((char) (96+(size) - y));
     }
 
 
