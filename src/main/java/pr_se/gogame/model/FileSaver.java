@@ -35,11 +35,26 @@ public class FileSaver {
         /*FileSaver test = new FileSaver("Black","White","19");
         test.addStone("B",0,0);
         test.addStone("W",0,1);*/
-        System.out.println(String.format("test %s,%s","test","test"));
-        String[] tokens = new String[] {"PW","KM"};
-        for (String s:tokens) {
-            System.out.println(s+"[%s%s]");
-        }
+        StartNode testStart = new StartNode("FF[4]GM[1]SZ[9]PB[Black]PW[White]");
+        FileTree test = new FileTree();
+        Node test1 = new TreeNode("B[bh]");
+        Node test2 = new TreeNode("B[cg]");
+        BranchNode test3 = new BranchNode("B[cf]");
+        BranchNode test4 = new BranchNode("B[ch]");
+        Node test5 = new TreeNode("B[dh]");
+        Node test6 = new TreeNode("B[sa]");
+        testStart.setNext(test1);
+        test1.setNext(test2);
+        test2.setBranchNode(test3);
+        test3.setBranchNode(test4);
+        test2.setNext(test5);
+        test5.setNext(test6);
+        test.setStart(testStart);
+        FileTree.printGameTree(testStart);
+
+
+
+
     }
 
     public FileSaver(String namePlayerOne, String namePlayerTwo, String size) {
