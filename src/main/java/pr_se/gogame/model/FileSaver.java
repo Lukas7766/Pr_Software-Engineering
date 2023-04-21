@@ -30,10 +30,16 @@ public class FileSaver {
     private String filetext = "(;%s%s%s%s%s";
 
     public static void main(String[] args) {
+        //TODO Is it possible to write file while playing (because of the closing brackets)
         //importFile(Path.of("C:\\Users\\lukas\\Downloads\\test\\test.sgf"));
-        FileSaver test = new FileSaver("Black","White","19");
+        /*FileSaver test = new FileSaver("Black","White","19");
         test.addStone("B",0,0);
-        test.addStone("W",0,1);
+        test.addStone("W",0,1);*/
+        System.out.println(String.format("test %s,%s","test","test"));
+        String[] tokens = new String[] {"PW","KM"};
+        for (String s:tokens) {
+            System.out.println(s+"[%s%s]");
+        }
     }
 
     public FileSaver(String namePlayerOne, String namePlayerTwo, String size) {
@@ -146,6 +152,18 @@ public class FileSaver {
         return (char) (x + 97) + String.valueOf((char) (96+(size) - y));
     }
 
+     public String getNamePlayerOne() {
+         return namePlayerOne;
+     }
 
-    //TODO thread mit rausschreiben und buffer
+     public String getNamePlayerTwo() {
+         return namePlayerTwo;
+     }
+
+     public String getFilepath() {
+         return filepath;
+     }
+
+
+     //TODO thread mit rausschreiben und buffer
 }

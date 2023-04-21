@@ -13,7 +13,6 @@ import java.util.function.Predicate;
 import static pr_se.gogame.model.StoneColor.*;
 
 import java.nio.file.Path;
-import java.util.*;
 
 
 /**
