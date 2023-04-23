@@ -26,7 +26,7 @@ public class FileTree {
         if (current.getClass() == BranchNode.class && current.getBranchNode() == null){
             System.out.print(current.getToken()+"Branch closed\n");
             return;
-        }
+        }//TODO:fix
 
         if (current.getClass() == BranchNode.class || current.getBranchNode() != null){
             System.out.print(current.getToken()+"-");
