@@ -53,9 +53,6 @@ public class FileSaver {
         test.setStart(testStart);
         FileTree.printGameTree(testStart);
 
-
-
-
     }
 
     public FileSaver(String namePlayerOne, String namePlayerTwo, String size) {

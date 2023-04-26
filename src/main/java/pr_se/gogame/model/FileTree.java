@@ -3,18 +3,26 @@ package pr_se.gogame.model;
 import java.util.LinkedList;
 
 public class FileTree {
-    //TODO: write the file Tree class
     private StartNode start;
+    private Node last;
+
+    private Node currentBranch;
 
     public StartNode getStart() {
         return start;
     }
 
-    public void setStart(StartNode start) {
-        this.start = start;
+    public void addNode(Node node){
+        //TODO: insert at the start
+        //TODO: insert a branchnode
+        //TODO: insert normally
     }
 
-    //TODO: printing for visualization
+
+    public void setStart(StartNode start) {
+        this.start = start;
+        this.last = start;
+    }
 
     public static void printGameTree(Node current) {
         if (current.getClass() == StartNode.class && current.getNext() != null) {

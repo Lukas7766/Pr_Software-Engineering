@@ -2,6 +2,8 @@ package pr_se.gogame.model;
 
 public abstract class Node {
     //TODO Write the Node class for file structure
+    //TODO: maybe include an index for a node ?
+
     private Node next;
     private Node previous;
 
@@ -9,8 +11,8 @@ public abstract class Node {
 
     private BranchNode branchNode = null;
 
-    public Node(String token) {
-        this.token = token;
+    public Node(SgfToken token, String coordinates) {
+        this.token = String.format(token.getValue(),coordinates);
     }
 
     public void setNext(Node next) {
