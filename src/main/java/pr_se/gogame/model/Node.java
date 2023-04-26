@@ -14,6 +14,7 @@ public abstract class Node {
     }
 
     public void setNext(Node next) {
+        next.previous = this;
         this.next = next;
     }
 
@@ -26,6 +27,7 @@ public abstract class Node {
     }
 
     public void setBranchNode(BranchNode branchNode) {
+        branchNode.setPrevious(this);
         this.branchNode = branchNode;
     }
 

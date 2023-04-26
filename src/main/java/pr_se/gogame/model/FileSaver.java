@@ -41,6 +41,7 @@ public class FileSaver {
         Node test2 = new TreeNode("B[cg]");
         BranchNode test3 = new BranchNode("B[cf]");
         BranchNode test4 = new BranchNode("B[ch]");
+        BranchNode testBranchnode = new BranchNode("B[test]");
         Node test5 = new TreeNode("B[dh]");
         Node test6 = new TreeNode("B[sa]");
         testStart.setNext(test1);

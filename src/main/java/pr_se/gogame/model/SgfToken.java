@@ -15,10 +15,12 @@ public enum SgfToken {
     LB("LB[%s]");
 
     //TODO: create token List or map ? maybe with enum
+    //TODO: Test
     //Maybe Write token in a formattable way to easily insert coords
-    //Like this --> "B[%s%s]; --> Because of that string operations should be less and maybe faster
+    //Like this --> "B[%s]; --> Because of that string operations should be less and maybe faster (its not faster)
 
     private final String value;
+
 
     SgfToken(String token) {
         this.value = token;
