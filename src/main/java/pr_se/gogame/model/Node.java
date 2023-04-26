@@ -11,8 +11,8 @@ public abstract class Node {
 
     private BranchNode branchNode = null;
 
-    public Node(SgfToken token, String coordinates) {
-        this.token = String.format(token.getValue(),coordinates);
+    public Node(SgfToken token, String data) {
+        this.token = String.format(token.getValue(),data);
     }
 
     public void setNext(Node next) {

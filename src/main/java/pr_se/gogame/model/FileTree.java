@@ -16,6 +16,9 @@ public class FileTree {
         //TODO: insert at the start
         //TODO: insert a branchnode
         //TODO: insert normally
+        /*if (start == null && node.getClass() == StartNode.class){
+            this.start = node; //warum geht nix diese
+        }*/
     }
 
 

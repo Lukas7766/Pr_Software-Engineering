@@ -1,7 +1,7 @@
 package pr_se.gogame.model;
 
 public class TreeNode extends Node{
-    public TreeNode(String token) {
-        super(token);
+    public TreeNode(SgfToken token,String data) {
+        super(token,data);//TODO:Do I need this class ?
     }
 }
