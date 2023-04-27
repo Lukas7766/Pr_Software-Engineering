@@ -4,7 +4,6 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -240,7 +239,7 @@ public class BoardPane extends GridPane {
                     throw new NullPointerException();
                 }
 
-                PlayableBoardCell destinationBC = getPlayableCell(e.getCol(), e.getRow());
+                PlayableBoardCell destinationBC = getPlayableCell(e.getX(), e.getY());
                 destinationBC.getLabel().setText("" + e.getMoveNumber());
 
                 if(e.getColor() == BLACK) {
@@ -256,7 +255,7 @@ public class BoardPane extends GridPane {
                     throw new NullPointerException();
                 }
 
-                getPlayableCell(e.getCol(), e.getRow()).unset();
+                getPlayableCell(e.getX(), e.getY()).unset();
             }
 
             @Override

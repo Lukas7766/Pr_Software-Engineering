@@ -1,8 +1,6 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.view_controller.GoListener;
-import pr_se.gogame.view_controller.StoneRemovedEvent;
-import pr_se.gogame.view_controller.StoneSetEvent;
+import pr_se.gogame.view_controller.*;
 
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -13,7 +11,6 @@ import java.util.function.Predicate;
 import static pr_se.gogame.model.StoneColor.*;
 
 import java.nio.file.Path;
-import java.util.*;
 
 
 /**
@@ -32,7 +29,7 @@ public class Board implements BoardInterface {
     /**
      * the View listeners that have been registered with this Board
      */
-    private final LinkedList<GoListener> listeners;
+    private final LinkedList<GameListener> listeners;
     /**
      * the actual board
      */
@@ -113,12 +110,12 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public void addListener(GoListener l) {
+    public void addListener(GameListener l) {
         listeners.add(l);
     }
 
     @Override
-    public void removeListener(GoListener l) {
+    public void removeListener(GameListener l) {
         listeners.remove(l);
     }
 
@@ -240,8 +237,9 @@ public class Board implements BoardInterface {
         for(int i = 0; i < SIZE; i++) {
             for(int j = 0; j < SIZE; j++) {
                 if(board[i][j] != null) {
-                    for (GoListener l : listeners) {
-                        l.debugInfoRequested(i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    for (GameListener l : listeners) {
+                        GameEvent e = new StoneEvent(GameCommand.DEBUGINFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                        l.gameCommand(e);
                     }
                 }
             }
@@ -260,10 +258,14 @@ public class Board implements BoardInterface {
      * @param c the StoneColor of the stone that has been set
      */
     private void fireStoneSet(int x, int y, StoneColor c) {
-        StoneSetEvent e = new StoneSetEvent(x, y, c, this.moveNumber);
+        GameCommand gc = GameCommand.BLACKPLAYS;
+        if(c == WHITE) {
+            gc = GameCommand.WHITEPLAYS;
+        }
+        StoneSetEvent e = new StoneSetEvent(gc, x, y, this.moveNumber);
 
-        for(GoListener l : listeners) {
-            l.stoneSet(e);
+        for(GameListener l : listeners) {
+            l.gameCommand(e);
         }
     }
 
@@ -273,10 +275,14 @@ public class Board implements BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      */
     private void fireStoneRemoved(int x, int y) {
-        StoneRemovedEvent e = new StoneRemovedEvent(x, y);
+        GameCommand gc = GameCommand.BLACKPLAYS;
+        if(curColor == WHITE) {
+            gc = GameCommand.WHITEPLAYS;
+        }
+        StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
 
-        for(GoListener l : listeners) {
-            l.stoneRemoved(e);
+        for(GameListener l : listeners) {
+            l.gameCommand(e);
         }
     }
 
@@ -345,7 +351,7 @@ public class Board implements BoardInterface {
         return SIZE;
     }
 
-    public LinkedList<GoListener> getListeners() {
+    public LinkedList<GameListener> getListeners() {
         return listeners;
     }
 

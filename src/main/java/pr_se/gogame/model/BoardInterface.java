@@ -1,5 +1,6 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.view_controller.GameListener;
 import pr_se.gogame.view_controller.GoListener;
 
 import java.util.LinkedList;
@@ -9,13 +10,13 @@ public interface BoardInterface {
      * Adds the supplied GoListener
      * @param l GoListener that handles StoneSetEvents and StoneRemovedEvents
      */
-    public void addListener(GoListener l);
+    public void addListener(GameListener l);
 
     /**
      * Removes the supplied GoListener
      * @param l GoListener that has previously been added with addListener()
      */
-    public void removeListener(GoListener l);
+    public void removeListener(GameListener l);
 
     /**
      * Places a stone on the board, calculating its liberties and adding it to an existing group where applicable, as
@@ -45,7 +46,7 @@ public interface BoardInterface {
 
     public int getSIZE();
 
-    public LinkedList<GoListener> getListeners();
+    public LinkedList<GameListener> getListeners();
 
     public StoneGroupPointer[][] getBoard();
 
