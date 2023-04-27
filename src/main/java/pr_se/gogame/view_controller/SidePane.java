@@ -98,20 +98,15 @@ public class SidePane extends StackPane {
         game.addListener(l -> {
             if (!(l.getGameCommand() == GameCommand.BLACKSTARTS || l.getGameCommand() == GameCommand.WHITSTARTS))
                 return;
-            game.getBoard().addListener(new GoListener() {
-                @Override
-                public void stoneSet(StoneSetEvent e) {
-                    actualPlayer.setText((e.getColor() == StoneColor.WHITE) ? "Black" : "White");
-                }
-
-                @Override
-                public void stoneRemoved(StoneRemovedEvent e) {
-
-                }
-
-                @Override
-                public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-
+            game.getBoard().addListener(k -> {
+                switch(k.getGameCommand()) {
+                    case BLACKPLAYS:
+                        actualPlayer.setText("Black");
+                        break;
+                    case WHITEPLAYS:
+                        actualPlayer.setText("White");
+                        break;
+                    default: return;
                 }
             });
         });

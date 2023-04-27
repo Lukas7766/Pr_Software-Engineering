@@ -238,8 +238,7 @@ public class Board implements BoardInterface {
             for(int j = 0; j < SIZE; j++) {
                 if(board[i][j] != null) {
                     for (GameListener l : listeners) {
-                        GameEvent e = new StoneEvent(GameCommand.DEBUGINFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
-                        l.gameCommand(e);
+                        // l.debugInfoRequested(i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
                     }
                 }
             }

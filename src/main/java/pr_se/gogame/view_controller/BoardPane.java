@@ -232,33 +232,36 @@ public class BoardPane extends GridPane {
     public void setBoard(Board board) {
         this.board = board;
 
-        board.addListener(new GoListener() {
+        board.addListener(new GameListener() {
             @Override
-            public void stoneSet(StoneSetEvent e) {
-                if(e == null) {
+            public void gameCommand(GameEvent e) {
+                if (e == null) {
                     throw new NullPointerException();
                 }
 
-                PlayableBoardCell destinationBC = getPlayableCell(e.getX(), e.getY());
-                destinationBC.getLabel().setText("" + e.getMoveNumber());
+                switch (e.getGameCommand()) {
+                    case BLACKPLAYS:
+                    case WHITEPLAYS:
+                        StoneSetEvent sse = (StoneSetEvent) e;
+                        PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
+                        destinationBC.getLabel().setText("" + sse.getMoveNumber());
 
-                if(e.getColor() == BLACK) {
-                    destinationBC.setBlack();
-                } else {
-                    destinationBC.setWhite();
+                        if (sse.getColor() == BLACK) {
+                            destinationBC.setBlack();
+                        } else {
+                            destinationBC.setWhite();
+                        }
+                        break;
+                    case WHITEREMOVED:
+                    case BLACKREMOVED:
+                        StoneRemovedEvent sre = (StoneRemovedEvent) e;
+                        getPlayableCell(sre.getX(), sre.getY()).unset();
+                        break;
+                    default:
+                        return;
                 }
             }
 
-            @Override
-            public void stoneRemoved(StoneRemovedEvent e) {
-                if(e == null) {
-                    throw new NullPointerException();
-                }
-
-                getPlayableCell(e.getX(), e.getY()).unset();
-            }
-
-            @Override
             public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
                 getPlayableCell(x, y).getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
