@@ -164,12 +164,9 @@ public class Board implements BoardInterface {
             // TODO: Call ruleset method instead, because some rulesets (e.g., New Zealand) permit suicide.
             if (board[x][y] == null) {
                 System.out.println("SUICIDE DETECTED!!!");
-                // return;
-            }
-
-            if (board[x][y] == null) {
-                System.out.println("SUICIDE DETECTED!!!");
-                //return;
+                if(!GAME.getRuleset().getSuicide()) {
+                    return;
+                }
             }
 
             String saveCol = color == BLACK ? "B" : "W";
@@ -252,9 +249,9 @@ public class Board implements BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      */
     private void fireStoneRemoved(int x, int y) {
-        GameCommand gc = GameCommand.BLACKPLAYS;
+        GameCommand gc = GameCommand.BLACKREMOVED;
         if(GAME.getCurColor() == WHITE) {
-            gc = GameCommand.WHITEPLAYS;
+            gc = GameCommand.WHITEREMOVED;
         }
         StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
 

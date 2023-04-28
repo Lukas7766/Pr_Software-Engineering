@@ -1,5 +1,6 @@
 package pr_se.gogame.model;
 
+import javafx.css.Rule;
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
 
@@ -18,6 +19,8 @@ public class Game implements GameInterface {
 
     private int curMoveNumber = 1;
     private StoneColor curColor = StoneColor.BLACK;
+
+    private Ruleset ruleset = new JapaneseRuleset();
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -124,12 +127,17 @@ public class Game implements GameInterface {
 
     @Override
     public int getCurMoveNumber() {
-        return curMoveNumber;
+        return this.curMoveNumber;
     }
 
     @Override
     public StoneColor getCurColor() {
-        return curColor;
+        return this.curColor;
+    }
+
+    @Override
+    public Ruleset getRuleset() {
+        return this.ruleset;
     }
 
     @Override

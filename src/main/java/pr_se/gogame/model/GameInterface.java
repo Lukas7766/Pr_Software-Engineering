@@ -40,6 +40,8 @@ public interface GameInterface {
 
     StoneColor getCurColor();
 
+    Ruleset getRuleset();
+
     void setCurMoveNumber(int curMoveNumber);
 
     void setCurColor(StoneColor c);

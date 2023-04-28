@@ -16,6 +16,11 @@ public interface Ruleset {
         return false;
     }
 
+    /**
+     * @return whether the ruleset permits suicide
+     */
+    boolean getSuicide();
+
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
      * This method sets the amount of restricted repetitions.
      * @param amount (2 ... n)
