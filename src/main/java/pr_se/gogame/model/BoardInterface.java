@@ -31,8 +31,6 @@ public interface BoardInterface {
 
     public StoneGroupPointer[][] getBoard();
 
-    public int getMoveNumber();
-
     public int getLastDebugX();
 
     public int getLastDebugY();

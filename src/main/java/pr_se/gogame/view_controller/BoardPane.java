@@ -91,6 +91,9 @@ public class BoardPane extends GridPane {
      */
     private NumberBinding MAX_CELL_DIM_INT;
 
+    // TODO: Remove
+    private final boolean debug = true;
+
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
@@ -271,9 +274,11 @@ public class BoardPane extends GridPane {
                 System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
             }
 
-            for(int i = 0; i < size; i++) {
-                for(int j = 0; j < size; j++) {
-                    board.printDebugInfo(i, j);
+            if(debug) {
+                for (int i = 0; i < size; i++) {
+                    for (int j = 0; j < size; j++) {
+                        board.printDebugInfo(i, j);
+                    }
                 }
             }
         }

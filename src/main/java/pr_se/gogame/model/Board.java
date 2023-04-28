@@ -37,9 +37,6 @@ public class Board implements BoardInterface {
     //TODO: Move this elsewere ?
     private FileSaver fileSaver;
 
-    // TODO: Should this be moved to game?
-    private int moveNumber;
-
     // Likely to be removed (or definitely moved to game).
     private StoneColor curColor = BLACK;
 
@@ -56,7 +53,6 @@ public class Board implements BoardInterface {
         this.GAME = game;
         this.SIZE = game.getSize();
         this.board = new StoneGroupPointer[SIZE][SIZE];
-        moveNumber = 1;
         this.fileSaver = new FileSaver("Black","White",String.valueOf(SIZE));
 
         int komi = game.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
@@ -184,7 +180,7 @@ public class Board implements BoardInterface {
             // Update UI
             fireStoneSet(x, y, color);
 
-            moveNumber++;
+            GAME.setCurMoveNumber(GAME.getCurMoveNumber() + 1);
 
             // Update current player color
             // TODO: Remove and delegate to Game
@@ -248,7 +244,7 @@ public class Board implements BoardInterface {
         if(c == WHITE) {
             gc = GameCommand.WHITEPLAYS;
         }
-        StoneSetEvent e = new StoneSetEvent(gc, x, y, this.moveNumber);
+        StoneSetEvent e = new StoneSetEvent(gc, x, y, GAME.getCurMoveNumber());
 
         GAME.fireGameEvent(e);
     }
@@ -335,10 +331,6 @@ public class Board implements BoardInterface {
 
     public StoneGroupPointer[][] getBoard() {
         return board;
-    }
-
-    public int getMoveNumber() {
-        return moveNumber;
     }
 
     public int getLastDebugX() {

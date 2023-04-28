@@ -36,5 +36,9 @@ public interface GameInterface {
 
     Board getBoard();
 
+    int getCurMoveNumber();
+
+    void setCurMoveNumber(int curMoveNumber);
+
     void fireGameEvent(GameEvent e);
 }

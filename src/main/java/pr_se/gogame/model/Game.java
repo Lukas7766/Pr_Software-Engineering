@@ -16,7 +16,7 @@ public class Game implements GameInterface {
     private Board board;
 
 
-
+    private int curMoveNumber = 1;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -48,7 +48,7 @@ public class Game implements GameInterface {
 
     @Override
     public boolean importGame(Path path) {
-        //TODO: Das board überchreiben od nd
+        //TODO: Das board überschreiben od nd
         return FileSaver.importFile(path);
     }
 
@@ -112,24 +112,35 @@ public class Game implements GameInterface {
         return this.board;
     }
 
-    private void fireNewGame(GameCommand gameCommand, int size, int komi) {
-        GameEvent e = new GameEvent(gameCommand, size, komi);
-        for (GameListener l : listeners) {
-            l.gameCommand(e);
-        }
-    }
-
-    private void fireGameCommand(GameCommand command) {
-        GameEvent e = new GameEvent(command);
-        for (GameListener l : listeners) {
-            l.gameCommand(e);
-        }
+    @Override
+    public int getCurMoveNumber() {
+        return curMoveNumber;
     }
 
     @Override
-    public void fireGameEvent(GameEvent e) {   // (Added by Gerald) I would have liked to give it default visibility so it's visible only in the same package.
+    public void setCurMoveNumber(int curMoveNumber) {
+        if(curMoveNumber < 1) {
+            throw new IllegalArgumentException();
+        }
+
+        this.curMoveNumber = curMoveNumber;
+    }
+
+    /*
+        (Added by Gerald) I would have liked to give it default visibility so it's visible only in the same package.
+     */
+    @Override
+    public void fireGameEvent(GameEvent e) {
         for (GameListener l : listeners) {
             l.gameCommand(e);
         }
+    }
+
+    private void fireNewGame(GameCommand gameCommand, int size, int komi) {
+        fireGameEvent(new GameEvent(gameCommand, size, komi));
+    }
+
+    private void fireGameCommand(GameCommand command) {
+        fireGameEvent(new GameEvent(command));
     }
 }

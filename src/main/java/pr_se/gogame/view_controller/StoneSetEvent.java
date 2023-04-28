@@ -2,7 +2,6 @@ package pr_se.gogame.view_controller;
 
 import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
-import pr_se.gogame.model.StoneGroupPointer;
 
 public class StoneSetEvent extends StoneEvent {
     private final StoneColor COLOR;
