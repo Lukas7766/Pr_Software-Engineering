@@ -163,7 +163,7 @@ public class BoardPane extends GridPane {
     private void init() {
         getChildren().removeAll(getChildren());
 
-        setBoard(this.game.getBoard());
+        this.board = this.game.getBoard();
         this.size = board.getSize();
         // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); No, don't to that, it breaks the cells' aspect ratio (even equal insets on all four sides will)
 
@@ -249,49 +249,6 @@ public class BoardPane extends GridPane {
 
         // Layout of this BoardPane
         setAlignment(Pos.CENTER);
-    }
-
-    /**
-     * Sets the board that this BoardPane is listening to, as well as adding listeners to it in the first place.
-     * @param board the board that this BoardPane is listening to
-     */
-    public void setBoard(Board board) {
-        this.board = board;
-
-        /*board.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                if (e == null) {
-                    throw new NullPointerException();
-                }
-
-                switch (e.getGameCommand()) {
-                    case BLACKPLAYS:
-                    case WHITEPLAYS:
-                        StoneSetEvent sse = (StoneSetEvent) e;
-                        PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
-                        destinationBC.getLabel().setText("" + sse.getMoveNumber());
-
-                        if (sse.getColor() == BLACK) {
-                            destinationBC.setBlack();
-                        } else {
-                            destinationBC.setWhite();
-                        }
-                        break;
-                    case WHITEREMOVED:
-                    case BLACKREMOVED:
-                        StoneRemovedEvent sre = (StoneRemovedEvent) e;
-                        getPlayableCell(sre.getX(), sre.getY()).unset();
-                        break;
-                    case DEBUGINFO:
-                        DebugEvent de = (DebugEvent) e;
-                        getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
-                        break;
-                    default:
-                        return;
-                }
-            }
-        });*/
     }
 
     /*
