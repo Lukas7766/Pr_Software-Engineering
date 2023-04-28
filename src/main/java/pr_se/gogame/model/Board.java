@@ -1,16 +1,17 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.view_controller.*;
+import pr_se.gogame.view_controller.DebugEvent;
+import pr_se.gogame.view_controller.StoneRemovedEvent;
+import pr_se.gogame.view_controller.StoneSetEvent;
 
+import java.nio.file.Path;
 import java.util.HashSet;
-import java.util.LinkedList;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 
-import static pr_se.gogame.model.StoneColor.*;
-
-import java.nio.file.Path;
+import static pr_se.gogame.model.StoneColor.BLACK;
+import static pr_se.gogame.model.StoneColor.WHITE;
 
 
 /**
@@ -22,14 +23,12 @@ public class Board implements BoardInterface {
      * the Game that this Board belongs to
      */
     private final Game GAME;
+
     /**
      * the number of rows and columns of this board
      */
     private final int SIZE;
-    /**
-     * the View listeners that have been registered with this Board
-     */
-    private final LinkedList<GameListener> listeners;
+
     /**
      * the actual board
      */
@@ -56,7 +55,6 @@ public class Board implements BoardInterface {
     public Board(Game game, StoneColor beginner) {
         this.GAME = game;
         this.SIZE = game.getSize();
-        listeners = new LinkedList<>();
         this.board = new StoneGroupPointer[SIZE][SIZE];
         moveNumber = 1;
         this.fileSaver = new FileSaver("Black","White",String.valueOf(SIZE));
@@ -107,16 +105,6 @@ public class Board implements BoardInterface {
         }
 
 
-    }
-
-    @Override
-    public void addListener(GameListener l) {
-        listeners.add(l);
-    }
-
-    @Override
-    public void removeListener(GameListener l) {
-        listeners.remove(l);
     }
 
     @Override
@@ -343,10 +331,6 @@ public class Board implements BoardInterface {
 
     public int getSIZE() {
         return SIZE;
-    }
-
-    public LinkedList<GameListener> getListeners() {
-        return listeners;
     }
 
     public StoneGroupPointer[][] getBoard() {

@@ -51,21 +51,25 @@ public class SidePane extends StackPane {
         VBox gameInfo = gameInfo();
         this.getChildren().add(gameSetting);
 
-        game.addListener(l -> {
-            if (l.getGameCommand() != GameCommand.INIT) return;
-            if (!this.getChildren().contains(gameSetting)) {
-                this.getChildren().add(gameSetting);
-                this.getChildren().remove(gameInfo);
+        game.addListener(e -> {
+            if(e == null) {
+                throw new NullPointerException();
             }
-        });
 
-        game.addListener(l -> {
-            if (!(l.getGameCommand() == GameCommand.BLACKSTARTS || l.getGameCommand() == GameCommand.WHITSTARTS))
-                return;
-
-            this.getChildren().remove(gameSetting);
-            this.getChildren().add(gameInfo);
-
+            switch(e.getGameCommand()) {
+                case INIT:
+                    if (!this.getChildren().contains(gameSetting)) {
+                        this.getChildren().add(gameSetting);
+                        this.getChildren().remove(gameInfo);
+                    }
+                    break;
+                case BLACKSTARTS:
+                case WHITSTARTS:
+                    this.getChildren().remove(gameSetting);
+                    this.getChildren().add(gameInfo);
+                    break;
+                default: return;
+            }
         });
     }
 
@@ -95,20 +99,20 @@ public class SidePane extends StackPane {
 
         infoPane.getChildren().add(playerInfo);
 
+        /*
+         * Comment by Gerald:
+         * Adds listener to Game to update the currently displayed player name
+         */
         game.addListener(l -> {
-            if (!(l.getGameCommand() == GameCommand.BLACKSTARTS || l.getGameCommand() == GameCommand.WHITSTARTS))
-                return;
-            game.getBoard().addListener(k -> {
-                switch(k.getGameCommand()) {
-                    case BLACKPLAYS:
-                        actualPlayer.setText("Black");
-                        break;
-                    case WHITEPLAYS:
-                        actualPlayer.setText("White");
-                        break;
-                    default: return;
-                }
-            });
+            switch(l.getGameCommand()) {
+                case WHITEPLAYS:
+                    actualPlayer.setText("Black");
+                    break;
+                case BLACKPLAYS:
+                    actualPlayer.setText("White");
+                    break;
+                default: return;
+            }
         });
 
         Pane spring1 = new Pane();
