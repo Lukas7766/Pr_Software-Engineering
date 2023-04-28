@@ -3,4 +3,5 @@ package pr_se.gogame.model;
 public enum GameCommand {
     INIT, WHITSTARTS, BLACKSTARTS, BLACKsTURN, WHITEsTURN, WHITWON, BLACKWON, PLAYBACK, CONFIRMCHOICE, START, DRAW,
     BLACKPLAYS, WHITEPLAYS, BLACKREMOVED, WHITEREMOVED, // Added by Gerald, TODO: Could BLACKPLAYS be replaced with BLACKSTURN?
+    DEBUGINFO // TODO: Remove in final product
 }

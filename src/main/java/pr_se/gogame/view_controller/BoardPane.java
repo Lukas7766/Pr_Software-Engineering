@@ -257,13 +257,13 @@ public class BoardPane extends GridPane {
                         StoneRemovedEvent sre = (StoneRemovedEvent) e;
                         getPlayableCell(sre.getX(), sre.getY()).unset();
                         break;
+                    case DEBUGINFO:
+                        DebugEvent de = (DebugEvent) e;
+                        getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
+                        break;
                     default:
                         return;
                 }
-            }
-
-            public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-                getPlayableCell(x, y).getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
             }
         });
     }
@@ -286,6 +286,12 @@ public class BoardPane extends GridPane {
                 board.setStone(col, row, board.getCurColor(), false);
             } else {
                 System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
+            }
+
+            for(int i = 0; i < size; i++) {
+                for(int j = 0; j < size; j++) {
+                    board.printDebugInfo(i, j);
+                }
             }
         }
     }
