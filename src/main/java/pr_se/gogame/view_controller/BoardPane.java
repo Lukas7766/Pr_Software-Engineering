@@ -106,8 +106,12 @@ public class BoardPane extends GridPane {
         this.game = game;
         this.graphicsPath = graphicsPath;
 
-        game.addListener(l -> {
-            switch(l.getGameCommand()) {
+        game.addListener(e -> {
+            if(e == null) {
+                throw new NullPointerException();
+            }
+
+            switch(e.getGameCommand()) {
                 case CONFIRMCHOICE:
                     confirmMove();
                     break;
@@ -116,10 +120,32 @@ public class BoardPane extends GridPane {
                     break;
                 case WHITSTARTS:
                 case BLACKSTARTS:
-                    System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
+                    System.out.println(e.getGameCommand()+" inBoardPane: BoardSize: " + e.getSize() + " Komi: "+  e.getKomi());
 
                     setMouseTransparent(false);
                     init();
+                    break;
+                case BLACKPLAYS:
+                case WHITEPLAYS:
+                    StoneSetEvent sse = (StoneSetEvent) e;
+                    PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
+                    destinationBC.getLabel().setText("" + sse.getMoveNumber());
+
+                    if (sse.getColor() == BLACK) {
+                        destinationBC.setBlack();
+                    } else {
+                        destinationBC.setWhite();
+                    }
+                    break;
+                case WHITEREMOVED:
+                case BLACKREMOVED:
+                    StoneRemovedEvent sre = (StoneRemovedEvent) e;
+                    getPlayableCell(sre.getX(), sre.getY()).unset();
+                    break;
+                case DEBUGINFO:
+                    DebugEvent de = (DebugEvent) e;
+                    getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
+                    break;
                 default: return;
             }
 
@@ -232,7 +258,7 @@ public class BoardPane extends GridPane {
     public void setBoard(Board board) {
         this.board = board;
 
-        board.addListener(new GameListener() {
+        /*board.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
                 if (e == null) {
@@ -265,7 +291,7 @@ public class BoardPane extends GridPane {
                         return;
                 }
             }
-        });
+        });*/
     }
 
     /*

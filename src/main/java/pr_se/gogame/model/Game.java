@@ -125,4 +125,11 @@ public class Game implements GameInterface {
             l.gameCommand(e);
         }
     }
+
+    @Override
+    public void fireGameEvent(GameEvent e) {   // (Added by Gerald) I would have liked to give it default visibility so it's visible only in the same package.
+        for (GameListener l : listeners) {
+            l.gameCommand(e);
+        }
+    }
 }

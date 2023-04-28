@@ -237,10 +237,11 @@ public class Board implements BoardInterface {
         for(int i = 0; i < SIZE; i++) {
             for(int j = 0; j < SIZE; j++) {
                 if(board[i][j] != null) {
-                    for (GameListener l : listeners) {
-                        DebugEvent e = new DebugEvent(GameCommand.DEBUGINFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    DebugEvent e = new DebugEvent(GameCommand.DEBUGINFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    GAME.fireGameEvent(e);
+                    /*for (GameListener l : listeners) {
                         l.gameCommand(e);
-                    }
+                    }*/
                 }
             }
         }
@@ -264,9 +265,10 @@ public class Board implements BoardInterface {
         }
         StoneSetEvent e = new StoneSetEvent(gc, x, y, this.moveNumber);
 
-        for(GameListener l : listeners) {
+        GAME.fireGameEvent(e);
+        /*for(GameListener l : listeners) {
             l.gameCommand(e);
-        }
+        }*/
     }
 
     /**
@@ -281,9 +283,10 @@ public class Board implements BoardInterface {
         }
         StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
 
-        for(GameListener l : listeners) {
+        GAME.fireGameEvent(e);
+        /*for(GameListener l : listeners) {
             l.gameCommand(e);
-        }
+        }*/
     }
 
     /**
