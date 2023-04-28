@@ -1,20 +1,19 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.GameListener;
-import pr_se.gogame.view_controller.GoListener;
 
 import java.util.LinkedList;
 
 public interface BoardInterface {
     /**
-     * Adds the supplied GoListener
-     * @param l GoListener that handles StoneSetEvents and StoneRemovedEvents
+     * Adds the supplied GameListener
+     * @param l GameListener that handles StoneSetEvents and StoneRemovedEvents
      */
     public void addListener(GameListener l);
 
     /**
-     * Removes the supplied GoListener
-     * @param l GoListener that has previously been added with addListener()
+     * Removes the supplied GameListener
+     * @param l GameListener that has previously been added with addListener()
      */
     public void removeListener(GameListener l);
 
