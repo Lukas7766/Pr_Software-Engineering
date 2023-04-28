@@ -94,7 +94,7 @@ public class SidePane extends StackPane {
 
         Label actualPlayer = new Label();
         actualPlayer.setFont(Font.font(null, FontWeight.NORMAL, 13));
-        actualPlayer.setText(game.getBoard().getCurColor() == StoneColor.BLACK ? "Black" : "White");
+        actualPlayer.setText(game.getCurColor() == StoneColor.BLACK ? "Black" : "White");
         playerInfo.getChildren().add(actualPlayer);
 
         infoPane.getChildren().add(playerInfo);

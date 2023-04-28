@@ -38,7 +38,11 @@ public interface GameInterface {
 
     int getCurMoveNumber();
 
+    StoneColor getCurColor();
+
     void setCurMoveNumber(int curMoveNumber);
+
+    void setCurColor(StoneColor c);
 
     void fireGameEvent(GameEvent e);
 }

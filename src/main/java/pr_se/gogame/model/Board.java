@@ -37,9 +37,6 @@ public class Board implements BoardInterface {
     //TODO: Move this elsewere ?
     private FileSaver fileSaver;
 
-    // Likely to be removed (or definitely moved to game).
-    private StoneColor curColor = BLACK;
-
     private int lastDebugX = 0;
     private int lastDebugY = 0;
 
@@ -183,11 +180,11 @@ public class Board implements BoardInterface {
             GAME.setCurMoveNumber(GAME.getCurMoveNumber() + 1);
 
             // Update current player color
-            // TODO: Remove and delegate to Game
-            if (color == WHITE) {
-                curColor = BLACK;
+            // TODO: Eventually do this in GAME to begin with
+            if(GAME.getCurColor() == WHITE) {
+                GAME.setCurColor(BLACK);
             } else {
-                curColor = WHITE;
+                GAME.setCurColor(WHITE);
             }
         }
     }
@@ -256,7 +253,7 @@ public class Board implements BoardInterface {
      */
     private void fireStoneRemoved(int x, int y) {
         GameCommand gc = GameCommand.BLACKPLAYS;
-        if(curColor == WHITE) {
+        if(GAME.getCurColor() == WHITE) {
             gc = GameCommand.WHITEPLAYS;
         }
         StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
@@ -307,10 +304,6 @@ public class Board implements BoardInterface {
     // Getters and Setters
     public int getSize() {
         return SIZE;
-    }
-
-    public StoneColor getCurColor() {
-        return curColor;
     }
 
     public StoneColor getColorAt(int x, int y) {

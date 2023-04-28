@@ -17,6 +17,7 @@ public class Game implements GameInterface {
 
 
     private int curMoveNumber = 1;
+    private StoneColor curColor = StoneColor.BLACK;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -32,11 +33,20 @@ public class Game implements GameInterface {
 
     @Override
     public void newGame(GameCommand gameCommand, int size, int komi) {
+        if(gameCommand == GameCommand.BLACKSTARTS) {
+            this.curColor = StoneColor.BLACK;
+        } else if (gameCommand == GameCommand.WHITSTARTS) {
+            this.curColor = StoneColor.WHITE;
+        } else {
+            throw new IllegalArgumentException();
+        }
+
         this.size = size;
         this.komi = komi;
         this.gameCommand = gameCommand;
+        this.curMoveNumber = 1;
         System.out.println("newGame, Size: " + size + " Komi: " + komi);
-        this.board = new Board(this, StoneColor.BLACK);
+        this.board = new Board(this, this.curColor);
         fireNewGame(gameCommand, size, komi);
     }
 
@@ -118,12 +128,26 @@ public class Game implements GameInterface {
     }
 
     @Override
+    public StoneColor getCurColor() {
+        return curColor;
+    }
+
+    @Override
     public void setCurMoveNumber(int curMoveNumber) {
         if(curMoveNumber < 1) {
             throw new IllegalArgumentException();
         }
 
         this.curMoveNumber = curMoveNumber;
+    }
+
+    @Override
+    public void setCurColor(StoneColor c) {
+        if(c == null) {
+            throw new NullPointerException();
+        }
+
+        this.curColor = c;
     }
 
     /*

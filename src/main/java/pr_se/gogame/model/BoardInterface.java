@@ -21,8 +21,6 @@ public interface BoardInterface {
     // Getters
     public int getSize();
 
-    public StoneColor getCurColor();
-
     public StoneColor getColorAt(int x, int y);
 
     public Game getGAME();

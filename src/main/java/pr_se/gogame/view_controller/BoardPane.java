@@ -269,7 +269,7 @@ public class BoardPane extends GridPane {
             int col = getColumnIndex(selectionPBC) - 1;
             int row = getRowIndex(selectionPBC) - 1;
             if(col >= 0 && row >= 0) {
-                board.setStone(col, row, board.getCurColor(), false);
+                board.setStone(col, row, game.getCurColor(), false);
             } else {
                 System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
             }
@@ -569,7 +569,7 @@ public class BoardPane extends GridPane {
             });*/
 
             setOnMouseEntered((e) -> {
-                if (board.getCurColor() == BLACK) {
+                if (game.getCurColor() == BLACK) {
                     hoverBlack();
                 } else {
                     hoverWhite();
@@ -590,7 +590,7 @@ public class BoardPane extends GridPane {
                 }
                 selectionPBC = this;
 
-                if(board.getCurColor() == BLACK) {
+                if(game.getCurColor() == BLACK) {
                     selectBlack();
                 } else {
                     selectWhite();
