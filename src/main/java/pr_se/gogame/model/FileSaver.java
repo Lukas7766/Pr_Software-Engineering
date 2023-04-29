@@ -56,12 +56,12 @@ public class FileSaver {
         if (this.count == 4) {
             buffer += color + "[" + calculateCoordinates(x, y) + "];\n";
             count = 0;
-            System.out.println(buffer);
+            // System.out.println(buffer);
             return true;
         } else {
             buffer += color + "[" + calculateCoordinates(x, y) + "];";
             count++;
-            System.out.println(buffer);
+            // System.out.println(buffer);
             return true;
         }
     }
@@ -70,12 +70,12 @@ public class FileSaver {
         if (this.count == 3) {
             buffer += "AE[" + calculateCoordinates(x, y) + "];\n";
             count = 0;
-            System.out.println(buffer);
+            // System.out.println(buffer);
             return true;
         } else {
             buffer += "AE[" + calculateCoordinates(x, y) + "];";
             count++;
-            System.out.println(buffer);
+            // System.out.println(buffer);
             return true;
         }
     }

@@ -9,7 +9,7 @@ public interface BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      * @param prepareMode Whether this stone is set before the beginning of the game (e.g., as a handicap) or by a (human or AI) player
      */
-    public void setStone(int x, int y, StoneColor color, boolean prepareMode);
+    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode);
 
     /**
      *

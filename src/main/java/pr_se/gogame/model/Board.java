@@ -47,7 +47,7 @@ public class Board implements BoardInterface {
         this.SIZE = game.getSize();
         this.board = new StoneGroupPointer[SIZE][SIZE];
 
-        int komi = this.GAME.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
+        int komi = this.GAME.getKomi(); // temporary variable; komi will eventually need to be replaced with a simple number of handicap stones, as komi has nothing to do with handicap stones.
 
         if(this.GAME.getRuleset().hasDefaultHandicapPlacement()) {
             /*
@@ -94,21 +94,16 @@ public class Board implements BoardInterface {
             }
         } else {
             /*
-             * TODO: Let the Ruleset place its own handicap stones. This could, for instance, be done by giving it
-             *  a method like "placeHandicapStones(Board board)", which passes "this" in and lets the Ruleset place
-             *  handicap stones. This might require further integration with the Game class if the ruleset allows the
-             *  manual placement of handicap stones, because the BoardPane which would be required for such manual
-             *  placement does not exist yet in memory. However, manual placement of handicap stones would probably
-             *  require at least slight further modifications to the GUI and Game, anyways.
+             * Lets the Ruleset place its own handicap stones.
              */
-
+            this.GAME.getRuleset().setHandicapStones(this, komi);
         }
 
 
     }
 
     @Override
-    public void setStone(int x, int y, StoneColor color, boolean prepareMode) { // TODO: Maybe return boolean for move successful/unsuccessful?
+    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode) { // TODO: Maybe return boolean for move successful/unsuccessful?
         // Are the coordinates invalid?
         if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();
@@ -116,50 +111,86 @@ public class Board implements BoardInterface {
 
         // Is the space already occupied?
         if (board[x][y] != null) {
-            return; // TODO: throw a custom exception?
+            return false; // TODO: throw a custom exception?
         }
 
         // Get neighbors at these x and y coordinates
         Set<StoneGroup> surroundingSGs = getSurroundings(
-                x,
-                y,
-                (sgp) -> sgp != null,
-                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+            x,
+            y,
+            (sgp) -> sgp != null,
+            (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
         // Get liberties at these x and y coordinates
         Set<Position> newStoneLiberties = getSurroundings(
-                x,
-                y,
-                (sgp) -> sgp == null,
-                (neighborX, neighborY) -> new Position(neighborX, neighborY)
+            x,
+            y,
+            (sgp) -> sgp == null,
+            (neighborX, neighborY) -> new Position(neighborX, neighborY)
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
+        Set<StoneGroup> removableSGs = new HashSet<>();
+
         StoneGroup firstSameColorGroup = null;
 
+        /*
+         * Merge groups of the same color as the new stone
+         */
         for (StoneGroup sg : surroundingSGs) {
-            if (sg != null) {
-                sg.removeLiberty(new Position(x, y));
-                if (sg.getStoneColor() == color) {
-                    if (firstSameColorGroup != null) {
-                        firstSameColorGroup.mergeWithStoneGroup(sg);
-                    } else {
-                        sg.mergeWithStoneGroup(newGroup);
-                        firstSameColorGroup = sg;
-                    }
+            sg.removeLiberty(new Position(x, y));
+            if (sg.getStoneColor() == color) {
+                if (firstSameColorGroup != null) {
+                    firstSameColorGroup.mergeWithStoneGroup(sg);
+                    removableSGs.add(sg);
+                } else {
+                    sg.mergeWithStoneGroup(newGroup);
+                    removableSGs.add(newGroup);
+                    firstSameColorGroup = sg;
+                    System.out.println("Found group of same colour!");
                 }
             }
         }
 
+        surroundingSGs.removeAll(removableSGs);
+
         if (firstSameColorGroup == null) {
+            System.out.println("I'm so ronery");
             firstSameColorGroup = newGroup;
             surroundingSGs.add(newGroup);
         }
-        board[x][y] =
-                firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
 
-        if (!prepareMode) {
+        System.out.println("Board currently at " + x + ", " + y + ": " + board[x][y]);
+        System.out.println("Board currently at " + (x + 1) + ", " + y + ": " + board[x + 1][y]);
+        System.out.println("group liberties of " + x + ", " + y + ": " + firstSameColorGroup.getLiberties());
+
+        boolean permittedSuicide = false;
+
+        if (!prepareMode && firstSameColorGroup.getLiberties().size() == 0) {
+            System.out.println("SUICIDE DETECTED!!!");
+            if (!GAME.getRuleset().getSuicide(firstSameColorGroup)) {
+                Position pos = new Position(x, y);
+                firstSameColorGroup.removeLocation(pos);
+                for(StoneGroup sg: surroundingSGs) {
+                    sg.addLiberty(pos);
+                }
+                return false;
+            }
+            permittedSuicide = true;
+        }
+
+        if(!permittedSuicide) {
+            System.out.println("Placing stone down at " + x + ", " + y);
+            board[x][y] =
+                firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
+        }
+
+        if(board[x][y] == null) {
+            System.out.println("Stone was never there!");
+        }
+
+        if(!prepareMode) {
             for (StoneGroup sg : surroundingSGs) {
                 if ((sg.getStoneColor() != color || sg == firstSameColorGroup) && sg.getLiberties().size() == 0) {
                     for (Position p : sg.getLocations()) {
@@ -168,19 +199,22 @@ public class Board implements BoardInterface {
                 }
             }
 
-            // TODO: Call ruleset method instead, because some rulesets (e.g., New Zealand) permit suicide.
-            if (board[x][y] == null) {
-                System.out.println("SUICIDE DETECTED!!!");
-                if(!GAME.getRuleset().getSuicide()) {
-                    return;
-                }
-            }
-
             String saveCol = color == BLACK ? "B" : "W";
             GAME.getFileSaver().addStone(saveCol, x, y);
-            // Update UI
-            fireStoneSet(x, y, color);
         }
+
+        if(board[x][y] == null) {
+            System.out.println("Stone has gone!");
+        }
+
+        // Update UI if possible
+        if(!permittedSuicide) {
+            fireStoneSet(x, y, color, prepareMode);
+        }
+
+        System.out.println();
+
+        return true;
     }
 
     @Override
@@ -211,10 +245,19 @@ public class Board implements BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      * @param c the StoneColor of the stone that has been set
      */
-    private void fireStoneSet(int x, int y, StoneColor c) {
+    private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
         GameCommand gc = GameCommand.BLACKPLAYS;
-        if(c == WHITE) {
-            gc = GameCommand.WHITEPLAYS;
+
+        if(prepareMode) {
+            if(c == BLACK) {
+                gc = GameCommand.BLACKHANDICAP;
+            } else {
+                gc = GameCommand.WHITEHANDICAP;
+            }
+        } else {
+            if (c == WHITE) {
+                gc = GameCommand.WHITEPLAYS;
+            }
         }
         StoneSetEvent e = new StoneSetEvent(gc, x, y, GAME.getCurMoveNumber());
 
@@ -275,6 +318,7 @@ public class Board implements BoardInterface {
 
     public StoneColor getColorAt(int x, int y) {
         if(board[x][y] != null) {
+            System.out.println(board[x][y]);
             return board[x][y].getStoneGroup().getStoneColor();
         } else {
             return null;

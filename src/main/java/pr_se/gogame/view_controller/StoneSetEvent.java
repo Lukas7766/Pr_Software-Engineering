@@ -19,9 +19,9 @@ public class StoneSetEvent extends StoneEvent {
             throw new NullPointerException();
         }
 
-        if(gameCommand == GameCommand.BLACKPLAYS) {
+        if(gameCommand == GameCommand.BLACKPLAYS || gameCommand == GameCommand.BLACKHANDICAP) {
             this.COLOR = StoneColor.BLACK;
-        } else if(gameCommand == GameCommand.WHITEPLAYS) {
+        } else if(gameCommand == GameCommand.WHITEPLAYS || gameCommand == GameCommand.WHITEHANDICAP) {
             this.COLOR = StoneColor.WHITE;
         } else {
             throw new IllegalArgumentException();

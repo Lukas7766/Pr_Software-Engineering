@@ -29,7 +29,7 @@ public class BoardPane extends GridPane {
     /**
      * whether moves have to be confirmed separately, rather than immediately played
      */
-    private boolean needsMoveConfirmation = true;
+    private boolean needsMoveConfirmation = false;
 
     /**
      * whether move numbers are shown on the stones
@@ -88,7 +88,7 @@ public class BoardPane extends GridPane {
     private NumberBinding MAX_CELL_DIM_INT;
 
     // TODO: Remove in final product
-    private final boolean debug = true;
+    private final boolean debug = false;
 
     /**
      *
@@ -123,6 +123,19 @@ public class BoardPane extends GridPane {
 
                     setMouseTransparent(false);
                     init();
+                    break;
+                case BLACKHANDICAP:
+                case WHITEHANDICAP:
+                    StoneSetEvent sseH = (StoneSetEvent) e;
+                    PlayableBoardCell destBC = getPlayableCell(sseH.getX(), sseH.getY());
+
+                    if (sseH.getColor() == BLACK) {
+                        destBC.setBlack();
+                    } else {
+                        destBC.setWhite();
+                    }
+                    destBC.getLabel().setVisible(false);
+
                     break;
                 case BLACKPLAYS:
                 case WHITEPLAYS:
@@ -266,7 +279,11 @@ public class BoardPane extends GridPane {
             int col = getColumnIndex(selectionPBC) - 1;
             int row = getRowIndex(selectionPBC) - 1;
             if(col >= 0 && row >= 0) {
-                game.playMove(col, row);
+                if(game.getHandicapStoneCounter() <= 0) {
+                    game.playMove(col, row);
+                } else {
+                    game.placeHandicapStone(col, row);
+                }
             } else {
                 System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
             }

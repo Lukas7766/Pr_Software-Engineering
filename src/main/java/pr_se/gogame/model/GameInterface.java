@@ -50,11 +50,17 @@ public interface GameInterface {
      */
     StoneColor getColorAt(int x, int y);
 
+    int getHandicapStoneCounter();
+
     void setCurMoveNumber(int curMoveNumber);
 
     void setCurColor(StoneColor c);
 
+    void setHandicapStoneCounter(int counter); // For rulesets with custom, manually placed handicap stones
+
     void fireGameEvent(GameEvent e);
 
     void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
+
+    void placeHandicapStone(int x, int y); // For rulesets with custom handicap stones
 }

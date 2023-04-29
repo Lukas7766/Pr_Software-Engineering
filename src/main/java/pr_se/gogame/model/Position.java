@@ -26,6 +26,11 @@ public class Position /*implements Comparable<Position>*/ {
         return Objects.hash(X, Y);
     }
 
+    @Override
+    public String toString() {
+        return "(" + X + ", " + Y + ")";
+    }
+
     /*@Override
     public int compareTo(Position p) {
         int retVal = this.Y - p.Y;

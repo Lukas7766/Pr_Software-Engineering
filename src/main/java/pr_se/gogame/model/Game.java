@@ -19,12 +19,14 @@ public class Game implements GameInterface {
     private Board board;
 
 
-    private int curMoveNumber = 1;
+    private int curMoveNumber = 0;
     private StoneColor curColor = StoneColor.BLACK;
 
     private Ruleset ruleset = new JapaneseRuleset();
 
     private FileSaver fileSaver;
+
+    private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -54,7 +56,7 @@ public class Game implements GameInterface {
         this.gameCommand = gameCommand;
         this.curMoveNumber = 1;
         System.out.println("newGame, Size: " + size + " Komi: " + komi);
-        this.board = new Board(this, this.curColor);
+        this.board = new Board(this, this.curColor); // Warning: This may set the handicapStoneCounter, so beware of changing it after calling this constructor.
         fireNewGame(gameCommand, size, komi);
     }
 
@@ -165,7 +167,13 @@ public class Game implements GameInterface {
 
     @Override
     public StoneColor getColorAt(int x, int y) {
-        return board.getColorAt(x, y);
+        StoneColor c =  board.getColorAt(x, y);
+        return c;
+    }
+
+    @Override
+    public int getHandicapStoneCounter() {
+        return handicapStoneCounter;
     }
 
     @Override
@@ -186,6 +194,11 @@ public class Game implements GameInterface {
         this.curColor = c;
     }
 
+    @Override
+    public void setHandicapStoneCounter(int counter) {
+        this.handicapStoneCounter = counter;
+    }
+
     /*
         I would have liked to give it default visibility so it's visible only in the same package, but alas IntelliJ
         won't let me.
@@ -199,15 +212,32 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y) {
-        board.setStone(x, y, curColor, false);
+        if(board.setStone(x, y, curColor, false)) {
+            curMoveNumber++;
 
-        curMoveNumber++;
-
-        // Update current player color
-        if(curColor == WHITE) {
-            curColor = BLACK;
+            // Update current player color
+            switchColor();
         } else {
+            System.out.println("Move aborted.");
+        }
+    }
+
+    @Override
+    public void placeHandicapStone(int x, int y) {
+        board.setStone(x, y, curColor, true);
+        handicapStoneCounter--;
+        if(handicapStoneCounter == 0) {
+            switchColor();
+        } else if(handicapStoneCounter < 0) {
+            throw new IllegalStateException();
+        }
+    }
+
+    private void switchColor() {
+        if(curColor == BLACK) {
             curColor = WHITE;
+        } else {
+            curColor = BLACK;
         }
     }
 
