@@ -11,8 +11,23 @@ public abstract class Node {
 
     private BranchNode branchNode = null;
 
+    private int moveNumber;
+
     public Node(SgfToken token, String data) {
         this.token = String.format(token.getValue(),data);
+    }
+
+    public Node(SgfToken token, String data,int moveNumber) {
+        this.token = String.format(token.getValue(),data);
+    }
+
+
+    public int getMoveNumber() {
+        return moveNumber;
+    }
+
+    public void setMoveNumber(int moveNumber) {
+        this.moveNumber = moveNumber;
     }
 
     public void setNext(Node next) {
