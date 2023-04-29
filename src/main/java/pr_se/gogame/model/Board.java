@@ -8,6 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
@@ -156,7 +157,6 @@ public class Board implements BoardInterface {
         surroundingSGs.removeAll(removableSGs);
 
         if (firstSameColorGroup == null) {
-            System.out.println("I'm so ronery");
             firstSameColorGroup = newGroup;
             surroundingSGs.add(newGroup);
         }
@@ -166,18 +166,25 @@ public class Board implements BoardInterface {
         System.out.println("group liberties of " + x + ", " + y + ": " + firstSameColorGroup.getLiberties());
 
         boolean permittedSuicide = false;
+        boolean killAnother = false;
+
+        Set<StoneGroup> otherColorGroups = surroundingSGs.stream().filter(sg -> sg.getStoneColor() != color).collect(Collectors.toSet());
 
         if (!prepareMode && firstSameColorGroup.getLiberties().size() == 0) {
-            System.out.println("SUICIDE DETECTED!!!");
-            if (!GAME.getRuleset().getSuicide(firstSameColorGroup)) {
-                Position pos = new Position(x, y);
-                firstSameColorGroup.removeLocation(pos);
-                for(StoneGroup sg: surroundingSGs) {
-                    sg.addLiberty(pos);
+            if(otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 0)) { // if there are any groups of the opposite color with 0 liberties, the attacker wins and the existing group is removed instead.
+                System.out.println("SUICIDE DETECTED!!!");
+                if (!GAME.getRuleset().getSuicide(firstSameColorGroup)) {
+                    Position pos = new Position(x, y);
+                    firstSameColorGroup.removeLocation(pos);
+                    for (StoneGroup sg : surroundingSGs) {
+                        sg.addLiberty(pos);
+                    }
+                    return false;
                 }
-                return false;
+                permittedSuicide = true;
+            } else {
+                killAnother = true; // TODO: This sort of thing is exactly what ko is about, so this might be a good place to check for ko.
             }
-            permittedSuicide = true;
         }
 
         if(!permittedSuicide) {
@@ -186,13 +193,9 @@ public class Board implements BoardInterface {
                 firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
         }
 
-        if(board[x][y] == null) {
-            System.out.println("Stone was never there!");
-        }
-
         if(!prepareMode) {
             for (StoneGroup sg : surroundingSGs) {
-                if ((sg.getStoneColor() != color || sg == firstSameColorGroup) && sg.getLiberties().size() == 0) {
+                if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !killAnother)) && sg.getLiberties().size() == 0) {
                     for (Position p : sg.getLocations()) {
                         removeStone(p.X, p.Y);
                     }
