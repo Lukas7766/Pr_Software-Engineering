@@ -19,7 +19,9 @@ public interface Ruleset {
     /**
      * @return whether the ruleset permits suicide
      */
-    boolean getSuicide();
+    default boolean getSuicide() {
+        return false;
+    }
 
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
      * This method sets the amount of restricted repetitions.
@@ -39,6 +41,13 @@ public interface Ruleset {
      *
      */
     void scoreGame();
+
+    /**
+     * @return whether the RuleSet uses the default placement of handicap stones or not
+     */
+    default boolean hasDefaultHandicapPlacement() {
+        return true;
+    }
 
     //Kompensationspunkte
 }

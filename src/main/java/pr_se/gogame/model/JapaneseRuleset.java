@@ -7,11 +7,6 @@ public class JapaneseRuleset implements Ruleset {
     }
 
     @Override
-    public boolean getSuicide() {
-        return false;
-    }
-
-    @Override
     public void setKoAmount(int amount) {
 
     }

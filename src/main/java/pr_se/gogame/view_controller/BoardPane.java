@@ -87,7 +87,7 @@ public class BoardPane extends GridPane {
      */
     private NumberBinding MAX_CELL_DIM_INT;
 
-    // TODO: Remove
+    // TODO: Remove in final product
     private final boolean debug = true;
 
     /**

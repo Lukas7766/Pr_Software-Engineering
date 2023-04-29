@@ -49,47 +49,59 @@ public class Board implements BoardInterface {
 
         int komi = this.GAME.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
 
-        /*
-        * Handle handicap stones (After research, I don't think that komi actually means "number of handicap stones").
-        *
-        * TODO: This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
-        *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. Thus, it should be possible
-        *  for a ruleset to override this.
-        */
-        switch (komi) {
-            case 9:
-                setStone(SIZE/2, SIZE/2, beginner, true);
-                komi--;                                                     // set remaining no. to 8
-            case 8:
-                setStone(SIZE / 2, 3, beginner, true);
-                setStone(SIZE / 2, SIZE - 4, beginner, true);
-                komi-=2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
-            default: break;
-        }
+        if(this.GAME.getRuleset().hasDefaultHandicapPlacement()) {
+            /*
+             * This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
+             *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. That is why a ruleset
+             *  may override this.
+             */
+            switch (komi) {
+                case 9:
+                    setStone(SIZE / 2, SIZE / 2, beginner, true);
+                    komi--;                                                     // set remaining no. to 8
+                case 8:
+                    setStone(SIZE / 2, 3, beginner, true);
+                    setStone(SIZE / 2, SIZE - 4, beginner, true);
+                    komi -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
+                default:
+                    break;
+            }
 
-        switch (komi) {
-            case 7:
-                setStone(SIZE / 2, SIZE / 2, beginner, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
-                komi--;
-            case 6:
-                setStone(SIZE - 4, SIZE / 2, beginner, true);
-                setStone(3, SIZE / 2, beginner, true);
-                komi -= 2;
-            default:
-                break;
-        }
+            switch (komi) {
+                case 7:
+                    setStone(SIZE / 2, SIZE / 2, beginner, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
+                    komi--;
+                case 6:
+                    setStone(SIZE - 4, SIZE / 2, beginner, true);
+                    setStone(3, SIZE / 2, beginner, true);
+                    komi -= 2;
+                default:
+                    break;
+            }
 
-        switch (komi) {
-            case 5:
-                setStone(SIZE / 2, SIZE / 2, beginner, true);
-            case 4:
-                setStone(3, 3, beginner, true);
-            case 3:
-                setStone(SIZE - 4, SIZE - 4, beginner, true);
-            case 2:
-                setStone(SIZE - 4, 3, beginner, true);
-                setStone(3, SIZE - 4, beginner, true);
-            default: break;
+            switch (komi) {
+                case 5:
+                    setStone(SIZE / 2, SIZE / 2, beginner, true);
+                case 4:
+                    setStone(3, 3, beginner, true);
+                case 3:
+                    setStone(SIZE - 4, SIZE - 4, beginner, true);
+                case 2:
+                    setStone(SIZE - 4, 3, beginner, true);
+                    setStone(3, SIZE - 4, beginner, true);
+                default:
+                    break;
+            }
+        } else {
+            /*
+             * TODO: Let the Ruleset place its own handicap stones. This could, for instance, be done by giving it
+             *  a method like "placeHandicapStones(Board board)", which passes "this" in and lets the Ruleset place
+             *  handicap stones. This might require further integration with the Game class if the ruleset allows the
+             *  manual placement of handicap stones, because the BoardPane which would be required for such manual
+             *  placement does not exist yet in memory. However, manual placement of handicap stones would probably
+             *  require at least slight further modifications to the GUI and Game, anyways.
+             */
+
         }
 
 
