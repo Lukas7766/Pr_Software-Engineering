@@ -10,7 +10,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.layout.*;
-import pr_se.gogame.model.*;
+import pr_se.gogame.model.Game;
+import pr_se.gogame.model.StoneColor;
 
 import java.io.InputStream;
 import java.util.Objects;
@@ -44,11 +45,6 @@ public class BoardPane extends GridPane {
      * Number of PLAYABLE rows and columns of this board. Does not include the coordinate axes.
      */
     private int size;
-    
-    /**
-     * pointer to the board of the game.
-     */
-    private Board board;
 
     /**
      * the game that is being displayed by this BoardPane
@@ -166,7 +162,6 @@ public class BoardPane extends GridPane {
     private void init() {
         getChildren().removeAll(getChildren());
 
-        this.board = this.game.getBoard();
         this.size = this.game.getSize();
         // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); No, don't to that, it breaks the cells' aspect ratio (even equal insets on all four sides will)
 
@@ -351,10 +346,6 @@ public class BoardPane extends GridPane {
 
     public int getSize() {
         return size;
-    }
-
-    public Board getBoard() {
-        return board;
     }
 
     public Image getTile() {
