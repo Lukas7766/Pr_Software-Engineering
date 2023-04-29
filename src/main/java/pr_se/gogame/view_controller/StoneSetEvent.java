@@ -1,24 +1,32 @@
 package pr_se.gogame.view_controller;
 
+import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
-import pr_se.gogame.model.StoneGroupPointer;
 
 public class StoneSetEvent extends StoneEvent {
     private final StoneColor COLOR;
 
     private final int moveNumber;
 
-    public StoneSetEvent(int col, int row, StoneColor color, int moveNumber) {
-        super(col, row);
+    public StoneSetEvent(GameCommand gameCommand, int col, int row, int moveNumber) {
+        super(gameCommand, col, row);
 
-        if(moveNumber < 0) {
+        if(moveNumber < 0 || col < 0 || row < 0) {
             throw new IllegalArgumentException();
         }
 
-        if(color == null) {
+        if(gameCommand == null) {
             throw new NullPointerException();
         }
-        this.COLOR = color;
+
+        if(gameCommand == GameCommand.BLACKPLAYS || gameCommand == GameCommand.BLACKHANDICAP) {
+            this.COLOR = StoneColor.BLACK;
+        } else if(gameCommand == GameCommand.WHITEPLAYS || gameCommand == GameCommand.WHITEHANDICAP) {
+            this.COLOR = StoneColor.WHITE;
+        } else {
+            throw new IllegalArgumentException();
+        }
+
         this.moveNumber = moveNumber;
     }
 

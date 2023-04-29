@@ -1,25 +1,26 @@
 package pr_se.gogame.view_controller;
 
-import pr_se.gogame.model.StoneColor;
+import pr_se.gogame.model.GameCommand;
 
-public abstract class StoneEvent {
-    private final int COL;
-    private final int ROW;
+public class StoneEvent extends GameEvent {
+    private final int X;
+    private final int Y;
 
-    protected StoneEvent(int col, int row) {
-        if(col < 0 || row < 0) {
+    protected StoneEvent(GameCommand gameCommand, int x, int y) {
+        super(gameCommand);
+        if(x < 0 || y < 0) {
             throw new IllegalArgumentException();
         }
 
-        this.COL = col;
-        this.ROW = row;
+        this.X = x;
+        this.Y = y;
     }
 
-    public int getCol() {
-        return COL;
+    public int getX() {
+        return X;
     }
 
-    public int getRow() {
-        return ROW;
+    public int getY() {
+        return Y;
     }
 }

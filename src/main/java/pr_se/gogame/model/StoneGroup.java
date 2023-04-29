@@ -160,4 +160,8 @@ public class StoneGroup {
     public Set<StoneGroupPointer> getPointers() {
         return pointers;
     }
+
+    public void removeLocation(Position location) {
+        locations.remove(location);
+    }
 }

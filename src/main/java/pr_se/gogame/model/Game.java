@@ -3,10 +3,12 @@ package pr_se.gogame.model;
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
 
-import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+
+import static pr_se.gogame.model.StoneColor.BLACK;
+import static pr_se.gogame.model.StoneColor.WHITE;
 
 public class Game implements GameInterface {
 
@@ -17,7 +19,14 @@ public class Game implements GameInterface {
     private Board board;
 
 
+    private int curMoveNumber = 0;
+    private StoneColor curColor = StoneColor.BLACK;
 
+    private Ruleset ruleset = new JapaneseRuleset();
+
+    private FileSaver fileSaver;
+
+    private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -33,11 +42,21 @@ public class Game implements GameInterface {
 
     @Override
     public void newGame(GameCommand gameCommand, int size, int komi) {
+        if(gameCommand == GameCommand.BLACKSTARTS) {
+            this.curColor = StoneColor.BLACK;
+        } else if (gameCommand == GameCommand.WHITSTARTS) {
+            this.curColor = StoneColor.WHITE;
+        } else {
+            throw new IllegalArgumentException();
+        }
+
+        this.fileSaver = new FileSaver("Black", "White", String.valueOf(size));
         this.size = size;
         this.komi = komi;
         this.gameCommand = gameCommand;
+        this.curMoveNumber = 1;
         System.out.println("newGame, Size: " + size + " Komi: " + komi);
-        this.board = new Board(this, StoneColor.BLACK);
+        this.board = new Board(this, this.curColor); // Warning: This may set the handicapStoneCounter, so beware of changing it after calling this constructor.
         fireNewGame(gameCommand, size, komi);
     }
 
@@ -49,14 +68,27 @@ public class Game implements GameInterface {
 
     @Override
     public boolean importGame(Path path) {
-        //TODO: Das board überchreiben od nd
+        //TODO: Das board überschreiben od nd
         return FileSaver.importFile(path);
     }
 
     @Override
     public boolean exportGame(Path path) {
         System.out.println("saved a file");
-        return board.saveFile(path);
+        return saveFile(path);
+    }
+
+    /*
+     * Note from Gerald: I moved these out of Board, as the FileSaver saves more than just the board's contents, such as player names,
+     * and most importantly the game tree. Additionally, it just seems a good idea to have all IO connections go through
+     * Game, as it is the "main class" of the model.
+     */
+    public boolean saveFile(Path path){
+        return fileSaver.saveFile(path);
+    }
+
+    public boolean importFile(Path path){
+        return FileSaver.importFile(path);
     }
 
     @Override
@@ -113,17 +145,112 @@ public class Game implements GameInterface {
         return this.board;
     }
 
-    private void fireNewGame(GameCommand gameCommand, int size, int komi) {
-        GameEvent e = new GameEvent(gameCommand, size, komi);
+    @Override
+    public int getCurMoveNumber() {
+        return this.curMoveNumber;
+    }
+
+    @Override
+    public StoneColor getCurColor() {
+        return this.curColor;
+    }
+
+    @Override
+    public Ruleset getRuleset() {
+        return this.ruleset;
+    }
+
+    @Override
+    public FileSaver getFileSaver() {
+        return fileSaver;
+    }
+
+    @Override
+    public StoneColor getColorAt(int x, int y) {
+        StoneColor c =  board.getColorAt(x, y);
+        return c;
+    }
+
+    @Override
+    public int getHandicapStoneCounter() {
+        return handicapStoneCounter;
+    }
+
+    @Override
+    public void setCurMoveNumber(int curMoveNumber) {
+        if(curMoveNumber < 1) {
+            throw new IllegalArgumentException();
+        }
+
+        this.curMoveNumber = curMoveNumber;
+    }
+
+    @Override
+    public void setCurColor(StoneColor c) {
+        if(c == null) {
+            throw new NullPointerException();
+        }
+
+        this.curColor = c;
+    }
+
+    @Override
+    public void setHandicapStoneCounter(int counter) {
+        this.handicapStoneCounter = counter;
+    }
+
+    /*
+        I would have liked to give it default visibility so it's visible only in the same package, but alas IntelliJ
+        won't let me.
+     */
+    @Override
+    public void fireGameEvent(GameEvent e) {
         for (GameListener l : listeners) {
             l.gameCommand(e);
         }
     }
 
-    private void fireGameCommand(GameCommand command) {
-        GameEvent e = new GameEvent(command);
-        for (GameListener l : listeners) {
-            l.gameCommand(e);
+    @Override
+    public void playMove(int x, int y) {
+        if(board.setStone(x, y, curColor, false)) {
+            curMoveNumber++;
+
+            // Update current player color
+            switchColor();
+        } else {
+            System.out.println("Move aborted.");
         }
+    }
+
+    @Override
+    public void placeHandicapStone(int x, int y) {
+        board.setStone(x, y, curColor, true);
+        handicapStoneCounter--;
+        if(handicapStoneCounter == 0) {
+            switchColor();
+        } else if(handicapStoneCounter < 0) {
+            throw new IllegalStateException();
+        }
+    }
+
+    private void switchColor() {
+        if(curColor == BLACK) {
+            curColor = WHITE;
+        } else {
+            curColor = BLACK;
+        }
+    }
+
+    private void fireNewGame(GameCommand gameCommand, int size, int komi) {
+        fireGameEvent(new GameEvent(gameCommand, size, komi));
+    }
+
+    private void fireGameCommand(GameCommand command) {
+        fireGameEvent(new GameEvent(command));
+    }
+
+    // TODO: Remove this debug method
+    public void printDebugInfo(int x, int y) {
+        board.printDebugInfo(x, y);
     }
 }

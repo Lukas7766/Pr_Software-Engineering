@@ -4,14 +4,14 @@ import javafx.beans.binding.Bindings;
 import javafx.beans.binding.NumberBinding;
 import javafx.beans.property.DoubleProperty;
 import javafx.beans.property.SimpleDoubleProperty;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
 import javafx.scene.layout.*;
-import pr_se.gogame.model.*;
+import pr_se.gogame.model.Game;
+import pr_se.gogame.model.StoneColor;
 
 import java.io.InputStream;
 import java.util.Objects;
@@ -29,7 +29,7 @@ public class BoardPane extends GridPane {
     /**
      * whether moves have to be confirmed separately, rather than immediately played
      */
-    private boolean needsMoveConfirmation = true;
+    private boolean needsMoveConfirmation = false;
 
     /**
      * whether move numbers are shown on the stones
@@ -45,11 +45,6 @@ public class BoardPane extends GridPane {
      * Number of PLAYABLE rows and columns of this board. Does not include the coordinate axes.
      */
     private int size;
-    
-    /**
-     * pointer to the board of the game.
-     */
-    private Board board;
 
     /**
      * the game that is being displayed by this BoardPane
@@ -92,6 +87,9 @@ public class BoardPane extends GridPane {
      */
     private NumberBinding MAX_CELL_DIM_INT;
 
+    // TODO: Remove in final product
+    private final boolean debug = false;
+
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
@@ -107,8 +105,12 @@ public class BoardPane extends GridPane {
         this.game = game;
         this.graphicsPath = graphicsPath;
 
-        game.addListener(l -> {
-            switch(l.getGameCommand()) {
+        game.addListener(e -> {
+            if(e == null) {
+                throw new NullPointerException();
+            }
+
+            switch(e.getGameCommand()) {
                 case CONFIRMCHOICE:
                     confirmMove();
                     break;
@@ -117,10 +119,45 @@ public class BoardPane extends GridPane {
                     break;
                 case WHITSTARTS:
                 case BLACKSTARTS:
-                    System.out.println(l.getGameCommand()+" inBoardPane: BoardSize: " + l.getSize() + " Komi: "+  l.getKomi());
+                    System.out.println(e.getGameCommand()+" inBoardPane: BoardSize: " + e.getSize() + " Komi: "+  e.getKomi());
 
                     setMouseTransparent(false);
                     init();
+                    break;
+                case BLACKHANDICAP:
+                case WHITEHANDICAP:
+                    StoneSetEvent sseH = (StoneSetEvent) e;
+                    PlayableBoardCell destBC = getPlayableCell(sseH.getX(), sseH.getY());
+
+                    if (sseH.getColor() == BLACK) {
+                        destBC.setBlack();
+                    } else {
+                        destBC.setWhite();
+                    }
+                    destBC.getLabel().setVisible(false);
+
+                    break;
+                case BLACKPLAYS:
+                case WHITEPLAYS:
+                    StoneSetEvent sse = (StoneSetEvent) e;
+                    PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
+                    destinationBC.getLabel().setText("" + sse.getMoveNumber());
+
+                    if (sse.getColor() == BLACK) {
+                        destinationBC.setBlack();
+                    } else {
+                        destinationBC.setWhite();
+                    }
+                    break;
+                case WHITEREMOVED:
+                case BLACKREMOVED:
+                    StoneRemovedEvent sre = (StoneRemovedEvent) e;
+                    getPlayableCell(sre.getX(), sre.getY()).unset();
+                    break;
+                case DEBUGINFO:
+                    DebugEvent de = (DebugEvent) e;
+                    getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
+                    break;
                 default: return;
             }
 
@@ -138,8 +175,7 @@ public class BoardPane extends GridPane {
     private void init() {
         getChildren().removeAll(getChildren());
 
-        setBoard(this.game.getBoard());
-        this.size = board.getSize();
+        this.size = this.game.getSize();
         // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); No, don't to that, it breaks the cells' aspect ratio (even equal insets on all four sides will)
 
         // determine cell size
@@ -197,8 +233,10 @@ public class BoardPane extends GridPane {
                 /*
                  * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
                  * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
+                 *
+                 * Note: I changed this to make sure that Game would be the only connection between Model and View/Controller.
                  */
-                StoneColor c = this.board.getColorAt(j, i);
+                StoneColor c = this.game.getColorAt(j, i);
                 if(c != null) {
                     if(c == BLACK) {
                         bc.setBlack();
@@ -226,46 +264,6 @@ public class BoardPane extends GridPane {
         setAlignment(Pos.CENTER);
     }
 
-    /**
-     * Sets the board that this BoardPane is listening to, as well as adding listeners to it in the first place.
-     * @param board the board that this BoardPane is listening to
-     */
-    public void setBoard(Board board) {
-        this.board = board;
-
-        board.addListener(new GoListener() {
-            @Override
-            public void stoneSet(StoneSetEvent e) {
-                if(e == null) {
-                    throw new NullPointerException();
-                }
-
-                PlayableBoardCell destinationBC = getPlayableCell(e.getCol(), e.getRow());
-                destinationBC.getLabel().setText("" + e.getMoveNumber());
-
-                if(e.getColor() == BLACK) {
-                    destinationBC.setBlack();
-                } else {
-                    destinationBC.setWhite();
-                }
-            }
-
-            @Override
-            public void stoneRemoved(StoneRemovedEvent e) {
-                if(e == null) {
-                    throw new NullPointerException();
-                }
-
-                getPlayableCell(e.getCol(), e.getRow()).unset();
-            }
-
-            @Override
-            public void debugInfoRequested(int x, int y, int StoneGroupPtrNO, int StoneGroupSerialNo) {
-                getPlayableCell(x, y).getLabel().setText(StoneGroupPtrNO + "," + StoneGroupSerialNo);
-            }
-        });
-    }
-
     /*
      * TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse
      *  might be on the board during confirmation)
@@ -274,16 +272,28 @@ public class BoardPane extends GridPane {
      */
     /**
      * If moves are to be confirmed, calling this method confirms a move on the currently selected PlayableBoardCell,
-     * calling the board's setStone() method.
+     * calling the game's playMove() method.
      */
     public void confirmMove() {
         if(selectionPBC != null) {
             int col = getColumnIndex(selectionPBC) - 1;
             int row = getRowIndex(selectionPBC) - 1;
             if(col >= 0 && row >= 0) {
-                board.setStone(col, row, board.getCurColor(), false);
+                if(game.getHandicapStoneCounter() <= 0) {
+                    game.playMove(col, row);
+                } else {
+                    game.placeHandicapStone(col, row);
+                }
             } else {
                 System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
+            }
+
+            if(debug) {
+                for (int i = 0; i < size; i++) {
+                    for (int j = 0; j < size; j++) {
+                        game.printDebugInfo(i, j);
+                    }
+                }
             }
         }
     }
@@ -353,10 +363,6 @@ public class BoardPane extends GridPane {
 
     public int getSize() {
         return size;
-    }
-
-    public Board getBoard() {
-        return board;
     }
 
     public Image getTile() {
@@ -573,7 +579,7 @@ public class BoardPane extends GridPane {
             });*/
 
             setOnMouseEntered((e) -> {
-                if (board.getCurColor() == BLACK) {
+                if (game.getCurColor() == BLACK) {
                     hoverBlack();
                 } else {
                     hoverWhite();
@@ -594,7 +600,7 @@ public class BoardPane extends GridPane {
                 }
                 selectionPBC = this;
 
-                if(board.getCurColor() == BLACK) {
+                if(game.getCurColor() == BLACK) {
                     selectBlack();
                 } else {
                     selectWhite();
