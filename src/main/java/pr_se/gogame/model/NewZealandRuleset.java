@@ -3,16 +3,6 @@ package pr_se.gogame.model;
 public class NewZealandRuleset implements Ruleset {
 
     @Override
-    public void setSuicide(boolean allow) {
-
-    }
-
-    @Override
-    public void setKoAmount(int amount) {
-
-    }
-
-    @Override
     public void scoreGame() {
 
     }
