@@ -167,7 +167,7 @@ public class BoardPane extends GridPane {
         getChildren().removeAll(getChildren());
 
         this.board = this.game.getBoard();
-        this.size = board.getSize();
+        this.size = this.game.getSize();
         // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); No, don't to that, it breaks the cells' aspect ratio (even equal insets on all four sides will)
 
         // determine cell size
@@ -225,8 +225,10 @@ public class BoardPane extends GridPane {
                 /*
                  * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
                  * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
+                 *
+                 * Note: I changed this to make sure that Game would be the only connection between Model and View/Controller.
                  */
-                StoneColor c = this.board.getColorAt(j, i);
+                StoneColor c = this.game.getColorAt(j, i);
                 if(c != null) {
                     if(c == BLACK) {
                         bc.setBlack();
@@ -262,14 +264,14 @@ public class BoardPane extends GridPane {
      */
     /**
      * If moves are to be confirmed, calling this method confirms a move on the currently selected PlayableBoardCell,
-     * calling the board's setStone() method.
+     * calling the game's playMove() method.
      */
     public void confirmMove() {
         if(selectionPBC != null) {
             int col = getColumnIndex(selectionPBC) - 1;
             int row = getRowIndex(selectionPBC) - 1;
             if(col >= 0 && row >= 0) {
-                board.setStone(col, row, game.getCurColor(), false);
+                game.playMove(col, row);
             } else {
                 System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
             }
@@ -277,7 +279,7 @@ public class BoardPane extends GridPane {
             if(debug) {
                 for (int i = 0; i < size; i++) {
                     for (int j = 0; j < size; j++) {
-                        board.printDebugInfo(i, j);
+                        game.printDebugInfo(i, j);
                     }
                 }
             }

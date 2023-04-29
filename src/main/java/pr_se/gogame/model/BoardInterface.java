@@ -25,8 +25,6 @@ public interface BoardInterface {
 
     public Game getGAME();
 
-    public int getSIZE();
-
     public StoneGroupPointer[][] getBoard();
 
     public int getLastDebugX();

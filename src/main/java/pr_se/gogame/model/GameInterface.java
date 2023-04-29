@@ -42,9 +42,19 @@ public interface GameInterface {
 
     Ruleset getRuleset();
 
+    FileSaver getFileSaver();
+
+    /*
+     *  Note by Gerald: I simply added this to GameInterface so that BoardPane could exclusively talk to Game, reducing
+     * coupling. If anyone has a better, more generic idea for such a method, I'm entirely open to suggestions.
+     */
+    StoneColor getColorAt(int x, int y);
+
     void setCurMoveNumber(int curMoveNumber);
 
     void setCurColor(StoneColor c);
 
     void fireGameEvent(GameEvent e);
+
+    void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
 }

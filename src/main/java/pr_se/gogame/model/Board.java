@@ -4,7 +4,6 @@ import pr_se.gogame.view_controller.DebugEvent;
 import pr_se.gogame.view_controller.StoneRemovedEvent;
 import pr_se.gogame.view_controller.StoneSetEvent;
 
-import java.nio.file.Path;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -34,9 +33,6 @@ public class Board implements BoardInterface {
      */
     private final StoneGroupPointer[][] board;
 
-    //TODO: Move this elsewere ?
-    private FileSaver fileSaver;
-
     private int lastDebugX = 0;
     private int lastDebugY = 0;
 
@@ -50,9 +46,8 @@ public class Board implements BoardInterface {
         this.GAME = game;
         this.SIZE = game.getSize();
         this.board = new StoneGroupPointer[SIZE][SIZE];
-        this.fileSaver = new FileSaver("Black","White",String.valueOf(SIZE));
 
-        int komi = game.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
+        int komi = this.GAME.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
 
         /*
         * Handle handicap stones (After research, I don't think that komi actually means "number of handicap stones").
@@ -101,7 +96,7 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public void setStone(int x, int y, StoneColor color, boolean prepareMode) {
+    public void setStone(int x, int y, StoneColor color, boolean prepareMode) { // TODO: Maybe return boolean for move successful/unsuccessful?
         // Are the coordinates invalid?
         if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();
@@ -170,26 +165,16 @@ public class Board implements BoardInterface {
             }
 
             String saveCol = color == BLACK ? "B" : "W";
-            fileSaver.addStone(saveCol, x, y);
+            GAME.getFileSaver().addStone(saveCol, x, y);
             // Update UI
             fireStoneSet(x, y, color);
-
-            GAME.setCurMoveNumber(GAME.getCurMoveNumber() + 1);
-
-            // Update current player color
-            // TODO: Eventually do this in GAME to begin with
-            if(GAME.getCurColor() == WHITE) {
-                GAME.setCurColor(BLACK);
-            } else {
-                GAME.setCurColor(WHITE);
-            }
         }
     }
 
     @Override
     public void removeStone(int x, int y) {
         board[x][y] = null;
-        fileSaver.removeStone(x,y);
+        GAME.getFileSaver().removeStone(x,y);
 
         Set<StoneGroup> surroundingSGs = getSurroundings(
                 x,
@@ -204,25 +189,6 @@ public class Board implements BoardInterface {
 
         // Update UI
         fireStoneRemoved(x, y);
-    }
-
-    public void printDebugInfo(int x, int y) {
-        if(board[x][y] != null && !(x == lastDebugX && y == lastDebugY)) {
-            System.out.println("Group at " + x + ", " + y + ":");
-            System.out.println("Liberties: " + board[x][y].getStoneGroup().getLiberties().size());
-        }
-
-        for(int i = 0; i < SIZE; i++) {
-            for(int j = 0; j < SIZE; j++) {
-                if(board[i][j] != null) {
-                    DebugEvent e = new DebugEvent(GameCommand.DEBUGINFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
-                    GAME.fireGameEvent(e);
-                }
-            }
-        }
-
-        lastDebugX = x;
-        lastDebugY = y;
     }
 
     // Private methods
@@ -290,14 +256,6 @@ public class Board implements BoardInterface {
         return surroundings;
     }
 
-    public boolean saveFile(Path path){
-       return fileSaver.saveFile(path);
-    }
-
-    public boolean importFile(Path path){
-        return FileSaver.importFile(path);
-    }
-
     // Getters and Setters
     public int getSize() {
         return SIZE;
@@ -315,13 +273,11 @@ public class Board implements BoardInterface {
         return GAME;
     }
 
-    public int getSIZE() {
-        return SIZE;
-    }
-
     public StoneGroupPointer[][] getBoard() {
         return board;
     }
+
+    // TODO: Remove these debug methods
 
     public int getLastDebugX() {
         return lastDebugX;
@@ -329,5 +285,24 @@ public class Board implements BoardInterface {
 
     public int getLastDebugY() {
         return lastDebugY;
+    }
+
+    public void printDebugInfo(int x, int y) {
+        if(board[x][y] != null && !(x == lastDebugX && y == lastDebugY)) {
+            System.out.println("Group at " + x + ", " + y + ":");
+            System.out.println("Liberties: " + board[x][y].getStoneGroup().getLiberties().size());
+        }
+
+        for(int i = 0; i < SIZE; i++) {
+            for(int j = 0; j < SIZE; j++) {
+                if(board[i][j] != null) {
+                    DebugEvent e = new DebugEvent(GameCommand.DEBUGINFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    GAME.fireGameEvent(e);
+                }
+            }
+        }
+
+        lastDebugX = x;
+        lastDebugY = y;
     }
 }
