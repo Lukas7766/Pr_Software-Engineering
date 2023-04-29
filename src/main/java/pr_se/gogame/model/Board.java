@@ -161,10 +161,6 @@ public class Board implements BoardInterface {
             surroundingSGs.add(newGroup);
         }
 
-        System.out.println("Board currently at " + x + ", " + y + ": " + board[x][y]);
-        System.out.println("Board currently at " + (x + 1) + ", " + y + ": " + board[x + 1][y]);
-        System.out.println("group liberties of " + x + ", " + y + ": " + firstSameColorGroup.getLiberties());
-
         boolean permittedSuicide = false;
         boolean killAnother = false;
 
