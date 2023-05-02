@@ -260,8 +260,11 @@ public class HeaderPane extends VBox {
             var k = this.gameShortCardList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
             if (moveConfirmationRequired.isSelected()) {
                 k.ifPresent(button -> button.setVisible(true));
+                game.setConfirmationNeeded(true);
+
             } else {
                 k.ifPresent(button -> button.setVisible(false));
+                game.setConfirmationNeeded(false);
             }
         });
 

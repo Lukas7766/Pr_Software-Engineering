@@ -58,9 +58,11 @@ public interface GameInterface {
 
     void setHandicapStoneCounter(int counter); // For rulesets with custom, manually placed handicap stones
 
-    void fireGameEvent(GameEvent e);
+    //void fireGameEvent(GameEvent e);
 
     void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
 
     void placeHandicapStone(int x, int y); // For rulesets with custom handicap stones
+
+    void setConfirmationNeeded(boolean needed);
 }

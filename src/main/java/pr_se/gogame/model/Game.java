@@ -27,6 +27,7 @@ public class Game implements GameInterface {
     private FileSaver fileSaver;
 
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
+    private boolean confirmationNeeded;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -36,13 +37,13 @@ public class Game implements GameInterface {
 
     public void initGame() {
         this.gameCommand = GameCommand.INIT;
-        fireGameCommand(gameCommand);
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
 
     @Override
     public void newGame(GameCommand gameCommand, int size, int komi) {
-        if(gameCommand == GameCommand.BLACKSTARTS) {
+        if (gameCommand == GameCommand.BLACKSTARTS) {
             this.curColor = StoneColor.BLACK;
         } else if (gameCommand == GameCommand.WHITSTARTS) {
             this.curColor = StoneColor.WHITE;
@@ -57,7 +58,7 @@ public class Game implements GameInterface {
         this.curMoveNumber = 1;
         System.out.println("newGame, Size: " + size + " Komi: " + komi);
         this.board = new Board(this, this.curColor); // Warning: This may set the handicapStoneCounter, so beware of changing it after calling this constructor.
-        fireNewGame(gameCommand, size, komi);
+        fireGameEvent(new GameEvent(gameCommand, size, komi));
     }
 
 
@@ -83,11 +84,11 @@ public class Game implements GameInterface {
      * and most importantly the game tree. Additionally, it just seems a good idea to have all IO connections go through
      * Game, as it is the "main class" of the model.
      */
-    public boolean saveFile(Path path){
+    public boolean saveFile(Path path) {
         return fileSaver.saveFile(path);
     }
 
-    public boolean importFile(Path path){
+    public boolean importFile(Path path) {
         return FileSaver.importFile(path);
     }
 
@@ -137,7 +138,7 @@ public class Game implements GameInterface {
     public void confirmChoice() {
         System.out.println("confirmChoice");
         this.gameCommand = GameCommand.CONFIRMCHOICE;
-        fireGameCommand(gameCommand);
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
@@ -167,7 +168,7 @@ public class Game implements GameInterface {
 
     @Override
     public StoneColor getColorAt(int x, int y) {
-        StoneColor c =  board.getColorAt(x, y);
+        StoneColor c = board.getColorAt(x, y);
         return c;
     }
 
@@ -178,7 +179,7 @@ public class Game implements GameInterface {
 
     @Override
     public void setCurMoveNumber(int curMoveNumber) {
-        if(curMoveNumber < 1) {
+        if (curMoveNumber < 1) {
             throw new IllegalArgumentException();
         }
 
@@ -187,7 +188,7 @@ public class Game implements GameInterface {
 
     @Override
     public void setCurColor(StoneColor c) {
-        if(c == null) {
+        if (c == null) {
             throw new NullPointerException();
         }
 
@@ -199,20 +200,9 @@ public class Game implements GameInterface {
         this.handicapStoneCounter = counter;
     }
 
-    /*
-        I would have liked to give it default visibility so it's visible only in the same package, but alas IntelliJ
-        won't let me.
-     */
-    @Override
-    public void fireGameEvent(GameEvent e) {
-        for (GameListener l : listeners) {
-            l.gameCommand(e);
-        }
-    }
-
     @Override
     public void playMove(int x, int y) {
-        if(board.setStone(x, y, curColor, false)) {
+        if (board.setStone(x, y, curColor, false)) {
             curMoveNumber++;
 
             // Update current player color
@@ -226,27 +216,42 @@ public class Game implements GameInterface {
     public void placeHandicapStone(int x, int y) {
         board.setStone(x, y, curColor, true);
         handicapStoneCounter--;
-        if(handicapStoneCounter == 0) {
+        if (handicapStoneCounter == 0) {
             switchColor();
-        } else if(handicapStoneCounter < 0) {
+        } else if (handicapStoneCounter < 0) {
             throw new IllegalStateException();
         }
     }
 
+    @Override
+    public void setConfirmationNeeded(boolean needed) {
+        this.confirmationNeeded = needed;
+        if (needed) {
+            this.gameCommand = GameCommand.ENABLECONFIRMATION;
+        } else {
+            this.gameCommand = GameCommand.DISENABLECONFIRMATION;
+        }
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
     private void switchColor() {
-        if(curColor == BLACK) {
+        if (curColor == BLACK) {
             curColor = WHITE;
         } else {
             curColor = BLACK;
         }
     }
 
-    private void fireNewGame(GameCommand gameCommand, int size, int komi) {
-        fireGameEvent(new GameEvent(gameCommand, size, komi));
-    }
 
-    private void fireGameCommand(GameCommand command) {
-        fireGameEvent(new GameEvent(command));
+    /*
+    I would have liked to give it default visibility so it's visible only in the same package, but alas IntelliJ
+    won't let me.
+    -> 20230502, SeWa: changed to package private
+ */
+    void fireGameEvent(GameEvent e) {
+        for (GameListener l : listeners) {
+            l.gameCommand(e);
+        }
     }
 
     // TODO: Remove this debug method

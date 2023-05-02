@@ -29,7 +29,7 @@ public class BoardPane extends GridPane {
     /**
      * whether moves have to be confirmed separately, rather than immediately played
      */
-    private boolean needsMoveConfirmation = false;
+    private boolean needsMoveConfirmation = true;
 
     /**
      * whether move numbers are shown on the stones
@@ -157,6 +157,12 @@ public class BoardPane extends GridPane {
                 case DEBUGINFO:
                     DebugEvent de = (DebugEvent) e;
                     getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
+                    break;
+                case ENABLECONFIRMATION:
+                    this.needsMoveConfirmation =  true;
+                    break;
+                case DISENABLECONFIRMATION:
+                    this.needsMoveConfirmation =  false;
                     break;
                 default: return;
             }
