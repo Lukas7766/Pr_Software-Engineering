@@ -15,7 +15,9 @@ public class Game implements GameInterface {
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private int size = 19;
-    private int komi = 0;
+    private int handicap = 0;
+
+    private double komi = 7.5;
     private Board board;
 
 
@@ -28,6 +30,8 @@ public class Game implements GameInterface {
 
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
     private boolean confirmationNeeded;
+    private boolean showMoveNumbers;
+    private boolean showCoordinates;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -37,28 +41,30 @@ public class Game implements GameInterface {
 
     public void initGame() {
         this.gameCommand = GameCommand.INIT;
+
+        System.out.println("initGame: " + gameCommand);
         fireGameEvent(new GameEvent(gameCommand));
     }
 
 
     @Override
-    public void newGame(GameCommand gameCommand, int size, int komi) {
-        if (gameCommand == GameCommand.BLACKSTARTS) {
-            this.curColor = StoneColor.BLACK;
-        } else if (gameCommand == GameCommand.WHITSTARTS) {
-            this.curColor = StoneColor.WHITE;
-        } else {
-            throw new IllegalArgumentException();
+    public void newGame(GameCommand gameCommand, int size, int handicap, double komi) {
+        switch (gameCommand) {
+            case BLACKSTARTS -> this.curColor = StoneColor.BLACK;
+            case WHITSTARTS -> this.curColor = StoneColor.WHITE;
+            default -> throw new IllegalArgumentException();
         }
 
         this.fileSaver = new FileSaver("Black", "White", String.valueOf(size));
         this.size = size;
+        this.handicap = handicap;
         this.komi = komi;
         this.gameCommand = gameCommand;
         this.curMoveNumber = 1;
-        System.out.println("newGame, Size: " + size + " Komi: " + komi);
         this.board = new Board(this, this.curColor); // Warning: This may set the handicapStoneCounter, so beware of changing it after calling this constructor.
-        fireGameEvent(new GameEvent(gameCommand, size, komi));
+
+        System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + komi);
+        fireGameEvent(new GameEvent(gameCommand, size, handicap, komi));
     }
 
 
@@ -114,7 +120,12 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public int getKomi() {
+    public int getHandicap() {
+        return this.handicap;
+    }
+
+    @Override
+    public double getKomi() {
         return this.komi;
     }
 
@@ -136,8 +147,8 @@ public class Game implements GameInterface {
 
     @Override
     public void confirmChoice() {
-        System.out.println("confirmChoice");
         this.gameCommand = GameCommand.CONFIRMCHOICE;
+        System.out.println(this.gameCommand);
         fireGameEvent(new GameEvent(gameCommand));
     }
 
@@ -226,10 +237,32 @@ public class Game implements GameInterface {
     @Override
     public void setConfirmationNeeded(boolean needed) {
         this.confirmationNeeded = needed;
-        if (needed) {
+        if (confirmationNeeded) {
             this.gameCommand = GameCommand.ENABLECONFIRMATION;
         } else {
-            this.gameCommand = GameCommand.DISENABLECONFIRMATION;
+            this.gameCommand = GameCommand.DISABLECONFIRMATION;
+        }
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public void setShowMoveNumbers(boolean show) {
+        this.showMoveNumbers = show;
+        if (show) {
+            this.gameCommand = GameCommand.ENABLEMOVENUMBERS;
+        } else {
+            this.gameCommand = GameCommand.DISABLEMOVENUMBERS;
+        }
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public void setShowCoordinates(boolean show) {
+        this.showCoordinates = show;
+        if (show) {
+            this.gameCommand = GameCommand.ENABLECOORDINATES;
+        } else {
+            this.gameCommand = GameCommand.DISABLECOORDINATES;
         }
         fireGameEvent(new GameEvent(gameCommand));
     }

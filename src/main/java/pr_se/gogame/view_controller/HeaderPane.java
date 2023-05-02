@@ -297,9 +297,11 @@ public class HeaderPane extends VBox {
             }
         });
 
-        SeparatorMenuItem sep = new SeparatorMenuItem();
+        SeparatorMenuItem sep1 = new SeparatorMenuItem();
+        menu.getItems().add(1, sep1);
 
-        menu.getItems().add(2, sep);
+        SeparatorMenuItem sep2 = new SeparatorMenuItem();
+        menu.getItems().add(4, sep2);
 
         return menu;
     }
@@ -321,7 +323,14 @@ public class HeaderPane extends VBox {
         viewSectionItems.add(showMoveNumbersCBtn);
         showMoveNumbersCBtn.setSelected(false);
         showMoveNumbersCBtn.setOnAction(e -> {
-            System.out.println(showMoveNumbersCBtn.isSelected());
+            game.setShowMoveNumbers(showMoveNumbersCBtn.isSelected());
+        });
+
+        CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("Show Coordinates");
+        viewSectionItems.add(showCoordinatesCBtn);
+        showCoordinatesCBtn.setSelected(true);
+        showCoordinatesCBtn.setOnAction(e -> {
+            game.setShowCoordinates(showCoordinatesCBtn.isSelected());
         });
         menu.getItems().addAll(viewSectionItems);
 

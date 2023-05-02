@@ -28,8 +28,9 @@ public class SidePane extends StackPane {
 
     private final int maxCustomBoardSize = 26;
     private final int minCustomBoardSize = 5;
-    private final int maxKomiAmount = 9;
-    private final int minKomiAmount = 0;
+    private final int maxHandicapAmount = 9;
+    private final int minHandicapAmount = 0;
+    private final double komi = 7.5;
     private final Game game;
     private final Color backColor;
 
@@ -211,21 +212,37 @@ public class SidePane extends StackPane {
             customSize.setDisable(t1.hashCode() != custom.hashCode());
             System.out.println(((RadioButton) t1).getText());
         });
-        //Handicap //ToDo refactor naming
-        Label komi = new Label();
-        komi.setFont(Font.font(null, FontWeight.NORMAL, 13));
-        komi.setText("Handicap");
-        komi.setPadding(new Insets(5));
-        gridPane.add(komi, 0, 6);
+        
+        //Handicap
+        Label handicapLbl = new Label();
+        handicapLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        handicapLbl.setText("Handicap");
+        handicapLbl.setPadding(new Insets(5));
+        gridPane.add(handicapLbl, 0, 6);
 
-        Spinner<Integer> komiCnt = new Spinner<>(minKomiAmount, maxKomiAmount, minKomiAmount, 1);
+        Spinner<Integer> handicapCnt = new Spinner<>(minHandicapAmount, maxHandicapAmount, minHandicapAmount, 1);
         //customSize.setDisable(true);
-        komiCnt.setMaxSize(55, 15);
-        SpinnerValueFactory.IntegerSpinnerValueFactory komiIntFactory =
-                (SpinnerValueFactory.IntegerSpinnerValueFactory) komiCnt.getValueFactory();
+        handicapCnt.setMaxSize(55, 15);
+        SpinnerValueFactory.IntegerSpinnerValueFactory handicapIntFactory =
+                (SpinnerValueFactory.IntegerSpinnerValueFactory) handicapCnt.getValueFactory();
         //TextField customSize = new TextField();
         //customSize.setTextFormatter(new TextFormatter<>(new NumberStringConverter()));
-        gridPane.add(komiCnt, 1, 6);
+        gridPane.add(handicapCnt, 1, 6);
+
+        //Komi
+        Label komiLbl = new Label();
+        komiLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        komiLbl.setText("Komi");
+        komiLbl.setPadding(new Insets(5));
+        gridPane.add(komiLbl, 0, 7);
+
+        Label komiCntLbl = new Label();
+        komiCntLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        komiCntLbl.setText(""+komi);
+        komiCntLbl.setPadding(new Insets(5));
+        komiCntLbl.setDisable(true);
+        gridPane.add(komiCntLbl, 1, 7);
+
 
 
         //start Button
@@ -235,14 +252,14 @@ public class SidePane extends StackPane {
         startGameBtn.setOnAction(event -> {
             //this.getChildren().remove(gridPane);
             RadioButton selected = (RadioButton) boardSize.getSelectedToggle();
-            int handicap = komiIntFactory.getValue();
+            int handicap = handicapIntFactory.getValue();
             int actualBoardSize;
 
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
             System.out.println("BoardSize: " + actualBoardSize + " Handicap: " + handicap);
-            game.newGame(GameCommand.BLACKSTARTS, actualBoardSize, handicap);
+            game.newGame(GameCommand.BLACKSTARTS, actualBoardSize, handicap, komi);
         });
 
         //colum, row,

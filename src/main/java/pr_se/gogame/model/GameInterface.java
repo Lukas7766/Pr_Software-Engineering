@@ -10,7 +10,7 @@ public interface GameInterface {
     boolean saveGame(Path path);
 
     void initGame();
-    void newGame(GameCommand gameCommand, int size, int komi);
+    void newGame(GameCommand gameCommand, int size, int handicap, double komi);
 
     boolean importGame(Path path);
 
@@ -24,7 +24,9 @@ public interface GameInterface {
 
     int getSize();
 
-    int getKomi();
+    int getHandicap();
+
+    double getKomi();
 
     void addListener(GameListener l);
 
@@ -65,4 +67,8 @@ public interface GameInterface {
     void placeHandicapStone(int x, int y); // For rulesets with custom handicap stones
 
     void setConfirmationNeeded(boolean needed);
+
+    void setShowMoveNumbers(boolean show);
+
+    void setShowCoordinates(boolean show);
 }

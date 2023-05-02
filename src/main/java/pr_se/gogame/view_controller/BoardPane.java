@@ -34,7 +34,7 @@ public class BoardPane extends GridPane {
     /**
      * whether move numbers are shown on the stones
      */
-    private boolean showsMoveNumbers = true;
+    private boolean showsMoveNumbers = false;
 
     /**
      * whether coordinates are shown on the sides of the board
@@ -119,8 +119,6 @@ public class BoardPane extends GridPane {
                     break;
                 case WHITSTARTS:
                 case BLACKSTARTS:
-                    System.out.println(e.getGameCommand()+" inBoardPane: BoardSize: " + e.getSize() + " Komi: "+  e.getKomi());
-
                     setMouseTransparent(false);
                     init();
                     break;
@@ -159,10 +157,22 @@ public class BoardPane extends GridPane {
                     getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
                     break;
                 case ENABLECONFIRMATION:
-                    this.needsMoveConfirmation =  true;
+                    setMoveConfirmation(true);
                     break;
-                case DISENABLECONFIRMATION:
-                    this.needsMoveConfirmation =  false;
+                case DISABLECONFIRMATION:
+                    setMoveConfirmation(false);
+                    break;
+                case ENABLECOORDINATES:
+                    setShowsCoordinates(true);
+                    break;
+                case DISABLECOORDINATES:
+                    setShowsCoordinates(false);
+                    break;
+                case ENABLEMOVENUMBERS:
+                    setShowsMoveNumbers(true);
+                    break;
+                case DISABLEMOVENUMBERS:
+                    setShowsMoveNumbers(false);
                     break;
                 default: return;
             }
@@ -646,6 +656,7 @@ public class BoardPane extends GridPane {
          */
         public void showMoveNumber() {
             LABEL.setVisible(CURRENTLY_SET_STONE != null && showsMoveNumbers);
+            updateLabelColor();
         }
 
         /**

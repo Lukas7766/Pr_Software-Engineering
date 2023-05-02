@@ -48,7 +48,7 @@ public class Board implements BoardInterface {
         this.SIZE = game.getSize();
         this.board = new StoneGroupPointer[SIZE][SIZE];
 
-        int komi = this.GAME.getKomi(); // temporary variable; komi will eventually need to be replaced with a simple number of handicap stones, as komi has nothing to do with handicap stones.
+        int komi = this.GAME.getHandicap(); // temporary variable; komi will eventually need to be replaced with a simple number of handicap stones, as komi has nothing to do with handicap stones.
 
         if(this.GAME.getRuleset().hasDefaultHandicapPlacement()) {
             /*

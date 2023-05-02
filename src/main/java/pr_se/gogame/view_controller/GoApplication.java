@@ -38,14 +38,15 @@ public class GoApplication extends Application {
         BoardPane bp = new BoardPane(game, path+"debug.zip");
         // bp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(5), null/*new Insets(5, 5, 5, 2.5)*/)));
 
-        Button changeGFX = new Button("Change graphics set");
+        Button changeGFX = new Button("CGS");
         changeGFX.setOnAction((e) -> bp.setGraphicsPath(path + "inverted.zip"));
-        Button toggleCoords = new Button("Toggle Coordinates");
-        toggleCoords.setOnAction((e) -> bp.setShowsCoordinates(!bp.showsCoordinates()));
-        Button toggleMoveNos = new Button("Toggle Move Numbers");
-        toggleMoveNos.setOnAction((e) -> bp.setShowsMoveNumbers(!bp.showsMoveNumbers()));
+        //Button toggleCoords = new Button("Toggle Coordinates");
+        //toggleCoords.setOnAction((e) -> bp.setShowsCoordinates(!bp.showsCoordinates()));
+        //Button toggleMoveNos = new Button("Toggle Move Numbers");
+        //toggleMoveNos.setOnAction((e) -> bp.setShowsMoveNumbers(!bp.showsMoveNumbers()));
         VBox debugButtons = new VBox();
-        debugButtons.getChildren().addAll(changeGFX, toggleCoords, toggleMoveNos);
+        //debugButtons.getChildren().addAll(changeGFX, toggleCoords, toggleMoveNos);
+        debugButtons.getChildren().add(changeGFX);
 
         root.setCenter(bp);
         HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, stage, game);
