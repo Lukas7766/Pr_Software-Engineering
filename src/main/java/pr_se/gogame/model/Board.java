@@ -34,7 +34,14 @@ public class Board implements BoardInterface {
      */
     private final StoneGroupPointer[][] board;
 
+    /**
+     * count KO moves
+     */
     private int currentKOCnt = 1;
+
+    /**
+     * Position for preventing KO-Move
+     */
     private Position ko;
 
     private int lastDebugX = 0;
