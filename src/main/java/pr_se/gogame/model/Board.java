@@ -34,6 +34,9 @@ public class Board implements BoardInterface {
      */
     private final StoneGroupPointer[][] board;
 
+    private int currentKOCnt = 1;
+    private Position ko;
+
     private int lastDebugX = 0;
     private int lastDebugY = 0;
 
@@ -115,6 +118,16 @@ public class Board implements BoardInterface {
             return false; // TODO: throw a custom exception?
         }
 
+        //prevent KO
+        if(ko!=null && ko.X == x && ko.Y == y) {
+            System.out.println("KO detected");
+            return false;
+        }
+        else if (ko !=null){
+            ko = null;
+            currentKOCnt = 1;
+        }
+
         // Get neighbors at these x and y coordinates
         Set<StoneGroup> surroundingSGs = getSurroundings(
                 x,
@@ -179,7 +192,15 @@ public class Board implements BoardInterface {
                 }
                 permittedSuicide = true;
             } else {
-                killAnother = true; // TODO: This sort of thing is exactly what ko is about, so this might be a good place to check for ko.
+                System.out.println("killAnother " + currentKOCnt);
+                if (GAME.getRuleset().getKoAmount() > currentKOCnt) {
+                    killAnother = true; // TODO: This sort of thing is exactly what ko is about, so this might be a good place to check for ko.
+                    currentKOCnt++;
+                }else {
+                    System.out.println("KO detected");
+                    ko = new Position(x, y);
+                    return false;
+                }
             }
         }
 
