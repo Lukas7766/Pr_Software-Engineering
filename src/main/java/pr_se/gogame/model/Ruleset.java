@@ -18,7 +18,12 @@ public interface Ruleset {
     }
 
     /** Evaluation is the central feature of a set of rules; It varies depending on the set of rules.
-     *
+     *7.1 A game is played until both parties agree that it is
+     * finished.
+     * 7.2 During the game, if one player resigns, the game
+     * is finished.
+     * 7.3 If both players pass one after the other, the game
+     * is finished.
      */
     void scoreGame();
 
@@ -36,9 +41,6 @@ public interface Ruleset {
      * @param board The board that these handicap stones are to be set for (this is used to get the game, as well).
      * @param noStones The number of handicap stones to be placed
      */
-    default void setHandicapStones(Board board, int noStones) {
-        return;
-    }
+    default void setHandicapStones(Board board, int noStones) {}
 
-    //Kompensationspunkte
 }

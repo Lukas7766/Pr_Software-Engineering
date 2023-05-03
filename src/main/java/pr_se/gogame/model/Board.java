@@ -117,18 +117,18 @@ public class Board implements BoardInterface {
 
         // Get neighbors at these x and y coordinates
         Set<StoneGroup> surroundingSGs = getSurroundings(
-            x,
-            y,
-            (sgp) -> sgp != null,
-            (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+                x,
+                y,
+                (sgp) -> sgp != null,
+                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
         // Get liberties at these x and y coordinates
         Set<Position> newStoneLiberties = getSurroundings(
-            x,
-            y,
-            (sgp) -> sgp == null,
-            (neighborX, neighborY) -> new Position(neighborX, neighborY)
+                x,
+                y,
+                (sgp) -> sgp == null,
+                (neighborX, neighborY) -> new Position(neighborX, neighborY)
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
@@ -186,7 +186,7 @@ public class Board implements BoardInterface {
         if(!permittedSuicide) {
             System.out.println("Placing stone down at " + x + ", " + y);
             board[x][y] =
-                firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
+                    firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
         }
 
         if(!prepareMode) {

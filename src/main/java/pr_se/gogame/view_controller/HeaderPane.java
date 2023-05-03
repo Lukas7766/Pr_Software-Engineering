@@ -1,6 +1,5 @@
 package pr_se.gogame.view_controller;
 
-import javafx.event.Event;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -8,7 +7,6 @@ import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 
 import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -19,7 +17,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -88,8 +85,7 @@ public class HeaderPane extends VBox {
         this.getChildren().add(menuBar);
         this.getChildren().add(shortMenu());
 
-        //ToDo exceeding competence -> onCloseAction
-        stage.setOnCloseRequest(this::onCloseAction);
+        stage.setOnCloseRequest(e -> CustomCloseAction.onCloseAction(stage, game, e, filterList));
     }
 
     /**
@@ -211,7 +207,7 @@ public class HeaderPane extends VBox {
         importFileItem.setText("Import Game");
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
-            File f = fileDialog(false, filterList);
+            File f = CustomFileDialog.getFile(stage, false, filterList);//fileDialog(false, filterList);
             if (f != null) game.importGame(f.toPath());
             else System.out.println("Import Dialog cancelled");
         });
@@ -220,7 +216,7 @@ public class HeaderPane extends VBox {
         exportFileItem.setText("Export Game");
         files.getItems().add(exportFileItem);
         exportFileItem.setOnAction(e -> {
-            File f = fileDialog(true, filterList);
+            File f = CustomFileDialog.getFile(stage, true, filterList);//fileDialog(true, filterList);
             if (f != null) game.exportGame(f.toPath());
             else System.out.println("Export Dialog cancelled");
         });
@@ -228,7 +224,7 @@ public class HeaderPane extends VBox {
         MenuItem exitGameItem = new MenuItem();
         exitGameItem.setText("Exit Game");
         files.getItems().add(exitGameItem);
-        exitGameItem.setOnAction(e -> onCloseAction()); //ToDo exceeding competence -> onCloseAction
+        exitGameItem.setOnAction(e -> CustomCloseAction.onCloseAction(stage, game, null, filterList)); //onCloseAction(null)
 
 
         SeparatorMenuItem sep1 = new SeparatorMenuItem();
@@ -374,89 +370,4 @@ public class HeaderPane extends VBox {
         return menu;
     }
 
-
-    /**
-     * Creates a parameterizes File Dialog
-     *
-     * @param isSave true for saving a file, false for opening a file
-     * @param filter pass list of Extension Filters
-     * @return where to save or open the FILE
-     */
-    private File fileDialog(boolean isSave, HashSet<FileChooser.ExtensionFilter> filter) {
-
-        FileChooser fileChooser = new FileChooser();
-
-        if (filter != null && !filter.isEmpty()) filter.forEach(i -> fileChooser.getExtensionFilters().add(i));
-
-        return (isSave) ? fileChooser.showSaveDialog(stage) : fileChooser.showOpenDialog(stage);
-    }
-
-    /**
-     * Handles the on close action <br>
-     * -> without save <br>
-     * -> with save <br>
-     * -> cancel <br>
-     */
-    private void onCloseAction() { //ToDo exceeding competence -> onCloseAction
-        onCloseAction(null);
-
-    }
-
-    /**
-     * Handles the on close action<br>
-     * -> without save <br>
-     * -> with save <br>
-     * -> cancel <br>
-     *
-     * @param e Event
-     */
-    private void onCloseAction(Event e) {
-
-        if (game.getGameState() == GameCommand.INIT) {
-            Platform.exit();
-            System.exit(0);
-        }
-        System.out.println(game.getGameState());
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Close Go Game");
-        alert.setHeaderText("Do you really want to close your Game?");
-        alert.setContentText("Choose your option:");
-        alert.initOwner(stage);
-
-        ButtonType noSaveBtn = new ButtonType("without save");
-        ButtonType saveBtn = new ButtonType("with save");
-        ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(saveBtn, noSaveBtn, cancelBtn);
-
-        Optional<ButtonType> btnResult = alert.showAndWait();
-
-        btnResult.ifPresent(er -> {
-            switch (er.getText()) {
-                case "without save" -> Platform.exit();
-                case "with save" -> {
-                    File f = fileDialog(true, filterList);
-                    if (f != null) {
-                        if (game.saveGame(f.toPath())) {
-                            Platform.exit();
-                            System.exit(0);
-                        }
-                    }
-                    System.out.println("Info");
-                    Alert info = new Alert(Alert.AlertType.INFORMATION);
-                    info.setTitle("Close Go Game - Info");
-                    info.setHeaderText("Saving your game didn't work.");
-                    info.setContentText("Try it again!");
-                    info.initOwner(stage);
-                    info.showAndWait();
-                    if (e != null) e.consume();
-                }
-                case "Cancel" ->  {if (e != null) e.consume();}
-            }
-        });
-
-
-
-
-    }
 }

@@ -177,7 +177,7 @@ public class BoardPane extends GridPane {
                 default: return;
             }
 
-        }); //ToDo: full Event integration
+        });
 
         loadGraphics(graphicsPath);
         init();

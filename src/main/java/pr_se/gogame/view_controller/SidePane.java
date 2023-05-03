@@ -150,8 +150,8 @@ public class SidePane extends StackPane {
      * newGame creates a panel that is a dialog for creating a new game<br>
      * At least it contains: <br>
      * -> Board size options <br>
-     * -> Komi spinner <br>
-     *
+     * -> Handicap spinner <br>
+     * -> Komi <br>
      * @return a GridPane which contains items for creating a new game.
      */
     private GridPane newGame() {
@@ -258,7 +258,6 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            System.out.println("BoardSize: " + actualBoardSize + " Handicap: " + handicap);
             game.newGame(GameCommand.BLACKSTARTS, actualBoardSize, handicap, komi);
         });
 

@@ -63,7 +63,7 @@ public class Game implements GameInterface {
         this.curMoveNumber = 1;
         this.board = new Board(this, this.curColor); // Warning: This may set the handicapStoneCounter, so beware of changing it after calling this constructor.
 
-        System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + komi);
+        System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + komi + "\n");
         fireGameEvent(new GameEvent(gameCommand, size, handicap, komi));
     }
 
@@ -220,6 +220,7 @@ public class Game implements GameInterface {
             switchColor();
         } else {
             System.out.println("Move aborted.");
+
         }
     }
 
