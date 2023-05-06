@@ -2,9 +2,58 @@ package pr_se.gogame.model;
 
 public class AncientChineseRuleset implements Ruleset {
 
+    private int currentKOCnt = 0;
+    private Position koMove;
+
+    @Override
+    public int getKoAmount() {
+        return 1;
+    }
+
+    @Override
+    public boolean predicateKoMove(int x, int y) {
+
+        System.out.println("predicateKoMove X:" + x + " Y: " + y);
+
+        if (this.getKoAmount() > currentKOCnt) {
+            currentKOCnt++;
+            return false;
+        }
+        if (koMove == null) koMove = new Position(x, y);
+
+        return koMove.X == x && koMove.Y == y;
+
+    }
+
+    public Position getKoMove(){
+        return koMove;
+    }
+
+    @Override
+    public void resetKoMove() {
+        this.koMove = null;
+        this.currentKOCnt = 0;
+    }
+
     @Override
     public void scoreGame(Board board) {
 
+        if (board == null) throw new IllegalArgumentException();
+
+        int scoreBlack = 0;
+        int scoreWhite = 0;
+        for (int i = 0; i < board.getBoard().length - 1; i++) {
+            for (int j = 0; j < board.getBoard()[i].length - 1; j++) {
+                StoneGroupPointer p = board.getBoard()[i][j];
+                if (p == null) continue;
+                StoneGroup stoneGroup = p.getStoneGroup();
+                if (stoneGroup == null) continue;
+                if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.BLACK) scoreBlack++;
+                else if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.WHITE) scoreWhite++;
+            }
+        }
+        System.out.println("Score Black: " + scoreBlack);
+        System.out.println("Score White: " + scoreWhite);
 
     }
 

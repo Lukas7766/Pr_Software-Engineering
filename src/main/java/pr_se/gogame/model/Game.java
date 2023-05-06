@@ -20,6 +20,8 @@ public class Game implements GameInterface {
     private double komi = 7.5;
     private Board board;
 
+    private int koCounter = 0;
+
 
     private int curMoveNumber = 0;
     private StoneColor curColor = StoneColor.BLACK;
@@ -112,6 +114,7 @@ public class Game implements GameInterface {
     @Override
     public void scoreGame() {
         System.out.println("scoreGame");
+        ruleset.scoreGame(board);
     }
 
     @Override

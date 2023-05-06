@@ -17,6 +17,12 @@ public interface Ruleset {
         return 2;
     }
 
+    boolean predicateKoMove(int x, int y);
+
+    Position getKoMove();
+
+    void resetKoMove();
+
     /** Evaluation is the central feature of a set of rules; It varies depending on the set of rules.
      *7.1 A game is played until both parties agree that it is
      * finished.
@@ -42,5 +48,6 @@ public interface Ruleset {
      * @param noStones The number of handicap stones to be placed
      */
     default void setHandicapStones(Board board, int noStones) {}
+
 
 }

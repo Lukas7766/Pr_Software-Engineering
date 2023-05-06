@@ -50,6 +50,21 @@ public class UserDefinableRuleset implements Ruleset {
         return koAmount;
     }
 
+    @Override
+    public boolean predicateKoMove(int x, int y) {
+        return false;
+    }
+
+    @Override
+    public Position getKoMove() {
+        return null;
+    }
+
+    @Override
+    public void resetKoMove() {
+
+    }
+
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
      * Two consecutive moves (except passing) may not restore the original position.
      * @return 2

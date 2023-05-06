@@ -13,6 +13,21 @@ public class NewZealandRuleset implements Ruleset {
     }
 
     @Override
+    public boolean predicateKoMove(int x, int y) {
+        return false;
+    }
+
+    @Override
+    public Position getKoMove() {
+        return null;
+    }
+
+    @Override
+    public void resetKoMove() {
+
+    }
+
+    @Override
     public boolean hasDefaultHandicapPlacement() {
         return false;
     }
