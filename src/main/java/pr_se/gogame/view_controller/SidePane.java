@@ -86,6 +86,12 @@ public class SidePane extends StackPane {
         VBox infoPane = new VBox();
         infoPane.setPadding(new Insets(5));
 
+        Label gameBoardLbl = new Label("Game Board");
+        gameBoardLbl.setFont(Font.font(null,FontWeight.BOLD,24));
+        infoPane.getChildren().add(gameBoardLbl);
+
+        //-----------------------------------------
+        //Player Info
         HBox playerInfo = new HBox();
 
         Label currentPlayer = new Label();
@@ -99,6 +105,46 @@ public class SidePane extends StackPane {
         playerInfo.getChildren().add(actualPlayer);
 
         infoPane.getChildren().add(playerInfo);
+
+        Pane spring1 = new Pane();
+        spring1.minHeightProperty().bind(currentPlayer.heightProperty());
+        infoPane.getChildren().add(spring1);
+
+        //-----------------------------------------
+        //Score Board
+        VBox scoreboard = new VBox();
+
+        Label scoreLbl = new Label("Score");
+        scoreLbl.setFont(Font.font(null,FontWeight.BOLD,20));
+        scoreboard.getChildren().add(scoreLbl);
+
+        GridPane scorePane = new GridPane();
+
+        Label p1 = new Label("Player Black:");
+        p1.setFont(Font.font(null,FontWeight.BOLD,13));
+        scorePane.add(p1,0,0);
+
+        Label scoreCountP1 = new Label("0");
+        scoreCountP1.setPadding(new Insets(0,0,0,15));
+        scoreCountP1.setFont(Font.font(null,FontWeight.NORMAL,13));
+        scorePane.add(scoreCountP1,1,0);
+
+
+        Label p2 = new Label("Player White:");
+        p2.setFont(Font.font(null,FontWeight.BOLD,13));
+        scorePane.add(p2,0,1);
+
+        Label scoreCountP2 = new Label("0");
+        scoreCountP2.setPadding(new Insets(0,0,0,15));
+        scoreCountP2.setFont(Font.font(null,FontWeight.NORMAL,13));
+        scorePane.add(scoreCountP2,1,1);
+
+        scoreboard.getChildren().add(scorePane);
+        infoPane.getChildren().add(scoreboard);
+
+
+
+
 
         /*
          * Comment by Gerald:
@@ -116,15 +162,19 @@ public class SidePane extends StackPane {
             }
         });
 
-        Pane spring1 = new Pane();
-        spring1.minHeightProperty().bind(currentPlayer.heightProperty());
-        infoPane.getChildren().add(spring1);
 
+
+        Pane spring2 = new Pane();
+        spring2.setMinWidth(25);
+        infoPane.getChildren().add(spring2);
+
+
+        VBox explanationBoad = new VBox();
         //ToDo proper integration postponed to Sprint 2
         Label explanationLabel = new Label();
         explanationLabel.setFont(Font.font(null, FontWeight.BOLD, 13));
         explanationLabel.setText("Turn Explanation:");
-        infoPane.getChildren().add(explanationLabel);
+        explanationBoad.getChildren().add(explanationLabel);
 
         ScrollPane textArea = new ScrollPane();
         textArea.setFitToWidth(true);
@@ -141,7 +191,8 @@ public class SidePane extends StackPane {
         textFlow.getChildren().add(explanation);
 
         textArea.setContent(textFlow);
-        infoPane.getChildren().add(textArea);
+        explanationBoad.getChildren().add(textArea);
+        //explanationBoad.getChildren().add(textArea);
 
         return infoPane;
     }
