@@ -58,7 +58,7 @@ public class Board implements BoardInterface {
         this.SIZE = game.getSize();
         this.board = new StoneGroupPointer[SIZE][SIZE];
 
-        int komi = this.GAME.getHandicap(); // temporary variable; komi will eventually need to be replaced with a simple number of handicap stones, as komi has nothing to do with handicap stones.
+        int handicap = this.GAME.getHandicap(); // temporary variable; handicap will eventually need to be replaced with a simple number of handicap stones, as handicap has nothing to do with handicap stones.
 
         if(this.GAME.getRuleset().hasDefaultHandicapPlacement()) {
             /*
@@ -66,31 +66,31 @@ public class Board implements BoardInterface {
              *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. That is why a ruleset
              *  may override this.
              */
-            switch (komi) {
+            switch (handicap) {
                 case 9:
                     setStone(SIZE / 2, SIZE / 2, beginner, true);
-                    komi--;                                                     // set remaining no. to 8
+                    handicap--;                                                     // set remaining no. to 8
                 case 8:
                     setStone(SIZE / 2, 3, beginner, true);
                     setStone(SIZE / 2, SIZE - 4, beginner, true);
-                    komi -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
+                    handicap -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
                 default:
                     break;
             }
 
-            switch (komi) {
+            switch (handicap) {
                 case 7:
                     setStone(SIZE / 2, SIZE / 2, beginner, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
-                    komi--;
+                    handicap--;
                 case 6:
                     setStone(SIZE - 4, SIZE / 2, beginner, true);
                     setStone(3, SIZE / 2, beginner, true);
-                    komi -= 2;
+                    handicap -= 2;
                 default:
                     break;
             }
 
-            switch (komi) {
+            switch (handicap) {
                 case 5:
                     setStone(SIZE / 2, SIZE / 2, beginner, true);
                 case 4:
@@ -107,7 +107,7 @@ public class Board implements BoardInterface {
             /*
              * Lets the Ruleset place its own handicap stones.
              */
-            this.GAME.getRuleset().setHandicapStones(this, komi);
+            this.GAME.getRuleset().setHandicapStones(this, handicap);
         }
 
 

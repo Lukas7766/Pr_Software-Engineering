@@ -3,7 +3,8 @@ package pr_se.gogame.model;
 public class AncientChineseRuleset implements Ruleset {
 
     @Override
-    public void scoreGame() {
+    public void scoreGame(Board board) {
+
 
     }
 

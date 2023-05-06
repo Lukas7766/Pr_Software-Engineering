@@ -25,7 +25,7 @@ public interface Ruleset {
      * 7.3 If both players pass one after the other, the game
      * is finished.
      */
-    void scoreGame();
+    void scoreGame(Board board);
 
     /**
      * @return whether the RuleSet uses the default placement of handicap stones or not

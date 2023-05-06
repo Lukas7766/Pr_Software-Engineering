@@ -59,7 +59,7 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public void scoreGame() {
+    public void scoreGame(Board board) {
 
     }
 

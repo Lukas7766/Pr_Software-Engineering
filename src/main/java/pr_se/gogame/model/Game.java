@@ -24,7 +24,7 @@ public class Game implements GameInterface {
     private int curMoveNumber = 0;
     private StoneColor curColor = StoneColor.BLACK;
 
-    private Ruleset ruleset = new JapaneseRuleset();
+    private Ruleset ruleset = new AncientChineseRuleset();
 
     private FileSaver fileSaver;
 

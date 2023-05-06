@@ -3,7 +3,7 @@ package pr_se.gogame.model;
 public class NewZealandRuleset implements Ruleset {
 
     @Override
-    public void scoreGame() {
+    public void scoreGame(Board board) {
 
     }
 
