@@ -29,7 +29,7 @@ public class BoardPane extends GridPane {
     /**
      * whether moves have to be confirmed separately, rather than immediately played
      */
-    private boolean needsMoveConfirmation = true;
+    private boolean needsMoveConfirmation = false;
 
     /**
      * whether move numbers are shown on the stones

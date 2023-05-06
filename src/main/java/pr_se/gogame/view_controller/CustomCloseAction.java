@@ -28,12 +28,12 @@ public class CustomCloseAction {
      * @param filterList pass list of Extension Filters
      */
     public static void onCloseAction(Stage stage, Game game, Event e, HashSet<FileChooser.ExtensionFilter> filterList) {
-
+        System.out.println("last game command: "+game.getGameState());
         if (game.getGameState() == GameCommand.INIT) {
             Platform.exit();
             System.exit(0);
         }
-        System.out.println(game.getGameState());
+
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Close Go Game");
         alert.setHeaderText("Do you really want to close your Game?");

@@ -163,6 +163,7 @@ public class HeaderPane extends VBox {
 
         Button confirm = new Button("Confirm");
         confirm.setFocusTraversable(false);
+        confirm.setVisible(false);
         confirm.setOnAction(e -> game.confirmChoice());
         gameShortCardList.add(confirm);
 
@@ -251,7 +252,7 @@ public class HeaderPane extends VBox {
 
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move confirmation required");
         gameSectionItems.add(moveConfirmationRequired);
-        moveConfirmationRequired.setSelected(true);
+        moveConfirmationRequired.setSelected(false);
         moveConfirmationRequired.setOnAction(e -> {
             var k = this.gameShortCardList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
             if (moveConfirmationRequired.isSelected()) {
@@ -329,6 +330,17 @@ public class HeaderPane extends VBox {
             game.setShowCoordinates(showCoordinatesCBtn.isSelected());
         });
         menu.getItems().addAll(viewSectionItems);
+
+        viewSectionItems.forEach(e -> e.setDisable(true));
+
+        game.addListener(l -> {
+            if (l.getGameCommand() == GameCommand.INIT) {
+                viewSectionItems.forEach(e -> e.setDisable(true));
+            } else {
+                viewSectionItems.forEach(e -> e.setDisable(false));
+            }
+        });
+
 
         return menu;
     }
