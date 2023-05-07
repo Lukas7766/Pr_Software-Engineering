@@ -47,7 +47,7 @@ public class Game implements GameInterface {
 
 
     @Override
-    public void newGame(GameCommand gameCommand, int size, int handicap, double komi) {
+    public void newGame(GameCommand gameCommand, int size, int handicap) {
 
         switch (gameCommand) {
             case BLACKSTARTS -> this.curColor = StoneColor.BLACK;
@@ -58,8 +58,8 @@ public class Game implements GameInterface {
         this.fileSaver = new FileSaver("Black", "White", String.valueOf(size));
 
 
-        System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + komi + "\n");
-        fireGameEvent(new GameEvent(gameCommand, size, handicap, komi));
+        System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
+        fireGameEvent(new GameEvent(gameCommand, size, handicap));
     }
 
 

@@ -30,7 +30,6 @@ public class SidePane extends StackPane {
     private final int minCustomBoardSize = 5;
     private final int maxHandicapAmount = 9;
     private final int minHandicapAmount = 0;
-    private final double komi = 7.5;
     private final Game game;
     private final Color backColor;
 
@@ -289,12 +288,10 @@ public class SidePane extends StackPane {
 
         Label komiCntLbl = new Label();
         komiCntLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
-        komiCntLbl.setText(""+komi);
+        komiCntLbl.setText(""+game.getKomi());
         komiCntLbl.setPadding(new Insets(5));
         komiCntLbl.setDisable(true);
         gridPane.add(komiCntLbl, 1, 7);
-
-
 
         //start Button
         Button startGameBtn = new Button();
@@ -309,7 +306,7 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            game.newGame(GameCommand.BLACKSTARTS, actualBoardSize, handicap, komi);
+            game.newGame(GameCommand.BLACKSTARTS, actualBoardSize, handicap);
         });
 
         //colum, row,

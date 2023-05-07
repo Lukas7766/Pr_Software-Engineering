@@ -9,7 +9,7 @@ public interface GameInterface {
     boolean saveGame(Path path);
 
     void initGame();
-    void newGame(GameCommand gameCommand, int size, int handicap, double komi);
+    void newGame(GameCommand gameCommand, int size, int handicap);
 
     boolean importGame(Path path);
 
