@@ -31,7 +31,6 @@ public class SidePane extends StackPane {
     private final int maxHandicapAmount = 9;
     private final int minHandicapAmount = 0;
     private final Game game;
-    private final Color backColor;
 
     /**
      * Constructor to create a SidePane
@@ -39,10 +38,9 @@ public class SidePane extends StackPane {
      * @param game instance of actual game -> needed for triggering and observing changes in model
      */
     public SidePane(Color backColor, Game game) {
-        this.backColor = backColor;
         this.game = game;
 
-        this.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
+        this.setBackground(new Background(new BackgroundFill(backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
         this.setMinWidth(250);
         setPadding(new Insets(5, 5, 5, 5)); //top, right, bottom, left
 
@@ -68,7 +66,6 @@ public class SidePane extends StackPane {
                     this.getChildren().remove(gameSetting);
                     this.getChildren().add(gameInfo);
                     break;
-                default: return;
             }
         });
     }
@@ -157,7 +154,6 @@ public class SidePane extends StackPane {
                     actualPlayer.setText("White");
 
                     break;
-                default: return;
             }
         });
 

@@ -50,20 +50,6 @@ public class JapaneseRuleset implements Ruleset {
         int scoreBlack = 0;
         int scoreWhite = 0;
 
-        for (int i = 0; i < board.getBoard().length; i++) {
-            for (int j = 0; j < board.getBoard()[i].length; j++) {
-                StoneGroupPointer p = board.getBoard()[i][j];
-                if (p == null) continue;
-                StoneGroup stoneGroup = p.getStoneGroup();
-                if (stoneGroup == null) continue;
-                if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.BLACK) {
-                } else if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.WHITE) {
-                }
-
-            }
-        }
-
-
         for (StoneColor color : StoneColor.values()) {
             if (color == StoneColor.BLACK) {
                 scoreBlack += calculateTerritoryPoints(color, board);

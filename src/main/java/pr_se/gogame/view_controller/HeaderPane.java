@@ -53,9 +53,9 @@ public class HeaderPane extends VBox {
 
     private final List<Button> playbackControlList = new ArrayList<>();
 
-    List<Button> gameShortCardList = new ArrayList<>();
+    private final List<Button> gameShortCardList = new ArrayList<>();
 
-    List<MenuItem> gameSectionItems = new ArrayList<>();
+    private final List<MenuItem> gameSectionItems = new ArrayList<>();
 
     /**
      * Constructor to create a Header Pane

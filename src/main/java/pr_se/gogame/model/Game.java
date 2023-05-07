@@ -13,7 +13,7 @@ import static pr_se.gogame.model.StoneColor.WHITE;
 public class Game implements GameInterface {
 
     //Settings
-    private Ruleset ruleset = new JapaneseRuleset();
+    private final Ruleset ruleset = new JapaneseRuleset();
     private int size = 19;
     private int handicap = 0;
     private boolean confirmationNeeded = false;
@@ -188,8 +188,7 @@ public class Game implements GameInterface {
 
     @Override
     public StoneColor getColorAt(int x, int y) {
-        StoneColor c = board.getColorAt(x, y);
-        return c;
+        return board.getColorAt(x, y);
     }
 
     @Override
@@ -321,7 +320,7 @@ public class Game implements GameInterface {
     }
 
     /*
-    I would have liked to give it default visibility so it's visible only in the same package, but alas IntelliJ
+    I would have liked to give it default visibility, so it's visible only in the same package, but alas IntelliJ
     won't let me.
     -> 20230502, SeWa: changed to package private
  */

@@ -168,7 +168,6 @@ public class BoardPane extends GridPane {
                 case CONFIGSHOWMOVENUMBERS:
                     setShowsMoveNumbers(game.isShowMoveNumbers());
                     break;
-                default: return;
             }
 
         });

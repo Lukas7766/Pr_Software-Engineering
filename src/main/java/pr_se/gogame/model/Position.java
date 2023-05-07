@@ -1,7 +1,5 @@
 package pr_se.gogame.model;
 
-import javafx.geometry.Pos;
-
 import java.util.Objects;
 
 public class Position /*implements Comparable<Position>*/ {
