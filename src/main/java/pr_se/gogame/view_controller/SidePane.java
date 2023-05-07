@@ -162,13 +162,12 @@ public class SidePane extends StackPane {
             scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
             switch(l.getGameCommand()) {
                 case WHITEPLAYS:
-                case BLACKSTARTS:
-                    actualPlayer.setText("Black");
-                    break;
-                case BLACKPLAYS:
                 case WHITSTARTS:
                     actualPlayer.setText("White");
-
+                    break;
+                case BLACKPLAYS:
+                case BLACKSTARTS:
+                    actualPlayer.setText("Black");
                     break;
             }
         });

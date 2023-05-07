@@ -282,7 +282,6 @@ public class Board implements BoardInterface {
             }
         }
         StoneSetEvent e = new StoneSetEvent(gc, x, y, GAME.getCurMoveNumber());
-
         GAME.fireGameEvent(e);
     }
 

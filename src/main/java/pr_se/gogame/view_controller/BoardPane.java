@@ -116,14 +116,17 @@ public class BoardPane extends GridPane {
             switch(e.getGameCommand()) {
                 case BLACKPLAYS:
                 case WHITEPLAYS:
-                    StoneSetEvent sse = (StoneSetEvent) e;
-                    PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
-                    destinationBC.getLabel().setText("" + sse.getMoveNumber());
+                    if(e instanceof StoneSetEvent) {//TODO: StoneEvent vs GameCommand question
+                        System.out.println("StoneSetEvent");
+                        StoneSetEvent sse = (StoneSetEvent) e;
+                        PlayableBoardCell destBC = getPlayableCell(sse.getX(), sse.getY());
 
-                    if (sse.getColor() == BLACK) {
-                        destinationBC.setBlack();
-                    } else {
-                        destinationBC.setWhite();
+                        if (sse.getColor() == BLACK) {
+                            destBC.setBlack();
+                        } else {
+                            destBC.setWhite();
+                        }
+                        destBC.getLabel().setVisible(false);
                     }
                     break;
                 case CONFIRMCHOICE:
