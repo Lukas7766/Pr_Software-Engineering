@@ -123,39 +123,39 @@ public class SidePane extends StackPane {
         p1.setFont(Font.font(null,FontWeight.BOLD,13));
         scorePane.add(p1,0,0);
 
-        Label scoreCountP1 = new Label("0");
-        scoreCountP1.setPadding(new Insets(0,0,0,15));
-        scoreCountP1.setFont(Font.font(null,FontWeight.NORMAL,13));
-        scorePane.add(scoreCountP1,1,0);
+        Label scoreCountBlackLbl = new Label(game.getScore(StoneColor.BLACK) + "");
+        scoreCountBlackLbl.setPadding(new Insets(0,0,0,15));
+        scoreCountBlackLbl.setFont(Font.font(null,FontWeight.NORMAL,13));
+        scorePane.add(scoreCountBlackLbl,1,0);
 
 
         Label p2 = new Label("Player White:");
         p2.setFont(Font.font(null,FontWeight.BOLD,13));
         scorePane.add(p2,0,1);
 
-        Label scoreCountP2 = new Label("0");
-        scoreCountP2.setPadding(new Insets(0,0,0,15));
-        scoreCountP2.setFont(Font.font(null,FontWeight.NORMAL,13));
-        scorePane.add(scoreCountP2,1,1);
+        Label scoreCountWhiteLbl = new Label(game.getScore(StoneColor.WHITE) + "");
+        scoreCountWhiteLbl.setPadding(new Insets(0,0,0,15));
+        scoreCountWhiteLbl.setFont(Font.font(null,FontWeight.NORMAL,13));
+        scorePane.add(scoreCountWhiteLbl,1,1);
 
         scoreboard.getChildren().add(scorePane);
         infoPane.getChildren().add(scoreboard);
-
-
-
-
 
         /*
          * Comment by Gerald:
          * Adds listener to Game to update the currently displayed player name
          */
         game.addListener(l -> {
+            scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
+            scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
             switch(l.getGameCommand()) {
                 case WHITEPLAYS:
                     actualPlayer.setText("Black");
+
                     break;
                 case BLACKPLAYS:
                     actualPlayer.setText("White");
+
                     break;
                 default: return;
             }

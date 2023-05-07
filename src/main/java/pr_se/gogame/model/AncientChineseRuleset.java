@@ -32,7 +32,7 @@ public class AncientChineseRuleset implements Ruleset {
     }
 
     @Override
-    public void scoreGame(Board board) {
+    public int[] scoreGame(Board board) {
 
         if (board == null) throw new IllegalArgumentException();
 
@@ -54,11 +54,9 @@ public class AncientChineseRuleset implements Ruleset {
             }
         }
 
-
-        System.out.println("Score Board:");
-
         System.out.println("Score Black: " + scoreBlack);
         System.out.println("Score White: " + scoreWhite);
+        return new int[]{scoreBlack, scoreWhite};
 
     }
 

@@ -34,16 +34,6 @@ public class Board implements BoardInterface {
      */
     private final StoneGroupPointer[][] board;
 
-    /**
-     * count KO moves
-     */
-    private int currentKOCnt = 1;
-
-    /**
-     * Position for preventing KO-Move
-     */
-    private Position ko;
-
     private int lastDebugX = 0;
     private int lastDebugY = 0;
 
@@ -201,7 +191,6 @@ public class Board implements BoardInterface {
                 }
                 permittedSuicide = true;
             } else {
-                System.out.println("killAnother " + currentKOCnt);
                 if (!GAME.getRuleset().predicateKoMove(x,y)) {
                     killAnother = true;
                 } else {
@@ -218,12 +207,16 @@ public class Board implements BoardInterface {
         }
 
         if (!prepareMode) {
+
             for (StoneGroup sg : surroundingSGs) {
                 if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !killAnother)) && sg.getLiberties().size() == 0) {
+                    int captured = 0;
                     for (Position p : sg.getLocations()) {
                         removeStone(p.X, p.Y);
-                        System.out.println("remove: " + p.X + " / " + p.Y);
+                        captured++;
+                        System.out.println("remove: " + p.X + 1 + " / " + p.Y + 1);
                     }
+                    GAME.setCapturedStones(color,captured);
                 }
             }
 
@@ -358,7 +351,6 @@ public class Board implements BoardInterface {
 
     public StoneColor getColorAt(int x, int y) {
         if (board[x][y] != null) {
-            System.out.println(board[x][y]);
             return board[x][y].getStoneGroup().getStoneColor();
         } else {
             return null;

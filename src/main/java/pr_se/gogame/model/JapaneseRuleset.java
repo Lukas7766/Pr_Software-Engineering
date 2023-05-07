@@ -43,7 +43,7 @@ public class JapaneseRuleset implements Ruleset {
     }
 
     @Override
-    public void scoreGame(Board board) {
+    public int[] scoreGame(Board board) {
 
         if (board == null) throw new IllegalArgumentException();
 
@@ -57,9 +57,7 @@ public class JapaneseRuleset implements Ruleset {
                 StoneGroup stoneGroup = p.getStoneGroup();
                 if (stoneGroup == null) continue;
                 if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.BLACK) {
-                    //scoreBlack++;
                 } else if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.WHITE) {
-                    //scoreWhite++;
                 }
 
             }
@@ -73,10 +71,11 @@ public class JapaneseRuleset implements Ruleset {
                 scoreWhite += calculateTerritoryPoints(color, board);
             }
         }
-        System.out.println("Score Board:");
 
         System.out.println("Score Black: " + scoreBlack);
         System.out.println("Score White: " + scoreWhite);
+
+        return new int[]{scoreBlack, scoreWhite};
 
     }
 

@@ -12,6 +12,7 @@ import static pr_se.gogame.model.StoneColor.WHITE;
 
 public class Game implements GameInterface {
 
+    //Settings
     private Ruleset ruleset = new JapaneseRuleset();
     private int size = 19;
     private int handicap = 0;
@@ -19,25 +20,29 @@ public class Game implements GameInterface {
     private boolean showMoveNumbers = false;
     private boolean showCoordinates = true;
 
+    //global (helper) variables
     private FileSaver fileSaver;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private Board board;
-
-    private int koCounter = 0;
-
     private int curMoveNumber = 0;
-    private StoneColor curColor = StoneColor.BLACK;
-
+    private StoneColor curColor;
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
+
+    private double playerBlackScore;
+    private int blackCapturedStones;
+
+    private double playerWhiteScore;
+    private int whiteCapturedStones;
 
 
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
-        this.board = new Board(this, StoneColor.BLACK);
+        this.board = new Board(this, BLACK);
     }
 
+    @Override
     public void initGame() {
         this.gameCommand = GameCommand.INIT;
 
@@ -45,10 +50,8 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(gameCommand));
     }
 
-
     @Override
     public void newGame(GameCommand gameCommand, int size, int handicap) {
-
         switch (gameCommand) {
             case BLACKSTARTS -> this.curColor = StoneColor.BLACK;
             case WHITSTARTS -> this.curColor = StoneColor.WHITE;
@@ -56,7 +59,14 @@ public class Game implements GameInterface {
         }
 
         this.fileSaver = new FileSaver("Black", "White", String.valueOf(size));
-
+        this.gameCommand = gameCommand;
+        this.size = size;
+        this.handicap = handicap;
+        this.playerBlackScore = handicap;
+        this.playerWhiteScore = this.ruleset.getKomi();
+        this.blackCapturedStones = 0;
+        this.whiteCapturedStones = 0;
+        this.board = new Board(this, curColor);
 
         System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
         fireGameEvent(new GameEvent(gameCommand, size, handicap));
@@ -85,10 +95,12 @@ public class Game implements GameInterface {
      * and most importantly the game tree. Additionally, it just seems a good idea to have all IO connections go through
      * Game, as it is the "main class" of the model.
      */
+    //ToDo move competence to importFile methode?? and delete this method when it is not needed anymore
     public boolean saveFile(Path path) {
         return fileSaver.saveFile(path);
     }
 
+    //ToDo delete this method when it is not needed anymore??
     public boolean importFile(Path path) {
         return FileSaver.importFile(path);
     }
@@ -107,7 +119,9 @@ public class Game implements GameInterface {
     @Override
     public void scoreGame() {
         System.out.println("scoreGame");
-        ruleset.scoreGame(board);
+        int[] score = ruleset.scoreGame(board);
+        this.playerBlackScore += score[0];
+        this.playerWhiteScore += score[1];
     }
 
     @Override
@@ -133,7 +147,6 @@ public class Game implements GameInterface {
     @Override
     public void removeListener(GameListener l) {
         listeners.remove(l);
-
     }
 
     @Override
@@ -240,11 +253,21 @@ public class Game implements GameInterface {
     }
 
     @Override
+    public boolean isConfirmationNeeded() {
+        return this.confirmationNeeded;
+    }
+
+    @Override
     public void setShowMoveNumbers(boolean show) {
         this.showMoveNumbers = show;
         this.gameCommand = GameCommand.CONFIGSHOWMOVENUMBERS;
 
         fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public boolean isShowMoveNumbers() {
+        return this.showMoveNumbers;
     }
 
     @Override
@@ -256,28 +279,46 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public boolean isConfirmationNeeded() {
-        return this.confirmationNeeded;
-    }
-
-    @Override
-    public boolean isShowMoveNumbers() {
-        return this.showMoveNumbers;
-    }
-
-    @Override
     public boolean isShowCoordinates() {
         return this.showCoordinates;
+    }
+
+    @Override
+    public void setCapturedStones(StoneColor color, int amount) {
+        if (color == null) throw new NullPointerException();
+        if (amount < 0) throw new IllegalArgumentException();
+
+        if (color == BLACK) {
+            this.blackCapturedStones += amount;
+            this.playerBlackScore += amount;
+        } else {
+            this.whiteCapturedStones += amount;
+            this.playerWhiteScore += amount;
+        }
+    }
+
+    @Override
+    public int getCapturedStones(StoneColor color) {
+        if (color == null) throw new NullPointerException();
+
+        if (color == BLACK) return this.blackCapturedStones;
+        else return this.whiteCapturedStones;
+    }
+
+    @Override
+    public double getScore(StoneColor color) {
+        return color == BLACK ? this.playerBlackScore : this.playerWhiteScore;
     }
 
     private void switchColor() {
         if (curColor == BLACK) {
             curColor = WHITE;
+            this.gameCommand = GameCommand.WHITEPLAYS;
         } else {
             curColor = BLACK;
+            this.gameCommand = GameCommand.BLACKPLAYS;
         }
     }
-
 
     /*
     I would have liked to give it default visibility so it's visible only in the same package, but alas IntelliJ
@@ -294,5 +335,6 @@ public class Game implements GameInterface {
     public void printDebugInfo(int x, int y) {
         board.printDebugInfo(x, y);
     }
+
 }
 

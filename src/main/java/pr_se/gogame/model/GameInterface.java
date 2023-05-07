@@ -76,4 +76,10 @@ public interface GameInterface {
     boolean isShowMoveNumbers();
 
     boolean isShowCoordinates();
+
+    void setCapturedStones(StoneColor color, int amount);
+
+    int getCapturedStones(StoneColor color);
+
+    double getScore(StoneColor color);
 }
