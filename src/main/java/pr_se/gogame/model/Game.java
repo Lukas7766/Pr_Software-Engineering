@@ -12,7 +12,7 @@ import static pr_se.gogame.model.StoneColor.WHITE;
 
 public class Game implements GameInterface {
 
-    private Ruleset ruleset = new AncientChineseRuleset();
+    private Ruleset ruleset = new JapaneseRuleset();
     private int size = 19;
     private int handicap = 0;
     private boolean confirmationNeeded = false;
