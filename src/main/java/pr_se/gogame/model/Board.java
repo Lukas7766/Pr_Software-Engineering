@@ -222,6 +222,7 @@ public class Board implements BoardInterface {
                 if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !killAnother)) && sg.getLiberties().size() == 0) {
                     for (Position p : sg.getLocations()) {
                         removeStone(p.X, p.Y);
+                        System.out.println("remove: " + p.X + " / " + p.Y);
                     }
                 }
             }
@@ -306,6 +307,15 @@ public class Board implements BoardInterface {
         StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
 
         GAME.fireGameEvent(e);
+    }
+
+    public Set getNeighbors(int x, int y) {
+        return getSurroundings(
+                x,
+                y,
+                (sgp) -> sgp != null,
+                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+        );
     }
 
     /**
