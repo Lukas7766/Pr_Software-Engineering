@@ -58,8 +58,8 @@ public class JapaneseRuleset implements Ruleset {
             }
         }
 
-        System.out.println("Score Black: " + scoreBlack);
-        System.out.println("Score White: " + scoreWhite);
+        System.out.println("Territory Score Black: " + scoreBlack);
+        System.out.println("Territory Score White: " + scoreWhite);
 
         return new int[]{scoreBlack, scoreWhite};
 

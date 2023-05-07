@@ -113,7 +113,11 @@ public class Game implements GameInterface {
     @Override
     public void resign() {
         System.out.println("resign");
-
+        switch (gameCommand){
+            case BLACKPLAYS, BLACKSTARTS -> this.gameCommand = GameCommand.WHITEWON;
+            case WHITEPLAYS, WHITSTARTS -> this.gameCommand = GameCommand.BLACKWON;
+        }
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
@@ -122,6 +126,15 @@ public class Game implements GameInterface {
         int[] score = ruleset.scoreGame(board);
         this.playerBlackScore += score[0];
         this.playerWhiteScore += score[1];
+
+        if(playerBlackScore < playerWhiteScore){
+            this.gameCommand = GameCommand.WHITEWON;
+        } else if(playerBlackScore > playerWhiteScore){
+            this.gameCommand = GameCommand.BLACKWON;
+        } else {
+            this.gameCommand = GameCommand.DRAW;
+        }
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override

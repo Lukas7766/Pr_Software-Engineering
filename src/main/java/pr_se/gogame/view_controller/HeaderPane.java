@@ -368,7 +368,7 @@ public class HeaderPane extends VBox {
         gameShortCardList.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT) {
+            if (l.getGameCommand() == GameCommand.INIT || l.getGameCommand() == GameCommand.WHITEWON || l.getGameCommand() == GameCommand.BLACKWON || l.getGameCommand() == GameCommand.DRAW) {
                 gameShortCardList.forEach(e -> e.setDisable(true));
             } else {
                 gameShortCardList.forEach(e -> e.setDisable(false));

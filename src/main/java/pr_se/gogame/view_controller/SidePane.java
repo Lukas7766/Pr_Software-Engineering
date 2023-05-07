@@ -16,9 +16,15 @@ import javafx.scene.text.TextFlow;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
+
+import java.util.HashSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class contains the controller and view function of the game information panel.<br>
@@ -31,14 +37,17 @@ public class SidePane extends StackPane {
     private final int maxHandicapAmount = 9;
     private final int minHandicapAmount = 0;
     private final Game game;
+    private final HashSet<FileChooser.ExtensionFilter> filterList;
 
     /**
      * Constructor to create a SidePane
      *
      * @param game instance of actual game -> needed for triggering and observing changes in model
      */
-    public SidePane(Color backColor, Game game) {
+    public SidePane(Color backColor, Stage stage, Game game) {
         this.game = game;
+        this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
+                .collect(Collectors.toCollection(HashSet::new));
 
         this.setBackground(new Background(new BackgroundFill(backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
         this.setMinWidth(250);
@@ -65,6 +74,12 @@ public class SidePane extends StackPane {
                 case WHITSTARTS:
                     this.getChildren().remove(gameSetting);
                     this.getChildren().add(gameInfo);
+                    break;
+                case BLACKWON:
+                case WHITEWON:
+                case DRAW:
+                    System.out.println(e.getGameCommand());
+                    CustomWinAction.winAction(stage, game, filterList);
                     break;
             }
         });
@@ -97,7 +112,7 @@ public class SidePane extends StackPane {
 
         Label actualPlayer = new Label();
         actualPlayer.setFont(Font.font(null, FontWeight.NORMAL, 13));
-        actualPlayer.setText(game.getCurColor() == StoneColor.BLACK ? "Black" : "White");
+
         playerInfo.getChildren().add(actualPlayer);
 
         infoPane.getChildren().add(playerInfo);
@@ -147,10 +162,11 @@ public class SidePane extends StackPane {
             scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
             switch(l.getGameCommand()) {
                 case WHITEPLAYS:
+                case BLACKSTARTS:
                     actualPlayer.setText("Black");
-
                     break;
                 case BLACKPLAYS:
+                case WHITSTARTS:
                     actualPlayer.setText("White");
 
                     break;

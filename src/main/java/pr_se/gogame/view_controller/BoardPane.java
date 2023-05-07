@@ -114,8 +114,25 @@ public class BoardPane extends GridPane {
             }
 
             switch(e.getGameCommand()) {
+                case BLACKPLAYS:
+                case WHITEPLAYS:
+                    StoneSetEvent sse = (StoneSetEvent) e;
+                    PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
+                    destinationBC.getLabel().setText("" + sse.getMoveNumber());
+
+                    if (sse.getColor() == BLACK) {
+                        destinationBC.setBlack();
+                    } else {
+                        destinationBC.setWhite();
+                    }
+                    break;
                 case CONFIRMCHOICE:
                     confirmMove();
+                    break;
+                case WHITEREMOVED:
+                case BLACKREMOVED:
+                    StoneRemovedEvent sre = (StoneRemovedEvent) e;
+                    getPlayableCell(sre.getX(), sre.getY()).unset();
                     break;
                 case INIT:
                     setMouseTransparent(true);
@@ -136,28 +153,11 @@ public class BoardPane extends GridPane {
                         destBC.setWhite();
                     }
                     destBC.getLabel().setVisible(false);
-
                     break;
-                case BLACKPLAYS:
-                case WHITEPLAYS:
-                    StoneSetEvent sse = (StoneSetEvent) e;
-                    PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
-                    destinationBC.getLabel().setText("" + sse.getMoveNumber());
-
-                    if (sse.getColor() == BLACK) {
-                        destinationBC.setBlack();
-                    } else {
-                        destinationBC.setWhite();
-                    }
-                    break;
-                case WHITEREMOVED:
-                case BLACKREMOVED:
-                    StoneRemovedEvent sre = (StoneRemovedEvent) e;
-                    getPlayableCell(sre.getX(), sre.getY()).unset();
-                    break;
-                case DEBUGINFO:
-                    DebugEvent de = (DebugEvent) e;
-                    getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
+                case BLACKWON:
+                case WHITEWON:
+                case DRAW:
+                    setMouseTransparent(true);
                     break;
                 case CONFIGCONFIRMATION:
                     setMoveConfirmation(game.isConfirmationNeeded());
@@ -167,6 +167,10 @@ public class BoardPane extends GridPane {
                     break;
                 case CONFIGSHOWMOVENUMBERS:
                     setShowsMoveNumbers(game.isShowMoveNumbers());
+                    break;
+                case DEBUGINFO:
+                    DebugEvent de = (DebugEvent) e;
+                    getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
                     break;
             }
 

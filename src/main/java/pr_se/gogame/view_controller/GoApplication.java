@@ -45,7 +45,7 @@ public class GoApplication extends Application {
         root.setCenter(bp);
         HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, stage, game);
         root.setTop(hp);
-        SidePane sp = new SidePane(Color.LIGHTGRAY, game);
+        SidePane sp = new SidePane(Color.LIGHTGRAY, stage, game);
         root.setLeft(sp);
         root.setRight(debugButtons);
 
