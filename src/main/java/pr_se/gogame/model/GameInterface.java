@@ -1,6 +1,5 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
 
 import java.nio.file.Path;
@@ -71,4 +70,10 @@ public interface GameInterface {
     void setShowMoveNumbers(boolean show);
 
     void setShowCoordinates(boolean show);
+
+    boolean isConfirmationNeeded();
+
+    boolean isShowMoveNumbers();
+
+    boolean isShowCoordinates();
 }

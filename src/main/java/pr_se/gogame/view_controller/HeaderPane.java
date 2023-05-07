@@ -89,6 +89,203 @@ public class HeaderPane extends VBox {
     }
 
     /**
+     * Creates the file section for the menu bar <br>
+     * contains at least: <br>
+     * -> New Game <br>
+     * -> Import Game <br>
+     * -> Export Game <br>
+     * -> Exit Game
+     *
+     * @return the file section for the menu bar
+     */
+    private Menu fileSection() {
+        Menu files = new Menu();
+        files.setText("File");
+
+        MenuItem newGameItem = new MenuItem();
+        newGameItem.setText("New Game");
+        files.getItems().add(newGameItem);
+        newGameItem.setOnAction(e -> game.initGame());
+
+        MenuItem importFileItem = new MenuItem();
+        importFileItem.setText("Import Game");
+        files.getItems().add(importFileItem);
+        importFileItem.setOnAction(e -> {
+            File f = CustomFileDialog.getFile(stage, false, filterList);//fileDialog(false, filterList);
+            if (f != null) game.importGame(f.toPath());
+            else System.out.println("Import Dialog cancelled");
+        });
+
+        MenuItem exportFileItem = new MenuItem();
+        exportFileItem.setText("Export Game");
+        files.getItems().add(exportFileItem);
+        exportFileItem.setOnAction(e -> {
+            File f = CustomFileDialog.getFile(stage, true, filterList);//fileDialog(true, filterList);
+            if (f != null) game.exportGame(f.toPath());
+            else System.out.println("Export Dialog cancelled");
+        });
+
+        MenuItem exitGameItem = new MenuItem();
+        exitGameItem.setText("Exit Game");
+        files.getItems().add(exitGameItem);
+        exitGameItem.setOnAction(e -> CustomCloseAction.onCloseAction(stage, game, null, filterList)); //onCloseAction(null)
+
+
+        SeparatorMenuItem sep1 = new SeparatorMenuItem();
+        SeparatorMenuItem sep2 = new SeparatorMenuItem();
+
+        files.getItems().add(1, sep1);
+        files.getItems().add(4, sep2);
+
+        return files;
+    }
+
+    /**
+     * Creates the game section for the menu bar <br>
+     * contains at least: <br>
+     * -> Pass <br>
+     * -> Resign <br>
+     * -> Score Game
+     *
+     * @return the game section for the menu bar
+     */
+    private Menu gameSection() {
+        Menu menu = new Menu();
+        menu.setText("Game");
+
+        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move confirmation required");
+        gameSectionItems.add(moveConfirmationRequired);
+        moveConfirmationRequired.setSelected(game.isConfirmationNeeded());
+        moveConfirmationRequired.setOnAction(e -> {
+            var k = this.gameShortCardList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
+            if (moveConfirmationRequired.isSelected()) {
+                k.ifPresent(button -> button.setVisible(true));
+                game.setConfirmationNeeded(true);
+
+            } else {
+                k.ifPresent(button -> button.setVisible(false));
+                game.setConfirmationNeeded(false);
+            }
+        });
+
+        MenuItem passItem = new MenuItem();
+        passItem.setText("Pass");
+        //menu.getItems().add(passItem);
+        gameSectionItems.add(passItem);
+        passItem.setOnAction(e -> game.pass());
+
+        MenuItem resignItem = new MenuItem();
+        resignItem.setText("Resign");
+        //menu.getItems().add(resignItem);
+        gameSectionItems.add(resignItem);
+        resignItem.setOnAction(e -> game.resign());
+
+        MenuItem scoreGameItem = new MenuItem();
+        scoreGameItem.setText("Score Game");
+        //menu.getItems().add(scoreGameItem);
+        gameSectionItems.add(scoreGameItem);
+        scoreGameItem.setOnAction(e -> game.scoreGame());
+
+        menu.getItems().addAll(gameSectionItems);
+        gameSectionItems.forEach(e -> e.setDisable(true));
+
+        game.addListener(l -> {
+            if (l.getGameCommand() == GameCommand.INIT) {
+                gameSectionItems.forEach(e -> e.setDisable(true));
+            } else {
+                gameSectionItems.forEach(e -> e.setDisable(false));
+            }
+        });
+
+        SeparatorMenuItem sep1 = new SeparatorMenuItem();
+        menu.getItems().add(1, sep1);
+
+        SeparatorMenuItem sep2 = new SeparatorMenuItem();
+        menu.getItems().add(4, sep2);
+
+        return menu;
+    }
+
+    /**
+     * Creates the view section for the menu bar <br>
+     * contains at least: <br>
+     * ->
+     *
+     * @return the view section for the menu bar
+     */
+    private Menu viewSection() {
+        Menu menu = new Menu();
+        menu.setText("View");
+
+        List<MenuItem> viewSectionItems = new ArrayList<>();
+
+        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Show Move Numbers");
+        viewSectionItems.add(showMoveNumbersCBtn);
+        showMoveNumbersCBtn.setSelected(game.isShowMoveNumbers());
+        showMoveNumbersCBtn.setOnAction(e -> {
+            game.setShowMoveNumbers(showMoveNumbersCBtn.isSelected());
+        });
+
+        CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("Show Coordinates");
+        viewSectionItems.add(showCoordinatesCBtn);
+        showCoordinatesCBtn.setSelected(game.isShowCoordinates());
+        showCoordinatesCBtn.setOnAction(e -> {
+            game.setShowCoordinates(showCoordinatesCBtn.isSelected());
+        });
+        menu.getItems().addAll(viewSectionItems);
+
+        viewSectionItems.forEach(e -> e.setDisable(true));
+
+        game.addListener(l -> {
+            if (l.getGameCommand() == GameCommand.INIT) {
+                viewSectionItems.forEach(e -> e.setDisable(true));
+            } else {
+                viewSectionItems.forEach(e -> e.setDisable(false));
+            }
+        });
+
+
+        return menu;
+    }
+
+    /**
+     * Creates the help section for the menu bar <br>
+     * contains at least: <br>
+     * -> Help -> Link to WebSite <br>
+     * -> About us -> Information ab the developer
+     *
+     * @return the help section for the menu bar
+     */
+    private Menu helpSection() {
+        Menu menu = new Menu();
+        menu.setText("Help");
+
+        MenuItem helpItem = new MenuItem();
+        helpItem.setText("Help");
+        menu.getItems().add(helpItem);
+        helpItem.setOnAction(ev -> {
+            String url = "https://en.wikipedia.org/wiki/Go_(game)";
+            app.getHostServices().showDocument(url);
+        });
+
+        MenuItem aboutUs = new MenuItem();
+        aboutUs.setText("About Us");
+        menu.getItems().add(aboutUs);
+        aboutUs.setOnAction(e -> {
+
+            Alert box = new Alert(Alert.AlertType.INFORMATION);
+            box.setTitle("About us");
+            box.setHeaderText(null);
+            box.setContentText("This Go Game was developed by Gerald, Lukas and Sebastian.");
+            box.initStyle(StageStyle.UTILITY);
+            box.initOwner(stage);
+            box.show();
+        });
+
+        return menu;
+    }
+
+    /**
      * The short menu contains at least: <br>
      * -> playback control buttons <br>
      * -> pass button <br>
@@ -163,7 +360,7 @@ public class HeaderPane extends VBox {
 
         Button confirm = new Button("Confirm");
         confirm.setFocusTraversable(false);
-        confirm.setVisible(false);
+        confirm.setVisible(game.isConfirmationNeeded());
         confirm.setOnAction(e -> game.confirmChoice());
         gameShortCardList.add(confirm);
 
@@ -183,203 +380,6 @@ public class HeaderPane extends VBox {
 
         return lane;
 
-    }
-
-    /**
-     * Creates the file section for the menu bar <br>
-     * contains at least: <br>
-     * -> New Game <br>
-     * -> Import Game <br>
-     * -> Export Game <br>
-     * -> Exit Game
-     *
-     * @return the file section for the menu bar
-     */
-    private Menu fileSection() {
-        Menu files = new Menu();
-        files.setText("File");
-
-        MenuItem newGameItem = new MenuItem();
-        newGameItem.setText("New Game");
-        files.getItems().add(newGameItem);
-        newGameItem.setOnAction(e -> game.initGame());
-
-        MenuItem importFileItem = new MenuItem();
-        importFileItem.setText("Import Game");
-        files.getItems().add(importFileItem);
-        importFileItem.setOnAction(e -> {
-            File f = CustomFileDialog.getFile(stage, false, filterList);//fileDialog(false, filterList);
-            if (f != null) game.importGame(f.toPath());
-            else System.out.println("Import Dialog cancelled");
-        });
-
-        MenuItem exportFileItem = new MenuItem();
-        exportFileItem.setText("Export Game");
-        files.getItems().add(exportFileItem);
-        exportFileItem.setOnAction(e -> {
-            File f = CustomFileDialog.getFile(stage, true, filterList);//fileDialog(true, filterList);
-            if (f != null) game.exportGame(f.toPath());
-            else System.out.println("Export Dialog cancelled");
-        });
-
-        MenuItem exitGameItem = new MenuItem();
-        exitGameItem.setText("Exit Game");
-        files.getItems().add(exitGameItem);
-        exitGameItem.setOnAction(e -> CustomCloseAction.onCloseAction(stage, game, null, filterList)); //onCloseAction(null)
-
-
-        SeparatorMenuItem sep1 = new SeparatorMenuItem();
-        SeparatorMenuItem sep2 = new SeparatorMenuItem();
-
-        files.getItems().add(1, sep1);
-        files.getItems().add(4, sep2);
-
-        return files;
-    }
-
-    /**
-     * Creates the game section for the menu bar <br>
-     * contains at least: <br>
-     * -> Pass <br>
-     * -> Resign <br>
-     * -> Score Game
-     *
-     * @return the game section for the menu bar
-     */
-    private Menu gameSection() {
-        Menu menu = new Menu();
-        menu.setText("Game");
-
-        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move confirmation required");
-        gameSectionItems.add(moveConfirmationRequired);
-        moveConfirmationRequired.setSelected(false);
-        moveConfirmationRequired.setOnAction(e -> {
-            var k = this.gameShortCardList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
-            if (moveConfirmationRequired.isSelected()) {
-                k.ifPresent(button -> button.setVisible(true));
-                game.setConfirmationNeeded(true);
-
-            } else {
-                k.ifPresent(button -> button.setVisible(false));
-                game.setConfirmationNeeded(false);
-            }
-        });
-
-        MenuItem passItem = new MenuItem();
-        passItem.setText("Pass");
-        //menu.getItems().add(passItem);
-        gameSectionItems.add(passItem);
-        passItem.setOnAction(e -> game.pass());
-
-        MenuItem resignItem = new MenuItem();
-        resignItem.setText("Resign");
-        //menu.getItems().add(resignItem);
-        gameSectionItems.add(resignItem);
-        resignItem.setOnAction(e -> game.resign());
-
-        MenuItem scoreGameItem = new MenuItem();
-        scoreGameItem.setText("Score Game");
-        //menu.getItems().add(scoreGameItem);
-        gameSectionItems.add(scoreGameItem);
-        scoreGameItem.setOnAction(e -> game.scoreGame());
-
-        menu.getItems().addAll(gameSectionItems);
-        gameSectionItems.forEach(e -> e.setDisable(true));
-
-        game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT) {
-                gameSectionItems.forEach(e -> e.setDisable(true));
-            } else {
-                gameSectionItems.forEach(e -> e.setDisable(false));
-            }
-        });
-
-        SeparatorMenuItem sep1 = new SeparatorMenuItem();
-        menu.getItems().add(1, sep1);
-
-        SeparatorMenuItem sep2 = new SeparatorMenuItem();
-        menu.getItems().add(4, sep2);
-
-        return menu;
-    }
-
-    /**
-     * Creates the view section for the menu bar <br>
-     * contains at least: <br>
-     * ->
-     *
-     * @return the view section for the menu bar
-     */
-    private Menu viewSection() {
-        Menu menu = new Menu();
-        menu.setText("View");
-
-        List<MenuItem> viewSectionItems = new ArrayList<>();
-
-        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Show Move Numbers");
-        viewSectionItems.add(showMoveNumbersCBtn);
-        showMoveNumbersCBtn.setSelected(false);
-        showMoveNumbersCBtn.setOnAction(e -> {
-            game.setShowMoveNumbers(showMoveNumbersCBtn.isSelected());
-        });
-
-        CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("Show Coordinates");
-        viewSectionItems.add(showCoordinatesCBtn);
-        showCoordinatesCBtn.setSelected(true);
-        showCoordinatesCBtn.setOnAction(e -> {
-            game.setShowCoordinates(showCoordinatesCBtn.isSelected());
-        });
-        menu.getItems().addAll(viewSectionItems);
-
-        viewSectionItems.forEach(e -> e.setDisable(true));
-
-        game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT) {
-                viewSectionItems.forEach(e -> e.setDisable(true));
-            } else {
-                viewSectionItems.forEach(e -> e.setDisable(false));
-            }
-        });
-
-
-        return menu;
-    }
-
-    /**
-     * Creates the help section for the menu bar <br>
-     * contains at least: <br>
-     * -> Help -> Link to WebSite <br>
-     * -> About us -> Information ab the developer
-     *
-     * @return the help section for the menu bar
-     */
-    private Menu helpSection() {
-        Menu menu = new Menu();
-        menu.setText("Help");
-
-        MenuItem helpItem = new MenuItem();
-        helpItem.setText("Help");
-        menu.getItems().add(helpItem);
-        helpItem.setOnAction(ev -> {
-            String url = "https://en.wikipedia.org/wiki/Go_(game)";
-            app.getHostServices().showDocument(url);
-        });
-
-        MenuItem aboutUs = new MenuItem();
-        aboutUs.setText("About Us");
-        menu.getItems().add(aboutUs);
-        aboutUs.setOnAction(e -> {
-
-            Alert box = new Alert(Alert.AlertType.INFORMATION);
-            box.setTitle("About us");
-            box.setHeaderText(null);
-            box.setContentText("This Go Game was developed by Gerald, Lukas and Sebastian.");
-            box.initStyle(StageStyle.UTILITY);
-            box.initOwner(stage);
-            box.show();
-        });
-
-        return menu;
     }
 
 }

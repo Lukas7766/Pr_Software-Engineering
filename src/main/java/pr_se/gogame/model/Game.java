@@ -12,46 +12,30 @@ import static pr_se.gogame.model.StoneColor.WHITE;
 
 public class Game implements GameInterface {
 
+    private Ruleset ruleset = new AncientChineseRuleset();
+    private int size = 19;
+    private int handicap = 0;
+    private boolean confirmationNeeded = false;
+    private boolean showMoveNumbers = false;
+    private boolean showCoordinates = true;
+
+    private FileSaver fileSaver;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
-    private int size;
-    private int handicap;
-    private double komi;
-
-    private boolean confirmationNeeded;
-    private boolean showMoveNumbers;
-    private boolean showCoordinates;
-
-    private Ruleset ruleset;
     private Board board;
 
     private int koCounter = 0;
 
-
     private int curMoveNumber = 0;
     private StoneColor curColor = StoneColor.BLACK;
 
-
-
-    private FileSaver fileSaver;
-
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
-
 
 
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
         this.board = new Board(this, StoneColor.BLACK);
-        this.komi = ruleset.getKomi();
-        this.ruleset = new AncientChineseRuleset();
-        this.handicap = 0;
-        this.size = 19;
-
-        this.confirmationNeeded = false;
-        this.showMoveNumbers = false;
-        this.showCoordinates = true;
-
     }
 
     public void initGame() {
@@ -64,6 +48,7 @@ public class Game implements GameInterface {
 
     @Override
     public void newGame(GameCommand gameCommand, int size, int handicap, double komi) {
+
         switch (gameCommand) {
             case BLACKSTARTS -> this.curColor = StoneColor.BLACK;
             case WHITSTARTS -> this.curColor = StoneColor.WHITE;
@@ -71,12 +56,7 @@ public class Game implements GameInterface {
         }
 
         this.fileSaver = new FileSaver("Black", "White", String.valueOf(size));
-        this.size = size;
-        this.handicap = handicap;
-        this.komi = komi;
-        this.gameCommand = gameCommand;
-        this.curMoveNumber = 1;
-        this.board = new Board(this, this.curColor); // Warning: This may set the handicapStoneCounter, so beware of changing it after calling this constructor.
+
 
         System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + komi + "\n");
         fireGameEvent(new GameEvent(gameCommand, size, handicap, komi));
@@ -142,7 +122,7 @@ public class Game implements GameInterface {
 
     @Override
     public double getKomi() {
-        return this.komi;
+        return this.ruleset.getKomi();
     }
 
     @Override
@@ -254,34 +234,40 @@ public class Game implements GameInterface {
     @Override
     public void setConfirmationNeeded(boolean needed) {
         this.confirmationNeeded = needed;
-        if (confirmationNeeded) {
-            this.gameCommand = GameCommand.ENABLECONFIRMATION;
-        } else {
-            this.gameCommand = GameCommand.DISABLECONFIRMATION;
-        }
+        this.gameCommand = GameCommand.CONFIGCONFIRMATION;
+
         fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
     public void setShowMoveNumbers(boolean show) {
         this.showMoveNumbers = show;
-        if (show) {
-            this.gameCommand = GameCommand.ENABLEMOVENUMBERS;
-        } else {
-            this.gameCommand = GameCommand.DISABLEMOVENUMBERS;
-        }
+        this.gameCommand = GameCommand.CONFIGSHOWMOVENUMBERS;
+
         fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
     public void setShowCoordinates(boolean show) {
         this.showCoordinates = show;
-        if (show) {
-            this.gameCommand = GameCommand.ENABLECOORDINATES;
-        } else {
-            this.gameCommand = GameCommand.DISABLECOORDINATES;
-        }
+        this.gameCommand = GameCommand.CONFIGSHOWCOORDINATES;
+
         fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public boolean isConfirmationNeeded() {
+        return this.confirmationNeeded;
+    }
+
+    @Override
+    public boolean isShowMoveNumbers() {
+        return this.showMoveNumbers;
+    }
+
+    @Override
+    public boolean isShowCoordinates() {
+        return this.showCoordinates;
     }
 
     private void switchColor() {
@@ -309,3 +295,4 @@ public class Game implements GameInterface {
         board.printDebugInfo(x, y);
     }
 }
+

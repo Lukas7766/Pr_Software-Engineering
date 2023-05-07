@@ -29,17 +29,17 @@ public class BoardPane extends GridPane {
     /**
      * whether moves have to be confirmed separately, rather than immediately played
      */
-    private boolean needsMoveConfirmation = false;
+    private boolean needsMoveConfirmation;
 
     /**
      * whether move numbers are shown on the stones
      */
-    private boolean showsMoveNumbers = false;
+    private boolean showsMoveNumbers;
 
     /**
      * whether coordinates are shown on the sides of the board
      */
-    private boolean showsCoordinates = true;
+    private boolean showsCoordinates;
 
     /**
      * Number of PLAYABLE rows and columns of this board. Does not include the coordinate axes.
@@ -104,6 +104,9 @@ public class BoardPane extends GridPane {
 
         this.game = game;
         this.graphicsPath = graphicsPath;
+        this.showsMoveNumbers = game.isShowMoveNumbers();
+        this.showsCoordinates = game.isShowCoordinates();
+        this.needsMoveConfirmation = game.isConfirmationNeeded();
 
         game.addListener(e -> {
             if(e == null) {
@@ -156,23 +159,14 @@ public class BoardPane extends GridPane {
                     DebugEvent de = (DebugEvent) e;
                     getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
                     break;
-                case ENABLECONFIRMATION:
-                    setMoveConfirmation(true);
+                case CONFIGCONFIRMATION:
+                    setMoveConfirmation(game.isConfirmationNeeded());
                     break;
-                case DISABLECONFIRMATION:
-                    setMoveConfirmation(false);
+                case CONFIGSHOWCOORDINATES:
+                    setShowsCoordinates(game.isShowCoordinates());
                     break;
-                case ENABLECOORDINATES:
-                    setShowsCoordinates(true);
-                    break;
-                case DISABLECOORDINATES:
-                    setShowsCoordinates(false);
-                    break;
-                case ENABLEMOVENUMBERS:
-                    setShowsMoveNumbers(true);
-                    break;
-                case DISABLEMOVENUMBERS:
-                    setShowsMoveNumbers(false);
+                case CONFIGSHOWMOVENUMBERS:
+                    setShowsMoveNumbers(game.isShowMoveNumbers());
                     break;
                 default: return;
             }
