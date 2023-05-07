@@ -309,7 +309,7 @@ public class Board implements BoardInterface {
         GAME.fireGameEvent(e);
     }
 
-    public Set getNeighbors(int x, int y) {
+    public Set<StoneGroup> getNeighbors(int x, int y) {
         return getSurroundings(
                 x,
                 y,

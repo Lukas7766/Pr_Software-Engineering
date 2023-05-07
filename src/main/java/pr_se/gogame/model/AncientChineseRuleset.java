@@ -59,16 +59,22 @@ public class AncientChineseRuleset implements Ruleset {
                 StoneGroup stoneGroup = p.getStoneGroup();
                 if (stoneGroup == null) continue;
                 if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.BLACK) {
-                    scoreBlack++;
+                    //scoreBlack++;
                 } else if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.WHITE) {
-                    scoreWhite++;
+                    //scoreWhite++;
                 }
 
             }
         }
 
 
-        System.out.println(calculateTerritory(StoneColor.BLACK, board));
+        for (StoneColor color : StoneColor.values()) {
+            if (color == StoneColor.BLACK) {
+                scoreBlack += calculateTerritoryPoints(color, board);
+            } else if (color == StoneColor.WHITE) {
+                scoreWhite += calculateTerritoryPoints(color, board);
+            }
+        }
         System.out.println("Score Board:");
 
         System.out.println("Score Black: " + scoreBlack);
@@ -76,14 +82,16 @@ public class AncientChineseRuleset implements Ruleset {
 
     }
 
-    //FloodFill Algorithm
-    public int calculateTerritory(StoneColor color, Board board) {
+    //FloodFill Algorithm, source ALGO assignment
+    public int calculateTerritoryPoints(StoneColor color, Board board) {
         int boardSize = board.getSize();
         visited = new boolean[boardSize][boardSize];
 
         int territoryPoints = 0;
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
+
+
                 if (board.getBoard()[i][j] == null && !visited[i][j]) {
 
                     boolean occupiedTerritory = true;
@@ -92,7 +100,7 @@ public class AncientChineseRuleset implements Ruleset {
                     floodFill(board, i, j);
 
                     for (Position p : territory) {
-                        for (StoneGroup n : (Set<StoneGroup>) board.getNeighbors(p.X, p.Y).stream().collect(Collectors.toList())) {
+                        for (StoneGroup n : board.getNeighbors(p.X, p.Y).stream().toList()) {
                             if (n.getStoneColor() != color) {
                                 occupiedTerritory = false;
                                 break;
@@ -174,5 +182,10 @@ public class AncientChineseRuleset implements Ruleset {
             default:
                 break;
         }
+    }
+
+    @Override
+    public double getKomi() {
+        return 6.5;
     }
 }

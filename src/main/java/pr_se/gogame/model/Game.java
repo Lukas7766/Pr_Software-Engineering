@@ -14,10 +14,15 @@ public class Game implements GameInterface {
 
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
-    private int size = 19;
-    private int handicap = 0;
+    private int size;
+    private int handicap;
+    private double komi;
 
-    private double komi = 7.5;
+    private boolean confirmationNeeded;
+    private boolean showMoveNumbers;
+    private boolean showCoordinates;
+
+    private Ruleset ruleset;
     private Board board;
 
     private int koCounter = 0;
@@ -26,19 +31,27 @@ public class Game implements GameInterface {
     private int curMoveNumber = 0;
     private StoneColor curColor = StoneColor.BLACK;
 
-    private Ruleset ruleset = new AncientChineseRuleset();
+
 
     private FileSaver fileSaver;
 
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
-    private boolean confirmationNeeded;
-    private boolean showMoveNumbers;
-    private boolean showCoordinates;
+
+
 
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
         this.board = new Board(this, StoneColor.BLACK);
+        this.komi = ruleset.getKomi();
+        this.ruleset = new AncientChineseRuleset();
+        this.handicap = 0;
+        this.size = 19;
+
+        this.confirmationNeeded = false;
+        this.showMoveNumbers = false;
+        this.showCoordinates = true;
+
     }
 
     public void initGame() {

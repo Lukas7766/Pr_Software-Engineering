@@ -50,4 +50,7 @@ public interface Ruleset {
     default void setHandicapStones(Board board, int noStones) {}
 
 
+    default double getKomi(){
+        return 7.5;
+    }
 }
