@@ -105,7 +105,7 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode) { // TODO: Maybe return boolean for move successful/unsuccessful?
+    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode) {
         // Are the coordinates invalid?
         if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
             throw new IllegalArgumentException();
@@ -181,7 +181,7 @@ public class Board implements BoardInterface {
         if (!prepareMode && firstSameColorGroup.getLiberties().size() == 0) {
             if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 0)) { // if there are any groups of the opposite color with 0 liberties, the attacker wins and the existing group is removed instead.
                 System.out.println("SUICIDE DETECTED!!!");
-                if (!GAME.getRuleset().getSuicide(firstSameColorGroup)) {
+                if (!GAME.getRuleset().getSuicide(firstSameColorGroup)) {//SeWa, ToDo challenge idea of getSuicide
                     Position pos = new Position(x, y);
                     firstSameColorGroup.removeLocation(pos);
                     for (StoneGroup sg : surroundingSGs) {

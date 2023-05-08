@@ -13,23 +13,37 @@ public interface Ruleset {
         return false;
     }
 
+    /** KO is a special rule that prevents immediate repetition of position, in which a single stone is captured and
+     *  another single stone immediately taken back. <br> Depending on the ruleset a number of allowed repetition is given.
+     *  <br> The default value is 2.
+     * @return the default value two as move repetition is allowed twice.
+     */
     default int getKoAmount() {
         return 2;
     }
 
+    /** This method predicates if the current move matches the KO criteria.
+     *
+     * @param x pass the X-axis of the verifiable move
+     * @param y pass the y-axis of the verifiable move
+     * @return true if a KO move was tried or return false if it isn't a KO move
+     */
     boolean predicateKoMove(int x, int y);
 
+    /** The non-repeatable KO move is stored in Position.
+     *
+     * @return the position of the non-repeatable KO move
+     */
     Position getKoMove();
 
+    /**
+     * This method resets the KO move.
+     */
     void resetKoMove();
 
-    /** Evaluation is the central feature of a set of rules; It varies depending on the set of rules.
-     *7.1 A game is played until both parties agree that it is
-     * finished.
-     * 7.2 During the game, if one player resigns, the game
-     * is finished.
-     * 7.3 If both players pass one after the other, the game
-     * is finished.
+    /** This method calculates the score of the game for both players.
+     *
+     * @return the score of the game for both players in an array of size 2. Index 0 is the score of black, index 1 is the score of white.
      */
     int[] scoreGame(Board board);
 
@@ -49,7 +63,9 @@ public interface Ruleset {
      */
     default void setHandicapStones(Board board, int noStones) {}
 
-
+    /**
+     * @return the default komi value for the ruleset
+     */
     default double getKomi(){
         return 7.5;
     }
