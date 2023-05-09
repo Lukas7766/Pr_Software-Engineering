@@ -20,6 +20,8 @@ public class Game implements GameInterface {
     private boolean showMoveNumbers = false;
     private boolean showCoordinates = true;
 
+    private boolean demoMode = false;
+
     //global (helper) variables
     private FileSaver fileSaver;
     private GameCommand gameCommand;
@@ -28,7 +30,6 @@ public class Game implements GameInterface {
     private int curMoveNumber = 0;
     private StoneColor curColor;
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
-
     private double playerBlackScore;
     private int blackCapturedStones;
 
@@ -54,7 +55,7 @@ public class Game implements GameInterface {
     public void newGame(GameCommand gameCommand, int size, int handicap) {
         switch (gameCommand) {
             case BLACKSTARTS -> this.curColor = StoneColor.BLACK;
-            case WHITSTARTS -> this.curColor = StoneColor.WHITE;
+            case WHITESTARTS -> this.curColor = StoneColor.WHITE;
             default -> throw new IllegalArgumentException();
         }
 
@@ -113,7 +114,7 @@ public class Game implements GameInterface {
                 this.gameCommand = GameCommand.WHITEPLAYS;
                 this.setCurColor(WHITE);
             }
-            case WHITEPLAYS, WHITSTARTS -> {
+            case WHITEPLAYS, WHITESTARTS -> {
                 this.gameCommand = GameCommand.BLACKPLAYS;
                 this.setCurColor(BLACK);
             }
@@ -125,7 +126,7 @@ public class Game implements GameInterface {
     public void resign() {
         System.out.println("resign");
         switch (gameCommand) {
-            case BLACKPLAYS, WHITSTARTS -> this.gameCommand = GameCommand.BLACKWON;
+            case BLACKPLAYS, WHITESTARTS -> this.gameCommand = GameCommand.BLACKWON;
             case WHITEPLAYS, BLACKSTARTS -> this.gameCommand = GameCommand.WHITEWON;
         }
         fireGameEvent(new GameEvent(gameCommand));
@@ -265,6 +266,18 @@ public class Game implements GameInterface {
         } else if (handicapStoneCounter < 0) {
             throw new IllegalStateException();
         }
+    }
+
+    @Override
+    public boolean isDemoMode() {
+        return demoMode;
+    }
+
+    @Override
+    public void setDemoMode(boolean demoMode) {
+        this.demoMode = demoMode;
+        this.gameCommand = GameCommand.CONFIGDEMOMODE;
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override

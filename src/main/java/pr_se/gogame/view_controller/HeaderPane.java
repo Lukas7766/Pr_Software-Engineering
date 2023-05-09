@@ -330,8 +330,8 @@ public class HeaderPane extends VBox {
         playbackControlList.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() != GameCommand.PLAYBACK) return;
-            playbackControlList.forEach(e -> e.setDisable(false));
+            if (l.getGameCommand() != GameCommand.CONFIGDEMOMODE) return;
+            playbackControlList.forEach(e -> e.setDisable(!game.isDemoMode()));
 
         });
 

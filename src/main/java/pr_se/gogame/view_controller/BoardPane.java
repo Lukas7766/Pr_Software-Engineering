@@ -140,7 +140,7 @@ public class BoardPane extends GridPane {
                 case INIT:
                     setMouseTransparent(true);
                     break;
-                case WHITSTARTS:
+                case WHITESTARTS:
                 case BLACKSTARTS:
                     setMouseTransparent(false);
                     init();
