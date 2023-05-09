@@ -33,7 +33,7 @@ class JapaneseRulesetTest {
     }
 
     @Test
-    @DisplayName("6.5 komi points were added to player white")
+    @DisplayName("6.5 komi points are defined in JP ruleset")
     void getKomi() {
         assertEquals(6.5, japaneseRuleset.getKomi());
     }
