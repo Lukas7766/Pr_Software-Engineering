@@ -33,14 +33,14 @@ class JapaneseRulesetTest {
     }
 
     @Test
-    void setHandicapStones() {
-        assertTrue(false);
-    }
-
-    @Test
     @DisplayName("6.5 komi points were added to player white")
     void getKomi() {
         assertEquals(6.5, japaneseRuleset.getKomi());
+    }
+
+    @Test
+    void setHandicapStones() {
+        assertTrue(false);
     }
 
     @Test
