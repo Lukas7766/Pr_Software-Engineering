@@ -126,8 +126,8 @@ public class Game implements GameInterface {
     public void resign() {
         System.out.println("resign");
         switch (gameCommand) {
-            case BLACKPLAYS, WHITESTARTS -> this.gameCommand = GameCommand.BLACKWON;
-            case WHITEPLAYS, BLACKSTARTS -> this.gameCommand = GameCommand.WHITEWON;
+            case WHITEPLAYS, WHITESTARTS -> this.gameCommand = GameCommand.BLACKWON;
+            case BLACKPLAYS, BLACKSTARTS -> this.gameCommand = GameCommand.WHITEWON;
         }
         fireGameEvent(new GameEvent(gameCommand));
     }
