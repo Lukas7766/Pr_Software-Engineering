@@ -67,6 +67,7 @@ public class Game implements GameInterface {
         this.playerWhiteScore = this.ruleset.getKomi();
         this.blackCapturedStones = 0;
         this.whiteCapturedStones = 0;
+        this.curMoveNumber = 0;
         this.board = new Board(this, curColor);
 
         System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
@@ -248,7 +249,8 @@ public class Game implements GameInterface {
     public void playMove(int x, int y) {
         if (board.setStone(x, y, curColor, false)) {
             curMoveNumber++;
-
+            System.out.println("show move # " + showMoveNumbers);
+            System.out.println("Move played.");
             // Update current player color
             switchColor();
         } else {

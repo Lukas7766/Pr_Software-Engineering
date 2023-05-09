@@ -159,17 +159,17 @@ public class SidePane extends StackPane {
 
         GridPane scorePane = new GridPane();
 
-        Label p1 = new Label("Player Black:");
+        Label p1 = new Label("Black:");
         p1.setFont(Font.font(null, FontWeight.BOLD, 13));
         scorePane.add(p1, 0, 0);
 
-        Label scoreCountBlackLbl = new Label(game.getScore(StoneColor.BLACK) + "");
+        Label scoreCountBlackLbl = new Label(game.getScore(StoneColor.BLACK) + "");//ToDo check reset while INIT new game
         scoreCountBlackLbl.setPadding(new Insets(0, 0, 0, 15));
         scoreCountBlackLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
         scorePane.add(scoreCountBlackLbl, 1, 0);
 
 
-        Label p2 = new Label("Player White:");
+        Label p2 = new Label("White:");
         p2.setFont(Font.font(null, FontWeight.BOLD, 13));
         scorePane.add(p2, 0, 1);
 
@@ -214,15 +214,15 @@ public class SidePane extends StackPane {
          * Adds listener to Game to update the currently displayed player name
          */
         game.addListener(l -> {
+            scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
+            scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
             switch (l.getGameCommand()) {
                 case WHITEPLAYS:
                 case WHITESTARTS:
-                    scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     actualPlayer.setText("White");
                     break;
                 case BLACKPLAYS:
                 case BLACKSTARTS:
-                    scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                     actualPlayer.setText("Black");
                     break;
                 case CONFIGDEMOMODE:

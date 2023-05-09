@@ -23,7 +23,6 @@ public class CustomWinAction {
      *
      * @param stage pass stage
      * @param game pass game
-     * @param e Event
      * @param filterList pass list of Extension Filters
      */
     public static void winAction(Stage stage, Game game, HashSet<FileChooser.ExtensionFilter> filterList) {

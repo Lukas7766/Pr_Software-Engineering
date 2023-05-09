@@ -112,21 +112,21 @@ public class BoardPane extends GridPane {
             if(e == null) {
                 throw new NullPointerException();
             }
-
+            System.out.println("show move numbers border pane " + showsMoveNumbers);
             switch(e.getGameCommand()) {
                 case BLACKPLAYS:
                 case WHITEPLAYS:
                     if(e instanceof StoneSetEvent) {//TODO: StoneEvent vs GameCommand question
                         System.out.println("StoneSetEvent");
                         StoneSetEvent sse = (StoneSetEvent) e;
-                        PlayableBoardCell destBC = getPlayableCell(sse.getX(), sse.getY());
+                        PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
+                        destinationBC.getLabel().setText("" + sse.getMoveNumber());
 
                         if (sse.getColor() == BLACK) {
-                            destBC.setBlack();
+                            destinationBC.setBlack();
                         } else {
-                            destBC.setWhite();
+                            destinationBC.setWhite();
                         }
-                        destBC.getLabel().setVisible(false);
                     }
                     break;
                 case CONFIRMCHOICE:
@@ -329,7 +329,7 @@ public class BoardPane extends GridPane {
 
     public void setShowsMoveNumbers(boolean showsMoveNumbers) {
         this.showsMoveNumbers = showsMoveNumbers;
-
+        System.out.println(showsMoveNumbers);
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
                 getPlayableCell(j, i).showMoveNumber();

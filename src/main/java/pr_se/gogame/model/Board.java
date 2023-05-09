@@ -281,6 +281,7 @@ public class Board implements BoardInterface {
                 gc = GameCommand.WHITEPLAYS;
             }
         }
+        System.out.println("cur move number: "+GAME.getCurMoveNumber());
         StoneSetEvent e = new StoneSetEvent(gc, x, y, GAME.getCurMoveNumber());
         GAME.fireGameEvent(e);
     }
