@@ -214,7 +214,7 @@ public class Board implements BoardInterface {
                     for (Position p : sg.getLocations()) {
                         removeStone(p.X, p.Y);
                         captured++;
-                        System.out.println("remove: " + p.X + 1 + " / " + p.Y + 1);
+                        System.out.println("remove: " + p.X + " / " + p.Y);
                     }
                     GAME.setCapturedStones(color,captured);
                 }

@@ -14,14 +14,13 @@ import java.util.Optional;
 public class CustomNewGameAction {
 
     /**
-     * Handles the on close action<br>
+     * Handles the on new game action<br>
      * -> save <br>
      * -> no save <br>
      * -> cancel <br>
      *
      * @param stage pass stage
      * @param game pass game
-     * @param e Event
      * @param filterList pass list of Extension Filters
      */
     public static void onSaveAction(Stage stage, Game game, HashSet<FileChooser.ExtensionFilter> filterList) {
