@@ -17,7 +17,7 @@ public class UserDefinableRuleset implements Ruleset {
      * -> set to true if you want to allow it <br>
      * -> set to false if you want to forbid it <br>
      * @param allow (true or false)
-     * @param check predicate to evaluate whether the stonegroup stonegroup in question is allowed to commit suicide.
+     * @param check predicate to evaluate whether the stonegroup in question is allowed to commit suicide.
      */
     void setSuicide(boolean allow, Predicate<StoneGroup> check) {
         suicideAllowed = allow;
@@ -50,6 +50,21 @@ public class UserDefinableRuleset implements Ruleset {
         return koAmount;
     }
 
+    @Override
+    public boolean predicateKoMove(int x, int y) {
+        return false;
+    }
+
+    @Override
+    public Position getKoMove() {
+        return null;
+    }
+
+    @Override
+    public void resetKoMove() {
+
+    }
+
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
      * Two consecutive moves (except passing) may not restore the original position.
      * @return 2
@@ -59,8 +74,8 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public void scoreGame() {
-
+    public GameResult scoreGame(Game game) {
+        return new GameResult(1, 1, null,"");
     }
 
     @Override
@@ -79,7 +94,7 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public void setHandicapStones(Board board, int noStones) {
+    public void setHandicapStones(Board board, StoneColor beginner, int noStones) {
         if(!hasDefaultHandicap) {
             handicapStoneSetter.accept(board, noStones);
         }

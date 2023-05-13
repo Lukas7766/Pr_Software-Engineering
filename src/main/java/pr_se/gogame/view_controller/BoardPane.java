@@ -29,17 +29,17 @@ public class BoardPane extends GridPane {
     /**
      * whether moves have to be confirmed separately, rather than immediately played
      */
-    private boolean needsMoveConfirmation = false;
+    private boolean needsMoveConfirmation;
 
     /**
      * whether move numbers are shown on the stones
      */
-    private boolean showsMoveNumbers = false;
+    private boolean showsMoveNumbers;
 
     /**
      * whether coordinates are shown on the sides of the board
      */
-    private boolean showsCoordinates = true;
+    private boolean showsCoordinates;
 
     /**
      * Number of PLAYABLE rows and columns of this board. Does not include the coordinate axes.
@@ -104,23 +104,44 @@ public class BoardPane extends GridPane {
 
         this.game = game;
         this.graphicsPath = graphicsPath;
+        this.showsMoveNumbers = game.isShowMoveNumbers();
+        this.showsCoordinates = game.isShowCoordinates();
+        this.needsMoveConfirmation = game.isConfirmationNeeded();
 
         game.addListener(e -> {
             if(e == null) {
                 throw new NullPointerException();
             }
-
+            System.out.println("show move numbers border pane " + showsMoveNumbers);
             switch(e.getGameCommand()) {
+                case BLACKPLAYS:
+                case WHITEPLAYS:
+                    if(e instanceof StoneSetEvent) {//TODO: StoneEvent vs GameCommand question
+                        System.out.println("StoneSetEvent");
+                        StoneSetEvent sse = (StoneSetEvent) e;
+                        PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
+                        destinationBC.getLabel().setText("" + sse.getMoveNumber());
+
+                        if (sse.getColor() == BLACK) {
+                            destinationBC.setBlack();
+                        } else {
+                            destinationBC.setWhite();
+                        }
+                    }
+                    break;
                 case CONFIRMCHOICE:
                     confirmMove();
+                    break;
+                case WHITEREMOVED:
+                case BLACKREMOVED:
+                    StoneRemovedEvent sre = (StoneRemovedEvent) e;
+                    getPlayableCell(sre.getX(), sre.getY()).unset();
                     break;
                 case INIT:
                     setMouseTransparent(true);
                     break;
-                case WHITSTARTS:
+                case WHITESTARTS:
                 case BLACKSTARTS:
-                    System.out.println(e.getGameCommand()+" inBoardPane: BoardSize: " + e.getSize() + " Komi: "+  e.getKomi());
-
                     setMouseTransparent(false);
                     init();
                     break;
@@ -135,33 +156,28 @@ public class BoardPane extends GridPane {
                         destBC.setWhite();
                     }
                     destBC.getLabel().setVisible(false);
-
                     break;
-                case BLACKPLAYS:
-                case WHITEPLAYS:
-                    StoneSetEvent sse = (StoneSetEvent) e;
-                    PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
-                    destinationBC.getLabel().setText("" + sse.getMoveNumber());
-
-                    if (sse.getColor() == BLACK) {
-                        destinationBC.setBlack();
-                    } else {
-                        destinationBC.setWhite();
-                    }
+                case BLACKWON:
+                case WHITEWON:
+                case DRAW:
+                    setMouseTransparent(true);
                     break;
-                case WHITEREMOVED:
-                case BLACKREMOVED:
-                    StoneRemovedEvent sre = (StoneRemovedEvent) e;
-                    getPlayableCell(sre.getX(), sre.getY()).unset();
+                case CONFIGCONFIRMATION:
+                    setMoveConfirmation(game.isConfirmationNeeded());
+                    break;
+                case CONFIGSHOWCOORDINATES:
+                    setShowsCoordinates(game.isShowCoordinates());
+                    break;
+                case CONFIGSHOWMOVENUMBERS:
+                    setShowsMoveNumbers(game.isShowMoveNumbers());
                     break;
                 case DEBUGINFO:
                     DebugEvent de = (DebugEvent) e;
                     getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
                     break;
-                default: return;
             }
 
-        }); //ToDo: full Event integration
+        });
 
         loadGraphics(graphicsPath);
         init();
@@ -313,7 +329,7 @@ public class BoardPane extends GridPane {
 
     public void setShowsMoveNumbers(boolean showsMoveNumbers) {
         this.showsMoveNumbers = showsMoveNumbers;
-
+        System.out.println(showsMoveNumbers);
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
                 getPlayableCell(j, i).showMoveNumber();

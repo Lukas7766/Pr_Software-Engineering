@@ -1,16 +1,10 @@
 package pr_se.gogame.view_controller;
 
 import javafx.application.Application;
-import javafx.geometry.Insets;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Menu;
-import javafx.scene.control.MenuBar;
-import javafx.scene.control.MenuItem;
 import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
 import javafx.scene.control.Button;
 
 import javafx.stage.Stage;
@@ -38,19 +32,20 @@ public class GoApplication extends Application {
         BoardPane bp = new BoardPane(game, path+"debug.zip");
         // bp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(5), null/*new Insets(5, 5, 5, 2.5)*/)));
 
-        Button changeGFX = new Button("Change graphics set");
+        Button changeGFX = new Button("CGS");
         changeGFX.setOnAction((e) -> bp.setGraphicsPath(path + "inverted.zip"));
-        Button toggleCoords = new Button("Toggle Coordinates");
-        toggleCoords.setOnAction((e) -> bp.setShowsCoordinates(!bp.showsCoordinates()));
-        Button toggleMoveNos = new Button("Toggle Move Numbers");
-        toggleMoveNos.setOnAction((e) -> bp.setShowsMoveNumbers(!bp.showsMoveNumbers()));
+        //Button toggleCoords = new Button("Toggle Coordinates");
+        //toggleCoords.setOnAction((e) -> bp.setShowsCoordinates(!bp.showsCoordinates()));
+        //Button toggleMoveNos = new Button("Toggle Move Numbers");
+        //toggleMoveNos.setOnAction((e) -> bp.setShowsMoveNumbers(!bp.showsMoveNumbers()));
         VBox debugButtons = new VBox();
-        debugButtons.getChildren().addAll(changeGFX, toggleCoords, toggleMoveNos);
+        //debugButtons.getChildren().addAll(changeGFX, toggleCoords, toggleMoveNos);
+        debugButtons.getChildren().add(changeGFX);
 
         root.setCenter(bp);
         HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, stage, game);
         root.setTop(hp);
-        SidePane sp = new SidePane(Color.LIGHTGRAY, game);
+        SidePane sp = new SidePane(Color.LIGHTGRAY, stage, game);
         root.setLeft(sp);
         root.setRight(debugButtons);
 

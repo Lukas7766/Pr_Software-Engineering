@@ -12,52 +12,67 @@ import static pr_se.gogame.model.StoneColor.WHITE;
 
 public class Game implements GameInterface {
 
+    //Settings
+    private final Ruleset ruleset = new JapaneseRuleset();
+    private int size = 19;
+    private int handicap = 0;
+    private boolean confirmationNeeded = false;
+    private boolean showMoveNumbers = false;
+    private boolean showCoordinates = true;
+
+    private boolean demoMode = false;
+
+    //global (helper) variables
+    private FileSaver fileSaver;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
-    private int size = 19;
-    private int komi = 0;
     private Board board;
-
-
     private int curMoveNumber = 0;
-    private StoneColor curColor = StoneColor.BLACK;
-
-    private Ruleset ruleset = new JapaneseRuleset();
-
-    private FileSaver fileSaver;
-
+    private StoneColor curColor;
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
+    private double playerBlackScore;
+    private int blackCapturedStones;
+
+    private double playerWhiteScore;
+    private int whiteCapturedStones;
+    private GameResult gameResult;
+
 
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
-        this.board = new Board(this, StoneColor.BLACK);
+        this.board = new Board(this, BLACK);
     }
-
-    public void initGame() {
-        this.gameCommand = GameCommand.INIT;
-        fireGameCommand(gameCommand);
-    }
-
 
     @Override
-    public void newGame(GameCommand gameCommand, int size, int komi) {
-        if(gameCommand == GameCommand.BLACKSTARTS) {
-            this.curColor = StoneColor.BLACK;
-        } else if (gameCommand == GameCommand.WHITSTARTS) {
-            this.curColor = StoneColor.WHITE;
-        } else {
-            throw new IllegalArgumentException();
+    public void initGame() {
+        this.gameCommand = GameCommand.INIT;
+
+        System.out.println("initGame: " + gameCommand);
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public void newGame(GameCommand gameCommand, int size, int handicap) {
+        switch (gameCommand) {
+            case BLACKSTARTS -> this.curColor = StoneColor.BLACK;
+            case WHITESTARTS -> this.curColor = StoneColor.WHITE;
+            default -> throw new IllegalArgumentException();
         }
 
         this.fileSaver = new FileSaver("Black", "White", String.valueOf(size));
-        this.size = size;
-        this.komi = komi;
         this.gameCommand = gameCommand;
-        this.curMoveNumber = 1;
-        System.out.println("newGame, Size: " + size + " Komi: " + komi);
-        this.board = new Board(this, this.curColor); // Warning: This may set the handicapStoneCounter, so beware of changing it after calling this constructor.
-        fireNewGame(gameCommand, size, komi);
+        this.size = size;
+        this.handicap = handicap;
+        this.playerBlackScore = handicap;
+        this.playerWhiteScore = this.ruleset.getKomi();
+        this.blackCapturedStones = 0;
+        this.whiteCapturedStones = 0;
+        this.curMoveNumber = 0;
+        this.board = new Board(this, curColor);
+
+        System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
+        fireGameEvent(new GameEvent(gameCommand, size, handicap));
     }
 
 
@@ -83,28 +98,70 @@ public class Game implements GameInterface {
      * and most importantly the game tree. Additionally, it just seems a good idea to have all IO connections go through
      * Game, as it is the "main class" of the model.
      */
-    public boolean saveFile(Path path){
+    //ToDo move competence to importFile methode?? and delete this method when it is not needed anymore
+    public boolean saveFile(Path path) {
         return fileSaver.saveFile(path);
     }
 
-    public boolean importFile(Path path){
+    //ToDo delete this method when it is not needed anymore??
+    public boolean importFile(Path path) {
         return FileSaver.importFile(path);
     }
 
     @Override
     public void pass() {
         System.out.println("pass");
+        switch (gameCommand) {
+            case BLACKPLAYS, BLACKSTARTS -> {
+                this.gameCommand = GameCommand.WHITEPLAYS;
+                this.setCurColor(WHITE);
+            }
+            case WHITEPLAYS, WHITESTARTS -> {
+                this.gameCommand = GameCommand.BLACKPLAYS;
+                this.setCurColor(BLACK);
+            }
+        }
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
     public void resign() {
         System.out.println("resign");
-
+        GameResult result;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Game was resigned by").append(" ");
+        switch (gameCommand) {
+            case WHITEPLAYS, WHITESTARTS -> {
+                this.gameCommand = GameCommand.BLACKWON;
+                sb.append("White!").append("\n\n").append("Black won!");
+                result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
+            }
+            case BLACKPLAYS, BLACKSTARTS -> {
+                this.gameCommand = GameCommand.WHITEWON;
+                sb.append("Black!").append("\n\n").append("White won!");
+                result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
+            }
+            default -> {throw new IllegalArgumentException("Game was not resigned! Consult your application owner!");}
+        }
+        this.gameResult=result;
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
     public void scoreGame() {
         System.out.println("scoreGame");
+        this.gameResult = ruleset.scoreGame(this);
+        this.playerBlackScore = gameResult.getScoreBlack();
+        this.playerWhiteScore = gameResult.getScoreWhite();
+
+        if (gameResult.getWinner() == BLACK) {
+            this.gameCommand = GameCommand.BLACKWON;
+        } else if (gameResult.getWinner() == WHITE) {
+            this.gameCommand = GameCommand.WHITEWON;
+        } else {
+            this.gameCommand = GameCommand.DRAW;
+        }
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
@@ -113,8 +170,13 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public int getKomi() {
-        return this.komi;
+    public int getHandicap() {
+        return this.handicap;
+    }
+
+    @Override
+    public double getKomi() {
+        return this.ruleset.getKomi();
     }
 
     @Override
@@ -125,7 +187,6 @@ public class Game implements GameInterface {
     @Override
     public void removeListener(GameListener l) {
         listeners.remove(l);
-
     }
 
     @Override
@@ -135,9 +196,9 @@ public class Game implements GameInterface {
 
     @Override
     public void confirmChoice() {
-        System.out.println("confirmChoice");
         this.gameCommand = GameCommand.CONFIRMCHOICE;
-        fireGameCommand(gameCommand);
+        System.out.println(this.gameCommand);
+        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
@@ -167,8 +228,7 @@ public class Game implements GameInterface {
 
     @Override
     public StoneColor getColorAt(int x, int y) {
-        StoneColor c =  board.getColorAt(x, y);
-        return c;
+        return board.getColorAt(x, y);
     }
 
     @Override
@@ -178,7 +238,7 @@ public class Game implements GameInterface {
 
     @Override
     public void setCurMoveNumber(int curMoveNumber) {
-        if(curMoveNumber < 1) {
+        if (curMoveNumber < 1) {
             throw new IllegalArgumentException();
         }
 
@@ -187,7 +247,7 @@ public class Game implements GameInterface {
 
     @Override
     public void setCurColor(StoneColor c) {
-        if(c == null) {
+        if (c == null) {
             throw new NullPointerException();
         }
 
@@ -199,26 +259,17 @@ public class Game implements GameInterface {
         this.handicapStoneCounter = counter;
     }
 
-    /*
-        I would have liked to give it default visibility so it's visible only in the same package, but alas IntelliJ
-        won't let me.
-     */
-    @Override
-    public void fireGameEvent(GameEvent e) {
-        for (GameListener l : listeners) {
-            l.gameCommand(e);
-        }
-    }
-
     @Override
     public void playMove(int x, int y) {
-        if(board.setStone(x, y, curColor, false)) {
+        if (board.setStone(x, y, curColor, false)) {
             curMoveNumber++;
-
+            System.out.println("show move # " + showMoveNumbers);
+            System.out.println("Move played.");
             // Update current player color
             switchColor();
         } else {
             System.out.println("Move aborted.");
+
         }
     }
 
@@ -226,31 +277,122 @@ public class Game implements GameInterface {
     public void placeHandicapStone(int x, int y) {
         board.setStone(x, y, curColor, true);
         handicapStoneCounter--;
-        if(handicapStoneCounter == 0) {
+        if (handicapStoneCounter == 0) {
             switchColor();
-        } else if(handicapStoneCounter < 0) {
+        } else if (handicapStoneCounter < 0) {
             throw new IllegalStateException();
         }
     }
 
-    private void switchColor() {
-        if(curColor == BLACK) {
-            curColor = WHITE;
+    @Override
+    public boolean isDemoMode() {
+        return demoMode;
+    }
+
+    @Override
+    public void setDemoMode(boolean demoMode) {
+        this.demoMode = demoMode;
+        this.gameCommand = GameCommand.CONFIGDEMOMODE;
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public void setConfirmationNeeded(boolean needed) {
+        this.confirmationNeeded = needed;
+        this.gameCommand = GameCommand.CONFIGCONFIRMATION;
+
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public boolean isConfirmationNeeded() {
+        return this.confirmationNeeded;
+    }
+
+    @Override
+    public void setShowMoveNumbers(boolean show) {
+        this.showMoveNumbers = show;
+        this.gameCommand = GameCommand.CONFIGSHOWMOVENUMBERS;
+
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public boolean isShowMoveNumbers() {
+        return this.showMoveNumbers;
+    }
+
+    @Override
+    public void setShowCoordinates(boolean show) {
+        this.showCoordinates = show;
+        this.gameCommand = GameCommand.CONFIGSHOWCOORDINATES;
+
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    @Override
+    public boolean isShowCoordinates() {
+        return this.showCoordinates;
+    }
+
+    @Override
+    public void setCapturedStones(StoneColor color, int amount) {
+        if (color == null) throw new NullPointerException();
+        if (amount < 0) throw new IllegalArgumentException();
+
+        if (color == BLACK) {
+            this.blackCapturedStones += amount;
+            this.playerBlackScore += amount;
         } else {
-            curColor = BLACK;
+            this.whiteCapturedStones += amount;
+            this.playerWhiteScore += amount;
         }
     }
 
-    private void fireNewGame(GameCommand gameCommand, int size, int komi) {
-        fireGameEvent(new GameEvent(gameCommand, size, komi));
+    @Override
+    public int getCapturedStones(StoneColor color) {
+        if (color == null) throw new NullPointerException();
+
+        if (color == BLACK) return this.blackCapturedStones;
+        else return this.whiteCapturedStones;
     }
 
-    private void fireGameCommand(GameCommand command) {
-        fireGameEvent(new GameEvent(command));
+    @Override
+    public double getScore(StoneColor color) {
+        return color == BLACK ? this.playerBlackScore : this.playerWhiteScore;
+    }
+
+    @Override
+    public GameResult getGameResult() {
+        return gameResult;
+    }
+
+    private void switchColor() {
+        if (curColor == BLACK) {
+            curColor = WHITE;
+            this.gameCommand = GameCommand.WHITEPLAYS;
+        } else {
+            curColor = BLACK;
+            this.gameCommand = GameCommand.BLACKPLAYS;
+        }
+        fireGameEvent(new GameEvent(gameCommand));
+    }
+
+    /*
+    I would have liked to give it default visibility, so it's visible only in the same package, but alas IntelliJ
+    won't let me.
+    -> 20230502, SeWa: changed to package private
+ */
+    void fireGameEvent(GameEvent e) {
+        for (GameListener l : listeners) {
+            l.gameCommand(e);
+        }
     }
 
     // TODO: Remove this debug method
     public void printDebugInfo(int x, int y) {
         board.printDebugInfo(x, y);
     }
+
 }
+

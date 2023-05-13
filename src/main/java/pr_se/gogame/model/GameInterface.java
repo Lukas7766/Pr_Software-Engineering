@@ -1,16 +1,16 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
 
 import java.nio.file.Path;
 
 public interface GameInterface {
 
-    boolean saveGame(Path path);
-
+    //##################################################################################################################
+    //game operations
     void initGame();
-    void newGame(GameCommand gameCommand, int size, int komi);
+    void newGame(GameCommand gameCommand, int size, int handicap);
+    boolean saveGame(Path path);
 
     boolean importGame(Path path);
 
@@ -20,25 +20,58 @@ public interface GameInterface {
 
     void resign();
 
+    void confirmChoice();
+
     void scoreGame();
+
+    void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
+
+    void placeHandicapStone(int x, int y); // For rulesets with custom handicap stones
+
+
+    //##################################################################################################################
+    //game settings
+
+    boolean isDemoMode();
+
+    void setDemoMode(boolean demoMode);
+    GameCommand getGameState();
 
     int getSize();
 
-    int getKomi();
+    int getHandicap();
 
-    void addListener(GameListener l);
+    double getKomi();
 
-    void removeListener(GameListener l);
+    boolean isConfirmationNeeded();
 
-    GameCommand getGameState();
+    void setConfirmationNeeded(boolean needed);
 
-    void confirmChoice();
+    boolean isShowMoveNumbers();
 
-    Board getBoard();
+    void setShowMoveNumbers(boolean show);
+
+    boolean isShowCoordinates();
+
+    void setShowCoordinates(boolean show);
+    //##################################################################################################################
+    //game information
 
     int getCurMoveNumber();
 
+    void setCurMoveNumber(int curMoveNumber);
+
+    int getCapturedStones(StoneColor color);
+
+    void setCapturedStones(StoneColor color, int amount);
+
+    StoneColor getColorAt(int x, int y);
+
     StoneColor getCurColor();
+
+    void setCurColor(StoneColor c);
+
+    Board getBoard();
 
     Ruleset getRuleset();
 
@@ -48,19 +81,21 @@ public interface GameInterface {
      *  Note by Gerald: I simply added this to GameInterface so that BoardPane could exclusively talk to Game, reducing
      * coupling. If anyone has a better, more generic idea for such a method, I'm entirely open to suggestions.
      */
-    StoneColor getColorAt(int x, int y);
 
     int getHandicapStoneCounter();
 
-    void setCurMoveNumber(int curMoveNumber);
-
-    void setCurColor(StoneColor c);
-
     void setHandicapStoneCounter(int counter); // For rulesets with custom, manually placed handicap stones
 
-    void fireGameEvent(GameEvent e);
+    //void fireGameEvent(GameEvent e); //delete for getting fireGameEvent package private
 
-    void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
+    double getScore(StoneColor color);
 
-    void placeHandicapStone(int x, int y); // For rulesets with custom handicap stones
+    GameResult getGameResult();
+
+    //##################################################################################################################
+    //Oberserver pattern
+    void addListener(GameListener l);
+
+    void removeListener(GameListener l);
 }
+

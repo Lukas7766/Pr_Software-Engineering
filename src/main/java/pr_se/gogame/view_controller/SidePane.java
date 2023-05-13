@@ -16,9 +16,15 @@ import javafx.scene.text.TextFlow;
 import javafx.scene.text.TextAlignment;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
+
+import java.util.HashSet;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * This class contains the controller and view function of the game information panel.<br>
@@ -26,23 +32,46 @@ import pr_se.gogame.model.StoneColor;
  */
 public class SidePane extends StackPane {
 
-    private final int maxCustomBoardSize = 26;
-    private final int minCustomBoardSize = 5;
-    private final int maxKomiAmount = 9;
-    private final int minKomiAmount = 0;
+    /**
+     * max size of custom board
+     */
+    private static final int MAX_CUSTOM_BOARD_SIZE = 26;
+
+    /**
+     * min size of custom board
+     */
+    private static final int MIN_CUSTOM_BOARD_SIZE = 5;
+
+    /**
+     * max handicap amount
+     */
+    private static final int MAX_HANDICAP_AMOUNT = 9;
+
+    /**
+     * min handicap amount
+     */
+    private static final int MIN_HANDICAP_AMOUNT = 0;
+
+    /**
+     * instance of actual game
+     */
     private final Game game;
-    private final Color backColor;
+    /**
+     * list of file extension filters for file chooser/saver
+     */
+    private final HashSet<FileChooser.ExtensionFilter> filterList;
 
     /**
      * Constructor to create a SidePane
      *
      * @param game instance of actual game -> needed for triggering and observing changes in model
      */
-    public SidePane(Color backColor, Game game) {
-        this.backColor = backColor;
+    public SidePane(Color backColor, Stage stage, Game game) {
         this.game = game;
+        this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
+                .collect(Collectors.toCollection(HashSet::new));
 
-        this.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
+        this.setBackground(new Background(new BackgroundFill(backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
         this.setMinWidth(250);
         setPadding(new Insets(5, 5, 5, 5)); //top, right, bottom, left
 
@@ -52,11 +81,11 @@ public class SidePane extends StackPane {
         this.getChildren().add(gameSetting);
 
         game.addListener(e -> {
-            if(e == null) {
+            if (e == null) {
                 throw new NullPointerException();
             }
 
-            switch(e.getGameCommand()) {
+            switch (e.getGameCommand()) {
                 case INIT:
                     if (!this.getChildren().contains(gameSetting)) {
                         this.getChildren().add(gameSetting);
@@ -64,11 +93,21 @@ public class SidePane extends StackPane {
                     }
                     break;
                 case BLACKSTARTS:
-                case WHITSTARTS:
+                case WHITESTARTS:
                     this.getChildren().remove(gameSetting);
                     this.getChildren().add(gameInfo);
                     break;
-                default: return;
+                case CONFIGDEMOMODE:
+                    if (game.isDemoMode()) {
+                        this.getChildren().remove(gameSetting);
+                        this.getChildren().add(gameInfo);
+                    }
+                    break;
+                case BLACKWON:
+                case WHITEWON:
+                case DRAW:
+                    CustomWinAction.winAction(stage, game);
+                    break;
             }
         });
     }
@@ -76,7 +115,7 @@ public class SidePane extends StackPane {
     /**
      * GameInfomations contains a mechanism to show relevant information based on current GameCommand <br>
      * contains at least: <br>
-     * -> Current Player <br>
+     * -> Game Board <br>
      * -> Turn Explanation <br>
      *
      * @return a VBox which contains items to show relevant game info.
@@ -85,6 +124,12 @@ public class SidePane extends StackPane {
         VBox infoPane = new VBox();
         infoPane.setPadding(new Insets(5));
 
+        Label gameBoardLbl = new Label("Game Board");
+        gameBoardLbl.setFont(Font.font(null, FontWeight.BOLD, 24));
+        infoPane.getChildren().add(gameBoardLbl);
+
+        //-----------------------------------------
+        //Player Info
         HBox playerInfo = new HBox();
 
         Label currentPlayer = new Label();
@@ -94,36 +139,57 @@ public class SidePane extends StackPane {
 
         Label actualPlayer = new Label();
         actualPlayer.setFont(Font.font(null, FontWeight.NORMAL, 13));
-        actualPlayer.setText(game.getCurColor() == StoneColor.BLACK ? "Black" : "White");
+
         playerInfo.getChildren().add(actualPlayer);
 
         infoPane.getChildren().add(playerInfo);
-
-        /*
-         * Comment by Gerald:
-         * Adds listener to Game to update the currently displayed player name
-         */
-        game.addListener(l -> {
-            switch(l.getGameCommand()) {
-                case WHITEPLAYS:
-                    actualPlayer.setText("Black");
-                    break;
-                case BLACKPLAYS:
-                    actualPlayer.setText("White");
-                    break;
-                default: return;
-            }
-        });
 
         Pane spring1 = new Pane();
         spring1.minHeightProperty().bind(currentPlayer.heightProperty());
         infoPane.getChildren().add(spring1);
 
-        //ToDo proper integration postponed to Sprint 2
+        //-----------------------------------------
+        //Score Board
+        VBox scoreboard = new VBox();
+
+        Label scoreLbl = new Label("Score");
+        scoreLbl.setFont(Font.font(null, FontWeight.BOLD, 20));
+        scoreboard.getChildren().add(scoreLbl);
+
+        GridPane scorePane = new GridPane();
+
+        Label p1 = new Label("Black:");
+        p1.setFont(Font.font(null, FontWeight.BOLD, 13));
+        scorePane.add(p1, 0, 0);
+
+        Label scoreCountBlackLbl = new Label(game.getScore(StoneColor.BLACK) + "");
+        scoreCountBlackLbl.setPadding(new Insets(0, 0, 0, 15));
+        scoreCountBlackLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        scorePane.add(scoreCountBlackLbl, 1, 0);
+
+
+        Label p2 = new Label("White:");
+        p2.setFont(Font.font(null, FontWeight.BOLD, 13));
+        scorePane.add(p2, 0, 1);
+
+        Label scoreCountWhiteLbl = new Label(game.getScore(StoneColor.WHITE) + "");
+        scoreCountWhiteLbl.setPadding(new Insets(0, 0, 0, 15));
+        scoreCountWhiteLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        scorePane.add(scoreCountWhiteLbl, 1, 1);
+
+        scoreboard.getChildren().add(scorePane);
+        infoPane.getChildren().add(scoreboard);
+
+        Pane spring2 = new Pane();
+        spring2.setMinSize(10, 10);
+        infoPane.getChildren().add(spring2);
+
+
+        VBox explanationBoad = new VBox();
         Label explanationLabel = new Label();
         explanationLabel.setFont(Font.font(null, FontWeight.BOLD, 13));
         explanationLabel.setText("Turn Explanation:");
-        infoPane.getChildren().add(explanationLabel);
+        explanationBoad.getChildren().add(explanationLabel);
 
         ScrollPane textArea = new ScrollPane();
         textArea.setFitToWidth(true);
@@ -136,11 +202,42 @@ public class SidePane extends StackPane {
 
         Text explanation = new Text();
         explanation.setFocusTraversable(false);
-        explanation.setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.");//
+        //explanation.setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.");//
+        explanation.setText("");
         textFlow.getChildren().add(explanation);
 
         textArea.setContent(textFlow);
-        infoPane.getChildren().add(textArea);
+        explanationBoad.getChildren().add(textArea);
+
+        /*
+         * Comment by Gerald:
+         * Adds listener to Game to update the currently displayed player name
+         */
+        game.addListener(l -> {
+
+            switch (l.getGameCommand()) {
+                case WHITEPLAYS, WHITESTARTS, BLACKPLAYS, BLACKSTARTS-> {
+                    scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
+                    scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
+                    switch (game.getCurColor()) {
+                        case BLACK -> actualPlayer.setText("Black");
+                        case WHITE -> actualPlayer.setText("White");
+                    }
+                }
+                case BLACKWON,WHITEWON -> {
+                    scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
+                    scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
+                }
+                case CONFIGDEMOMODE -> {
+                    if (infoPane.getChildren().contains(explanationBoad)) break;
+                    if (game.isDemoMode()) {
+                        infoPane.getChildren().add(explanationBoad);
+                    } else {
+                        infoPane.getChildren().remove(explanationBoad);
+                    }
+                }
+            }
+        });
 
         return infoPane;
     }
@@ -149,17 +246,19 @@ public class SidePane extends StackPane {
      * newGame creates a panel that is a dialog for creating a new game<br>
      * At least it contains: <br>
      * -> Board size options <br>
-     * -> Komi spinner <br>
+     * -> Handicap spinner <br>
+     * -> Komi <br>
      *
      * @return a GridPane which contains items for creating a new game.
      */
     private GridPane newGame() {
 
         GridPane gridPane = new GridPane();
+        gridPane.setPadding(new Insets(5));
+
         Label headline = new Label();
         headline.setText("Game Setup");
         headline.setFont(Font.font(null, FontWeight.BOLD, 15));
-        headline.setPadding(new Insets(5));
 
         gridPane.add(headline, 0, 0);
 
@@ -197,13 +296,11 @@ public class SidePane extends StackPane {
         gridPane.add(normal, 0, 4);
         gridPane.add(custom, 0, 5);
 
-        Spinner<Integer> customSize = new Spinner<>(minCustomBoardSize, maxCustomBoardSize, minCustomBoardSize, 1);
+        Spinner<Integer> customSize = new Spinner<>(MIN_CUSTOM_BOARD_SIZE, MAX_CUSTOM_BOARD_SIZE, MIN_CUSTOM_BOARD_SIZE, 1);
         customSize.setDisable(true);
         customSize.setMaxSize(55, 15);
         SpinnerValueFactory.IntegerSpinnerValueFactory customSizeIntFactory =
                 (SpinnerValueFactory.IntegerSpinnerValueFactory) customSize.getValueFactory();
-        //TextField customSize = new TextField();
-        //customSize.setTextFormatter(new TextFormatter<>(new NumberStringConverter()));
         gridPane.add(customSize, 1, 5);
 
         //change Event
@@ -211,22 +308,33 @@ public class SidePane extends StackPane {
             customSize.setDisable(t1.hashCode() != custom.hashCode());
             System.out.println(((RadioButton) t1).getText());
         });
-        //Handicap //ToDo refactor naming
-        Label komi = new Label();
-        komi.setFont(Font.font(null, FontWeight.NORMAL, 13));
-        komi.setText("Handicap");
-        komi.setPadding(new Insets(5));
-        gridPane.add(komi, 0, 6);
 
-        Spinner<Integer> komiCnt = new Spinner<>(minKomiAmount, maxKomiAmount, minKomiAmount, 1);
-        //customSize.setDisable(true);
-        komiCnt.setMaxSize(55, 15);
-        SpinnerValueFactory.IntegerSpinnerValueFactory komiIntFactory =
-                (SpinnerValueFactory.IntegerSpinnerValueFactory) komiCnt.getValueFactory();
-        //TextField customSize = new TextField();
-        //customSize.setTextFormatter(new TextFormatter<>(new NumberStringConverter()));
-        gridPane.add(komiCnt, 1, 6);
+        //Handicap
+        Label handicapLbl = new Label();
+        handicapLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        handicapLbl.setText("Handicap");
+        handicapLbl.setPadding(new Insets(5));
+        gridPane.add(handicapLbl, 0, 6);
 
+        Spinner<Integer> handicapCnt = new Spinner<>(MIN_HANDICAP_AMOUNT, MAX_HANDICAP_AMOUNT, MIN_HANDICAP_AMOUNT, 1);
+        handicapCnt.setMaxSize(55, 15);
+        SpinnerValueFactory.IntegerSpinnerValueFactory handicapIntFactory =
+                (SpinnerValueFactory.IntegerSpinnerValueFactory) handicapCnt.getValueFactory();
+        gridPane.add(handicapCnt, 1, 6);
+
+        //Komi
+        Label komiLbl = new Label();
+        komiLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        komiLbl.setText("Komi");
+        komiLbl.setPadding(new Insets(5));
+        gridPane.add(komiLbl, 0, 7);
+
+        Label komiCntLbl = new Label();
+        komiCntLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
+        komiCntLbl.setText("" + game.getKomi());
+        komiCntLbl.setPadding(new Insets(5));
+        komiCntLbl.setDisable(true);
+        gridPane.add(komiCntLbl, 1, 7);
 
         //start Button
         Button startGameBtn = new Button();
@@ -235,18 +343,33 @@ public class SidePane extends StackPane {
         startGameBtn.setOnAction(event -> {
             //this.getChildren().remove(gridPane);
             RadioButton selected = (RadioButton) boardSize.getSelectedToggle();
-            int handicap = komiIntFactory.getValue();
+            int handicap = handicapIntFactory.getValue();
             int actualBoardSize;
 
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            System.out.println("BoardSize: " + actualBoardSize + " Handicap: " + handicap);
             game.newGame(GameCommand.BLACKSTARTS, actualBoardSize, handicap);
         });
-
         //colum, row,
         gridPane.add(startGameBtn, 1, 15);
+
+        Pane spacer = new Pane();
+        spacer.setMinSize(10, 10);
+        gridPane.add(spacer, 0, 16);
+
+        Label demoLbl = new Label();
+        demoLbl.setFont(Font.font(null, FontWeight.BOLD, 13));
+        demoLbl.setText("Demo");
+        gridPane.add(demoLbl, 0, 17);
+
+        //start DemoGame
+        Button startDemoGameBtn = new Button("start Demo");
+        gridPane.add(startDemoGameBtn, 0, 18);
+
+        startDemoGameBtn.setOnAction(event -> {
+            game.setDemoMode(true);
+        });
 
         return gridPane;
     }

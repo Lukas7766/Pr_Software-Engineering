@@ -6,20 +6,20 @@ public class GameEvent {
 
     private final GameCommand gameCommand;
     private final int size;
-    private final int komi;
+    private final int handicap;
 
     public GameEvent(GameCommand gameCommand){
         this(gameCommand,-1,-1);
     }
 
-    public GameEvent(GameCommand gameCommand, int size, int komi){
+    public GameEvent(GameCommand gameCommand, int size, int handicap){
         this.size = size;
-        this.komi = komi;
+        this.handicap = handicap;
         this.gameCommand = gameCommand;
     }
 
-    public int getKomi() {
-        return komi;
+    public int getHandicap() {
+        return handicap;
     }
 
     public int getSize() {
