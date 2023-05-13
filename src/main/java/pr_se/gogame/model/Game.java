@@ -127,10 +127,23 @@ public class Game implements GameInterface {
     @Override
     public void resign() {
         System.out.println("resign");
+        GameResult result;
+        StringBuilder sb = new StringBuilder();
+        sb.append("Game was resigned by").append(" ");
         switch (gameCommand) {
-            case WHITEPLAYS, WHITESTARTS -> this.gameCommand = GameCommand.BLACKWON;
-            case BLACKPLAYS, BLACKSTARTS -> this.gameCommand = GameCommand.WHITEWON;
+            case WHITEPLAYS, WHITESTARTS -> {
+                this.gameCommand = GameCommand.BLACKWON;
+                sb.append("White!").append("\n\n").append("Black won!");
+                result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
+            }
+            case BLACKPLAYS, BLACKSTARTS -> {
+                this.gameCommand = GameCommand.WHITEWON;
+                sb.append("Black!").append("\n\n").append("White won!");
+                result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
+            }
+            default -> {throw new IllegalArgumentException("Game was not resigned! Consult your application owner!");}
         }
+        this.gameResult=result;
         fireGameEvent(new GameEvent(gameCommand));
     }
 

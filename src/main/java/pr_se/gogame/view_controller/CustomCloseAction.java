@@ -35,14 +35,14 @@ public class CustomCloseAction {
         }
 
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Close Go Game");
-        alert.setHeaderText("Do you really want to close your Game?");
+        alert.setTitle("Go Game - Close Game");
+        alert.setHeaderText("Do you want to save your Game before closing?");
         alert.setContentText("Choose your option:");
         alert.initOwner(stage);
 
-        ButtonType noSaveBtn = new ButtonType("without save");
-        ButtonType saveBtn = new ButtonType("with save");
-        ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType noSaveBtn = new ButtonType("no");
+        ButtonType saveBtn = new ButtonType("yes");
+        ButtonType cancelBtn = new ButtonType("cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(saveBtn, noSaveBtn, cancelBtn);
 
@@ -50,25 +50,24 @@ public class CustomCloseAction {
 
         btnResult.ifPresent(er -> {
             switch (er.getText()) {
-                case "without save" -> Platform.exit();
-                case "with save" -> {
-                    File f = CustomFileDialog.getFile(stage,true, filterList);//fileDialog(true, filterList)
+                case "no" -> Platform.exit();
+                case "yes" -> {
+                    File f = CustomFileDialog.getFile(stage,true, filterList);
                     if (f != null) {
                         if (game.saveGame(f.toPath())) {
                             Platform.exit();
                             System.exit(0);
                         }
                     }
-                    System.out.println("Info");
                     Alert info = new Alert(Alert.AlertType.INFORMATION);
-                    info.setTitle("Close Go Game - Info");
+                    info.setTitle("Go Game - Close Info");
                     info.setHeaderText("Saving your game didn't work.");
                     info.setContentText("Try it again!");
                     info.initOwner(stage);
                     info.showAndWait();
                     if (e != null) e.consume();
                 }
-                case "Cancel" ->  {if (e != null) e.consume();}
+                case "cancel" ->  {if (e != null) e.consume();}
             }
         });
     }

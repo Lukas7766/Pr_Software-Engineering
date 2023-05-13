@@ -127,8 +127,8 @@ public class JapaneseRuleset implements Ruleset {
                 trScore = territoryScoreBlack;
                 sc = scoreBlack;
             }
-            sb.append("Territory points:").append(" ").append(trScore).append("\n");
-            sb.append("Captured stones:").append(" ").append(captStone).append("\n\n");
+            sb.append("+ Territory points:").append(" ").append(trScore).append("\n");
+            sb.append("+ Captured stones:").append(" ").append(captStone).append("\n\n");
             sb.append("= ").append(sc).append(" points");
         }
 
