@@ -29,11 +29,6 @@ public class NewZealandRuleset implements Ruleset {
 
     @Override
     public boolean hasDefaultHandicapPlacement() {
-        return false;
-    }
-
-    @Override
-    public void setHandicapStones(Board board, int noStones) {
-        board.getGAME().setHandicapStoneCounter(noStones);
+        return true;
     }
 }

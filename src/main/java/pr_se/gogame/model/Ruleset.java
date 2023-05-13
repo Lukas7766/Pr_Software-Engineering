@@ -61,9 +61,61 @@ public interface Ruleset {
      * @param board The board that these handicap stones are to be set for (this is used to get the game, as well).
      * @param noStones The number of handicap stones to be placed
      */
-    default void setHandicapStones(Board board, int noStones) {}
+    default void setHandicapStones(Board board, StoneColor beginner, int noStones) {
+        /*
+         * This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
+         *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. That is why a ruleset
+         *  may override this.
+         */
+        if (board == null) {
+            throw new IllegalArgumentException("board must not be null");
+        }
+        if (beginner == null) {
+            throw new IllegalArgumentException("beginner must not be null");
+        }
+        if (noStones < 0 || noStones > 9){
+            throw new IllegalArgumentException("noStones must be between 0 and 9");
+        }
+        final int SIZE = board.getSize();
 
+        switch (noStones) {
+            case 9:
+                board.setStone(SIZE / 2, SIZE / 2, beginner, true);
+                noStones--;                                                     // set remaining no. to 8
+            case 8:
+                board.setStone(SIZE / 2, 3, beginner, true);
+                board.setStone(SIZE / 2, SIZE - 4, beginner, true);
+                noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
+            default:
+                break;
+        }
 
+        switch (noStones) {
+            case 7:
+                board.setStone(SIZE / 2, SIZE / 2, beginner, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
+                noStones--;
+            case 6:
+                board.setStone(SIZE - 4, SIZE / 2, beginner, true);
+                board.setStone(3, SIZE / 2, beginner, true);
+                noStones -= 2;
+            default:
+                break;
+        }
+
+        switch (noStones) {
+            case 5:
+                board.setStone(SIZE / 2, SIZE / 2, beginner, true);
+            case 4:
+                board.setStone(3, 3, beginner, true);
+            case 3:
+                board.setStone(SIZE - 4, SIZE - 4, beginner, true);
+            case 2:
+                board.setStone(SIZE - 4, 3, beginner, true);
+                board.setStone(3, SIZE - 4, beginner, true);
+            default:
+                break;
+        }
+    }
 
     /**
      * @return the default komi value for the ruleset

@@ -42,66 +42,67 @@ class JapaneseRulesetTest {
     @DisplayName("testing predicateKoMove(), repeating move (1,2) causes positive prediction")
     void predicateKoMove() {
         Game game = new Game();
-        game.newGame(GameCommand.BLACKSTARTS, 9,0);
-        game.playMove(0,1);
-        game.playMove(0,2);
+        game.newGame(GameCommand.BLACKSTARTS, 9, 0);
+        game.playMove(0, 1);
+        game.playMove(0, 2);
 
-        game.playMove(1,0);
-        game.playMove(1,3);
+        game.playMove(1, 0);
+        game.playMove(1, 3);
 
-        game.playMove(2,1);
-        game.playMove(2,2);
+        game.playMove(2, 1);
+        game.playMove(2, 2);
 
-        game.playMove(1,2);
-        game.playMove(1,1);
+        game.playMove(1, 2);
+        game.playMove(1, 1);
 
-        game.playMove(1,2);
+        game.playMove(1, 2);
 
-        assertEquals(new Position(1,2), game.getRuleset().getKoMove());
+        assertEquals(new Position(1, 2), game.getRuleset().getKoMove());
         assertNull(game.getColorAt(1, 2));
+        assertFalse(game.getRuleset().predicateKoMove(2, 1));
     }
 
     @Test
     @DisplayName("testing predicateKoMove(), must return true if the same move is done twice")
     void getKoMove() {
         Game game = new Game();
-        game.newGame(GameCommand.BLACKSTARTS, 9,0);
-        game.playMove(0,1);
-        game.playMove(0,2);
+        game.newGame(GameCommand.BLACKSTARTS, 9, 0);
+        game.playMove(0, 1);
+        game.playMove(0, 2);
 
-        game.playMove(1,0);
-        game.playMove(1,3);
+        game.playMove(1, 0);
+        game.playMove(1, 3);
 
-        game.playMove(2,1);
-        game.playMove(2,2);
+        game.playMove(2, 1);
+        game.playMove(2, 2);
 
-        game.playMove(1,2);
-        game.playMove(1,1);
+        game.playMove(1, 2);
+        game.playMove(1, 1);
 
-        assertTrue(game.getRuleset().predicateKoMove(1,2));
-        assertEquals(new Position(1,2), game.getRuleset().getKoMove());
+        assertTrue(game.getRuleset().predicateKoMove(1, 2));
+        assertEquals(new Position(1, 2), game.getRuleset().getKoMove());
     }
 
     @Test
     @DisplayName("testing resetKoMove(), saved KO move must be null after a random move of black")
     void resetKoMove() {
         Game game = new Game();
-        game.newGame(GameCommand.BLACKSTARTS, 9,0);
-        game.playMove(0,1);
-        game.playMove(0,2);
+        game.newGame(GameCommand.BLACKSTARTS, 9, 0);
+        game.playMove(0, 1);
+        game.playMove(0, 2);
 
-        game.playMove(1,0);
-        game.playMove(1,3);
+        game.playMove(1, 0);
+        game.playMove(1, 3);
 
-        game.playMove(2,1);
-        game.playMove(2,2);
+        game.playMove(2, 1);
+        game.playMove(2, 2);
 
-        game.playMove(1,2);
-        game.playMove(1,1);
+        game.playMove(1, 2);
+        game.playMove(1, 1);
 
-        game.getRuleset().predicateKoMove(1,2);
+        game.getRuleset().predicateKoMove(1, 2);
 
-        game.playMove(1,5);
+        game.playMove(1, 5);
 
         assertNull(game.getRuleset().getKoMove());
 
@@ -112,6 +113,7 @@ class JapaneseRulesetTest {
     void scoreGameWI() {
         assertThrowsExactly(IllegalArgumentException.class, () -> japaneseRuleset.scoreGame(null));
     }
+
     @Test
     @DisplayName("testing scoreGame(), black wins with 10 points")
     void scoreGameB() {
@@ -165,13 +167,13 @@ class JapaneseRulesetTest {
         assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
         assertEquals(StoneColor.BLACK, japaneseRuleset.scoreGame(game).getWinner());
         assertEquals(
-        "Black won!\n" +
-                "\n" +
-                "Handicap: 0\n" +
-                "+ Territory points: 9\n" +
-                "+ Captured stones: 1\n" +
-                "\n" +
-                "= 10.0 points", japaneseRuleset.scoreGame(game).getGameResult());
+                "Black won!\n" +
+                        "\n" +
+                        "Handicap: 0\n" +
+                        "+ Territory points: 9\n" +
+                        "+ Captured stones: 1\n" +
+                        "\n" +
+                        "= 10.0 points", japaneseRuleset.scoreGame(game).getGameResult());
     }
 
     @Test

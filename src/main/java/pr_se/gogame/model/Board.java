@@ -51,55 +51,9 @@ public class Board implements BoardInterface {
 
         int handicap = this.GAME.getHandicap(); // temporary variable; handicap will eventually need to be replaced with a simple number of handicap stones, as handicap has nothing to do with handicap stones.
 
-        if (this.GAME.getRuleset().hasDefaultHandicapPlacement()) {
-            /*
-             * This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
-             *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. That is why a ruleset
-             *  may override this.
-             */
-            switch (handicap) {
-                case 9:
-                    setStone(SIZE / 2, SIZE / 2, beginner, true);
-                    handicap--;                                                     // set remaining no. to 8
-                case 8:
-                    setStone(SIZE / 2, 3, beginner, true);
-                    setStone(SIZE / 2, SIZE - 4, beginner, true);
-                    handicap -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
-                default:
-                    break;
-            }
 
-            switch (handicap) {
-                case 7:
-                    setStone(SIZE / 2, SIZE / 2, beginner, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
-                    handicap--;
-                case 6:
-                    setStone(SIZE - 4, SIZE / 2, beginner, true);
-                    setStone(3, SIZE / 2, beginner, true);
-                    handicap -= 2;
-                default:
-                    break;
-            }
+        this.GAME.getRuleset().setHandicapStones(this, beginner, handicap);
 
-            switch (handicap) {
-                case 5:
-                    setStone(SIZE / 2, SIZE / 2, beginner, true);
-                case 4:
-                    setStone(3, 3, beginner, true);
-                case 3:
-                    setStone(SIZE - 4, SIZE - 4, beginner, true);
-                case 2:
-                    setStone(SIZE - 4, 3, beginner, true);
-                    setStone(3, SIZE - 4, beginner, true);
-                default:
-                    break;
-            }
-        } else {
-            /*
-             * Lets the Ruleset place its own handicap stones.
-             */
-            this.GAME.getRuleset().setHandicapStones(this, handicap);
-        }
 
 
     }

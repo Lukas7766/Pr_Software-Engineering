@@ -94,7 +94,7 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public void setHandicapStones(Board board, int noStones) {
+    public void setHandicapStones(Board board, StoneColor beginner, int noStones) {
         if(!hasDefaultHandicap) {
             handicapStoneSetter.accept(board, noStones);
         }

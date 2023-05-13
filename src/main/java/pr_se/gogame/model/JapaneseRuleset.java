@@ -104,33 +104,30 @@ public class JapaneseRuleset implements Ruleset {
         if (scoreBlack > scoreWhite) {
             winner = StoneColor.BLACK;
             sb.append("Black won!").append("\n\n");
-        } else if (scoreWhite > scoreBlack) {
+        } else{
             winner = StoneColor.WHITE;
             sb.append("White won!").append("\n\n");
-        } else {
-            sb.append("Draw!").append("\n");
         }
 
-        if (winner != null) {
-            int captStone = 0;
-            int trScore = 0;
-            double sc = 0;
-            if (winner == StoneColor.WHITE) {
-                sb.append("Komi:").append(" ").append(komi).append("\n");
-                captStone = capturedStonesWhite;
-                trScore = territoryScoreWhite;
-                sc = scoreWhite;
-            }
-            else {
-                sb.append("Handicap:").append(" ").append(handicap).append("\n");
-                captStone = capturedStonesBlack;
-                trScore = territoryScoreBlack;
-                sc = scoreBlack;
-            }
-            sb.append("+ Territory points:").append(" ").append(trScore).append("\n");
-            sb.append("+ Captured stones:").append(" ").append(captStone).append("\n\n");
-            sb.append("= ").append(sc).append(" points");
+        int captStone = 0;
+        int trScore = 0;
+        double sc = 0;
+        if (winner == StoneColor.WHITE) {
+            sb.append("Komi:").append(" ").append(komi).append("\n");
+            captStone = capturedStonesWhite;
+            trScore = territoryScoreWhite;
+            sc = scoreWhite;
         }
+        else {
+            sb.append("Handicap:").append(" ").append(handicap).append("\n");
+            captStone = capturedStonesBlack;
+            trScore = territoryScoreBlack;
+            sc = scoreBlack;
+        }
+        sb.append("+ Territory points:").append(" ").append(trScore).append("\n");
+        sb.append("+ Captured stones:").append(" ").append(captStone).append("\n\n");
+        sb.append("= ").append(sc).append(" points");
+
 
         return new GameResult(scoreBlack, scoreWhite, winner, sb.toString());
     }
