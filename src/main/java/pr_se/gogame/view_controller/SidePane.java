@@ -106,8 +106,7 @@ public class SidePane extends StackPane {
                 case BLACKWON:
                 case WHITEWON:
                 case DRAW:
-                    System.out.println(e.getGameCommand());
-                    CustomWinAction.winAction(stage, game, filterList);
+                    CustomWinAction.winAction(stage, game);
                     break;
             }
         });
@@ -163,7 +162,7 @@ public class SidePane extends StackPane {
         p1.setFont(Font.font(null, FontWeight.BOLD, 13));
         scorePane.add(p1, 0, 0);
 
-        Label scoreCountBlackLbl = new Label(game.getScore(StoneColor.BLACK) + "");//ToDo check reset while INIT new game
+        Label scoreCountBlackLbl = new Label(game.getScore(StoneColor.BLACK) + "");
         scoreCountBlackLbl.setPadding(new Insets(0, 0, 0, 15));
         scoreCountBlackLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
         scorePane.add(scoreCountBlackLbl, 1, 0);
@@ -203,7 +202,8 @@ public class SidePane extends StackPane {
 
         Text explanation = new Text();
         explanation.setFocusTraversable(false);
-        explanation.setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.");//
+        //explanation.setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.");//
+        explanation.setText("");
         textFlow.getChildren().add(explanation);
 
         textArea.setContent(textFlow);
@@ -214,25 +214,28 @@ public class SidePane extends StackPane {
          * Adds listener to Game to update the currently displayed player name
          */
         game.addListener(l -> {
-            scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
-            scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
+
             switch (l.getGameCommand()) {
-                case WHITEPLAYS:
-                case WHITESTARTS:
-                    actualPlayer.setText("White");
-                    break;
-                case BLACKPLAYS:
-                case BLACKSTARTS:
-                    actualPlayer.setText("Black");
-                    break;
-                case CONFIGDEMOMODE:
+                case WHITEPLAYS, WHITESTARTS, BLACKPLAYS, BLACKSTARTS-> {
+                    scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
+                    scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
+                    switch (game.getCurColor()) {
+                        case BLACK -> actualPlayer.setText("Black");
+                        case WHITE -> actualPlayer.setText("White");
+                    }
+                }
+                case BLACKWON,WHITEWON -> {
+                    scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
+                    scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
+                }
+                case CONFIGDEMOMODE -> {
                     if (infoPane.getChildren().contains(explanationBoad)) break;
                     if (game.isDemoMode()) {
                         infoPane.getChildren().add(explanationBoad);
                     } else {
                         infoPane.getChildren().remove(explanationBoad);
                     }
-                    break;
+                }
             }
         });
 

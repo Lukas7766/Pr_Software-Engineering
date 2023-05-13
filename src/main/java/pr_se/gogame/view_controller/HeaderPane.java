@@ -190,21 +190,30 @@ public class HeaderPane extends VBox {
         gameSectionItems.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT) {
-                gameSectionItems.forEach(e -> e.setDisable(true));
-            } else {
-                gameSectionItems.forEach(e -> e.setDisable(false));
+            switch (l.getGameCommand()) {
+                case INIT, WHITEWON, BLACKWON, DRAW -> {
+                    //gameSectionItems.forEach(e -> e.setDisable(true));
+                    gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
+                }
+                case BLACKPLAYS, WHITEPLAYS, WHITESTARTS, BLACKSTARTS -> {
+                    gameSectionItems.stream().filter(e -> e.isDisable()).forEach(e -> e.setDisable(false));
+                }
             }
-        });
 
-        SeparatorMenuItem sep1 = new SeparatorMenuItem();
-        menu.getItems().add(1, sep1);
+    });
 
-        SeparatorMenuItem sep2 = new SeparatorMenuItem();
-        menu.getItems().add(4, sep2);
+    SeparatorMenuItem sep1 = new SeparatorMenuItem();
+        menu.getItems().
+
+    add(1,sep1);
+
+    SeparatorMenuItem sep2 = new SeparatorMenuItem();
+        menu.getItems().
+
+    add(4,sep2);
 
         return menu;
-    }
+}
 
     /**
      * Creates the view section for the menu bar <br>

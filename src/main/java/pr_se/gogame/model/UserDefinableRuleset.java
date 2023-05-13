@@ -74,8 +74,8 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public int[] scoreGame(Board board) {
-        return new int[]{0,0};
+    public GameResult scoreGame(Game game) {
+        return new GameResult(1, 1, null,"");
     }
 
     @Override

@@ -90,6 +90,8 @@ public interface GameInterface {
 
     double getScore(StoneColor color);
 
+    GameResult getGameResult();
+
     //##################################################################################################################
     //Oberserver pattern
     void addListener(GameListener l);

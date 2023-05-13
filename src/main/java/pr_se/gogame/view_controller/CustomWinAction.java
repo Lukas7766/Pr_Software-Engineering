@@ -9,6 +9,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
+import pr_se.gogame.model.StoneColor;
 
 import java.io.File;
 import java.util.HashSet;
@@ -23,54 +24,18 @@ public class CustomWinAction {
      *
      * @param stage pass stage
      * @param game pass game
-     * @param filterList pass list of Extension Filters
      */
-    public static void winAction(Stage stage, Game game, HashSet<FileChooser.ExtensionFilter> filterList) {
+    public static void winAction(Stage stage, Game game) {
         System.out.println("last game command: "+game.getGameState());
         if (!(game.getGameState() != GameCommand.WHITEWON || game.getGameState() != GameCommand.BLACKWON || game.getGameState() != GameCommand.DRAW)){
             throw new IllegalArgumentException("Game is not over yet!");
         }
 
-        String gameResult = "Game result: ";
-        switch (game.getGameState()){
-            case WHITEWON -> gameResult += "White won!";
-            case BLACKWON -> gameResult += "Black won!";
-            case DRAW -> gameResult += "Draw";
-            default -> throw new IllegalStateException("Unexpected value: " + game.getGameState());
-        }
-
-        Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle(gameResult);
-        alert.setHeaderText(gameResult+"\nDo you want to save your Game?");
-        alert.setContentText("Choose your option:");
+        Alert alert = new Alert(Alert.AlertType.INFORMATION);
+        alert.setTitle("Game Result");
+        alert.setHeaderText(game.getGameResult().getGameResult());
         alert.initOwner(stage);
+        alert.showAndWait();
 
-        ButtonType noSaveBtn = new ButtonType("without save");
-        ButtonType saveBtn = new ButtonType("with save");
-
-        alert.getButtonTypes().setAll(saveBtn, noSaveBtn);
-
-        Optional<ButtonType> btnResult = alert.showAndWait();
-
-        btnResult.ifPresent(er -> {
-            switch (er.getText()) {
-                case "without save" -> game.initGame();
-                case "with save" -> {
-                    File f = CustomFileDialog.getFile(stage,true, filterList);
-                    if (f != null) {
-                        if (game.saveGame(f.toPath())) {
-                            game.initGame();
-                        }
-                    }
-                    System.out.println("Info");
-                    Alert info = new Alert(Alert.AlertType.INFORMATION);
-                    info.setTitle("Go Game - Info");
-                    info.setHeaderText("Saving your game didn't work.");
-                    info.setContentText("Try it manually save your game or start a new one!");
-                    info.initOwner(stage);
-                    info.showAndWait();
-                }
-            }
-        });
     }
 }

@@ -45,7 +45,7 @@ public interface Ruleset {
      *
      * @return the score of the game for both players in an array of size 2. Index 0 is the score of black, index 1 is the score of white.
      */
-    int[] scoreGame(Board board);
+    GameResult scoreGame(Game game);
 
     /**
      * @return whether the RuleSet uses the default placement of handicap stones or not
@@ -62,6 +62,8 @@ public interface Ruleset {
      * @param noStones The number of handicap stones to be placed
      */
     default void setHandicapStones(Board board, int noStones) {}
+
+
 
     /**
      * @return the default komi value for the ruleset

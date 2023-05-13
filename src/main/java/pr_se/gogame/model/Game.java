@@ -35,6 +35,7 @@ public class Game implements GameInterface {
 
     private double playerWhiteScore;
     private int whiteCapturedStones;
+    private GameResult gameResult;
 
 
     public Game() {
@@ -136,14 +137,14 @@ public class Game implements GameInterface {
     @Override
     public void scoreGame() {
         System.out.println("scoreGame");
-        int[] score = ruleset.scoreGame(board);
-        this.playerBlackScore += score[0];
-        this.playerWhiteScore += score[1];
+        this.gameResult = ruleset.scoreGame(this);
+        this.playerBlackScore = gameResult.getScoreBlack();
+        this.playerWhiteScore = gameResult.getScoreWhite();
 
-        if (playerBlackScore < playerWhiteScore) {
-            this.gameCommand = GameCommand.WHITEWON;
-        } else if (playerBlackScore > playerWhiteScore) {
+        if (gameResult.getWinner() == BLACK) {
             this.gameCommand = GameCommand.BLACKWON;
+        } else if (gameResult.getWinner() == WHITE) {
+            this.gameCommand = GameCommand.WHITEWON;
         } else {
             this.gameCommand = GameCommand.DRAW;
         }
@@ -346,6 +347,11 @@ public class Game implements GameInterface {
     @Override
     public double getScore(StoneColor color) {
         return color == BLACK ? this.playerBlackScore : this.playerWhiteScore;
+    }
+
+    @Override
+    public GameResult getGameResult() {
+        return gameResult;
     }
 
     private void switchColor() {

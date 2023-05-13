@@ -28,6 +28,7 @@ public class JapaneseRuleset implements Ruleset {
 
     /**
      * The JP ruleset allows only one KO move repetition.
+     *
      * @return 1 as only one KO move is allowed.
      */
     @Override
@@ -75,21 +76,63 @@ public class JapaneseRuleset implements Ruleset {
      * In the next and final step for every empty position all neighbouring positions will be checked if a different color than the passed is present.
      * If this is the case the territory will be added to the score of the player. If the territory is surrounded by at least one different color it will be ignored.
      * If on the board only one color is present, this player will get all points. If the board is empty, both players will get all points.
-     * @param board the board to calculate the score on
+     * ++komi ++handicap//ToDo adapt description
+     *
+     * @param game to calculate the score and define the winner
      * @return an array of size 2, containing the score of black and white
      */
     @Override
-    public int[] scoreGame(Board board) {
+    public GameResult scoreGame(Game game) {
 
-        if (board == null) throw new IllegalArgumentException();
+        if (game == null) throw new IllegalArgumentException();
 
-        int scoreBlack = calculateTerritoryPoints(StoneColor.BLACK, board);
-        int scoreWhite = calculateTerritoryPoints(StoneColor.WHITE, board);
+        double komi = game.getKomi();
+        int handicap = game.getHandicap();
 
-        System.out.println("Territory Score Black: " + scoreBlack);
-        System.out.println("Territory Score White: " + scoreWhite);
+        int capturedStonesBlack = game.getCapturedStones(StoneColor.BLACK);
+        int territoryScoreBlack = calculateTerritoryPoints(StoneColor.BLACK, game.getBoard());
 
-        return new int[]{scoreBlack, scoreWhite};
+        int capturedStonesWhite = game.getCapturedStones(StoneColor.WHITE);
+        int territoryScoreWhite = calculateTerritoryPoints(StoneColor.WHITE, game.getBoard());
+
+        double scoreBlack = capturedStonesBlack + territoryScoreBlack + handicap;
+        double scoreWhite = capturedStonesWhite + territoryScoreWhite + komi;
+
+        StringBuilder sb = new StringBuilder();
+        StoneColor winner = null;
+
+        if (scoreBlack > scoreWhite) {
+            winner = StoneColor.BLACK;
+            sb.append("Black won!").append("\n\n");
+        } else if (scoreWhite > scoreBlack) {
+            winner = StoneColor.WHITE;
+            sb.append("White won!").append("\n\n");
+        } else {
+            sb.append("Draw!").append("\n");
+        }
+
+        if (winner != null) {
+            int captStone = 0;
+            int trScore = 0;
+            double sc = 0;
+            if (winner == StoneColor.WHITE) {
+                sb.append("Komi:").append(" ").append(komi).append("\n");
+                captStone = capturedStonesWhite;
+                trScore = territoryScoreWhite;
+                sc = scoreWhite;
+            }
+            else {
+                sb.append("Handicap:").append(" ").append(handicap).append("\n");
+                captStone = capturedStonesBlack;
+                trScore = territoryScoreBlack;
+                sc = scoreBlack;
+            }
+            sb.append("Territory points:").append(" ").append(trScore).append("\n");
+            sb.append("Captured stones:").append(" ").append(captStone).append("\n\n");
+            sb.append("= ").append(sc).append(" points");
+        }
+
+        return new GameResult(scoreBlack, scoreWhite, winner, sb.toString());
     }
 
     //FloodFill Algorithm, source ALGO assignment
@@ -126,10 +169,11 @@ public class JapaneseRuleset implements Ruleset {
                 }
             }
         }
+        System.out.println("Territory Score " + color + " " + territoryPoints);
         return territoryPoints;
     }
 
-    
+
     public void floodFill(Board board, int x, int y) {
         if (x < 0) return;
         if (x >= board.getSize()) return;
@@ -152,4 +196,5 @@ public class JapaneseRuleset implements Ruleset {
     public double getKomi() {
         return 6.5;
     }
+
 }
