@@ -105,10 +105,14 @@ public class HeaderPane extends VBox {
         MenuItem newGameItem = new MenuItem();
         newGameItem.setText("New Game");
         files.getItems().add(newGameItem);
-        newGameItem.setOnAction(e -> game.initGame());
+        newGameItem.setOnAction(e -> {
+
+            if(game.getGameState() == GameCommand.INIT) return;
+            CustomNewGameAction.onSaveAction(stage, game, filterList);
+        });
 
         MenuItem importFileItem = new MenuItem();
-        importFileItem.setText("Import Game");
+        importFileItem.setText("Load Game");
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
             File f = CustomFileDialog.getFile(stage, false, filterList);//fileDialog(false, filterList);
@@ -117,12 +121,25 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem exportFileItem = new MenuItem();
-        exportFileItem.setText("Export Game");
+        exportFileItem.setText("Save Game");
+        exportFileItem.setDisable(true);
         files.getItems().add(exportFileItem);
         exportFileItem.setOnAction(e -> {
             File f = CustomFileDialog.getFile(stage, true, filterList);//fileDialog(true, filterList);
             if (f != null) game.exportGame(f.toPath());
             else System.out.println("Export Dialog cancelled");
+        });
+        game.addListener(l -> {
+            switch (l.getGameCommand()){
+                case BLACKPLAYS,WHITEPLAYS, BLACKSTARTS, WHITESTARTS -> {
+                    exportFileItem.setDisable(false);
+                    importFileItem.setDisable(true);
+                }
+                default -> {
+                    exportFileItem.setDisable(true);
+                    importFileItem.setDisable(false);
+                }
+            }
         });
 
         MenuItem exitGameItem = new MenuItem();

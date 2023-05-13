@@ -18,8 +18,8 @@ public class CustomCloseAction {
 
     /**
      * Handles the on close action<br>
-     * -> without save <br>
-     * -> with save <br>
+     * -> save <br>
+     * -> no save <br>
      * -> cancel <br>
      *
      * @param stage pass stage
