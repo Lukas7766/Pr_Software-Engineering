@@ -39,14 +39,14 @@ public class FileSaver {
         FileTree test = new FileTree();
         Node test1 = new TreeNode(SgfToken.B,"bh");
         Node test2 = new TreeNode(SgfToken.B,"cg");
-        BranchNode test3 = new BranchNode(SgfToken.B,"cf");
-        BranchNode test4 = new BranchNode(SgfToken.B,"ch");
+        //BranchNode test3 = new BranchNode(SgfToken.B,"cf");
+        //BranchNode test4 = new BranchNode(SgfToken.B,"ch");
         Node test5 = new TreeNode(SgfToken.B,"dh");
         Node test6 = new TreeNode(SgfToken.B,"sa");
         testStart.setNext(test1);
         test1.setNext(test2);
-        test2.setBranchNode(test3);
-        test3.setBranchNode(test4);
+        //test2.setBranchNode(test3);
+        //test3.setBranchNode(test4);
         test2.setNext(test5);
         test5.setNext(test6);
         test.setStart(testStart);

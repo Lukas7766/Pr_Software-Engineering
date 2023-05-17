@@ -16,6 +16,8 @@ public class FileTree {
         //TODO: insert at the start
         //TODO: insert a branchnode
         //TODO: insert normally
+        //TODO: add methods for traversing the tree
+        //TODO: add methods for inserting move/node (no specific oder)
         /*if (start == null && node.getClass() == StartNode.class){
             this.start = node; //warum geht nix diese
         }*/
@@ -27,7 +29,7 @@ public class FileTree {
         this.last = start;
     }
 
-    public static void printGameTree(Node current) {
+    /*public static void printGameTree(Node current) {
         if (current.getClass() == StartNode.class && current.getNext() != null) {
             System.out.println(current.getToken()+"\n|");
             printGameTree(current.getNext());
@@ -60,5 +62,22 @@ public class FileTree {
                 System.out.println(current.getToken());
             }
         }
+    }*/
+
+    public static void printGameTree(Node current) {
+        if (current == null){
+            return;
+        }else {
+            if (current.getClass() == StartNode.class){
+                System.out.println(current);
+                printGameTree(current.getNext());
+            }else {
+                System.out.println("|\n" + current);
+                printGameTree(current.getNext());
+            }
+        }
+
     }
+
+
 }

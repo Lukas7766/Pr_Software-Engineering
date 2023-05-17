@@ -34,7 +34,7 @@ public class BoardPane extends GridPane {
     /**
      * whether move numbers are shown on the stones
      */
-    private boolean showsMoveNumbers = true;
+    private boolean showsMoveNumbers = false;
 
     /**
      * whether coordinates are shown on the sides of the board

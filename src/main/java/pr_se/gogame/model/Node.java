@@ -9,7 +9,7 @@ public abstract class Node {
 
     private String token;
 
-    private BranchNode branchNode = null;
+    //private BranchNode branchNode = null;
 
     private int moveNumber;
 
@@ -43,10 +43,10 @@ public abstract class Node {
         this.token = token;
     }
 
-    public void setBranchNode(BranchNode branchNode) {
+   /* public void setBranchNode(BranchNode branchNode) {
         branchNode.setPrevious(this);
         this.branchNode = branchNode;
-    }
+    }*/
 
     public Node getNext() {
         return next;
@@ -60,7 +60,12 @@ public abstract class Node {
         return token;
     }
 
-    public BranchNode getBranchNode() {
+    /*public BranchNode getBranchNode() {
         return branchNode;
+    }*/
+
+    @Override
+    public String toString() {
+        return token;
     }
 }
