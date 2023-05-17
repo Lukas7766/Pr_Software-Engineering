@@ -1,7 +1,7 @@
 package pr_se.gogame.model;
 
 public enum SgfToken {
-
+//TODO add token AW and AB for handicap and subsequently method in filetree for setting handycap
     /**
      * Move for black
      */
