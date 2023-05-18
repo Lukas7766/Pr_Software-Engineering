@@ -1,61 +1,82 @@
 package pr_se.gogame.model;
 
 public enum SgfToken {
-//TODO add token AW and AB for handicap and subsequently method in filetree for setting handycap
+
     /**
      * Move for black
      */
-    B("B[%s]"),
+    B(";B[%s]"),
     /**
-     *Delete Stone/Set empty Stone
+     * Delete Stone/Set empty Stone
      */
-    AE("AE[%s]"), //
+    AE("AE[%s]"),
     /**
-     *Move for white
+     * Move for white
      */
-    W("W[%s]"), //
+    W(";W[%s]"),
+
     /**
-     *Name for Plyer black
+     * Add white stone for handicap
      */
-    PB("PB[%s]"), //
+    AWF(";AW%s"),
+
     /**
-     *Name for Player white
+     * Add black stone for handicap
      */
-    PW("PW[%s]"), //
+    ABF(";AB[%s]"),
+
+    /**
+     * Add white stone for handicap
+     */
+    AW("AW[%s]"),
+
+    /**
+     * Add black stone for handicap
+     */
+    AB("AB[%s]"),
+
+    /**
+     * Name for Player black
+     */
+    PB("PB[%s]"),
+    /**
+     * Name for Player white
+     */
+    PW("PW[%s]"),
     /**
      * Komi value like "1", "2"
      */
-    KM("KM[%s]"), //
+    KM("KM[%s]"),
     /**
      * Date when the game was played use "YYYY-MM-DD" format
      */
-    DT("DT[%s]"), //
+    DT("DT[%s]"),
     /**
      * Time but write in a real number e.g. "4600" or "300"
      */
-    TM("TM[%s]"), //
+    TM("TM[%s]"),
     /**
      * Textual comment
      */
-    C("C[%s]"), //
+    C("C[%s]"),
 
     //RE("RE[%s]"), //for the Result but has mandatory format
     /**
      * Handicap
      */
-    HA("HA[%s]"), //
+    HA("HA[%s]"),
     /**
      * Markup f.ex. with an x
      */
-    MA("MA[%s]"), //
+    MA("MA[%s]"),
     /**
      * label for a coordinate
      */
-    LB("LB[%s]"), //
+    LB("LB[%s]"),
     /**
      * The format for the first line of a File
      */
-    START("FF[4]GM[1]SZ[9]PB[Black]PW[White]");//TODO: change so that this has to be formatted correctly (one for every variable)
+    START("(;FF[4]GM[1]SZ[%s]"); //1.Board size
 
     /**
      * The value for the enum
@@ -64,6 +85,7 @@ public enum SgfToken {
 
     /**
      * Creates a token
+     *
      * @param token String for the token
      */
     SgfToken(String token) {
@@ -73,6 +95,7 @@ public enum SgfToken {
 
     /**
      * Returns the value of the token
+     *
      * @return the token value
      */
     public String getValue() {

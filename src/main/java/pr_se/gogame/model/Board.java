@@ -38,7 +38,7 @@ public class Board implements BoardInterface {
     private final StoneGroupPointer[][] board;
 
     //TODO: Move this elsewere ?
-    private FileSaver fileSaver;
+    private newFileSaver newFileSaver;
 
     // TODO: Should this be moved to game?
     private int moveNumber;
@@ -61,7 +61,7 @@ public class Board implements BoardInterface {
         listeners = new LinkedList<>();
         this.board = new StoneGroupPointer[SIZE][SIZE];
         moveNumber = 1;
-        this.fileSaver = new FileSaver("Black","White",String.valueOf(SIZE));
+        this.newFileSaver = new newFileSaver();
 
         int komi = game.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
 
@@ -194,7 +194,7 @@ public class Board implements BoardInterface {
             }
 
             String saveCol = color == BLACK ? "B" : "W";
-            fileSaver.addStone(saveCol, x, y);
+            //newFileSaver.addStone(saveCol, x, y);//TODO: old add Stone
             // Update UI
             fireStoneSet(x, y, color);
 
@@ -213,7 +213,7 @@ public class Board implements BoardInterface {
     @Override
     public void removeStone(int x, int y) {
         board[x][y] = null;
-        fileSaver.removeStone(x,y);
+        //newFileSaver.removeStone(x,y);//TODO: old remove Stone
 
         Set<StoneGroup> surroundingSGs = getSurroundings(
                 x,
@@ -312,11 +312,13 @@ public class Board implements BoardInterface {
     }
 
     public boolean saveFile(Path path){
-       return fileSaver.saveFile(path);
+       return newFileSaver.saveFile(path);
     }
 
     public boolean importFile(Path path){
-        return FileSaver.importFile(path);
+        //return FileSaver.importFile(path);
+        //TODO:rework
+        return false;
     }
 
     // Getters and Setters
