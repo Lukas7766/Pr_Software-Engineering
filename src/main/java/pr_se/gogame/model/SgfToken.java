@@ -16,24 +16,24 @@ public enum SgfToken {
     W(";W[%s]"),
 
     /**
-     * Add white stone for handicap
+     * Add white stone First for handicap
      */
     AWF(";AW%s"),
 
     /**
-     * Add black stone for handicap
+     * Add black stone First for handicap
      */
-    ABF(";AB[%s]"),
+    ABF(";AB%s"),
 
     /**
      * Add white stone for handicap
      */
-    AW("AW[%s]"),
+    AW("AW%s"),
 
     /**
      * Add black stone for handicap
      */
-    AB("AB[%s]"),
+    AB("AB%s"),
 
     /**
      * Name for Player black
@@ -47,20 +47,12 @@ public enum SgfToken {
      * Komi value like "1", "2"
      */
     KM("KM[%s]"),
-    /**
-     * Date when the game was played use "YYYY-MM-DD" format
-     */
-    DT("DT[%s]"),
-    /**
-     * Time but write in a real number e.g. "4600" or "300"
-     */
-    TM("TM[%s]"),
+
     /**
      * Textual comment
      */
     C("C[%s]"),
 
-    //RE("RE[%s]"), //for the Result but has mandatory format
     /**
      * Handicap
      */
@@ -76,7 +68,7 @@ public enum SgfToken {
     /**
      * The format for the first line of a File
      */
-    START("(;FF[4]GM[1]SZ[%s]"); //1.Board size
+    START("(;FF[4]GM[1]SZ[%s]");
 
     /**
      * The value for the enum

@@ -5,11 +5,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class newFileSaver {
-    //TODO: Einbinden wenn Game mit x geschlossen wird
+    //TODO: closing bracket when saving
     private Path path;
     String buffer;
 
-    //private boolean in_A_Branch;//TODO: branch detection when removing/inserting
+    //private boolean in_A_Branch;
 
     public newFileSaver(Path path) {
         this.path = path;

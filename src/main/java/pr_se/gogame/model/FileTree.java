@@ -1,13 +1,10 @@
 package pr_se.gogame.model;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
 
 public class FileTree {
     private final StartNode start;
-    private TreeNode current;
+    private Node current;
 
     private Node viewing;
 
@@ -15,64 +12,55 @@ public class FileTree {
 
     private int count;
 
-
-    //private Node currentBranch;
-
     public FileTree(int boardSize, String namePlayerBlack, String namePlayerWhite) {
         this.start = new StartNode(boardSize);
+        this.current = start;
+        current.setPrevious(start);
         this.boardSize = boardSize;
-
+        this.viewing = current;
     }
 
 
-
-    public StartNode getStart() {
-        return start;
-    }
-
-    //TODO: closing bracket
-    //TODO: closing bracket when game gets closed with x
-    //TODO: maybe a way of having the closing bracket in the string constantly
-    //TODO: add helper methods for the others i.e. inserting white etc
-    public void addMove(SgfToken moveType, int xCoord, int yCoord) {
-        if (current==null){
-            this.current = new TreeNode(moveType, calculateCoordinates(xCoord, yCoord));
-            current.setPrevious(start);
-            start.setNext(current);
-            viewing = current;
-        }else {
-            TreeNode newNode = new TreeNode(moveType, calculateCoordinates(xCoord, yCoord));
-            current.setNext(newNode);
-            current = newNode;
-            viewing = current;
-        }
-    }
-
-    public void addComment(String comment){
-        TreeNode newNode = new TreeNode(SgfToken.C, comment);
+    public void addNode(SgfToken token, String value) {
+        TreeNode newNode = new TreeNode(token, value);
         current.setNext(newNode);
+        newNode.setPrevious(current);
         current = newNode;
         viewing = current;
     }
 
-    public void addName(StoneColor playerColor,String name){
-        TreeNode newNode;
-        switch (playerColor){
-            case BLACK -> newNode = new TreeNode(SgfToken.PB, name);
-            case WHITE -> newNode = new TreeNode(SgfToken.PW, name);
+    public void addMove(SgfToken moveType, int xCoord, int yCoord) {
+        addNode(moveType, calculateCoordinates(xCoord, yCoord));
+    }
+
+
+    public void addComment(String comment) {
+        addNode(SgfToken.C, comment);
+    }
+
+    public void addLabelForCoordinate(String label) {
+        if (label.length() > 2) {
+            addNode(SgfToken.LB, label.substring(0, 2));
+        } else {
+            addNode(SgfToken.LB, label);
+        }
+    }
+
+    public void markACoordinate(int xCoord, int yCoord) {
+        addNode(SgfToken.MA, calculateCoordinates(xCoord, yCoord));
+    }
+
+
+    public void addName(StoneColor playerColor, String name) {
+        switch (playerColor) {
+            case BLACK -> addNode(SgfToken.PB, name);
+            case WHITE -> addNode(SgfToken.PW, name);
             default -> throw new IllegalArgumentException("Didnt use a correct player color");
         }
-
-        current.setNext(newNode);
-        current = newNode;
-        viewing = current;
     }
 
-    public void addKomi(int komi){
-        TreeNode newNode = new TreeNode(SgfToken.KM, String.valueOf(komi));
-        current.setNext(newNode);
-        current = newNode;
-        viewing = current;
+    public void addKomi(int komi) {
+        addNode(SgfToken.KM, String.valueOf(komi));
     }
 
     /*public static void printGameTree(Node current) {
@@ -121,29 +109,28 @@ public class FileTree {
         return (char) (x + 97) + String.valueOf((char) (96 + (this.boardSize) - y));
     }
 
-    private static String calculateCoordinate(int boardSize, int x, int y) {
+    public static String calculateCoordinate(int boardSize, int x, int y) {
         return (char) (x + 97) + String.valueOf((char) (96 + (boardSize) - y));
     }
 
-    //TODO:Test
     public void addStonesBeforeGame(ArrayList<String> coordinatesWhite, ArrayList<String> coordinatesBlack) {
-        String bufferWhite = "";
-        String bufferBlack = "";
+        StringBuilder bufferWhite = new StringBuilder();
+        StringBuilder bufferBlack = new StringBuilder();
         if (coordinatesWhite.isEmpty()) {
             for (String s : coordinatesBlack) {
-                bufferBlack += "[" + s + "]";
+                bufferBlack.append("[").append(s).append("]");
             }
-            current.setNext(new TreeNode(SgfToken.ABF, bufferBlack));
+            current.setNext(new TreeNode(SgfToken.ABF, bufferBlack.toString()));
         } else {
             for (String s : coordinatesBlack) {
-                bufferBlack += "[" + s + "]";
+                bufferBlack.append("[").append(s).append("]");
             }
             for (String s :
                     coordinatesWhite) {
-                bufferWhite += "[" + s + "]";
+                bufferWhite.append("[").append(s).append("]");
             }
-            current.setNext(new TreeNode(SgfToken.AWF, bufferWhite));
-            current.setNext(new TreeNode(SgfToken.AB,bufferBlack));
+            addNode(SgfToken.AWF, bufferWhite.toString());
+            addNode(SgfToken.AB, bufferBlack.toString());
         }
     }
 
@@ -152,32 +139,63 @@ public class FileTree {
      */
     public void printGameTree() {
         Node start = this.start;
-        while (start != null){
-            if (start.getClass() == StartNode.class){
+        while (start != null) {
+            if (start.getClass() == StartNode.class) {
                 System.out.println(start);
-                start = start.getNext();
-            }else {
-                System.out.println("|\n"+start);
-                start = start.getNext();
+            } else {
+                System.out.println("|\n" + start);
             }
+            start = start.getNext();
         }
     }
 
-    public TreeNode getCurrent() {
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        Node temp = start;
+        int count = 0;
+        while (temp != null) {
+            if (temp.getToken().equals(start.getToken())) {
+                sb.append(temp.getToken());
+                sb.append("\n");
+                temp = temp.getNext();
+                continue;
+            }//TODO: Format correctly
+            if (temp.toString().startsWith(";")) {
+                count++;
+            }
+            if (count == 2) {
+                sb.append(temp.getToken());
+                sb.append(System.lineSeparator());
+                count = 0;
+            } else {
+                sb.append(temp.getToken());
+            }
+            temp = temp.getNext();
+        }
+        return sb.toString();
+    }
+
+    public Node getCurrent() {
         return current;
+    }
+
+    public StartNode getStart() {
+        return start;
     }
 
     //Methods vor viewing
 
-    public Node viewCurrent(){
+    public Node viewCurrent() {
         return this.viewing;
     }
-    public Node viewNext(){
+
+    public Node viewNext() {
         this.viewing = viewing.getNext();
         return viewing;
     }
 
-    public Node viewPrev(){
+    public Node viewPrev() {
         this.viewing = viewing.getPrevious();
         return viewing;
     }
