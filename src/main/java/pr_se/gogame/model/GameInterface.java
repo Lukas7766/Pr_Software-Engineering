@@ -95,5 +95,7 @@ public interface GameInterface {
     void addListener(GameListener l);
 
     void removeListener(GameListener l);
+
+    void setHandicapStoneCounter(int noStones);
 }
 

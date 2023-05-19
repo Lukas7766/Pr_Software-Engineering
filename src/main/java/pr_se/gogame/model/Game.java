@@ -72,7 +72,6 @@ public class Game implements GameInterface {
         this.gameCommand = gameCommand;
         this.size = size;
         this.handicap = handicap;
-        this.handicapStoneCounter = handicap;
         this.playerBlackScore = handicap;
         this.playerWhiteScore = this.ruleset.getKomi();
         this.blackCapturedStones = 0;
@@ -202,6 +201,15 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
         listeners.remove(l);
+    }
+
+    @Override
+    public void setHandicapStoneCounter(int noStones) {
+        if(noStones < 0 || noStones > handicap) {
+            throw new IllegalArgumentException();
+        }
+
+        this.handicapStoneCounter = noStones;
     }
 
     @Override

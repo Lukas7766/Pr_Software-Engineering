@@ -77,6 +77,12 @@ class GameTest {
         assertThrows(NullPointerException.class, () -> game.getScore(null));
     }
 
+    @Test
+    void setHandicapStoneCounterArguments() {
+        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(-1));
+        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(game.getHandicap() + 1));
+    }
+
     // other tests
 
     @Test
@@ -212,8 +218,15 @@ class GameTest {
     }
 
     @Test
+    void setHandicapStoneCounter() {
+        game.newGame(BLACK_STARTS, 19, 8);
+        game.setHandicapStoneCounter(8);
+        assertEquals(8, game.getHandicapStoneCounter());
+    }
+
+    @Test
     void getHandicapStoneCounter() {
-        fail();
+        assertEquals(0, game.getHandicapStoneCounter());
     }
 
     @Test
@@ -238,6 +251,7 @@ class GameTest {
     @Test
     void placeHandicapStone() {
         game.newGame(BLACK_STARTS, 19, 1); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
+        game.setHandicapStoneCounter(1);
         assertNull(game.getColorAt(0, 0));
         game.placeHandicapStone(0, 0);
         assertEquals(BLACK, game.getColorAt(0, 0));
