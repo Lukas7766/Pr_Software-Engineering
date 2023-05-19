@@ -121,11 +121,11 @@ public class Game implements GameInterface {
         System.out.println("pass");
         switch (gameCommand) {
             case BLACK_PLAYS, BLACK_STARTS -> {
-                this.gameCommand = GameCommand.WHITE_PLAYS;
+                // this.gameCommand = GameCommand.WHITE_PLAYS; // moved into setCurColor()
                 this.setCurColor(WHITE);
             }
             case WHITE_PLAYS, WHITE_STARTS -> {
-                this.gameCommand = GameCommand.BLACK_PLAYS;
+                // this.gameCommand = GameCommand.BLACK_PLAYS; // moved into setCurColor()
                 this.setCurColor(BLACK);
             }
         }
@@ -275,6 +275,11 @@ public class Game implements GameInterface {
         }
 
         this.curColor = c;
+        if(this.curColor == BLACK) {
+            this.gameCommand = GameCommand.BLACK_PLAYS;
+        } else {
+            this.gameCommand = GameCommand.WHITE_PLAYS;
+        }
     }
 
     @Override
@@ -393,13 +398,13 @@ public class Game implements GameInterface {
         return gameResult;
     }
 
-    private void switchColor() {
+    public void switchColor() {
         if (curColor == BLACK) {
-            curColor = WHITE;
-            this.gameCommand = GameCommand.WHITE_PLAYS;
+            // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
+            setCurColor(WHITE);
         } else {
-            curColor = BLACK;
-            this.gameCommand = GameCommand.BLACK_PLAYS;
+            // this.gameCommand = GameCommand.BLACK_PLAYS; // handled by setCurColor()
+            setCurColor(BLACK);
         }
         fireGameEvent(new GameEvent(gameCommand));
     }

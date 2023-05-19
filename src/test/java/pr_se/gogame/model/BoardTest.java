@@ -156,7 +156,7 @@ class BoardTest {
         assertNull(board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(0, 0));
 
-        game.setCurColor(WHITE); // for maximum code-coverage
+        game.switchColor(); // for maximum code-coverage
         board.removeStone(0, 0);
         assertNull(board.getColorAt(0, 0));
     }

@@ -126,9 +126,11 @@ class GameTest {
     @Test
     void pass() {
         StoneColor prevColor = game.getCurColor();
+        GameCommand prevState = game.getGameState();
         int prevMoveNumber = game.getCurMoveNumber();
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
+        assertNotEquals(prevState, game.getGameState());
         assertEquals(prevMoveNumber, game.getCurMoveNumber());
     }
 
@@ -237,8 +239,11 @@ class GameTest {
 
     @Test
     void setCurColor() {
+        assertEquals(BLACK, game.getCurColor());
+        assertEquals(BLACK_STARTS, game.getGameState());
         game.setCurColor(WHITE);
         assertEquals(WHITE, game.getCurColor());
+        assertEquals(WHITE_PLAYS, game.getGameState());
     }
 
     @Test
@@ -364,5 +369,14 @@ class GameTest {
     @Test
     void printDebugInfo() {
         assertDoesNotThrow(() -> game.printDebugInfo(0, 0));
+    }
+
+    @Test
+    void switchColor() {
+        assertEquals(BLACK, game.getCurColor());
+        assertEquals(BLACK_STARTS, game.getGameState());
+        game.switchColor();
+        assertEquals(WHITE, game.getCurColor());
+        assertEquals(WHITE_PLAYS, game.getGameState());
     }
 }

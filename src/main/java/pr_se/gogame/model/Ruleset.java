@@ -112,7 +112,7 @@ public interface Ruleset {
             case 2:
                 board.setStone(SIZE - 4, 3, beginner, true);
                 board.setStone(3, SIZE - 4, beginner, true);
-                board.getGAME().setCurColor(StoneColor.getOpposite(beginner));
+                board.getGAME().switchColor();
             default:
                 break;
         }
