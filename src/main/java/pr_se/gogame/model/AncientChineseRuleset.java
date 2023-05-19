@@ -40,15 +40,19 @@ public class AncientChineseRuleset implements Ruleset {
         int scoreBlack = 0;
         int scoreWhite = 0;
 
-        for (int i = 0; i < board.getBoard().length; i++) {
-            for (int j = 0; j < board.getBoard()[i].length; j++) {
-                StoneGroupPointer p = board.getBoard()[i][j];
+        // for (int i = 0; i < board.getBoard().length; i++) {
+        for (int i = 0; i < board.getSize(); i++) {
+            // for (int j = 0; j < board.getBoard()[i].length; j++) {
+            for (int j = 0; j < board.getSize(); j++) {
+                /*StoneGroupPointer p = board.getBoard()[i][j];
                 if (p == null) continue;
                 StoneGroup stoneGroup = p.getStoneGroup();
-                if (stoneGroup == null) continue;
-                if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.BLACK) {
+                if (stoneGroup == null) continue;*/
+                //if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.BLACK) {
+                if (board.getColorAt(i, j) == StoneColor.BLACK) {
                     scoreBlack++;
-                } else if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.WHITE) {
+                // } else if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.WHITE) {
+                } else if (board.getColorAt(i, j) == StoneColor.WHITE) {
                     scoreWhite++;
                 }
 

@@ -89,10 +89,10 @@ public class JapaneseRuleset implements Ruleset {
         double komi = game.getKomi();
         int handicap = game.getHandicap();
 
-        int capturedStonesBlack = game.getCapturedStones(StoneColor.BLACK);
+        int capturedStonesBlack = game.getStonesCapturedBy(StoneColor.BLACK);
         int territoryScoreBlack = calculateTerritoryPoints(StoneColor.BLACK, game.getBoard());
 
-        int capturedStonesWhite = game.getCapturedStones(StoneColor.WHITE);
+        int capturedStonesWhite = game.getStonesCapturedBy(StoneColor.WHITE);
         int territoryScoreWhite = calculateTerritoryPoints(StoneColor.WHITE, game.getBoard());
 
         double scoreBlack = capturedStonesBlack + territoryScoreBlack + handicap;
@@ -141,7 +141,8 @@ public class JapaneseRuleset implements Ruleset {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
 
-                if (board.getBoard()[i][j] == null && !visited[i][j]) {
+                // if (board.getBoard()[i][j] == null && !visited[i][j]) {
+                if (board.getColorAt(i, j) == null && !visited[i][j]) {
 
                     boolean occupiedTerritory = true;
 
@@ -180,7 +181,8 @@ public class JapaneseRuleset implements Ruleset {
 
         visited[x][y] = true;
 
-        if (board.getBoard()[x][y] != null) return;
+        // if (board.getBoard()[x][y] != null) return;
+        if (board.getColorAt(x, y) != null) return;
 
         territory.add(new Position(x, y));
         floodFill(board, x, y + 1); //top

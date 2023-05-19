@@ -21,13 +21,13 @@ public interface BoardInterface {
     // Getters
     public int getSize();
 
+    /**
+     * Returns the stone color at the specified location
+     * @param x Horizontal coordinate from 0 to size-1, starting on the left
+     * @param y Vertical coordinate from 0 to size-1, starting on the top
+     * @return the stone color at the specified location or null if no stone is set
+     */
     public StoneColor getColorAt(int x, int y);
 
     public Game getGAME();
-
-    public StoneGroupPointer[][] getBoard();
-
-    public int getLastDebugX();
-
-    public int getLastDebugY();
 }

@@ -87,7 +87,7 @@ public class BoardPane extends GridPane {
      */
     private NumberBinding MAX_CELL_DIM_INT;
 
-    // TODO: Remove in final product
+    // TODO: Remove in final product (or maybe not)
     private final boolean debug = false;
 
     /**
@@ -114,8 +114,8 @@ public class BoardPane extends GridPane {
             }
             System.out.println("show move numbers border pane " + showsMoveNumbers);
             switch(e.getGameCommand()) {
-                case BLACKPLAYS:
-                case WHITEPLAYS:
+                case BLACK_PLAYS:
+                case WHITE_PLAYS:
                     if(e instanceof StoneSetEvent) {//TODO: StoneEvent vs GameCommand question
                         System.out.println("StoneSetEvent");
                         StoneSetEvent sse = (StoneSetEvent) e;
@@ -129,24 +129,24 @@ public class BoardPane extends GridPane {
                         }
                     }
                     break;
-                case CONFIRMCHOICE:
+                case CONFIRM_CHOICE:
                     confirmMove();
                     break;
-                case WHITEREMOVED:
-                case BLACKREMOVED:
+                case WHITE_HAS_CAPTURED:
+                case BLACK_HAS_CAPTURED:
                     StoneRemovedEvent sre = (StoneRemovedEvent) e;
                     getPlayableCell(sre.getX(), sre.getY()).unset();
                     break;
                 case INIT:
                     setMouseTransparent(true);
                     break;
-                case WHITESTARTS:
-                case BLACKSTARTS:
+                case WHITE_STARTS:
+                case BLACK_STARTS:
                     setMouseTransparent(false);
                     init();
                     break;
-                case BLACKHANDICAP:
-                case WHITEHANDICAP:
+                case BLACK_HANDICAP:
+                case WHITE_HANDICAP:
                     StoneSetEvent sseH = (StoneSetEvent) e;
                     PlayableBoardCell destBC = getPlayableCell(sseH.getX(), sseH.getY());
 
@@ -157,21 +157,21 @@ public class BoardPane extends GridPane {
                     }
                     destBC.getLabel().setVisible(false);
                     break;
-                case BLACKWON:
-                case WHITEWON:
+                case BLACK_WON:
+                case WHITE_WON:
                 case DRAW:
                     setMouseTransparent(true);
                     break;
-                case CONFIGCONFIRMATION:
+                case CONFIG_CONFIRMATION:
                     setMoveConfirmation(game.isConfirmationNeeded());
                     break;
-                case CONFIGSHOWCOORDINATES:
+                case CONFIG_SHOW_COORDINATES:
                     setShowsCoordinates(game.isShowCoordinates());
                     break;
-                case CONFIGSHOWMOVENUMBERS:
+                case CONFIG_SHOWMOVENUMBERS:
                     setShowsMoveNumbers(game.isShowMoveNumbers());
                     break;
-                case DEBUGINFO:
+                case DEBUG_INFO:
                     DebugEvent de = (DebugEvent) e;
                     getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
                     break;

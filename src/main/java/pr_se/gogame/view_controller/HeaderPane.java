@@ -131,7 +131,7 @@ public class HeaderPane extends VBox {
         });
         game.addListener(l -> {
             switch (l.getGameCommand()){
-                case BLACKPLAYS,WHITEPLAYS, BLACKSTARTS, WHITESTARTS -> {
+                case BLACK_PLAYS, WHITE_PLAYS, BLACK_STARTS, WHITE_STARTS -> {
                     exportFileItem.setDisable(false);
                     importFileItem.setDisable(true);
                 }
@@ -208,11 +208,11 @@ public class HeaderPane extends VBox {
 
         game.addListener(l -> {
             switch (l.getGameCommand()) {
-                case INIT, WHITEWON, BLACKWON, DRAW -> {
+                case INIT, WHITE_WON, BLACK_WON, DRAW -> {
                     //gameSectionItems.forEach(e -> e.setDisable(true));
                     gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
                 }
-                case BLACKPLAYS, WHITEPLAYS, WHITESTARTS, BLACKSTARTS -> {
+                case BLACK_PLAYS, WHITE_PLAYS, WHITE_STARTS, BLACK_STARTS -> {
                     gameSectionItems.stream().filter(e -> e.isDisable()).forEach(e -> e.setDisable(false));
                 }
             }
@@ -356,7 +356,7 @@ public class HeaderPane extends VBox {
         playbackControlList.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() != GameCommand.CONFIGDEMOMODE) return;
+            if (l.getGameCommand() != GameCommand.CONFIG_DEMO_MODE) return;
             playbackControlList.forEach(e -> e.setDisable(!game.isDemoMode()));
 
         });
@@ -394,7 +394,7 @@ public class HeaderPane extends VBox {
         gameShortCardList.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT || l.getGameCommand() == GameCommand.WHITEWON || l.getGameCommand() == GameCommand.BLACKWON || l.getGameCommand() == GameCommand.DRAW) {
+            if (l.getGameCommand() == GameCommand.INIT || l.getGameCommand() == GameCommand.WHITE_WON || l.getGameCommand() == GameCommand.BLACK_WON || l.getGameCommand() == GameCommand.DRAW) {
                 gameShortCardList.forEach(e -> e.setDisable(true));
             } else {
                 gameShortCardList.forEach(e -> e.setDisable(false));
