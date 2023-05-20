@@ -141,7 +141,6 @@ public class JapaneseRuleset implements Ruleset {
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
 
-                // if (board.getBoard()[i][j] == null && !visited[i][j]) {
                 if (board.getColorAt(i, j) == null && !visited[i][j]) {
 
                     boolean occupiedTerritory = true;
@@ -181,7 +180,6 @@ public class JapaneseRuleset implements Ruleset {
 
         visited[x][y] = true;
 
-        // if (board.getBoard()[x][y] != null) return;
         if (board.getColorAt(x, y) != null) return;
 
         territory.add(new Position(x, y));

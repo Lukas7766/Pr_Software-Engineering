@@ -284,7 +284,7 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y) {
-        if (board.setStone(x, y, curColor, false)) {
+        if (board.setStone(x, y, curColor, false, true)) {
             curMoveNumber++;
             System.out.println("show move # " + showMoveNumbers);
             System.out.println("Move played.");
@@ -298,7 +298,7 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapStone(int x, int y) {
-        board.setStone(x, y, curColor, true);
+        board.setStone(x, y, curColor, true, true);
         handicapStoneCounter--;
         if (handicapStoneCounter == 0) {
             switchColor();

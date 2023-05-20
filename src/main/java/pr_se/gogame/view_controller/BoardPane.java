@@ -58,24 +58,49 @@ public class BoardPane extends GridPane {
     private String graphicsPath;
     
     /**
-     * Background Image (not to be confused with BackgroundImage) for playable BoardCells
+     * Background Image (not to be confused with BackgroundImage) for inner playable BoardCells
      */
     private Image tile;
-    
+
+    /**
+     * Background Image (not to be confused with BackgroundImage) for outer edge playable BoardCells
+     */
+    private Image tileEdge;
+
+    /**
+     * Background Image (not to be confused with BackgroundImage) for outer corner playable BoardCells
+     */
+    private Image tileCorner;
+
+
     /**
      * Image used for the black and white stones
      */
     private final Image[] stones = new Image [2];
-    
+
     /**
-     * Background Image (not to be confused with BackgroundImage) for the BoardPane's edges
+     * Image used for circle marks
      */
-     
-    private Image edge;
+    private final Image[] circleMarks = new Image[2];
+
     /**
-     * Background Image (not to be confused with BackgroundImage) for the BoardPane's corners
+     * Image used for triangle marks
      */
-    private Image corner;
+    private final Image[] triangleMarks = new Image[2];
+
+    /**
+     * Image used for square marks
+     */
+    private final Image[] squareMarks = new Image[2];
+
+    /**
+     * Background Image (not to be confused with BackgroundImage) for the BoardPane's outer edges
+     */
+    private Image outerEdge;
+    /**
+     * Background Image (not to be confused with BackgroundImage) for the BoardPane's outer corners
+     */
+    private Image outerCorner;
 
     /**
      * the currently selected PlayableBoardCell
@@ -202,41 +227,41 @@ public class BoardPane extends GridPane {
         MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM); // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
-        BoardCell corner1 = new BoardCell(this.corner);
+        BoardCell corner1 = new BoardCell(this.outerCorner);
         corner1.getLabel().setVisible(false);
         add(corner1, 0, 0);
-        BoardCell corner2 = new BoardCell(this.corner);
+        BoardCell corner2 = new BoardCell(this.outerCorner);
         corner2.getLabel().setVisible(false);
         add(corner2, size + 1, 0);
-        BoardCell corner3 = new BoardCell(this.corner);
+        BoardCell corner3 = new BoardCell(this.outerCorner);
         corner3.getLabel().setVisible(false);
         add(corner3, 0, size + 1);
-        BoardCell corner4 = new BoardCell(this.corner);
+        BoardCell corner4 = new BoardCell(this.outerCorner);
         corner4.getLabel().setVisible(false);
         add(corner4, size + 1, size + 1);
 
         // populate the coordinate axes
         for (int i = 0; i < this.size; i++) {
             // top
-            BoardCell t = new BoardCell(this.edge);
+            BoardCell t = new BoardCell(this.outerEdge);
             t.getLabel().setText("" + (char)('A' + i));
             t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
             add(t, i + 1, 0);
 
             // bottom
-            BoardCell b = new BoardCell(this.edge);
+            BoardCell b = new BoardCell(this.outerEdge);
             b.getLabel().setText("" + (char)('A' + i));
             b.getLabel().setAlignment(Pos.TOP_CENTER);
             add(b, i + 1, size + 1);
 
             // left
-            BoardCell l = new BoardCell(this.edge);
+            BoardCell l = new BoardCell(this.outerEdge);
             l.getLabel().setText("" + (size - i));
             l.getLabel().setAlignment(Pos.CENTER_RIGHT);
             add(l, 0, i + 1);
 
             // right
-            BoardCell r = new BoardCell(this.edge);
+            BoardCell r = new BoardCell(this.outerEdge);
             r.getLabel().setText("" + (size - i));
             r.getLabel().setAlignment(Pos.CENTER_LEFT);
             add(r, size + 1, i + 1);
@@ -245,12 +270,10 @@ public class BoardPane extends GridPane {
         // Fill the grid with tiles
         for(int i = 0; i < this.size; i++) {
             for(int j = 0; j < this.size; j++) {
-                PlayableBoardCell bc = new PlayableBoardCell();
+                PlayableBoardCell bc = new PlayableBoardCell(this.tile);
                 /*
                  * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
                  * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
-                 *
-                 * Note: I changed this to make sure that Game would be the only connection between Model and View/Controller.
                  */
                 StoneColor c = this.game.getColorAt(j, i);
                 if(c != null) {
@@ -361,14 +384,14 @@ public class BoardPane extends GridPane {
 
         for(int i = 0; i < 4; i++) {
             BoardCell bc = (BoardCell)getChildren().get(i);
-            bc.setBackgroundImage(corner);
+            bc.setBackgroundImage(outerCorner);
         }
 
         for(int i = 0; i < size; i++) {
             // edges
             for(int j = 0; j < 4; j++) {
                 BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
-                bc.setBackgroundImage(edge);
+                bc.setBackgroundImage(outerEdge);
             }
             // center
             for(int j = 0; j < size; j++) {
@@ -389,12 +412,12 @@ public class BoardPane extends GridPane {
         return stones;
     }
 
-    public Image getEdge() {
-        return edge;
+    public Image getOuterEdge() {
+        return outerEdge;
     }
 
-    public Image getCorner() {
-        return corner;
+    public Image getOuterCorner() {
+        return outerCorner;
     }
 
     // private methods
@@ -405,20 +428,49 @@ public class BoardPane extends GridPane {
     private void loadGraphics(String graphicsPath) {
         try (ZipFile zip = new ZipFile(graphicsPath)) {
             ZipEntry tileEntry = zip.getEntry("tile.png");
-            ZipEntry cornerEntry = zip.getEntry("corner.png");
-            ZipEntry edgeEntry = zip.getEntry("edge.png");
+            ZipEntry tileCornerEntry = zip.getEntry("tile_corner.png");
+            ZipEntry tileEdgeEntry = zip.getEntry("tile_edge.png");
+            ZipEntry outerCornerEntry = zip.getEntry("outer_corner.png");
+            ZipEntry outerEdgeEntry = zip.getEntry("outer_edge.png");
             ZipEntry stone0Entry = zip.getEntry("stone_0.png");
             ZipEntry stone1Entry = zip.getEntry("stone_1.png");
+            ZipEntry circleMark0Entry = zip.getEntry("mark_circle_0.png");
+            ZipEntry circleMark1Entry = zip.getEntry("mark_circle_1.png");
+            ZipEntry triangleMark0Entry = zip.getEntry("mark_triangle_0.png");
+            ZipEntry triangleMark1Entry = zip.getEntry("mark_triangle_1.png");
+            ZipEntry squareMark0Entry = zip.getEntry("mark_square_0.png");
+            ZipEntry squareMark1Entry = zip.getEntry("mark_square_1.png");
 
-            if(Stream.of(tileEntry, cornerEntry, edgeEntry, stone0Entry, stone1Entry).anyMatch(Objects::isNull)) {
+            if(Stream.of(tileEntry,
+                    tileCornerEntry,
+                    tileEdgeEntry,
+                    outerCornerEntry,
+                    outerEdgeEntry,
+                    stone0Entry,
+                    stone1Entry,
+                    circleMark0Entry,
+                    circleMark1Entry,
+                    triangleMark0Entry,
+                    triangleMark1Entry,
+                    squareMark0Entry,
+                    squareMark1Entry
+                ).anyMatch(Objects::isNull)) {
                 throw new IllegalStateException("ERROR: Graphics pack " + graphicsPath + " is missing files!");
             }
 
             try (InputStream tileIS = zip.getInputStream(tileEntry);
-                 InputStream cornerIS = zip.getInputStream(cornerEntry);
-                 InputStream edgeIS = zip.getInputStream(edgeEntry);
+                 InputStream tileCornerIS = zip.getInputStream(tileCornerEntry);
+                 InputStream tileEdgeIS = zip.getInputStream(tileEdgeEntry);
+                 InputStream outerCornerIS = zip.getInputStream(outerCornerEntry);
+                 InputStream outerEdgeIS = zip.getInputStream(outerEdgeEntry);
                  InputStream stone0IS = zip.getInputStream(stone0Entry);
-                 InputStream stone1IS = zip.getInputStream(stone1Entry)
+                 InputStream stone1IS = zip.getInputStream(stone1Entry);
+                 InputStream circleMark0IS = zip.getInputStream(circleMark0Entry);
+                 InputStream circleMark1IS = zip.getInputStream(circleMark1Entry);
+                 InputStream triangleMark0IS = zip.getInputStream(triangleMark0Entry);
+                 InputStream triangleMark1IS = zip.getInputStream(triangleMark1Entry);
+                 InputStream squareMark0IS = zip.getInputStream(squareMark0Entry);
+                 InputStream squareMark1IS = zip.getInputStream(squareMark1Entry)
             ) {
                 final int DEFAULT_IMAGE_SIZE = 128;
                 final boolean SMOOTH_IMAGES = false;
@@ -429,11 +481,22 @@ public class BoardPane extends GridPane {
                         DEFAULT_IMAGE_SIZE, // requestedHeight
                         true,               // preserveRation
                         SMOOTH_IMAGES);     // smooth
-                this.edge = new Image(edgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                this.corner = new Image(cornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.tileEdge = new Image(tileEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.tileCorner = new Image(tileCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.outerEdge = new Image(outerEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.outerCorner = new Image(outerCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
 
                 stones[0] = new Image(stone0IS);
                 stones[1] = new Image(stone1IS);
+
+                circleMarks[0] = new Image(circleMark0IS);
+                circleMarks[1] = new Image(circleMark1IS);
+
+                triangleMarks[0] = new Image(triangleMark0IS);
+                triangleMarks[1] = new Image(triangleMark1IS);
+
+                squareMarks[0] = new Image(squareMark0IS);
+                squareMarks[1] = new Image(squareMark1IS);
             } catch (Exception e) {
                 System.err.println("ERROR: Couldn't read file from graphics pack " + graphicsPath + "!");
                 e.printStackTrace();
@@ -544,18 +607,52 @@ public class BoardPane extends GridPane {
          * Instance of the global Image of the Black stone; used for hovering and selection
          */
         private final ResizableImageView BLACK_HOVER;
+
         /**
          * Instance of the global Image of the white stone; used for hovering and selection
          */
         private final ResizableImageView WHITE_HOVER;
+
         /**
          * Instance of the global Image of the Black stone, used for setting
          */
         private final ResizableImageView BLACK_STONE;
+
         /**
          * Instance of the global Image of the Black stone, used for setting
          */
         private final ResizableImageView WHITE_STONE;
+
+        /**
+         * Instance of the global Image of the circle mark for use on black stones
+         */
+        private final ResizableImageView CIRCLE_MARK_ON_BLACK;
+
+        /**
+         * Instance of the global Image of the circle mark for use on white stones or empty tiles
+         */
+        private final ResizableImageView CIRCLE_MARK_ON_WHITE;
+
+        /**
+         * Instance of the global Image of the triangle mark for use on black stones
+         */
+        private final ResizableImageView TRIANGLE_MARK_ON_BLACK;
+
+        /**
+         * Instance of the global Image of the triangle mark for use on white stones or empty tiles
+         */
+        private final ResizableImageView TRIANGLE_MARK_ON_WHITE;
+
+        /**
+         * Instance of the global Image of the square mark for use on black stones
+         */
+        private final ResizableImageView SQUARE_MARK_ON_BLACK;
+
+        /**
+         * Instance of the global Image of the square mark for use on white stones or empty tiles
+         */
+        private final ResizableImageView SQUARE_MARK_ON_WHITE;
+
         /**
          * Pointer to the ImageView of the currently set stone, if any
          */
@@ -565,20 +662,33 @@ public class BoardPane extends GridPane {
          * Creates a new PlayableBoardCell with the specified background Image, images for the black and white
          * stones and hovers, as well as an invisible label
          */
-        private PlayableBoardCell() {
+        private PlayableBoardCell(Image tile) {
             super(tile);
 
             this.BLACK_HOVER = getCellImageView(stones[0]);
             getChildren().add(this.BLACK_HOVER);
-
             this.WHITE_HOVER = getCellImageView(stones[1]);
             getChildren().add(this.WHITE_HOVER);
 
             this.BLACK_STONE = getCellImageView(stones[0]);
             getChildren().add(this.BLACK_STONE);
-
             this.WHITE_STONE = getCellImageView(stones[1]);
             getChildren().add(this.WHITE_STONE);
+
+            this.CIRCLE_MARK_ON_BLACK = getCellImageView(circleMarks[0]);
+            getChildren().add(this.CIRCLE_MARK_ON_BLACK);
+            this.CIRCLE_MARK_ON_WHITE = getCellImageView(circleMarks[1]);
+            getChildren().add(this.CIRCLE_MARK_ON_WHITE);
+
+            this.TRIANGLE_MARK_ON_BLACK = getCellImageView(triangleMarks[0]);
+            getChildren().add(this.TRIANGLE_MARK_ON_BLACK);
+            this.TRIANGLE_MARK_ON_WHITE = getCellImageView(triangleMarks[1]);
+            getChildren().add(this.TRIANGLE_MARK_ON_WHITE);
+
+            this.SQUARE_MARK_ON_BLACK = getCellImageView(squareMarks[0]);
+            getChildren().add(this.SQUARE_MARK_ON_BLACK);
+            this.SQUARE_MARK_ON_WHITE = getCellImageView(squareMarks[1]);
+            getChildren().add(this.SQUARE_MARK_ON_WHITE);
 
             this.CURRENTLY_SET_STONE = null;
 
@@ -648,6 +758,13 @@ public class BoardPane extends GridPane {
             BLACK_HOVER.setImage(stones[0]);
             WHITE_STONE.setImage(stones[1]);
             WHITE_HOVER.setImage(stones[1]);
+
+            CIRCLE_MARK_ON_BLACK.setImage(circleMarks[0]);
+            CIRCLE_MARK_ON_WHITE.setImage(circleMarks[1]);
+            TRIANGLE_MARK_ON_BLACK.setImage(triangleMarks[0]);
+            TRIANGLE_MARK_ON_WHITE.setImage(triangleMarks[1]);
+            SQUARE_MARK_ON_BLACK.setImage(squareMarks[0]);
+            SQUARE_MARK_ON_WHITE.setImage(squareMarks[1]);
         }
 
         /**

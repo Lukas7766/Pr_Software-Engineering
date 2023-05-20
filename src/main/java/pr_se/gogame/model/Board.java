@@ -56,7 +56,7 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode) {
+    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save) {
         // Are the coordinates invalid?
         if (areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
@@ -167,7 +167,7 @@ public class Board implements BoardInterface {
                 if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !killAnother)) && sg.getLiberties().size() == 0) {
                     int captured = 0;
                     for (Position p : sg.getLocations()) {
-                        removeStone(p.X, p.Y);
+                        removeStone(p.X, p.Y, true);
                         captured++;
                         System.out.println("remove: " + p.X + " / " + p.Y);
                     }
@@ -175,8 +175,10 @@ public class Board implements BoardInterface {
                 }
             }
 
-            String saveCol = color == BLACK ? "B" : "W";
-            GAME.getFileSaver().addStone(saveCol, x, y);
+            if(save) {
+                String saveCol = color == BLACK ? "B" : "W";
+                GAME.getFileSaver().addStone(saveCol, x, y);
+            }
         }
 
         // Update UI if possible
@@ -190,13 +192,15 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public void removeStone(int x, int y) {
+    public void removeStone(int x, int y, boolean save) {
         if(areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
         }
 
         board[x][y] = null;
-        GAME.getFileSaver().removeStone(x, y);
+        if(save) {
+            GAME.getFileSaver().removeStone(x, y);
+        }
 
         Set<StoneGroup> surroundingSGs = getSurroundings(
                 x,
@@ -319,10 +323,6 @@ public class Board implements BoardInterface {
     public Game getGAME() {
         return GAME;
     }
-
-    /*public StoneGroupPointer[][] getBoard() {
-        return board;
-    }*/
 
     // TODO: Remove these debug methods
     public void printDebugInfo(int x, int y) {

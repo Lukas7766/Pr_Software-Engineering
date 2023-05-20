@@ -40,18 +40,10 @@ public class AncientChineseRuleset implements Ruleset {
         int scoreBlack = 0;
         int scoreWhite = 0;
 
-        // for (int i = 0; i < board.getBoard().length; i++) {
         for (int i = 0; i < board.getSize(); i++) {
-            // for (int j = 0; j < board.getBoard()[i].length; j++) {
             for (int j = 0; j < board.getSize(); j++) {
-                /*StoneGroupPointer p = board.getBoard()[i][j];
-                if (p == null) continue;
-                StoneGroup stoneGroup = p.getStoneGroup();
-                if (stoneGroup == null) continue;*/
-                //if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.BLACK) {
                 if (board.getColorAt(i, j) == StoneColor.BLACK) {
                     scoreBlack++;
-                // } else if (board.getBoard()[i][j].getStoneGroup().getStoneColor() == StoneColor.WHITE) {
                 } else if (board.getColorAt(i, j) == StoneColor.WHITE) {
                     scoreWhite++;
                 }
@@ -76,11 +68,11 @@ public class AncientChineseRuleset implements Ruleset {
     public void setHandicapStones(Board board, StoneColor beginner , int noStones) {
         switch (noStones) {
             case 9:
-                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true);
+                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true, true);
                 noStones--;                                                     // set remaining no. to 8
             case 8:
-                board.setStone(board.getSize() / 2, 3, board.getGAME().getCurColor(), true);
-                board.setStone(board.getSize() / 2, board.getSize() - 4, beginner, true);
+                board.setStone(board.getSize() / 2, 3, board.getGAME().getCurColor(), true, true);
+                board.setStone(board.getSize() / 2, board.getSize() - 4, beginner, true, true);
                 noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
             default:
                 break;
@@ -88,11 +80,11 @@ public class AncientChineseRuleset implements Ruleset {
 
         switch (noStones) {
             case 7:
-                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
+                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
                 noStones--;
             case 6:
-                board.setStone(board.getSize() - 4, board.getSize() / 2, beginner, true);
-                board.setStone(3, board.getSize() / 2, beginner, true);
+                board.setStone(board.getSize() - 4, board.getSize() / 2, beginner, true, true);
+                board.setStone(3, board.getSize() / 2, beginner, true, true);
                 noStones -= 2;
             default:
                 break;
@@ -100,14 +92,14 @@ public class AncientChineseRuleset implements Ruleset {
 
         switch (noStones) {
             case 5:
-                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true);
+                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true, true);
             case 4:
-                board.setStone(3, 3, board.getGAME().getCurColor(), true);
+                board.setStone(3, 3, board.getGAME().getCurColor(), true, true);
             case 3:
-                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true);
+                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true, true);
             case 2:
-                board.setStone(board.getSize() - 4, 3, beginner, true);
-                board.setStone(3, board.getSize() - 4, beginner, true);
+                board.setStone(board.getSize() - 4, 3, beginner, true, true);
+                board.setStone(3, board.getSize() - 4, beginner, true, true);
             default:
                 break;
         }
