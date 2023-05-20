@@ -232,13 +232,16 @@ public class BoardPane extends GridPane {
         add(corner1, 0, 0);
         BoardCell corner2 = new BoardCell(this.outerCorner);
         corner2.getLabel().setVisible(false);
+        corner2.getTile().setRotate(90);
         add(corner2, size + 1, 0);
         BoardCell corner3 = new BoardCell(this.outerCorner);
         corner3.getLabel().setVisible(false);
-        add(corner3, 0, size + 1);
+        corner3.getTile().setRotate(180);
+        add(corner3, size + 1, size + 1);
         BoardCell corner4 = new BoardCell(this.outerCorner);
         corner4.getLabel().setVisible(false);
-        add(corner4, size + 1, size + 1);
+        corner4.getTile().setRotate(270);
+        add(corner4, 0, size + 1);
 
         // populate the coordinate axes
         for (int i = 0; i < this.size; i++) {
@@ -247,6 +250,13 @@ public class BoardPane extends GridPane {
             t.getLabel().setText("" + (char)('A' + i));
             t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
             add(t, i + 1, 0);
+
+            // right
+            BoardCell r = new BoardCell(this.outerEdge);
+            r.getLabel().setText("" + (size - i));
+            r.getLabel().setAlignment(Pos.CENTER_LEFT);
+            r.getTile().setRotate(90);
+            add(r, size + 1, i + 1);
 
             // bottom
             BoardCell b = new BoardCell(this.outerEdge);
@@ -258,13 +268,8 @@ public class BoardPane extends GridPane {
             BoardCell l = new BoardCell(this.outerEdge);
             l.getLabel().setText("" + (size - i));
             l.getLabel().setAlignment(Pos.CENTER_RIGHT);
+            l.getTile().setRotate(90);
             add(l, 0, i + 1);
-
-            // right
-            BoardCell r = new BoardCell(this.outerEdge);
-            r.getLabel().setText("" + (size - i));
-            r.getLabel().setAlignment(Pos.CENTER_LEFT);
-            add(r, size + 1, i + 1);
         }
 
         // Fill the grid with tiles
@@ -286,6 +291,26 @@ public class BoardPane extends GridPane {
                 }
                 add(bc, j + 1, i + 1);
             }
+        }
+
+        // Update the corner and edge tiles to use the proper backgrounds
+        getPlayableCell(0, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
+        getPlayableCell(this.size - 1, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, this.size - 1).getTile().setRotate(180);
+        getPlayableCell(0, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(0, this.size - 1).getTile().setRotate(270);
+
+
+        for(int i = 1; i < this.size - 1; i++) {
+            getPlayableCell(i, 0).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).getTile().setRotate(90);
+            getPlayableCell(i, this.size - 1).setBackgroundImage(tileEdge);
+            getPlayableCell(i, this.size - 1).getTile().setRotate(180);
+            getPlayableCell(0, i).setBackgroundImage(tileEdge);
+            getPlayableCell(0, i).getTile().setRotate(270);
         }
 
         // Set up listeners
@@ -385,6 +410,7 @@ public class BoardPane extends GridPane {
         for(int i = 0; i < 4; i++) {
             BoardCell bc = (BoardCell)getChildren().get(i);
             bc.setBackgroundImage(outerCorner);
+            bc.getTile().setRotate(90 * i);
         }
 
         for(int i = 0; i < size; i++) {
@@ -392,11 +418,31 @@ public class BoardPane extends GridPane {
             for(int j = 0; j < 4; j++) {
                 BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
                 bc.setBackgroundImage(outerEdge);
+                bc.getTile().setRotate(90 * (j % 2));
             }
             // center
             for(int j = 0; j < size; j++) {
-                getPlayableCell(j, i).updateImages();
+                getPlayableCell(j, i).updateImages(tile);
             }
+        }
+
+        // Update the corner and edge tiles to use the proper backgrounds
+        getPlayableCell(0, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
+        getPlayableCell(this.size - 1, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, this.size - 1).getTile().setRotate(180);
+        getPlayableCell(0, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(0, this.size - 1).getTile().setRotate(270);
+
+        for(int i = 1; i < this.size - 1; i++) {
+            getPlayableCell(i, 0).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).getTile().setRotate(90);
+            getPlayableCell(i, this.size - 1).setBackgroundImage(tileEdge);
+            getPlayableCell(i, this.size - 1).getTile().setRotate(180);
+            getPlayableCell(0, i).setBackgroundImage(tileEdge);
+            getPlayableCell(0, i).getTile().setRotate(270);
         }
     }
 
@@ -520,6 +566,11 @@ public class BoardPane extends GridPane {
      */
     private class BoardCell extends StackPane {
         /**
+         * Instance of the background image
+         */
+        private final ResizableImageView TILE;
+
+        /**
          * the Label to be displayed by this BoardCell
          */
         protected final Label LABEL;
@@ -529,6 +580,10 @@ public class BoardPane extends GridPane {
          * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
          */
         private BoardCell(Image tile) {
+            this.TILE = getCellImageView(tile);
+            getChildren().add(this.TILE);
+            this.TILE.setVisible(true);
+
             this.LABEL = new Label("0");
             this.LABEL.setMinSize(0, 0);
             this.LABEL.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -537,9 +592,9 @@ public class BoardPane extends GridPane {
             FONT_SIZE.bind(this.LABEL.widthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty())));
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
 
-            getChildren().add(this.LABEL);
+            updateLabelColor();
 
-            setBackgroundImage(tile);
+            getChildren().add(this.LABEL);
 
             this.setMinSize(0, 0);
             prefWidthProperty().bind(MAX_CELL_DIM_INT);
@@ -553,30 +608,34 @@ public class BoardPane extends GridPane {
          * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
          */
         public void setBackgroundImage(Image tile) {
-            BackgroundSize bgSz = new BackgroundSize(
-                100,     // width
-                100,        // height
-                true,       // widthAsPercentage
-                true,       // heightAsPercentage
-                false,      // contain
-                true        // cover
-            );
-            BackgroundImage bgImg = new BackgroundImage(
-                tile,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                bgSz
-            );
-            this.setBackground(new Background(bgImg));
+            TILE.setImage(tile);
             updateLabelColor();
         }
 
         /**
+         * Returns the background ResizableImageView used by this cell
+         * @return the background ResizableImageView of this cell
+         */
+        public ResizableImageView getTile() {
+            return TILE;
+        }
+
+        // Getters
+        public Label getLabel() {
+            return LABEL;
+        }
+
+        // Private methods
+        /**
+         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
+         * @param i the image to be instantiated
+         * @return a properly instantiated instance of the provided Image
+         */
+        /**
          * Sets the text color of this BoardCell's label to the inverse of its background tile's center color
          */
         private void updateLabelColor() {
-            Image bgImg = getBackground().getImages().get(0).getImage();
+            Image bgImg = TILE.getImage();
 
             PixelReader p = bgImg.getPixelReader();
             if(p == null) {
@@ -587,9 +646,18 @@ public class BoardPane extends GridPane {
             );
         }
 
-        // Getters
-        public Label getLabel() {
-            return LABEL;
+        protected ResizableImageView getCellImageView(Image i) {
+            if(i == null) {
+                throw new NullPointerException();
+            }
+
+            ResizableImageView iv = new ResizableImageView(i);
+            iv.setPreserveRatio(true);
+            iv.setMouseTransparent(true);
+            iv.setSmooth(false);
+            iv.setVisible(false);
+
+            return iv;
         }
     } // private class BoardCell
 
@@ -744,7 +812,7 @@ public class BoardPane extends GridPane {
          * Changes all Images used by this PlayableBoardCell to the current global Images from the graphics pack.
          * Call this for each PlayableBoardCell after loading a different graphics pack
          */
-        public void updateImages() {
+        public void updateImages(Image tile) {
             setBackgroundImage(tile);
             if(CURRENTLY_SET_STONE != null) {
                 if(CURRENTLY_SET_STONE == BLACK_STONE) {
@@ -889,25 +957,6 @@ public class BoardPane extends GridPane {
                 updateLabelColor();
                 LABEL.setVisible(true);
             }
-        }
-
-        /**
-         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
-         * @param i the image to be instantiated
-         * @return a properly instantiated instance of the provided Image
-         */
-        private ResizableImageView getCellImageView(Image i) {
-            if(i == null) {
-                throw new NullPointerException();
-            }
-
-            ResizableImageView iv = new ResizableImageView(i);
-            iv.setPreserveRatio(true);
-            iv.setMouseTransparent(true);
-            iv.setSmooth(false);
-            iv.setVisible(false);
-
-            return iv;
         }
 
         /**
