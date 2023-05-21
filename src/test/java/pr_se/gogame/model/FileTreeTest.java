@@ -71,6 +71,11 @@ class FileTreeTest {
     }
 
     @Test
+    void addStone(){
+        //TODO
+    }
+
+    @Test
     void addComment(){
         //TODO
     }

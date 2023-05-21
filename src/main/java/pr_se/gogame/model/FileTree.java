@@ -59,6 +59,19 @@ public class FileTree {
     }
 
     /**
+     * adds a stone into the tree
+     * @param color The stone color
+     * @param xCoord the x coordinate for the move
+     * @param yCoord the y coordinate for the move
+     */
+    public void addStone (StoneColor color, int xCoord, int yCoord){
+        switch (color){
+            case WHITE -> addMove(SgfToken.W,xCoord,yCoord);
+            case BLACK -> addMove(SgfToken.B,xCoord,yCoord);
+        }
+    }
+
+    /**
      * Adds a comment into the file tree
      * @param comment The comment to add as String
      */
