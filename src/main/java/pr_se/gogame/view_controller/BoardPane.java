@@ -9,7 +9,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
+import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.StoneColor;
@@ -109,9 +111,24 @@ public class BoardPane extends GridPane {
     private PlayableBoardCell selectionPBC = null;
 
     /**
+     * the currently hovered PlayableBoardCell (only necessary for keyboard controls)
+     */
+    private PlayableBoardCell hoverPBC = null;
+
+    /**
      * NumberBinding for the width and height of all BoardCells
      */
     private NumberBinding MAX_CELL_DIM_INT;
+
+    /**
+     * X index for keyboard controls
+     */
+    private int keyboardCellX = -1;
+
+    /**
+     * Y index for keyboard controls
+     */
+    private int keyboardCellY = -1;
 
     // TODO: Remove in final product (or maybe not)
     private final boolean debug = false;
@@ -315,18 +332,85 @@ public class BoardPane extends GridPane {
         }
 
         // Set up listeners
-        // If this is active, dragging from within this BoardPane but outside the actual playble board works (might be desirable)
+        // If this is active, dragging from within this BoardPane but outside the actual playable board works (might be desirable)
         /*setOnDragDetected((e) -> {
             startFullDrag();
         });*/
 
         setOnKeyPressed((e) -> {
-            // TODO: Keyboard input?
+            System.out.println(e.getCode() + " PRESSED");
+
+            if(keyboardCellX < 0 || keyboardCellY < 0) {
+                if(selectionPBC == null) {
+                    keyboardCellX = 0;
+                    keyboardCellY = 0;
+                } else {
+                    keyboardCellX = getColumnIndex(selectionPBC) - 1;
+                    keyboardCellY = getRowIndex(selectionPBC) - 1;
+                }
+            }
+
+            boolean hasMoved = false;
+
+            switch(e.getCode()) {
+                case W:
+                case I:
+                case UP:
+                    if(keyboardCellY > 0) {
+                        keyboardCellY--;
+                    }
+                    hasMoved = true;
+                    break;
+
+                case S:
+                case K:
+                case DOWN:
+                    if(keyboardCellY < size - 1) {
+                        keyboardCellY++;
+                    }
+                    hasMoved = true;
+                    break;
+
+                case A:
+                case J:
+                case LEFT:
+                    if(keyboardCellX > 0) {
+                        keyboardCellX--;
+                    }
+                    hasMoved = true;
+                    break;
+
+                case D:
+                case L:
+                case RIGHT:
+                    if(keyboardCellX < size - 1) {
+                        keyboardCellX++;
+                    }
+                    hasMoved = true;
+                    break;
+
+                case ENTER:
+                case SPACE:
+                    if(hoverPBC != null) {
+                        hoverPBC.select();
+                    }
+                    break;
+                default: break;
+            }
+
+            if(hasMoved) {
+                if(hoverPBC != null && hoverPBC != selectionPBC) {
+                    hoverPBC.unhover();
+                }
+                hoverPBC = getPlayableCell(keyboardCellX, keyboardCellY);
+                hoverPBC.hover();
+            }
         });
 
 
         // Layout of this BoardPane
         setAlignment(Pos.CENTER);
+        requestFocus();
     }
 
     /*
@@ -814,43 +898,33 @@ public class BoardPane extends GridPane {
             });*/
 
             setOnMouseEntered((e) -> {
-                if (game.getCurColor() == BLACK) {
-                    hoverBlack();
-                } else {
-                    hoverWhite();
-                }
+                keyboardCellX = getColumnIndex(this) - 1;
+                keyboardCellY = getRowIndex(this) - 1;
+
+                hover();
             });
 
             setOnMouseDragEntered(getOnMouseEntered());
 
             setOnMouseExited((e) -> {
                 unhover();
+
+                /*
+                 *  Doing this ensures that if the mouse leaves the playing field, the keyboard controls resume at
+                 *  the default location of 0/0. Consequently, removing these lines means that keyboard controls resume
+                 *  where the mouse was last on the board, which MIGHT be desirable.
+                 */
+                keyboardCellX = -1;
+                keyboardCellY = -1;
             });
 
             setOnMouseDragExited(getOnMouseExited());
 
             setOnMouseClicked((e) -> {
                 if(e.getButton() == MouseButton.PRIMARY) {
-                    if (selectionPBC != null) {
-                        selectionPBC.deselect();
-                    }
-                    selectionPBC = this;
-
-                    if (game.getCurColor() == BLACK) {
-                        selectBlack();
-                    } else {
-                        selectWhite();
-                    }
-
-                    if (!needsMoveConfirmation) {
-                        confirmMove();
-                    }
+                    select();
                 } else {
-                    if(!isCircleMarked) {
-                        markCircle();
-                    } else {
-                        unMark();
-                    }
+                    toggleCircleMark();
                 }
             });
 
@@ -929,10 +1003,27 @@ public class BoardPane extends GridPane {
          * @param iv the ImageView to be displayed
          */
         private void hover(ImageView iv) {
-            unhover();              // might be unnecessary
+            unhover();                      // might be unnecessary
+            if(hoverPBC != null) {
+                hoverPBC.unhover();             // necessary due to keyboard controls
+                hoverPBC = null;
+            }
             if(CURRENTLY_SET_STONE == null && !isSelected) {
                 iv.setOpacity(0.5);
                 iv.setVisible(true);
+            }
+            hoverPBC = this;
+        }
+
+        /**
+         * Makes this PlayableBoardCell display a translucent version of the current player color to indicate that it is
+         * being hovered over and can be selected with a left click
+         */
+        private void hover() {
+            if (game.getCurColor() == BLACK) {
+                hoverBlack();
+            } else {
+                hoverWhite();
             }
         }
 
@@ -966,10 +1057,27 @@ public class BoardPane extends GridPane {
          * @param iv the ImageView that is to be displayed
          */
         private void select(ImageView iv) {
+            if (selectionPBC != null) {
+                selectionPBC.deselect();
+            }
+            selectionPBC = this;
+
             deselect();             // might be unnecessary
             iv.setOpacity(0.75);
             iv.setVisible(true);
             isSelected = true;
+
+            if (!needsMoveConfirmation) {
+                confirmMove();
+            }
+        }
+
+        private void select() {
+            if (game.getCurColor() == BLACK) {
+                selectBlack();
+            } else {
+                selectWhite();
+            }
         }
 
         /**
@@ -1075,6 +1183,14 @@ public class BoardPane extends GridPane {
             isTriangleMarked = false;
             unMark(TRIANGLE_MARK_ON_EMPTY, SQUARE_MARK_ON_BLACK, SQUARE_MARK_ON_WHITE);
             isSquareMarked = false;
+        }
+
+        public void toggleCircleMark() {
+            if(isCircleMarked) {
+                unMark();
+            } else {
+                markCircle();
+            }
         }
 
         /**
