@@ -5,7 +5,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 
 public class newFileSaver {
-    //TODO: closing bracket when saving
     private Path path;
     String buffer;
 

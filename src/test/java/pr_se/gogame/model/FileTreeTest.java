@@ -3,6 +3,7 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -13,7 +14,7 @@ class FileTreeTest {
 
     @BeforeEach
     void setUp() {
-        tree = new FileTree(9, "Black", "White");
+        tree = new FileTree(9);
 
         tree.addName(StoneColor.WHITE, "White");
         tree.addName(StoneColor.BLACK, "Black");
@@ -64,15 +65,53 @@ class FileTreeTest {
         black.add(FileTree.calculateCoordinate(9, 1, 0));
         black.add(FileTree.calculateCoordinate(9, 1, 1));
 
-        tree.addStonesBeforeGame(white,black);
-        assertEquals(";AW[ai][ah]",tree.getCurrent().getPrevious().getToken());
-        assertEquals("AB[bi][bh]",tree.getCurrent().getToken());
+        tree.addStonesBeforeGame(white, black);
+        assertEquals(";AW[ai][ah]", tree.getCurrent().getPrevious().getToken());
+        assertEquals("AB[bi][bh]", tree.getCurrent().getToken());
     }
 
     @Test
-    void fileTreeToString(){
-        tree.addNode(SgfToken.B,FileTree.calculateCoordinate(9,2,3));
-        System.out.println(tree.toString());
+    void addComment(){
+        //TODO
+    }
+
+    @Test
+    void addLabelForCoordinate(){
+        //TODO
+    }
+
+    @Test
+    void markACoordinate(){
+        //TODO
+    }
+
+    @Test
+    void addName(){
+        //TODO
+    }
+
+    @Test
+    void removeStone(){
+        //TODO
+    }
+
+    @Test
+    void addKomi(){
+        //TODO
+    }
+
+    @Test
+    void calculateCoordinates(){
+        //TODO
+    }
+
+    @Test
+    void fileTreeToString() {
+        String expectFirst = "(;FF[4]GM[1]SZ[9]\r\nPW[White]\r\nPB[Black]\r\n;B[ai];W[ah];B[bi];W[bh])";
+        String expectSecond = "(;FF[4]GM[1]SZ[9]\r\nPW[White]\r\nPB[Black]\r\n;B[ai];W[ah];B[bi];W[bh]\r\n;B[ai])";
+        assertEquals(expectFirst, tree.toString());
+        tree.addMove(SgfToken.B, 0, 0);
+        assertEquals(expectSecond,tree.toString());
     }
 
 }
