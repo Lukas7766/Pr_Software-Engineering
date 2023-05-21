@@ -82,17 +82,17 @@ public class BoardPane extends GridPane {
     /**
      * Image used for circle marks
      */
-    private final Image[] circleMarks = new Image[2];
+    private final Image[] circleMarks = new Image[3];
 
     /**
      * Image used for triangle marks
      */
-    private final Image[] triangleMarks = new Image[2];
+    private final Image[] triangleMarks = new Image[3];
 
     /**
      * Image used for square marks
      */
-    private final Image[] squareMarks = new Image[2];
+    private final Image[] squareMarks = new Image[3];
 
     /**
      * Background Image (not to be confused with BackgroundImage) for the BoardPane's outer edges
@@ -483,10 +483,13 @@ public class BoardPane extends GridPane {
             ZipEntry stone1Entry = zip.getEntry("stone_1.png");
             ZipEntry circleMark0Entry = zip.getEntry("mark_circle_0.png");
             ZipEntry circleMark1Entry = zip.getEntry("mark_circle_1.png");
+            ZipEntry circleMark2Entry = zip.getEntry("mark_circle_2.png");
             ZipEntry triangleMark0Entry = zip.getEntry("mark_triangle_0.png");
             ZipEntry triangleMark1Entry = zip.getEntry("mark_triangle_1.png");
+            ZipEntry triangleMark2Entry = zip.getEntry("mark_triangle_2.png");
             ZipEntry squareMark0Entry = zip.getEntry("mark_square_0.png");
             ZipEntry squareMark1Entry = zip.getEntry("mark_square_1.png");
+            ZipEntry squareMark2Entry = zip.getEntry("mark_square_2.png");
 
             if(Stream.of(tileEntry,
                     tileCornerEntry,
@@ -497,10 +500,13 @@ public class BoardPane extends GridPane {
                     stone1Entry,
                     circleMark0Entry,
                     circleMark1Entry,
+                    circleMark2Entry,
                     triangleMark0Entry,
                     triangleMark1Entry,
+                    triangleMark2Entry,
                     squareMark0Entry,
-                    squareMark1Entry
+                    squareMark1Entry,
+                    squareMark2Entry
                 ).anyMatch(Objects::isNull)) {
                 throw new IllegalStateException("ERROR: Graphics pack " + graphicsPath + " is missing files!");
             }
@@ -514,10 +520,13 @@ public class BoardPane extends GridPane {
                  InputStream stone1IS = zip.getInputStream(stone1Entry);
                  InputStream circleMark0IS = zip.getInputStream(circleMark0Entry);
                  InputStream circleMark1IS = zip.getInputStream(circleMark1Entry);
+                 InputStream circleMark2IS = zip.getInputStream(circleMark2Entry);
                  InputStream triangleMark0IS = zip.getInputStream(triangleMark0Entry);
                  InputStream triangleMark1IS = zip.getInputStream(triangleMark1Entry);
+                 InputStream triangleMark2IS = zip.getInputStream(triangleMark2Entry);
                  InputStream squareMark0IS = zip.getInputStream(squareMark0Entry);
-                 InputStream squareMark1IS = zip.getInputStream(squareMark1Entry)
+                 InputStream squareMark1IS = zip.getInputStream(squareMark1Entry);
+                 InputStream squareMark2IS = zip.getInputStream(squareMark2Entry)
             ) {
                 final int DEFAULT_IMAGE_SIZE = 128;
                 final boolean SMOOTH_IMAGES = false;
@@ -538,12 +547,15 @@ public class BoardPane extends GridPane {
 
                 circleMarks[0] = new Image(circleMark0IS);
                 circleMarks[1] = new Image(circleMark1IS);
+                circleMarks[2] = new Image(circleMark2IS);
 
                 triangleMarks[0] = new Image(triangleMark0IS);
                 triangleMarks[1] = new Image(triangleMark1IS);
+                triangleMarks[2] = new Image(triangleMark2IS);
 
                 squareMarks[0] = new Image(squareMark0IS);
                 squareMarks[1] = new Image(squareMark1IS);
+                squareMarks[2] = new Image(squareMark2IS);
             } catch (Exception e) {
                 System.err.println("ERROR: Couldn't read file from graphics pack " + graphicsPath + "!");
                 e.printStackTrace();
@@ -772,17 +784,17 @@ public class BoardPane extends GridPane {
             this.WHITE_STONE = getCellImageView(stones[1]);
             getChildren().add(this.WHITE_STONE);
 
-            this.CIRCLE_MARK_ON_BLACK = getCellImageView(circleMarks[0]);
+            this.CIRCLE_MARK_ON_BLACK = getCellImageView(circleMarks[2]);
             getChildren().add(this.CIRCLE_MARK_ON_BLACK);
             this.CIRCLE_MARK_ON_WHITE = getCellImageView(circleMarks[1]);
             getChildren().add(this.CIRCLE_MARK_ON_WHITE);
 
-            this.TRIANGLE_MARK_ON_BLACK = getCellImageView(triangleMarks[0]);
+            this.TRIANGLE_MARK_ON_BLACK = getCellImageView(triangleMarks[2]);
             getChildren().add(this.TRIANGLE_MARK_ON_BLACK);
             this.TRIANGLE_MARK_ON_WHITE = getCellImageView(triangleMarks[1]);
             getChildren().add(this.TRIANGLE_MARK_ON_WHITE);
 
-            this.SQUARE_MARK_ON_BLACK = getCellImageView(squareMarks[0]);
+            this.SQUARE_MARK_ON_BLACK = getCellImageView(squareMarks[2]);
             getChildren().add(this.SQUARE_MARK_ON_BLACK);
             this.SQUARE_MARK_ON_WHITE = getCellImageView(squareMarks[1]);
             getChildren().add(this.SQUARE_MARK_ON_WHITE);
