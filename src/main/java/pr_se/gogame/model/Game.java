@@ -149,7 +149,7 @@ public class Game implements GameInterface {
                 sb.append("Black!").append("\n\n").append("White won!");
                 result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
             }
-            default -> {throw new IllegalArgumentException("Game was not resigned! Consult your application owner!");}
+            default -> {throw new IllegalStateException("Game was not resigned! Consult your application owner!");}
         }
         this.gameResult=result;
         fireGameEvent(new GameEvent(gameCommand));
@@ -292,7 +292,6 @@ public class Game implements GameInterface {
             switchColor();
         } else {
             System.out.println("Move aborted.");
-
         }
     }
 
@@ -415,6 +414,10 @@ public class Game implements GameInterface {
     -> 20230502, SeWa: changed to package private
  */
     void fireGameEvent(GameEvent e) {
+        if(e == null) {
+            throw new NullPointerException();
+        }
+
         for (GameListener l : listeners) {
             l.gameCommand(e);
         }

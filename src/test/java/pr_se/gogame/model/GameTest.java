@@ -2,6 +2,9 @@ package pr_se.gogame.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.view_controller.DebugEvent;
+import pr_se.gogame.view_controller.GameEvent;
+import pr_se.gogame.view_controller.GameListener;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -83,11 +86,32 @@ class GameTest {
         assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(game.getHandicap() + 1));
     }
 
+    @Test
+    void setCurMoveNumberArguments() {
+        assertThrows(IllegalArgumentException.class, () -> game.setCurMoveNumber(0));
+    }
+
+    @Test
+    void setCurColorArguments() {
+        assertThrows(NullPointerException.class, () -> game.setCurColor(null));
+    }
+
+    @Test
+    void fireGameEventArguments() {
+        assertThrows(NullPointerException.class, () -> game.fireGameEvent(null));
+    }
+
     // other tests
 
     @Test
     void initGame() {
-        fail();
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(INIT, e.getGameCommand());
+            }
+        });
+        game.initGame();
     }
 
     @Test
@@ -136,12 +160,48 @@ class GameTest {
 
     @Test
     void resign() {
-        fail();
+        GameListener l1 = new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(WHITE_WON, e.getGameCommand());
+            }
+        };
+        game.addListener(l1);
+        game.resign();
+
+        game.removeListener(l1);
+        game.newGame(WHITE_STARTS, 19, 0);
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(BLACK_WON, e.getGameCommand());
+            }
+        });
+        game.resign();
+
+        assertThrows(IllegalStateException.class, () -> game.resign());
     }
 
     @Test
     void scoreGame() {
-        fail();
+        GameListener l1 = new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(WHITE_WON, e.getGameCommand());
+            }
+        };
+        game.addListener(l1);
+        game.scoreGame();
+
+        game.removeListener(l1);
+        game.newGame(BLACK_STARTS, 19, 9);
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(BLACK_WON, e.getGameCommand());
+            }
+        });
+        game.scoreGame();
     }
 
     @Test
@@ -161,22 +221,46 @@ class GameTest {
 
     @Test
     void addListener() {
-        fail();
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(DEBUG_INFO, e.getGameCommand());
+            }
+        });
+        game.printDebugInfo(0, 0);
     }
 
     @Test
     void removeListener() {
-        fail();
+        GameListener l1 = new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(DEBUG_INFO, e.getGameCommand());
+            }
+        };
+        game.addListener(l1);
+        game.printDebugInfo(0, 0);
+
+        game.removeListener(l1);
+        game.playMove(0, 0);
     }
 
     @Test
     void getGameState() {
-        fail();
+        assertEquals(BLACK_STARTS, game.getGameState());
+        game.playMove(0, 0);
+        assertEquals(WHITE_PLAYS, game.getGameState());
     }
 
     @Test
     void confirmChoice() {
-        fail();
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(CONFIRM_CHOICE, e.getGameCommand());
+            }
+        });
+        game.confirmChoice();
     }
 
     @Test
@@ -249,6 +333,15 @@ class GameTest {
     @Test
     void playMove() {
         assertNull(game.getColorAt(0, 0));
+        game.playMove(0, 0);
+        assertEquals(BLACK, game.getColorAt(0, 0));
+    }
+
+    @Test
+    void abortedMove() {
+        assertNull(game.getColorAt(0, 0));
+        game.playMove(0, 0);
+        assertEquals(BLACK, game.getColorAt(0, 0));
         game.playMove(0, 0);
         assertEquals(BLACK, game.getColorAt(0, 0));
     }
@@ -353,21 +446,38 @@ class GameTest {
 
     @Test
     void getScore() {
-        fail();
+        assertEquals(0, game.getScore(BLACK));
+        assertEquals(game.getRuleset().getKomi(), game.getScore(WHITE));
     }
 
     @Test
     void getGameResult() {
-        fail();
+        game.resign();
+        assertNotNull(game.getGameResult());
     }
 
     @Test
     void fireGameEvent() {
-        fail();
+        GameEvent ge = new DebugEvent(DEBUG_INFO, 0, 0, 0, 0);
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(ge, e);
+            }
+        });
+
+        game.fireGameEvent(ge);
     }
 
     @Test
     void printDebugInfo() {
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(DEBUG_INFO, e.getGameCommand());
+            }
+        });
+
         assertDoesNotThrow(() -> game.printDebugInfo(0, 0));
     }
 

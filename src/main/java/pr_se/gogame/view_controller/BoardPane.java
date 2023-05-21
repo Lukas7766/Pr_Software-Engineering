@@ -1129,6 +1129,7 @@ public class BoardPane extends GridPane {
         private void markCircle() {
             mark(CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
             isCircleMarked = true;
+            // Game.getFileTree().markACoordinate(getColumnIndex(this) - 1, getRowIndex(this) - 1)
         }
 
         /**
