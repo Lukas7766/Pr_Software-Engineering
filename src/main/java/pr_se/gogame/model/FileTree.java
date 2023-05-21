@@ -170,6 +170,8 @@ public class FileTree {
         }
     }
 
+    //TODO: add a stonesbeforegamebuffered which saves into two variables and then use a different to call the addstones before game to save them
+
     /**
      * Prints the current game Tree
      */
