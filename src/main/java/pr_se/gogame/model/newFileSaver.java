@@ -6,9 +6,6 @@ import java.nio.file.Path;
 
 public class newFileSaver {
     private Path path;
-    String buffer;
-
-    //private boolean in_A_Branch;
 
     public newFileSaver(Path path) {
         this.path = path;
@@ -21,14 +18,11 @@ public class newFileSaver {
         this.path = filepath;
     }
 
-    //TODO: File Speichern (static evtl)
-    public boolean saveFile(Path filepath) {
+    public void saveFile(Path filepath,String data) {
         try {
-            Files.write(filepath, buffer.getBytes());
-            return true;
+            Files.write(filepath, data.getBytes());
         } catch (IOException e) {
             System.out.println("File write Error");
-            return false;
         }
     }
 

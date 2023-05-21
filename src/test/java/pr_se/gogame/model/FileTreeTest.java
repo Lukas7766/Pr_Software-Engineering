@@ -59,15 +59,25 @@ class FileTreeTest {
     @Test
     void handicapStoneSet() {
         ArrayList<String> white = new ArrayList<>();
-        white.add(FileTree.calculateCoordinate(9, 0, 0));
-        white.add(FileTree.calculateCoordinate(9, 0, 1));
+        white.add(tree.calculateCoordinates( 0, 0));
+        white.add(tree.calculateCoordinates( 0, 1));
         ArrayList<String> black = new ArrayList<>();
-        black.add(FileTree.calculateCoordinate(9, 1, 0));
-        black.add(FileTree.calculateCoordinate(9, 1, 1));
+        black.add(tree.calculateCoordinates( 1, 0));
+        black.add(tree.calculateCoordinates( 1, 1));
 
         tree.addStonesBeforeGame(white, black);
         assertEquals(";AW[ai][ah]", tree.getCurrent().getPrevious().getToken());
         assertEquals("AB[bi][bh]", tree.getCurrent().getToken());
+    }
+
+    @Test
+    void bufferStonesBeforeGame(){
+        //TODO
+    }
+
+    @Test
+    void insertBufferedStonesBeforeGame(){
+        //TODO
     }
 
     @Test
@@ -109,6 +119,7 @@ class FileTreeTest {
     void calculateCoordinates(){
         //TODO
     }
+
 
     @Test
     void fileTreeToString() {

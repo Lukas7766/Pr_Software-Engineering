@@ -20,6 +20,9 @@ public abstract class Node {
         this.token = String.format(token.getValue(),data);
     }
 
+    public Node(SgfToken token,String coordinates,String letters) {
+        this.token = String.format(token.getValue(),coordinates,letters);
+    }
 
     public int getMoveNumber() {
         return moveNumber;

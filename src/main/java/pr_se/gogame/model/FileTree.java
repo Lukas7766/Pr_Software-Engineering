@@ -23,7 +23,19 @@ public class FileTree {
     private final int boardSize;
 
     /**
+     * Buffer for the white Handicap stones
+     */
+    private ArrayList<String> whiteBuffer = new ArrayList<>();
+
+    /**
+     * Buffer for the black HandicapStones
+     */
+    private ArrayList<String> blackBuffer = new ArrayList<>();
+
+
+    /**
      * The constructor for a File tree
+     *
      * @param boardSize The size of the game board
      */
     public FileTree(int boardSize) {
@@ -37,11 +49,26 @@ public class FileTree {
 
     /**
      * Adds a Node into the File tree
-     * @param token The move that is being saved
-     * @param value the coordinates or the text of the Node
+     *
+     * @param token       The move that is being saved
+     * @param coordinates the coordinates or the text of the Node
      */
-    private void addNode(SgfToken token, String value) {
-        TreeNode newNode = new TreeNode(token, value);
+    private void addNode(SgfToken token, String coordinates) {
+        TreeNode newNode = new TreeNode(token, coordinates);
+        current.setNext(newNode);
+        newNode.setPrevious(current);
+        current = newNode;
+        viewing = current;
+    }
+
+    /**
+     * Adds a Node into the File tree
+     *
+     * @param token       The move that is being saved
+     * @param coordinates the coordinates or the text of the Node
+     */
+    private void addNode(SgfToken token, String coordinates, String letters) {
+        TreeNode newNode = new TreeNode(token, coordinates, letters);
         current.setNext(newNode);
         newNode.setPrevious(current);
         current = newNode;
@@ -50,9 +77,10 @@ public class FileTree {
 
     /**
      * Adds a move into the File tree
+     *
      * @param moveType The token for the move kind
-     * @param xCoord the x coordinate for the move
-     * @param yCoord the y coordinate for the move
+     * @param xCoord   the x coordinate for the move
+     * @param yCoord   the y coordinate for the move
      */
     public void addMove(SgfToken moveType, int xCoord, int yCoord) {
         addNode(moveType, calculateCoordinates(xCoord, yCoord));
@@ -60,19 +88,21 @@ public class FileTree {
 
     /**
      * adds a stone into the tree
-     * @param color The stone color
+     *
+     * @param color  The stone color
      * @param xCoord the x coordinate for the move
      * @param yCoord the y coordinate for the move
      */
-    public void addStone (StoneColor color, int xCoord, int yCoord){
-        switch (color){
-            case WHITE -> addMove(SgfToken.W,xCoord,yCoord);
-            case BLACK -> addMove(SgfToken.B,xCoord,yCoord);
+    public void addStone(StoneColor color, int xCoord, int yCoord) {
+        switch (color) {
+            case WHITE -> addMove(SgfToken.W, xCoord, yCoord);
+            case BLACK -> addMove(SgfToken.B, xCoord, yCoord);
         }
     }
 
     /**
      * Adds a comment into the file tree
+     *
      * @param comment The comment to add as String
      */
     public void addComment(String comment) {
@@ -83,9 +113,10 @@ public class FileTree {
      * Adds a Label for a coordinate
      * Only the first three letters will be used
      * if the Label ist too long
+     *
      * @param label The laben for the coordinate
      */
-    public void addLabelForCoordinate(String label) {
+    public void addLabelForCoordinate(String label, int xCoord, int yCoord) {
         //TODO: which coordinate does this access ? research!
         if (label.length() > 2) {
             addNode(SgfToken.LB, label.substring(0, 2));
@@ -96,6 +127,7 @@ public class FileTree {
 
     /**
      * Marks a specific Coordinate
+     *
      * @param xCoord the x coordinate for the mark
      * @param yCoord the y coordinate for the mark
      */
@@ -106,8 +138,9 @@ public class FileTree {
 
     /**
      * Adds a Name for a player, determined by the stone color
+     *
      * @param playerColor the color for the player
-     * @param name the name for the player
+     * @param name        the name for the player
      */
     public void addName(StoneColor playerColor, String name) {
         switch (playerColor) {
@@ -119,15 +152,17 @@ public class FileTree {
 
     /**
      * Removes a stone by inserting an AE stone on the given coordinate
+     *
      * @param xCoord the x coordinate
      * @param yCoord the y coordinate
      */
-    public void removeStone(int xCoord, int yCoord){
-        addMove(SgfToken.AE,xCoord,yCoord);
+    public void removeStone(int xCoord, int yCoord) {
+        addMove(SgfToken.AE, xCoord, yCoord);
     }
 
     /**
      * Adds the Komi for the game
+     *
      * @param komi the komi to be set
      */
     public void addKomi(int komi) {
@@ -141,12 +176,8 @@ public class FileTree {
      * @param y row of Stone
      * @return The x and y-axis in letter format
      */
-    private String calculateCoordinates(int x, int y) {
+    public String calculateCoordinates(int x, int y) {
         return (char) (x + 97) + String.valueOf((char) (96 + (this.boardSize) - y));
-    }
-
-    public static String calculateCoordinate(int boardSize, int x, int y) {
-        return (char) (x + 97) + String.valueOf((char) (96 + (boardSize) - y));
     }
 
     public void addStonesBeforeGame(ArrayList<String> coordinatesWhite, ArrayList<String> coordinatesBlack) {
@@ -170,7 +201,16 @@ public class FileTree {
         }
     }
 
-    //TODO: add a stonesbeforegamebuffered which saves into two variables and then use a different to call the addstones before game to save them
+    public void bufferStonesBeforeGame(StoneColor color, int xCoord, int yCoord) {
+        switch (color) {
+            case BLACK -> blackBuffer.add(calculateCoordinates(xCoord, yCoord));
+            case WHITE -> whiteBuffer.add(calculateCoordinates(xCoord, yCoord));
+        }
+    }
+
+    public void insertBufferedStonesBeforeGame() {
+        addStonesBeforeGame(whiteBuffer, blackBuffer);
+    }
 
     /**
      * Prints the current game Tree
@@ -201,11 +241,11 @@ public class FileTree {
                 temp = temp.getNext();
             } else {
                 if (count == 4) {
-                    if (temp.getNext() == null){
+                    if (temp.getNext() == null) {
                         sb.append(System.lineSeparator());
                         sb.append(temp);
                         temp = temp.getNext();
-                    }else {
+                    } else {
                         sb.append(temp);
                         sb.append(System.lineSeparator());
                         count = 0;
@@ -214,7 +254,7 @@ public class FileTree {
                 } else {
                     sb.append(temp);
                     count++;
-                    temp=temp.getNext();
+                    temp = temp.getNext();
                 }
             }
         }

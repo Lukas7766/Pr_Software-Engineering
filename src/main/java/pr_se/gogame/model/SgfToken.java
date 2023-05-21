@@ -64,7 +64,7 @@ public enum SgfToken {
     /**
      * label for a coordinate
      */
-    LB("LB[%s]"),
+    LB("LB[%s:%s]"),
     /**
      * The format for the first line of a File
      */

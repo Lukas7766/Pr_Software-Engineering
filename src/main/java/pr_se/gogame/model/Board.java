@@ -312,7 +312,9 @@ public class Board implements BoardInterface {
     }
 
     public boolean saveFile(Path path){
-       return newFileSaver.saveFile(path);
+       //return newFileSaver.saveFile(path);
+        //TODO: include into board
+        return false;
     }
 
     public boolean importFile(Path path){
