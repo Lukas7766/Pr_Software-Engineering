@@ -876,11 +876,14 @@ public class BoardPane extends GridPane {
             WHITE_STONE.setImage(stones[1]);
             WHITE_HOVER.setImage(stones[1]);
 
-            CIRCLE_MARK_ON_BLACK.setImage(circleMarks[0]);
+            CIRCLE_MARK_ON_EMPTY.setImage(circleMarks[0]);
+            CIRCLE_MARK_ON_BLACK.setImage(circleMarks[2]);
             CIRCLE_MARK_ON_WHITE.setImage(circleMarks[1]);
-            TRIANGLE_MARK_ON_BLACK.setImage(triangleMarks[0]);
+            TRIANGLE_MARK_ON_EMPTY.setImage(triangleMarks[0]);
+            TRIANGLE_MARK_ON_BLACK.setImage(triangleMarks[2]);
             TRIANGLE_MARK_ON_WHITE.setImage(triangleMarks[1]);
-            SQUARE_MARK_ON_BLACK.setImage(squareMarks[0]);
+            SQUARE_MARK_ON_EMPTY.setImage(squareMarks[0]);
+            SQUARE_MARK_ON_BLACK.setImage(squareMarks[2]);
             SQUARE_MARK_ON_WHITE.setImage(squareMarks[1]);
         }
 
