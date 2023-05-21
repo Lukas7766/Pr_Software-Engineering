@@ -9,6 +9,7 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
+import javafx.scene.input.MouseButton;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.StoneColor;
@@ -671,6 +672,12 @@ public class BoardPane extends GridPane {
          */
         private boolean isSelected = false;
 
+        private boolean isCircleMarked = false;
+
+        private boolean isTriangleMarked = false;
+
+        private boolean isSquareMarked = false;
+
         /**
          * Instance of the global Image of the Black stone; used for hovering and selection
          */
@@ -692,14 +699,24 @@ public class BoardPane extends GridPane {
         private final ResizableImageView WHITE_STONE;
 
         /**
+         * Instance of the global Image of the circle mark for use on empty cells
+         */
+        private final ResizableImageView CIRCLE_MARK_ON_EMPTY;
+
+        /**
          * Instance of the global Image of the circle mark for use on black stones
          */
         private final ResizableImageView CIRCLE_MARK_ON_BLACK;
 
         /**
-         * Instance of the global Image of the circle mark for use on white stones or empty tiles
+         * Instance of the global Image of the circle mark for use on white stones
          */
         private final ResizableImageView CIRCLE_MARK_ON_WHITE;
+
+        /**
+         * Instance of the global Image of the triangle mark for use on empty cells
+         */
+        private final ResizableImageView TRIANGLE_MARK_ON_EMPTY;
 
         /**
          * Instance of the global Image of the triangle mark for use on black stones
@@ -707,9 +724,14 @@ public class BoardPane extends GridPane {
         private final ResizableImageView TRIANGLE_MARK_ON_BLACK;
 
         /**
-         * Instance of the global Image of the triangle mark for use on white stones or empty tiles
+         * Instance of the global Image of the triangle mark for use on white stones
          */
         private final ResizableImageView TRIANGLE_MARK_ON_WHITE;
+
+        /**
+         * Instance of the global Image of the square mark for use on empty cells
+         */
+        private final ResizableImageView SQUARE_MARK_ON_EMPTY;
 
         /**
          * Instance of the global Image of the square mark for use on black stones
@@ -732,6 +754,13 @@ public class BoardPane extends GridPane {
          */
         private PlayableBoardCell(Image tile) {
             super(tile);
+
+            this.CIRCLE_MARK_ON_EMPTY = getCellImageView(circleMarks[0]);
+            getChildren().add(this.CIRCLE_MARK_ON_EMPTY);
+            this.TRIANGLE_MARK_ON_EMPTY = getCellImageView(triangleMarks[0]);
+            getChildren().add(this.TRIANGLE_MARK_ON_EMPTY);
+            this.SQUARE_MARK_ON_EMPTY = getCellImageView(squareMarks[0]);
+            getChildren().add(this.SQUARE_MARK_ON_EMPTY);
 
             this.BLACK_HOVER = getCellImageView(stones[0]);
             getChildren().add(this.BLACK_HOVER);
@@ -789,19 +818,27 @@ public class BoardPane extends GridPane {
             setOnMouseDragExited(getOnMouseExited());
 
             setOnMouseClicked((e) -> {
-                if (selectionPBC != null) {
-                    selectionPBC.deselect();
-                }
-                selectionPBC = this;
+                if(e.getButton() == MouseButton.PRIMARY) {
+                    if (selectionPBC != null) {
+                        selectionPBC.deselect();
+                    }
+                    selectionPBC = this;
 
-                if(game.getCurColor() == BLACK) {
-                    selectBlack();
+                    if (game.getCurColor() == BLACK) {
+                        selectBlack();
+                    } else {
+                        selectWhite();
+                    }
+
+                    if (!needsMoveConfirmation) {
+                        confirmMove();
+                    }
                 } else {
-                    selectWhite();
-                }
-
-                if(!needsMoveConfirmation) {
-                    confirmMove();
+                    if(!isCircleMarked) {
+                        markCircle();
+                    } else {
+                        unMark();
+                    }
                 }
             });
 
@@ -943,6 +980,8 @@ public class BoardPane extends GridPane {
             WHITE_STONE.setVisible(false);
             LABEL.setVisible(false);
             CURRENTLY_SET_STONE = null;
+
+            updateMarks();
         }
 
         /**
@@ -957,6 +996,103 @@ public class BoardPane extends GridPane {
                 updateLabelColor();
                 LABEL.setVisible(true);
             }
+
+            updateMarks();
+        }
+
+        /**
+         * Marks this PLayableBoardCell with a circle mark
+         */
+        private void markCircle() {
+            mark(CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
+            isCircleMarked = true;
+        }
+
+        /**
+         * Marks this PLayableBoardCell with a triangle mark
+         */
+        private void markTriangle() {
+            mark(TRIANGLE_MARK_ON_EMPTY, TRIANGLE_MARK_ON_BLACK, TRIANGLE_MARK_ON_WHITE);
+            isTriangleMarked = true;
+        }
+
+        /**
+         * Marks this PLayableBoardCell with a square mark
+         */
+        private void markSquare() {
+            mark(SQUARE_MARK_ON_EMPTY, SQUARE_MARK_ON_BLACK, SQUARE_MARK_ON_WHITE);
+            isSquareMarked = true;
+        }
+
+        /**
+         * Marks this PlayableBoardCell with the supplied kind of mark
+         * @param onBlack the ResizableImageView constituting the mark to be used on black stones
+         * @param onWhite the ResizableImageView constituting the mark to be used on white stones or empty spaces
+         */
+        private void mark(ResizableImageView onEmpty, ResizableImageView onBlack, ResizableImageView onWhite) {
+            if(CURRENTLY_SET_STONE  == BLACK_STONE) {
+                onBlack.setVisible(true);
+            } else if(CURRENTLY_SET_STONE == WHITE_STONE) {
+                onWhite.setVisible(true);
+            } else {
+                onEmpty.setVisible(true);
+            }
+        }
+
+        /**
+         * Unmarks this PlayableBoardCell from the supplied kind of mark
+         * @param onBlack the ResizableImageView constituting the mark to be used on black stones
+         * @param onWhite the ResizableImageView constituting the mark to be used on white stones or empty spaces
+         */
+        private void unMark(ResizableImageView onEmpty, ResizableImageView onBlack, ResizableImageView onWhite) {
+            onEmpty.setVisible(false);
+            onWhite.setVisible(false);
+            onBlack.setVisible(false);
+        }
+
+        /**
+         * Unmarks this PLayableBoardCell altogether.
+         */
+        private void unMark() {
+            unMark(CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
+            isCircleMarked = false;
+            unMark(TRIANGLE_MARK_ON_EMPTY, TRIANGLE_MARK_ON_BLACK, TRIANGLE_MARK_ON_WHITE);
+            isTriangleMarked = false;
+            unMark(TRIANGLE_MARK_ON_EMPTY, SQUARE_MARK_ON_BLACK, SQUARE_MARK_ON_WHITE);
+            isSquareMarked = false;
+        }
+
+        /**
+         * Updates whether the marks in question are shown
+         * @param isMarked whether this playableBoardCell is marked thusly
+         * @param onBlack the ResizableImageView constituting the mark to be used on black stones
+         * @param onWhite the ResizableImageView constituting the mark to be used on white stones or empty spaces
+         */
+        private void updateMarks(boolean isMarked, ResizableImageView onEmpty, ResizableImageView onBlack, ResizableImageView onWhite) {
+            if(isMarked) {
+                if(CURRENTLY_SET_STONE == BLACK_STONE) {
+                    onEmpty.setVisible(false);
+                    onBlack.setVisible(true);
+                    onWhite.setVisible(false);
+                } else if(CURRENTLY_SET_STONE == WHITE_STONE) {
+                    onEmpty.setVisible(false);
+                    onBlack.setVisible(false);
+                    onWhite.setVisible(true);
+                } else {
+                    onEmpty.setVisible(true);
+                    onBlack.setVisible(false);
+                    onWhite.setVisible(false);
+                }
+            }
+        }
+
+        /**
+         * Updates all marks on this PLayableBoardCell.
+         */
+        private void updateMarks() {
+            updateMarks(isCircleMarked, CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
+            updateMarks(isTriangleMarked, TRIANGLE_MARK_ON_EMPTY, TRIANGLE_MARK_ON_BLACK, TRIANGLE_MARK_ON_WHITE);
+            updateMarks(isSquareMarked, SQUARE_MARK_ON_EMPTY, SQUARE_MARK_ON_BLACK, SQUARE_MARK_ON_WHITE);
         }
 
         /**
