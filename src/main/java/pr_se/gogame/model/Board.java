@@ -178,6 +178,13 @@ public class Board implements BoardInterface {
             if(save) {
                 String saveCol = color == BLACK ? "B" : "W";
                 GAME.getFileSaver().addStone(saveCol, x, y);
+                /*
+                 * if(prepareMode) {
+                 *      GAME.getFileTree().bufferStonesBeforeGame(color, x, y);
+                 * } else {
+                 *      GAME.getFileTree().addStone(color, x, y);
+                 * }
+                 */
             }
         }
 
@@ -200,6 +207,7 @@ public class Board implements BoardInterface {
         board[x][y] = null;
         if(save) {
             GAME.getFileSaver().removeStone(x, y);
+            // GAME.getFileTree().removeStone(x, y);
         }
 
         Set<StoneGroup> surroundingSGs = getSurroundings(

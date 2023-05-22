@@ -300,6 +300,7 @@ public class Game implements GameInterface {
         board.setStone(x, y, curColor, true, true);
         handicapStoneCounter--;
         if (handicapStoneCounter == 0) {
+            // fileTree.insertBufferedStonesBeforeGame();
             switchColor();
         } else if (handicapStoneCounter < 0) {
             throw new IllegalStateException();
