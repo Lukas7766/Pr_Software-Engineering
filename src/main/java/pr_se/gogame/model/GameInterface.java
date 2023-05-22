@@ -75,7 +75,7 @@ public interface GameInterface {
 
     Ruleset getRuleset();
 
-    FileSaver getFileSaver();
+    FileTree getFileTree();
 
     /*
      *  Note by Gerald: I simply added this to GameInterface so that BoardPane could exclusively talk to Game, reducing

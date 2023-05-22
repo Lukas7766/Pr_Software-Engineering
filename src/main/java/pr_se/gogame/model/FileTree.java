@@ -1,5 +1,6 @@
 package pr_se.gogame.model;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 public class FileTree {
@@ -32,6 +33,7 @@ public class FileTree {
      */
     private ArrayList<String> blackBuffer = new ArrayList<>();
 
+    private FileHandler fileHandler = new FileHandler();
 
     /**
      * The constructor for a File tree
@@ -44,6 +46,12 @@ public class FileTree {
         current.setPrevious(start);
         this.boardSize = boardSize;
         this.viewing = current;
+    }
+
+    public FileTree(int boardSize,String namePlayerBlack,String namePlayerWhite) {
+        this(boardSize);
+        addName(StoneColor.BLACK,namePlayerBlack);
+        addName(StoneColor.WHITE,namePlayerWhite);
     }
 
 
@@ -268,6 +276,10 @@ public class FileTree {
 
     public StartNode getStart() {
         return start;
+    }
+
+    public boolean saveFile(Path path){
+        return fileHandler.saveFile(path,toString());
     }
 
     //Methods vor viewing

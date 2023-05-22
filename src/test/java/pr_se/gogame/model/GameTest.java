@@ -293,7 +293,7 @@ class GameTest {
 
     @Test
     void getFileSaver() {
-        assertNotNull(game.getFileSaver());
+        assertNotNull(game.getFileTree());
     }
 
     @Test

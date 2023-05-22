@@ -18,11 +18,13 @@ public class FileHandler {
         this.path = filepath;
     }
 
-    public void saveFile(Path filepath,String data) {
+    public boolean saveFile(Path filepath,String data) {
         try {
             Files.write(filepath, data.getBytes());
+            return true;
         } catch (IOException e) {
             System.out.println("File write Error");
+            return false;
         }
     }
 

@@ -23,7 +23,7 @@ public class Game implements GameInterface {
     private boolean demoMode = false;
 
     //global (helper) variables
-    private FileSaver fileSaver;
+    private FileTree fileTree;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private Board board;
@@ -68,7 +68,7 @@ public class Game implements GameInterface {
             default -> throw new IllegalArgumentException();
         }
 
-        this.fileSaver = new FileSaver("Black", "White", String.valueOf(size));
+        this.fileTree = new FileTree(size,"Black", "White");
         this.gameCommand = gameCommand;
         this.size = size;
         this.handicap = handicap;
@@ -86,7 +86,7 @@ public class Game implements GameInterface {
 
     @Override
     public boolean saveGame(Path path) {
-        return true;
+        return exportGame(path);
     }
 
     @Override
@@ -99,22 +99,12 @@ public class Game implements GameInterface {
     @Override
     public boolean exportGame(Path path) {
         System.out.println("saved a file");
-        return saveFile(path);
-    }
-
-    /*
-     * Note from Gerald: I moved these out of Board, as the FileSaver saves more than just the board's contents, such as player names,
-     * and most importantly the game tree. Additionally, it just seems a good idea to have all IO connections go through
-     * Game, as it is the "main class" of the model.
-     */
-    //ToDo move competence to importFile methode?? and delete this method when it is not needed anymore
-    public boolean saveFile(Path path) {
-        return fileSaver.saveFile(path);
+        return fileTree.saveFile(path);
     }
 
     //ToDo delete this method when it is not needed anymore??
     public boolean importFile(Path path) {
-        return FileSaver.importFile(path);
+        return true;
     }
 
     @Override
@@ -246,8 +236,8 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public FileSaver getFileSaver() {
-        return fileSaver;
+    public FileTree getFileTree() {
+        return fileTree;
     }
 
     @Override
