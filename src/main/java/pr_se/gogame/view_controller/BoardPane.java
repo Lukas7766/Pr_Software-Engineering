@@ -444,6 +444,22 @@ public class BoardPane extends GridPane {
                     }
                 }
             }
+
+            /*
+             * This part is necessary to ensure that, once a stone has been set, keyboard controls don't originate from
+             * it (as they would if it were still selected). Note that "selectionPBC = null;" must not be moved into
+             * the deselect()-method; otherwise, previous selections will no longer be cleaned up, when clicking
+             * about, as there is no pointer.
+             */
+            selectionPBC.deselect();
+            selectionPBC = null;
+
+            /*
+             * Disable the following lines if you want CONSECUTIVE keyboard controls to originate from the last placed
+             * stone.
+             */
+            keyboardCellX = -1;
+            keyboardCellY = -1;
         }
     }
 
