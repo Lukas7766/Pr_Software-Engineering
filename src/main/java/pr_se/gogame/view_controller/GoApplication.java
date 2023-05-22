@@ -34,6 +34,7 @@ public class GoApplication extends Application {
 
         Button changeGFX = new Button("CGS");
         changeGFX.setOnAction((e) -> bp.setGraphicsPath(path + "inverted.zip"));
+        changeGFX.setFocusTraversable(false);
         //Button toggleCoords = new Button("Toggle Coordinates");
         //toggleCoords.setOnAction((e) -> bp.setShowsCoordinates(!bp.showsCoordinates()));
         //Button toggleMoveNos = new Button("Toggle Move Numbers");
