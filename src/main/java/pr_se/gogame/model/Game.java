@@ -91,8 +91,9 @@ public class Game implements GameInterface {
 
     @Override
     public boolean importGame(Path path) {
-        //TODO: Das board überschreiben od nd
-        return FileSaver.importFile(path);
+        //TODO: Das board überchreiben od nd
+        //return FileSaver.importFile(path);
+        return false;
     }
 
     @Override

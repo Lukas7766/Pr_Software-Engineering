@@ -9,9 +9,8 @@ import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-
-import static pr_se.gogame.model.StoneColor.BLACK;
-import static pr_se.gogame.model.StoneColor.WHITE;
+import static pr_se.gogame.model.StoneColor.*;
+import java.nio.file.Path;
 
 
 /**
