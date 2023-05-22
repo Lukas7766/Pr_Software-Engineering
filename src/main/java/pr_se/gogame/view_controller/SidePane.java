@@ -105,7 +105,6 @@ public class SidePane extends StackPane {
                     break;
                 case BLACK_WON:
                 case WHITE_WON:
-                case DRAW:
                     CustomWinAction.winAction(stage, game);
                     break;
             }

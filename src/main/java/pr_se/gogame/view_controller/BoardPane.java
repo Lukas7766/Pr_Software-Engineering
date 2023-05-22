@@ -202,7 +202,6 @@ public class BoardPane extends GridPane {
                     break;
                 case BLACK_WON:
                 case WHITE_WON:
-                case DRAW:
                     setMouseTransparent(true);
                     break;
                 case CONFIG_CONFIRMATION:

@@ -123,27 +123,12 @@ class GameTest {
     }
 
     @Test
-    void saveGame() {
-        fail();
-    }
-
-    @Test
     void importGame() {
         fail();
     }
 
     @Test
     void exportGame() {
-        fail();
-    }
-
-    @Test
-    void saveFile() {
-        fail();
-    }
-
-    @Test
-    void importFile() {
         fail();
     }
 

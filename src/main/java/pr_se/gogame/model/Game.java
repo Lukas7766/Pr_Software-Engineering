@@ -155,10 +155,8 @@ public class Game implements GameInterface {
 
         if (gameResult.getWinner() == BLACK) {
             this.gameCommand = GameCommand.BLACK_WON;
-        } else if (gameResult.getWinner() == WHITE) {
-            this.gameCommand = GameCommand.WHITE_WON;
         } else {
-            this.gameCommand = GameCommand.DRAW;
+            this.gameCommand = GameCommand.WHITE_WON;
         }
         fireGameEvent(new GameEvent(gameCommand));
     }
