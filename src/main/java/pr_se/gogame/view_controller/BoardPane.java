@@ -389,11 +389,14 @@ public class BoardPane extends GridPane {
                     hasMoved = true;
                     break;
 
-                case ENTER:
                 case SPACE:
                     if(hoverPBC != null) {
                         hoverPBC.select();
                     }
+                    break;
+
+                case ENTER:
+                    confirmMove();
                     break;
                 default: break;
             }
