@@ -1,7 +1,5 @@
 package pr_se.gogame.model;
 
-import javafx.scene.paint.Color;
-
 public class GameResult {
     private final double scoreBlack;
     private final double scoreWhite;

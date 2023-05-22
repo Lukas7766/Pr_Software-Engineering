@@ -42,7 +42,7 @@ class JapaneseRulesetTest {
     @DisplayName("testing predicateKoMove(), repeating move (1,2) causes positive prediction")
     void predicateKoMove() {
         Game game = new Game();
-        game.newGame(GameCommand.BLACKSTARTS, 9, 0);
+        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -66,7 +66,7 @@ class JapaneseRulesetTest {
     @DisplayName("testing predicateKoMove(), must return true if the same move is done twice")
     void getKoMove() {
         Game game = new Game();
-        game.newGame(GameCommand.BLACKSTARTS, 9, 0);
+        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -87,7 +87,7 @@ class JapaneseRulesetTest {
     @DisplayName("testing resetKoMove(), saved KO move must be null after a random move of black")
     void resetKoMove() {
         Game game = new Game();
-        game.newGame(GameCommand.BLACKSTARTS, 9, 0);
+        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -129,7 +129,7 @@ class JapaneseRulesetTest {
         null BLACK WHITE null null null null null null
          */
         Game game = new Game();
-        game.newGame(GameCommand.BLACKSTARTS, 9, 0);
+        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -191,7 +191,7 @@ class JapaneseRulesetTest {
         null null null null null null null null null
          */
         Game game = new Game();
-        game.newGame(GameCommand.BLACKSTARTS, 9, 0);
+        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 

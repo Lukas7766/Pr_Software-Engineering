@@ -34,8 +34,8 @@ public class Board implements BoardInterface {
      */
     private final StoneGroupPointer[][] board;
 
-    private int lastDebugX = 0;
-    private int lastDebugY = 0;
+    private int lastDebugX = -1;
+    private int lastDebugY = -1;
 
     /**
      * Creates a new Board belonging to the specified Game, containing handicap stones of the specified beginner color
@@ -53,21 +53,23 @@ public class Board implements BoardInterface {
 
 
         this.GAME.getRuleset().setHandicapStones(this, beginner, handicap);
-
-
-
     }
 
     @Override
-    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode) {
+    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save) {
         // Are the coordinates invalid?
-        if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
-            throw new IllegalArgumentException();
+        if (areInvalidXYCoordinates(x, y)) {
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+        }
+
+        // is the StoneColor invalid?
+        if(color == null) {
+            throw new NullPointerException();
         }
 
         // Is the space already occupied?
         if (board[x][y] != null) {
-            return false; // TODO: throw a custom exception?
+            return false; // TODO: throw a custom exception? Illegalargument? Generic Exception? Or maybe not if we output it to the user?
         }
 
         //prevent KO
@@ -75,8 +77,7 @@ public class Board implements BoardInterface {
             if(GAME.getRuleset().predicateKoMove(x,y)) {
                 System.out.println("KO move is not allowed");
                 return false;
-            }
-             else {
+            } else {
                 GAME.getRuleset().resetKoMove();
             }
         }
@@ -166,20 +167,25 @@ public class Board implements BoardInterface {
                 if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !killAnother)) && sg.getLiberties().size() == 0) {
                     int captured = 0;
                     for (Position p : sg.getLocations()) {
-                        removeStone(p.X, p.Y);
+                        removeStone(p.X, p.Y, true);
                         captured++;
                         System.out.println("remove: " + p.X + " / " + p.Y);
                     }
-                    GAME.setCapturedStones(color,captured);
+                    GAME.addCapturedStones(color, captured);
                 }
             }
 
-            String saveCol = color == BLACK ? "B" : "W";
-            GAME.getFileSaver().addStone(saveCol, x, y);
-        }
-
-        if (board[x][y] == null) {
-            System.out.println("Stone has gone!");
+            if(save) {
+                String saveCol = color == BLACK ? "B" : "W";
+                GAME.getFileSaver().addStone(saveCol, x, y);
+                /*
+                 * if(prepareMode) {
+                 *      GAME.getFileTree().bufferStonesBeforeGame(color, x, y);
+                 * } else {
+                 *      GAME.getFileTree().addStone(color, x, y);
+                 * }
+                 */
+            }
         }
 
         // Update UI if possible
@@ -193,9 +199,16 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public void removeStone(int x, int y) {
+    public void removeStone(int x, int y, boolean save) {
+        if(areInvalidXYCoordinates(x, y)) {
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+        }
+
         board[x][y] = null;
-        GAME.getFileSaver().removeStone(x, y);
+        if(save) {
+            GAME.getFileSaver().removeStone(x, y);
+            // GAME.getFileTree().removeStone(x, y);
+        }
 
         Set<StoneGroup> surroundingSGs = getSurroundings(
                 x,
@@ -222,17 +235,17 @@ public class Board implements BoardInterface {
      * @param c the StoneColor of the stone that has been set
      */
     private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
-        GameCommand gc = GameCommand.BLACKPLAYS;
+        GameCommand gc = GameCommand.BLACK_PLAYS;
 
         if (prepareMode) {
             if (c == BLACK) {
-                gc = GameCommand.BLACKHANDICAP;
+                gc = GameCommand.BLACK_HANDICAP;
             } else {
-                gc = GameCommand.WHITEHANDICAP;
+                gc = GameCommand.WHITE_HANDICAP;
             }
         } else {
             if (c == WHITE) {
-                gc = GameCommand.WHITEPLAYS;
+                gc = GameCommand.WHITE_PLAYS;
             }
         }
         System.out.println("cur move number: "+GAME.getCurMoveNumber());
@@ -247,9 +260,9 @@ public class Board implements BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      */
     private void fireStoneRemoved(int x, int y) {
-        GameCommand gc = GameCommand.BLACKREMOVED;
+        GameCommand gc = GameCommand.BLACK_HAS_CAPTURED;
         if (GAME.getCurColor() == WHITE) {
-            gc = GameCommand.WHITEREMOVED;
+            gc = GameCommand.WHITE_HAS_CAPTURED;
         }
         StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
 
@@ -276,8 +289,8 @@ public class Board implements BoardInterface {
      * @return a Set of at most four unique elements converted by conversion that are above, below, to the left and right of the provided x and y coordinate and fulfill check
      */
     private Set getSurroundings(int x, int y, Predicate<StoneGroupPointer> check, BiFunction<Integer, Integer, ?> conversion) {
-        if (x < 0 || y < 0 || x >= SIZE || y >= SIZE) {
-            throw new IllegalArgumentException();
+        if (areInvalidXYCoordinates(x, y)) {
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
         }
 
         Set surroundings = new HashSet<>();
@@ -304,6 +317,10 @@ public class Board implements BoardInterface {
     }
 
     public StoneColor getColorAt(int x, int y) {
+        if(areInvalidXYCoordinates(x, y)) {
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+        }
+
         if (board[x][y] != null) {
             return board[x][y].getStoneGroup().getStoneColor();
         } else {
@@ -315,21 +332,12 @@ public class Board implements BoardInterface {
         return GAME;
     }
 
-    public StoneGroupPointer[][] getBoard() {
-        return board;
-    }
-
     // TODO: Remove these debug methods
-
-    public int getLastDebugX() {
-        return lastDebugX;
-    }
-
-    public int getLastDebugY() {
-        return lastDebugY;
-    }
-
     public void printDebugInfo(int x, int y) {
+        if(areInvalidXYCoordinates(x, y)) {
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+        }
+
         if (board[x][y] != null && !(x == lastDebugX && y == lastDebugY)) {
             System.out.println("Group at " + x + ", " + y + ":");
             System.out.println("Liberties: " + board[x][y].getStoneGroup().getLiberties().size());
@@ -338,7 +346,7 @@ public class Board implements BoardInterface {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] != null) {
-                    DebugEvent e = new DebugEvent(GameCommand.DEBUGINFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    DebugEvent e = new DebugEvent(GameCommand.DEBUG_INFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
                     GAME.fireGameEvent(e);
                 }
             }
@@ -346,5 +354,15 @@ public class Board implements BoardInterface {
 
         lastDebugX = x;
         lastDebugY = y;
+    }
+
+    /**
+     * Tests whether these x and y coordinates are within the bounds of the playing field
+     * @param x x coordinate starting at the left
+     * @param y y coordinate starting at the top
+     * @return whether these x and y coordinates are outside the playing field.
+     */
+    private boolean areInvalidXYCoordinates(int x, int y) {
+        return x < 0 || y < 0 || x >= SIZE || y >= SIZE;
     }
 }

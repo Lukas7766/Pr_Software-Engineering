@@ -92,19 +92,19 @@ public class SidePane extends StackPane {
                         this.getChildren().remove(gameInfo);
                     }
                     break;
-                case BLACKSTARTS:
-                case WHITESTARTS:
+                case BLACK_STARTS:
+                case WHITE_STARTS:
                     this.getChildren().remove(gameSetting);
                     this.getChildren().add(gameInfo);
                     break;
-                case CONFIGDEMOMODE:
+                case CONFIG_DEMO_MODE:
                     if (game.isDemoMode()) {
                         this.getChildren().remove(gameSetting);
                         this.getChildren().add(gameInfo);
                     }
                     break;
-                case BLACKWON:
-                case WHITEWON:
+                case BLACK_WON:
+                case WHITE_WON:
                 case DRAW:
                     CustomWinAction.winAction(stage, game);
                     break;
@@ -216,7 +216,7 @@ public class SidePane extends StackPane {
         game.addListener(l -> {
 
             switch (l.getGameCommand()) {
-                case WHITEPLAYS, WHITESTARTS, BLACKPLAYS, BLACKSTARTS-> {
+                case WHITE_PLAYS, WHITE_STARTS, BLACK_PLAYS, BLACK_STARTS -> {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                     switch (game.getCurColor()) {
@@ -224,11 +224,11 @@ public class SidePane extends StackPane {
                         case WHITE -> actualPlayer.setText("White");
                     }
                 }
-                case BLACKWON,WHITEWON -> {
+                case BLACK_WON, WHITE_WON -> {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                 }
-                case CONFIGDEMOMODE -> {
+                case CONFIG_DEMO_MODE -> {
                     if (infoPane.getChildren().contains(explanationBoad)) break;
                     if (game.isDemoMode()) {
                         infoPane.getChildren().add(explanationBoad);
@@ -349,7 +349,7 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            game.newGame(GameCommand.BLACKSTARTS, actualBoardSize, handicap);
+            game.newGame(GameCommand.BLACK_STARTS, actualBoardSize, handicap);
         });
         //colum, row,
         gridPane.add(startGameBtn, 1, 15);

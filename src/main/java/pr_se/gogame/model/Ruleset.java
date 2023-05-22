@@ -80,11 +80,11 @@ public interface Ruleset {
 
         switch (noStones) {
             case 9:
-                board.setStone(SIZE / 2, SIZE / 2, beginner, true);
+                board.setStone(SIZE / 2, SIZE / 2, beginner, true, true);
                 noStones--;                                                     // set remaining no. to 8
             case 8:
-                board.setStone(SIZE / 2, 3, beginner, true);
-                board.setStone(SIZE / 2, SIZE - 4, beginner, true);
+                board.setStone(SIZE / 2, 3, beginner, true, true);
+                board.setStone(SIZE / 2, SIZE - 4, beginner, true, true);
                 noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
             default:
                 break;
@@ -92,11 +92,11 @@ public interface Ruleset {
 
         switch (noStones) {
             case 7:
-                board.setStone(SIZE / 2, SIZE / 2, beginner, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
+                board.setStone(SIZE / 2, SIZE / 2, beginner, true, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
                 noStones--;
             case 6:
-                board.setStone(SIZE - 4, SIZE / 2, beginner, true);
-                board.setStone(3, SIZE / 2, beginner, true);
+                board.setStone(SIZE - 4, SIZE / 2, beginner, true, true);
+                board.setStone(3, SIZE / 2, beginner, true, true);
                 noStones -= 2;
             default:
                 break;
@@ -104,14 +104,15 @@ public interface Ruleset {
 
         switch (noStones) {
             case 5:
-                board.setStone(SIZE / 2, SIZE / 2, beginner, true);
+                board.setStone(SIZE / 2, SIZE / 2, beginner, true, true);
             case 4:
-                board.setStone(3, 3, beginner, true);
+                board.setStone(3, 3, beginner, true, true);
             case 3:
-                board.setStone(SIZE - 4, SIZE - 4, beginner, true);
+                board.setStone(SIZE - 4, SIZE - 4, beginner, true, true);
             case 2:
-                board.setStone(SIZE - 4, 3, beginner, true);
-                board.setStone(3, SIZE - 4, beginner, true);
+                board.setStone(SIZE - 4, 3, beginner, true, true);
+                board.setStone(3, SIZE - 4, beginner, true, true);
+                board.getGAME().switchColor();
             default:
                 break;
         }

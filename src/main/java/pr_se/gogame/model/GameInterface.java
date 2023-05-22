@@ -61,9 +61,9 @@ public interface GameInterface {
 
     void setCurMoveNumber(int curMoveNumber);
 
-    int getCapturedStones(StoneColor color);
+    int getStonesCapturedBy(StoneColor color);
 
-    void setCapturedStones(StoneColor color, int amount);
+    void addCapturedStones(StoneColor color, int amount);
 
     StoneColor getColorAt(int x, int y);
 
@@ -84,8 +84,6 @@ public interface GameInterface {
 
     int getHandicapStoneCounter();
 
-    void setHandicapStoneCounter(int counter); // For rulesets with custom, manually placed handicap stones
-
     //void fireGameEvent(GameEvent e); //delete for getting fireGameEvent package private
 
     double getScore(StoneColor color);
@@ -97,5 +95,7 @@ public interface GameInterface {
     void addListener(GameListener l);
 
     void removeListener(GameListener l);
+
+    void setHandicapStoneCounter(int noStones);
 }
 

@@ -9,6 +9,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.StoneColor;
@@ -58,24 +61,49 @@ public class BoardPane extends GridPane {
     private String graphicsPath;
     
     /**
-     * Background Image (not to be confused with BackgroundImage) for playable BoardCells
+     * Background Image (not to be confused with BackgroundImage) for inner playable BoardCells
      */
     private Image tile;
-    
+
+    /**
+     * Background Image (not to be confused with BackgroundImage) for outer edge playable BoardCells
+     */
+    private Image tileEdge;
+
+    /**
+     * Background Image (not to be confused with BackgroundImage) for outer corner playable BoardCells
+     */
+    private Image tileCorner;
+
+
     /**
      * Image used for the black and white stones
      */
     private final Image[] stones = new Image [2];
-    
+
     /**
-     * Background Image (not to be confused with BackgroundImage) for the BoardPane's edges
+     * Image used for circle marks
      */
-     
-    private Image edge;
+    private final Image[] circleMarks = new Image[3];
+
     /**
-     * Background Image (not to be confused with BackgroundImage) for the BoardPane's corners
+     * Image used for triangle marks
      */
-    private Image corner;
+    private final Image[] triangleMarks = new Image[3];
+
+    /**
+     * Image used for square marks
+     */
+    private final Image[] squareMarks = new Image[3];
+
+    /**
+     * Background Image (not to be confused with BackgroundImage) for the BoardPane's outer edges
+     */
+    private Image outerEdge;
+    /**
+     * Background Image (not to be confused with BackgroundImage) for the BoardPane's outer corners
+     */
+    private Image outerCorner;
 
     /**
      * the currently selected PlayableBoardCell
@@ -83,11 +111,26 @@ public class BoardPane extends GridPane {
     private PlayableBoardCell selectionPBC = null;
 
     /**
+     * the currently hovered PlayableBoardCell (only necessary for keyboard controls)
+     */
+    private PlayableBoardCell hoverPBC = null;
+
+    /**
      * NumberBinding for the width and height of all BoardCells
      */
     private NumberBinding MAX_CELL_DIM_INT;
 
-    // TODO: Remove in final product
+    /**
+     * X index for keyboard controls
+     */
+    private int keyboardCellX = -1;
+
+    /**
+     * Y index for keyboard controls
+     */
+    private int keyboardCellY = -1;
+
+    // TODO: Remove in final product (or maybe not)
     private final boolean debug = false;
 
     /**
@@ -114,8 +157,8 @@ public class BoardPane extends GridPane {
             }
             System.out.println("show move numbers border pane " + showsMoveNumbers);
             switch(e.getGameCommand()) {
-                case BLACKPLAYS:
-                case WHITEPLAYS:
+                case BLACK_PLAYS:
+                case WHITE_PLAYS:
                     if(e instanceof StoneSetEvent) {//TODO: StoneEvent vs GameCommand question
                         System.out.println("StoneSetEvent");
                         StoneSetEvent sse = (StoneSetEvent) e;
@@ -129,24 +172,24 @@ public class BoardPane extends GridPane {
                         }
                     }
                     break;
-                case CONFIRMCHOICE:
+                case CONFIRM_CHOICE:
                     confirmMove();
                     break;
-                case WHITEREMOVED:
-                case BLACKREMOVED:
+                case WHITE_HAS_CAPTURED:
+                case BLACK_HAS_CAPTURED:
                     StoneRemovedEvent sre = (StoneRemovedEvent) e;
                     getPlayableCell(sre.getX(), sre.getY()).unset();
                     break;
                 case INIT:
                     setMouseTransparent(true);
                     break;
-                case WHITESTARTS:
-                case BLACKSTARTS:
+                case WHITE_STARTS:
+                case BLACK_STARTS:
                     setMouseTransparent(false);
                     init();
                     break;
-                case BLACKHANDICAP:
-                case WHITEHANDICAP:
+                case BLACK_HANDICAP:
+                case WHITE_HANDICAP:
                     StoneSetEvent sseH = (StoneSetEvent) e;
                     PlayableBoardCell destBC = getPlayableCell(sseH.getX(), sseH.getY());
 
@@ -157,21 +200,21 @@ public class BoardPane extends GridPane {
                     }
                     destBC.getLabel().setVisible(false);
                     break;
-                case BLACKWON:
-                case WHITEWON:
+                case BLACK_WON:
+                case WHITE_WON:
                 case DRAW:
                     setMouseTransparent(true);
                     break;
-                case CONFIGCONFIRMATION:
+                case CONFIG_CONFIRMATION:
                     setMoveConfirmation(game.isConfirmationNeeded());
                     break;
-                case CONFIGSHOWCOORDINATES:
+                case CONFIG_SHOW_COORDINATES:
                     setShowsCoordinates(game.isShowCoordinates());
                     break;
-                case CONFIGSHOWMOVENUMBERS:
+                case CONFIG_SHOWMOVENUMBERS:
                     setShowsMoveNumbers(game.isShowMoveNumbers());
                     break;
-                case DEBUGINFO:
+                case DEBUG_INFO:
                     DebugEvent de = (DebugEvent) e;
                     getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
                     break;
@@ -202,55 +245,58 @@ public class BoardPane extends GridPane {
         MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM); // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
-        BoardCell corner1 = new BoardCell(this.corner);
+        BoardCell corner1 = new BoardCell(this.outerCorner);
         corner1.getLabel().setVisible(false);
         add(corner1, 0, 0);
-        BoardCell corner2 = new BoardCell(this.corner);
+        BoardCell corner2 = new BoardCell(this.outerCorner);
         corner2.getLabel().setVisible(false);
+        corner2.getTile().setRotate(90);
         add(corner2, size + 1, 0);
-        BoardCell corner3 = new BoardCell(this.corner);
+        BoardCell corner3 = new BoardCell(this.outerCorner);
         corner3.getLabel().setVisible(false);
-        add(corner3, 0, size + 1);
-        BoardCell corner4 = new BoardCell(this.corner);
+        corner3.getTile().setRotate(180);
+        add(corner3, size + 1, size + 1);
+        BoardCell corner4 = new BoardCell(this.outerCorner);
         corner4.getLabel().setVisible(false);
-        add(corner4, size + 1, size + 1);
+        corner4.getTile().setRotate(270);
+        add(corner4, 0, size + 1);
 
         // populate the coordinate axes
         for (int i = 0; i < this.size; i++) {
             // top
-            BoardCell t = new BoardCell(this.edge);
+            BoardCell t = new BoardCell(this.outerEdge);
             t.getLabel().setText("" + (char)('A' + i));
             t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
             add(t, i + 1, 0);
 
+            // right
+            BoardCell r = new BoardCell(this.outerEdge);
+            r.getLabel().setText("" + (size - i));
+            r.getLabel().setAlignment(Pos.CENTER_LEFT);
+            r.getTile().setRotate(90);
+            add(r, size + 1, i + 1);
+
             // bottom
-            BoardCell b = new BoardCell(this.edge);
+            BoardCell b = new BoardCell(this.outerEdge);
             b.getLabel().setText("" + (char)('A' + i));
             b.getLabel().setAlignment(Pos.TOP_CENTER);
             add(b, i + 1, size + 1);
 
             // left
-            BoardCell l = new BoardCell(this.edge);
+            BoardCell l = new BoardCell(this.outerEdge);
             l.getLabel().setText("" + (size - i));
             l.getLabel().setAlignment(Pos.CENTER_RIGHT);
+            l.getTile().setRotate(90);
             add(l, 0, i + 1);
-
-            // right
-            BoardCell r = new BoardCell(this.edge);
-            r.getLabel().setText("" + (size - i));
-            r.getLabel().setAlignment(Pos.CENTER_LEFT);
-            add(r, size + 1, i + 1);
         }
 
         // Fill the grid with tiles
         for(int i = 0; i < this.size; i++) {
             for(int j = 0; j < this.size; j++) {
-                PlayableBoardCell bc = new PlayableBoardCell();
+                PlayableBoardCell bc = new PlayableBoardCell(this.tile);
                 /*
                  * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
                  * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
-                 *
-                 * Note: I changed this to make sure that Game would be the only connection between Model and View/Controller.
                  */
                 StoneColor c = this.game.getColorAt(j, i);
                 if(c != null) {
@@ -265,19 +311,106 @@ public class BoardPane extends GridPane {
             }
         }
 
+        // Update the corner and edge tiles to use the proper backgrounds
+        getPlayableCell(0, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
+        getPlayableCell(this.size - 1, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, this.size - 1).getTile().setRotate(180);
+        getPlayableCell(0, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(0, this.size - 1).getTile().setRotate(270);
+
+
+        for(int i = 1; i < this.size - 1; i++) {
+            getPlayableCell(i, 0).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).getTile().setRotate(90);
+            getPlayableCell(i, this.size - 1).setBackgroundImage(tileEdge);
+            getPlayableCell(i, this.size - 1).getTile().setRotate(180);
+            getPlayableCell(0, i).setBackgroundImage(tileEdge);
+            getPlayableCell(0, i).getTile().setRotate(270);
+        }
+
         // Set up listeners
-        // If this is active, dragging from within this BoardPane but outside the actual playble board works (might be desirable)
+        // If this is active, dragging from within this BoardPane but outside the actual playable board works (might be desirable)
         /*setOnDragDetected((e) -> {
             startFullDrag();
         });*/
 
         setOnKeyPressed((e) -> {
-            // TODO: Keyboard input?
+            System.out.println(e.getCode() + " PRESSED");
+
+            if(keyboardCellX < 0 || keyboardCellY < 0) {
+                if(selectionPBC == null) {
+                    keyboardCellX = 0;
+                    keyboardCellY = 0;
+                } else {
+                    keyboardCellX = getColumnIndex(selectionPBC) - 1;
+                    keyboardCellY = getRowIndex(selectionPBC) - 1;
+                }
+            }
+
+            boolean hasMoved = false;
+
+            switch(e.getCode()) {
+                case W:
+                case I:
+                case UP:
+                    if(keyboardCellY > 0) {
+                        keyboardCellY--;
+                    }
+                    hasMoved = true;
+                    break;
+
+                case S:
+                case K:
+                case DOWN:
+                    if(keyboardCellY < size - 1) {
+                        keyboardCellY++;
+                    }
+                    hasMoved = true;
+                    break;
+
+                case A:
+                case J:
+                case LEFT:
+                    if(keyboardCellX > 0) {
+                        keyboardCellX--;
+                    }
+                    hasMoved = true;
+                    break;
+
+                case D:
+                case L:
+                case RIGHT:
+                    if(keyboardCellX < size - 1) {
+                        keyboardCellX++;
+                    }
+                    hasMoved = true;
+                    break;
+
+                case ENTER:
+                case SPACE:
+                    if(hoverPBC != null) {
+                        hoverPBC.select();
+                    }
+                    break;
+                default: break;
+            }
+
+            if(hasMoved) {
+                if(hoverPBC != null && hoverPBC != selectionPBC) {
+                    hoverPBC.unhover();
+                }
+                hoverPBC = getPlayableCell(keyboardCellX, keyboardCellY);
+                hoverPBC.hover();
+            }
         });
 
 
         // Layout of this BoardPane
         setAlignment(Pos.CENTER);
+        requestFocus();
     }
 
     /*
@@ -311,6 +444,22 @@ public class BoardPane extends GridPane {
                     }
                 }
             }
+
+            /*
+             * This part is necessary to ensure that, once a stone has been set, keyboard controls don't originate from
+             * it (as they would if it were still selected). Note that "selectionPBC = null;" must not be moved into
+             * the deselect()-method; otherwise, previous selections will no longer be cleaned up, when clicking
+             * about, as there is no pointer.
+             */
+            selectionPBC.deselect();
+            selectionPBC = null;
+
+            /*
+             * Disable the following lines if you want CONSECUTIVE keyboard controls to originate from the last placed
+             * stone.
+             */
+            keyboardCellX = -1;
+            keyboardCellY = -1;
         }
     }
 
@@ -361,19 +510,40 @@ public class BoardPane extends GridPane {
 
         for(int i = 0; i < 4; i++) {
             BoardCell bc = (BoardCell)getChildren().get(i);
-            bc.setBackgroundImage(corner);
+            bc.setBackgroundImage(outerCorner);
+            bc.getTile().setRotate(90 * i);
         }
 
         for(int i = 0; i < size; i++) {
             // edges
             for(int j = 0; j < 4; j++) {
                 BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
-                bc.setBackgroundImage(edge);
+                bc.setBackgroundImage(outerEdge);
+                bc.getTile().setRotate(90 * (j % 2));
             }
             // center
             for(int j = 0; j < size; j++) {
-                getPlayableCell(j, i).updateImages();
+                getPlayableCell(j, i).updateImages(tile);
             }
+        }
+
+        // Update the corner and edge tiles to use the proper backgrounds
+        getPlayableCell(0, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
+        getPlayableCell(this.size - 1, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, this.size - 1).getTile().setRotate(180);
+        getPlayableCell(0, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(0, this.size - 1).getTile().setRotate(270);
+
+        for(int i = 1; i < this.size - 1; i++) {
+            getPlayableCell(i, 0).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).getTile().setRotate(90);
+            getPlayableCell(i, this.size - 1).setBackgroundImage(tileEdge);
+            getPlayableCell(i, this.size - 1).getTile().setRotate(180);
+            getPlayableCell(0, i).setBackgroundImage(tileEdge);
+            getPlayableCell(0, i).getTile().setRotate(270);
         }
     }
 
@@ -389,12 +559,12 @@ public class BoardPane extends GridPane {
         return stones;
     }
 
-    public Image getEdge() {
-        return edge;
+    public Image getOuterEdge() {
+        return outerEdge;
     }
 
-    public Image getCorner() {
-        return corner;
+    public Image getOuterCorner() {
+        return outerCorner;
     }
 
     // private methods
@@ -405,20 +575,58 @@ public class BoardPane extends GridPane {
     private void loadGraphics(String graphicsPath) {
         try (ZipFile zip = new ZipFile(graphicsPath)) {
             ZipEntry tileEntry = zip.getEntry("tile.png");
-            ZipEntry cornerEntry = zip.getEntry("corner.png");
-            ZipEntry edgeEntry = zip.getEntry("edge.png");
+            ZipEntry tileCornerEntry = zip.getEntry("tile_corner.png");
+            ZipEntry tileEdgeEntry = zip.getEntry("tile_edge.png");
+            ZipEntry outerCornerEntry = zip.getEntry("outer_corner.png");
+            ZipEntry outerEdgeEntry = zip.getEntry("outer_edge.png");
             ZipEntry stone0Entry = zip.getEntry("stone_0.png");
             ZipEntry stone1Entry = zip.getEntry("stone_1.png");
+            ZipEntry circleMark0Entry = zip.getEntry("mark_circle_0.png");
+            ZipEntry circleMark1Entry = zip.getEntry("mark_circle_1.png");
+            ZipEntry circleMark2Entry = zip.getEntry("mark_circle_2.png");
+            ZipEntry triangleMark0Entry = zip.getEntry("mark_triangle_0.png");
+            ZipEntry triangleMark1Entry = zip.getEntry("mark_triangle_1.png");
+            ZipEntry triangleMark2Entry = zip.getEntry("mark_triangle_2.png");
+            ZipEntry squareMark0Entry = zip.getEntry("mark_square_0.png");
+            ZipEntry squareMark1Entry = zip.getEntry("mark_square_1.png");
+            ZipEntry squareMark2Entry = zip.getEntry("mark_square_2.png");
 
-            if(Stream.of(tileEntry, cornerEntry, edgeEntry, stone0Entry, stone1Entry).anyMatch(Objects::isNull)) {
+            if(Stream.of(tileEntry,
+                    tileCornerEntry,
+                    tileEdgeEntry,
+                    outerCornerEntry,
+                    outerEdgeEntry,
+                    stone0Entry,
+                    stone1Entry,
+                    circleMark0Entry,
+                    circleMark1Entry,
+                    circleMark2Entry,
+                    triangleMark0Entry,
+                    triangleMark1Entry,
+                    triangleMark2Entry,
+                    squareMark0Entry,
+                    squareMark1Entry,
+                    squareMark2Entry
+                ).anyMatch(Objects::isNull)) {
                 throw new IllegalStateException("ERROR: Graphics pack " + graphicsPath + " is missing files!");
             }
 
             try (InputStream tileIS = zip.getInputStream(tileEntry);
-                 InputStream cornerIS = zip.getInputStream(cornerEntry);
-                 InputStream edgeIS = zip.getInputStream(edgeEntry);
+                 InputStream tileCornerIS = zip.getInputStream(tileCornerEntry);
+                 InputStream tileEdgeIS = zip.getInputStream(tileEdgeEntry);
+                 InputStream outerCornerIS = zip.getInputStream(outerCornerEntry);
+                 InputStream outerEdgeIS = zip.getInputStream(outerEdgeEntry);
                  InputStream stone0IS = zip.getInputStream(stone0Entry);
-                 InputStream stone1IS = zip.getInputStream(stone1Entry)
+                 InputStream stone1IS = zip.getInputStream(stone1Entry);
+                 InputStream circleMark0IS = zip.getInputStream(circleMark0Entry);
+                 InputStream circleMark1IS = zip.getInputStream(circleMark1Entry);
+                 InputStream circleMark2IS = zip.getInputStream(circleMark2Entry);
+                 InputStream triangleMark0IS = zip.getInputStream(triangleMark0Entry);
+                 InputStream triangleMark1IS = zip.getInputStream(triangleMark1Entry);
+                 InputStream triangleMark2IS = zip.getInputStream(triangleMark2Entry);
+                 InputStream squareMark0IS = zip.getInputStream(squareMark0Entry);
+                 InputStream squareMark1IS = zip.getInputStream(squareMark1Entry);
+                 InputStream squareMark2IS = zip.getInputStream(squareMark2Entry)
             ) {
                 final int DEFAULT_IMAGE_SIZE = 128;
                 final boolean SMOOTH_IMAGES = false;
@@ -429,11 +637,25 @@ public class BoardPane extends GridPane {
                         DEFAULT_IMAGE_SIZE, // requestedHeight
                         true,               // preserveRation
                         SMOOTH_IMAGES);     // smooth
-                this.edge = new Image(edgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                this.corner = new Image(cornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.tileEdge = new Image(tileEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.tileCorner = new Image(tileCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.outerEdge = new Image(outerEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                this.outerCorner = new Image(outerCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
 
                 stones[0] = new Image(stone0IS);
                 stones[1] = new Image(stone1IS);
+
+                circleMarks[0] = new Image(circleMark0IS);
+                circleMarks[1] = new Image(circleMark1IS);
+                circleMarks[2] = new Image(circleMark2IS);
+
+                triangleMarks[0] = new Image(triangleMark0IS);
+                triangleMarks[1] = new Image(triangleMark1IS);
+                triangleMarks[2] = new Image(triangleMark2IS);
+
+                squareMarks[0] = new Image(squareMark0IS);
+                squareMarks[1] = new Image(squareMark1IS);
+                squareMarks[2] = new Image(squareMark2IS);
             } catch (Exception e) {
                 System.err.println("ERROR: Couldn't read file from graphics pack " + graphicsPath + "!");
                 e.printStackTrace();
@@ -457,6 +679,11 @@ public class BoardPane extends GridPane {
      */
     private class BoardCell extends StackPane {
         /**
+         * Instance of the background image
+         */
+        private final ResizableImageView TILE;
+
+        /**
          * the Label to be displayed by this BoardCell
          */
         protected final Label LABEL;
@@ -466,6 +693,10 @@ public class BoardPane extends GridPane {
          * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
          */
         private BoardCell(Image tile) {
+            this.TILE = getCellImageView(tile);
+            getChildren().add(this.TILE);
+            this.TILE.setVisible(true);
+
             this.LABEL = new Label("0");
             this.LABEL.setMinSize(0, 0);
             this.LABEL.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -474,9 +705,9 @@ public class BoardPane extends GridPane {
             FONT_SIZE.bind(this.LABEL.widthProperty().divide(2).subtract(Bindings.length(this.LABEL.textProperty())));
             this.LABEL.styleProperty().bind(Bindings.concat("-fx-font-size: ", FONT_SIZE));
 
-            getChildren().add(this.LABEL);
+            updateLabelColor();
 
-            setBackgroundImage(tile);
+            getChildren().add(this.LABEL);
 
             this.setMinSize(0, 0);
             prefWidthProperty().bind(MAX_CELL_DIM_INT);
@@ -490,30 +721,34 @@ public class BoardPane extends GridPane {
          * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
          */
         public void setBackgroundImage(Image tile) {
-            BackgroundSize bgSz = new BackgroundSize(
-                100,     // width
-                100,        // height
-                true,       // widthAsPercentage
-                true,       // heightAsPercentage
-                false,      // contain
-                true        // cover
-            );
-            BackgroundImage bgImg = new BackgroundImage(
-                tile,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundRepeat.NO_REPEAT,
-                BackgroundPosition.CENTER,
-                bgSz
-            );
-            this.setBackground(new Background(bgImg));
+            TILE.setImage(tile);
             updateLabelColor();
         }
 
         /**
+         * Returns the background ResizableImageView used by this cell
+         * @return the background ResizableImageView of this cell
+         */
+        public ResizableImageView getTile() {
+            return TILE;
+        }
+
+        // Getters
+        public Label getLabel() {
+            return LABEL;
+        }
+
+        // Private methods
+        /**
+         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
+         * @param i the image to be instantiated
+         * @return a properly instantiated instance of the provided Image
+         */
+        /**
          * Sets the text color of this BoardCell's label to the inverse of its background tile's center color
          */
         private void updateLabelColor() {
-            Image bgImg = getBackground().getImages().get(0).getImage();
+            Image bgImg = TILE.getImage();
 
             PixelReader p = bgImg.getPixelReader();
             if(p == null) {
@@ -524,9 +759,18 @@ public class BoardPane extends GridPane {
             );
         }
 
-        // Getters
-        public Label getLabel() {
-            return LABEL;
+        protected ResizableImageView getCellImageView(Image i) {
+            if(i == null) {
+                throw new NullPointerException();
+            }
+
+            ResizableImageView iv = new ResizableImageView(i);
+            iv.setPreserveRatio(true);
+            iv.setMouseTransparent(true);
+            iv.setSmooth(false);
+            iv.setVisible(false);
+
+            return iv;
         }
     } // private class BoardCell
 
@@ -540,22 +784,77 @@ public class BoardPane extends GridPane {
          */
         private boolean isSelected = false;
 
+        private boolean isCircleMarked = false;
+
+        private boolean isTriangleMarked = false;
+
+        private boolean isSquareMarked = false;
+
         /**
          * Instance of the global Image of the Black stone; used for hovering and selection
          */
         private final ResizableImageView BLACK_HOVER;
+
         /**
          * Instance of the global Image of the white stone; used for hovering and selection
          */
         private final ResizableImageView WHITE_HOVER;
+
         /**
          * Instance of the global Image of the Black stone, used for setting
          */
         private final ResizableImageView BLACK_STONE;
+
         /**
          * Instance of the global Image of the Black stone, used for setting
          */
         private final ResizableImageView WHITE_STONE;
+
+        /**
+         * Instance of the global Image of the circle mark for use on empty cells
+         */
+        private final ResizableImageView CIRCLE_MARK_ON_EMPTY;
+
+        /**
+         * Instance of the global Image of the circle mark for use on black stones
+         */
+        private final ResizableImageView CIRCLE_MARK_ON_BLACK;
+
+        /**
+         * Instance of the global Image of the circle mark for use on white stones
+         */
+        private final ResizableImageView CIRCLE_MARK_ON_WHITE;
+
+        /**
+         * Instance of the global Image of the triangle mark for use on empty cells
+         */
+        private final ResizableImageView TRIANGLE_MARK_ON_EMPTY;
+
+        /**
+         * Instance of the global Image of the triangle mark for use on black stones
+         */
+        private final ResizableImageView TRIANGLE_MARK_ON_BLACK;
+
+        /**
+         * Instance of the global Image of the triangle mark for use on white stones
+         */
+        private final ResizableImageView TRIANGLE_MARK_ON_WHITE;
+
+        /**
+         * Instance of the global Image of the square mark for use on empty cells
+         */
+        private final ResizableImageView SQUARE_MARK_ON_EMPTY;
+
+        /**
+         * Instance of the global Image of the square mark for use on black stones
+         */
+        private final ResizableImageView SQUARE_MARK_ON_BLACK;
+
+        /**
+         * Instance of the global Image of the square mark for use on white stones or empty tiles
+         */
+        private final ResizableImageView SQUARE_MARK_ON_WHITE;
+
         /**
          * Pointer to the ImageView of the currently set stone, if any
          */
@@ -565,20 +864,40 @@ public class BoardPane extends GridPane {
          * Creates a new PlayableBoardCell with the specified background Image, images for the black and white
          * stones and hovers, as well as an invisible label
          */
-        private PlayableBoardCell() {
+        private PlayableBoardCell(Image tile) {
             super(tile);
+
+            this.CIRCLE_MARK_ON_EMPTY = getCellImageView(circleMarks[0]);
+            getChildren().add(this.CIRCLE_MARK_ON_EMPTY);
+            this.TRIANGLE_MARK_ON_EMPTY = getCellImageView(triangleMarks[0]);
+            getChildren().add(this.TRIANGLE_MARK_ON_EMPTY);
+            this.SQUARE_MARK_ON_EMPTY = getCellImageView(squareMarks[0]);
+            getChildren().add(this.SQUARE_MARK_ON_EMPTY);
 
             this.BLACK_HOVER = getCellImageView(stones[0]);
             getChildren().add(this.BLACK_HOVER);
-
             this.WHITE_HOVER = getCellImageView(stones[1]);
             getChildren().add(this.WHITE_HOVER);
 
             this.BLACK_STONE = getCellImageView(stones[0]);
             getChildren().add(this.BLACK_STONE);
-
             this.WHITE_STONE = getCellImageView(stones[1]);
             getChildren().add(this.WHITE_STONE);
+
+            this.CIRCLE_MARK_ON_BLACK = getCellImageView(circleMarks[2]);
+            getChildren().add(this.CIRCLE_MARK_ON_BLACK);
+            this.CIRCLE_MARK_ON_WHITE = getCellImageView(circleMarks[1]);
+            getChildren().add(this.CIRCLE_MARK_ON_WHITE);
+
+            this.TRIANGLE_MARK_ON_BLACK = getCellImageView(triangleMarks[2]);
+            getChildren().add(this.TRIANGLE_MARK_ON_BLACK);
+            this.TRIANGLE_MARK_ON_WHITE = getCellImageView(triangleMarks[1]);
+            getChildren().add(this.TRIANGLE_MARK_ON_WHITE);
+
+            this.SQUARE_MARK_ON_BLACK = getCellImageView(squareMarks[2]);
+            getChildren().add(this.SQUARE_MARK_ON_BLACK);
+            this.SQUARE_MARK_ON_WHITE = getCellImageView(squareMarks[1]);
+            getChildren().add(this.SQUARE_MARK_ON_WHITE);
 
             this.CURRENTLY_SET_STONE = null;
 
@@ -595,35 +914,33 @@ public class BoardPane extends GridPane {
             });*/
 
             setOnMouseEntered((e) -> {
-                if (game.getCurColor() == BLACK) {
-                    hoverBlack();
-                } else {
-                    hoverWhite();
-                }
+                keyboardCellX = getColumnIndex(this) - 1;
+                keyboardCellY = getRowIndex(this) - 1;
+
+                hover();
             });
 
             setOnMouseDragEntered(getOnMouseEntered());
 
             setOnMouseExited((e) -> {
                 unhover();
+
+                /*
+                 *  Doing this ensures that if the mouse leaves the playing field, the keyboard controls resume at
+                 *  the default location of 0/0. Consequently, removing these lines means that keyboard controls resume
+                 *  where the mouse was last on the board, which MIGHT be desirable.
+                 */
+                keyboardCellX = -1;
+                keyboardCellY = -1;
             });
 
             setOnMouseDragExited(getOnMouseExited());
 
             setOnMouseClicked((e) -> {
-                if (selectionPBC != null) {
-                    selectionPBC.deselect();
-                }
-                selectionPBC = this;
-
-                if(game.getCurColor() == BLACK) {
-                    selectBlack();
+                if(e.getButton() == MouseButton.PRIMARY) {
+                    select();
                 } else {
-                    selectWhite();
-                }
-
-                if(!needsMoveConfirmation) {
-                    confirmMove();
+                    toggleCircleMark();
                 }
             });
 
@@ -634,7 +951,7 @@ public class BoardPane extends GridPane {
          * Changes all Images used by this PlayableBoardCell to the current global Images from the graphics pack.
          * Call this for each PlayableBoardCell after loading a different graphics pack
          */
-        public void updateImages() {
+        public void updateImages(Image tile) {
             setBackgroundImage(tile);
             if(CURRENTLY_SET_STONE != null) {
                 if(CURRENTLY_SET_STONE == BLACK_STONE) {
@@ -648,6 +965,16 @@ public class BoardPane extends GridPane {
             BLACK_HOVER.setImage(stones[0]);
             WHITE_STONE.setImage(stones[1]);
             WHITE_HOVER.setImage(stones[1]);
+
+            CIRCLE_MARK_ON_EMPTY.setImage(circleMarks[0]);
+            CIRCLE_MARK_ON_BLACK.setImage(circleMarks[2]);
+            CIRCLE_MARK_ON_WHITE.setImage(circleMarks[1]);
+            TRIANGLE_MARK_ON_EMPTY.setImage(triangleMarks[0]);
+            TRIANGLE_MARK_ON_BLACK.setImage(triangleMarks[2]);
+            TRIANGLE_MARK_ON_WHITE.setImage(triangleMarks[1]);
+            SQUARE_MARK_ON_EMPTY.setImage(squareMarks[0]);
+            SQUARE_MARK_ON_BLACK.setImage(squareMarks[2]);
+            SQUARE_MARK_ON_WHITE.setImage(squareMarks[1]);
         }
 
         /**
@@ -692,10 +1019,27 @@ public class BoardPane extends GridPane {
          * @param iv the ImageView to be displayed
          */
         private void hover(ImageView iv) {
-            unhover();              // might be unnecessary
+            unhover();                      // might be unnecessary
+            if(hoverPBC != null) {
+                hoverPBC.unhover();             // necessary due to keyboard controls
+                hoverPBC = null;
+            }
             if(CURRENTLY_SET_STONE == null && !isSelected) {
                 iv.setOpacity(0.5);
                 iv.setVisible(true);
+            }
+            hoverPBC = this;
+        }
+
+        /**
+         * Makes this PlayableBoardCell display a translucent version of the current player color to indicate that it is
+         * being hovered over and can be selected with a left click
+         */
+        private void hover() {
+            if (game.getCurColor() == BLACK) {
+                hoverBlack();
+            } else {
+                hoverWhite();
             }
         }
 
@@ -729,10 +1073,27 @@ public class BoardPane extends GridPane {
          * @param iv the ImageView that is to be displayed
          */
         private void select(ImageView iv) {
+            if (selectionPBC != null) {
+                selectionPBC.deselect();
+            }
+            selectionPBC = this;
+
             deselect();             // might be unnecessary
             iv.setOpacity(0.75);
             iv.setVisible(true);
             isSelected = true;
+
+            if (!needsMoveConfirmation) {
+                confirmMove();
+            }
+        }
+
+        private void select() {
+            if (game.getCurColor() == BLACK) {
+                selectBlack();
+            } else {
+                selectWhite();
+            }
         }
 
         /**
@@ -758,6 +1119,8 @@ public class BoardPane extends GridPane {
             WHITE_STONE.setVisible(false);
             LABEL.setVisible(false);
             CURRENTLY_SET_STONE = null;
+
+            updateMarks();
         }
 
         /**
@@ -772,25 +1135,112 @@ public class BoardPane extends GridPane {
                 updateLabelColor();
                 LABEL.setVisible(true);
             }
+
+            updateMarks();
         }
 
         /**
-         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
-         * @param i the image to be instantiated
-         * @return a properly instantiated instance of the provided Image
+         * Marks this PLayableBoardCell with a circle mark
          */
-        private ResizableImageView getCellImageView(Image i) {
-            if(i == null) {
-                throw new NullPointerException();
+        private void markCircle() {
+            mark(CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
+            isCircleMarked = true;
+            // Game.getFileTree().markACoordinate(getColumnIndex(this) - 1, getRowIndex(this) - 1)
+        }
+
+        /**
+         * Marks this PLayableBoardCell with a triangle mark
+         */
+        private void markTriangle() {
+            mark(TRIANGLE_MARK_ON_EMPTY, TRIANGLE_MARK_ON_BLACK, TRIANGLE_MARK_ON_WHITE);
+            isTriangleMarked = true;
+        }
+
+        /**
+         * Marks this PLayableBoardCell with a square mark
+         */
+        private void markSquare() {
+            mark(SQUARE_MARK_ON_EMPTY, SQUARE_MARK_ON_BLACK, SQUARE_MARK_ON_WHITE);
+            isSquareMarked = true;
+        }
+
+        /**
+         * Marks this PlayableBoardCell with the supplied kind of mark
+         * @param onBlack the ResizableImageView constituting the mark to be used on black stones
+         * @param onWhite the ResizableImageView constituting the mark to be used on white stones or empty spaces
+         */
+        private void mark(ResizableImageView onEmpty, ResizableImageView onBlack, ResizableImageView onWhite) {
+            if(CURRENTLY_SET_STONE  == BLACK_STONE) {
+                onBlack.setVisible(true);
+            } else if(CURRENTLY_SET_STONE == WHITE_STONE) {
+                onWhite.setVisible(true);
+            } else {
+                onEmpty.setVisible(true);
             }
+        }
 
-            ResizableImageView iv = new ResizableImageView(i);
-            iv.setPreserveRatio(true);
-            iv.setMouseTransparent(true);
-            iv.setSmooth(false);
-            iv.setVisible(false);
+        /**
+         * Unmarks this PlayableBoardCell from the supplied kind of mark
+         * @param onBlack the ResizableImageView constituting the mark to be used on black stones
+         * @param onWhite the ResizableImageView constituting the mark to be used on white stones or empty spaces
+         */
+        private void unMark(ResizableImageView onEmpty, ResizableImageView onBlack, ResizableImageView onWhite) {
+            onEmpty.setVisible(false);
+            onWhite.setVisible(false);
+            onBlack.setVisible(false);
+        }
 
-            return iv;
+        /**
+         * Unmarks this PLayableBoardCell altogether.
+         */
+        private void unMark() {
+            unMark(CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
+            isCircleMarked = false;
+            unMark(TRIANGLE_MARK_ON_EMPTY, TRIANGLE_MARK_ON_BLACK, TRIANGLE_MARK_ON_WHITE);
+            isTriangleMarked = false;
+            unMark(TRIANGLE_MARK_ON_EMPTY, SQUARE_MARK_ON_BLACK, SQUARE_MARK_ON_WHITE);
+            isSquareMarked = false;
+        }
+
+        public void toggleCircleMark() {
+            if(isCircleMarked) {
+                unMark();
+            } else {
+                markCircle();
+            }
+        }
+
+        /**
+         * Updates whether the marks in question are shown
+         * @param isMarked whether this playableBoardCell is marked thusly
+         * @param onBlack the ResizableImageView constituting the mark to be used on black stones
+         * @param onWhite the ResizableImageView constituting the mark to be used on white stones or empty spaces
+         */
+        private void updateMarks(boolean isMarked, ResizableImageView onEmpty, ResizableImageView onBlack, ResizableImageView onWhite) {
+            if(isMarked) {
+                if(CURRENTLY_SET_STONE == BLACK_STONE) {
+                    onEmpty.setVisible(false);
+                    onBlack.setVisible(true);
+                    onWhite.setVisible(false);
+                } else if(CURRENTLY_SET_STONE == WHITE_STONE) {
+                    onEmpty.setVisible(false);
+                    onBlack.setVisible(false);
+                    onWhite.setVisible(true);
+                } else {
+                    onEmpty.setVisible(true);
+                    onBlack.setVisible(false);
+                    onWhite.setVisible(false);
+                }
+            }
+        }
+
+        /**
+         * Updates all marks on this PLayableBoardCell.
+         */
+        private void updateMarks() {
+            updateMarks(isCircleMarked, CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
+            updateMarks(isTriangleMarked, TRIANGLE_MARK_ON_EMPTY, TRIANGLE_MARK_ON_BLACK, TRIANGLE_MARK_ON_WHITE);
+            updateMarks(isSquareMarked, SQUARE_MARK_ON_EMPTY, SQUARE_MARK_ON_BLACK, SQUARE_MARK_ON_WHITE);
         }
 
         /**

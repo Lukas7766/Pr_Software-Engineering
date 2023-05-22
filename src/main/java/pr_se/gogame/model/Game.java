@@ -14,7 +14,7 @@ public class Game implements GameInterface {
 
     //Settings
     private final Ruleset ruleset = new JapaneseRuleset();
-    private int size = 19;
+    private int size = 19; // TODO: Just a thought, but technically, this is really just a property of the board, so maybe the Game shouldn't save this at all and instead just provide a method to obtain the board size via its interface (said method would then return board.getSize()).
     private int handicap = 0;
     private boolean confirmationNeeded = false;
     private boolean showMoveNumbers = false;
@@ -54,9 +54,17 @@ public class Game implements GameInterface {
 
     @Override
     public void newGame(GameCommand gameCommand, int size, int handicap) {
+        if(size < 0 || handicap < 0 || handicap > 9) {
+            throw new IllegalArgumentException();
+        }
+
+        if(gameCommand == null) {
+            throw new NullPointerException();
+        }
+
         switch (gameCommand) {
-            case BLACKSTARTS -> this.curColor = StoneColor.BLACK;
-            case WHITESTARTS -> this.curColor = StoneColor.WHITE;
+            case BLACK_STARTS -> this.curColor = StoneColor.BLACK;
+            case WHITE_STARTS -> this.curColor = StoneColor.WHITE;
             default -> throw new IllegalArgumentException();
         }
 
@@ -112,12 +120,12 @@ public class Game implements GameInterface {
     public void pass() {
         System.out.println("pass");
         switch (gameCommand) {
-            case BLACKPLAYS, BLACKSTARTS -> {
-                this.gameCommand = GameCommand.WHITEPLAYS;
+            case BLACK_PLAYS, BLACK_STARTS -> {
+                // this.gameCommand = GameCommand.WHITE_PLAYS; // moved into setCurColor()
                 this.setCurColor(WHITE);
             }
-            case WHITEPLAYS, WHITESTARTS -> {
-                this.gameCommand = GameCommand.BLACKPLAYS;
+            case WHITE_PLAYS, WHITE_STARTS -> {
+                // this.gameCommand = GameCommand.BLACK_PLAYS; // moved into setCurColor()
                 this.setCurColor(BLACK);
             }
         }
@@ -131,17 +139,17 @@ public class Game implements GameInterface {
         StringBuilder sb = new StringBuilder();
         sb.append("Game was resigned by").append(" ");
         switch (gameCommand) {
-            case WHITEPLAYS, WHITESTARTS -> {
-                this.gameCommand = GameCommand.BLACKWON;
+            case WHITE_PLAYS, WHITE_STARTS -> {
+                this.gameCommand = GameCommand.BLACK_WON;
                 sb.append("White!").append("\n\n").append("Black won!");
                 result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
             }
-            case BLACKPLAYS, BLACKSTARTS -> {
-                this.gameCommand = GameCommand.WHITEWON;
+            case BLACK_PLAYS, BLACK_STARTS -> {
+                this.gameCommand = GameCommand.WHITE_WON;
                 sb.append("Black!").append("\n\n").append("White won!");
                 result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
             }
-            default -> {throw new IllegalArgumentException("Game was not resigned! Consult your application owner!");}
+            default -> {throw new IllegalStateException("Game was not resigned! Consult your application owner!");}
         }
         this.gameResult=result;
         fireGameEvent(new GameEvent(gameCommand));
@@ -155,9 +163,9 @@ public class Game implements GameInterface {
         this.playerWhiteScore = gameResult.getScoreWhite();
 
         if (gameResult.getWinner() == BLACK) {
-            this.gameCommand = GameCommand.BLACKWON;
+            this.gameCommand = GameCommand.BLACK_WON;
         } else if (gameResult.getWinner() == WHITE) {
-            this.gameCommand = GameCommand.WHITEWON;
+            this.gameCommand = GameCommand.WHITE_WON;
         } else {
             this.gameCommand = GameCommand.DRAW;
         }
@@ -181,12 +189,27 @@ public class Game implements GameInterface {
 
     @Override
     public void addListener(GameListener l) {
+        if(l == null) {
+            throw new NullPointerException();
+        }
         listeners.add(l);
     }
 
     @Override
     public void removeListener(GameListener l) {
+        if(l == null) {
+            throw new NullPointerException();
+        }
         listeners.remove(l);
+    }
+
+    @Override
+    public void setHandicapStoneCounter(int noStones) {
+        if(noStones < 0 || noStones > handicap) {
+            throw new IllegalArgumentException();
+        }
+
+        this.handicapStoneCounter = noStones;
     }
 
     @Override
@@ -196,7 +219,7 @@ public class Game implements GameInterface {
 
     @Override
     public void confirmChoice() {
-        this.gameCommand = GameCommand.CONFIRMCHOICE;
+        this.gameCommand = GameCommand.CONFIRM_CHOICE;
         System.out.println(this.gameCommand);
         fireGameEvent(new GameEvent(gameCommand));
     }
@@ -252,16 +275,16 @@ public class Game implements GameInterface {
         }
 
         this.curColor = c;
-    }
-
-    @Override
-    public void setHandicapStoneCounter(int counter) {
-        this.handicapStoneCounter = counter;
+        if(this.curColor == BLACK) {
+            this.gameCommand = GameCommand.BLACK_PLAYS;
+        } else {
+            this.gameCommand = GameCommand.WHITE_PLAYS;
+        }
     }
 
     @Override
     public void playMove(int x, int y) {
-        if (board.setStone(x, y, curColor, false)) {
+        if (board.setStone(x, y, curColor, false, true)) {
             curMoveNumber++;
             System.out.println("show move # " + showMoveNumbers);
             System.out.println("Move played.");
@@ -269,15 +292,15 @@ public class Game implements GameInterface {
             switchColor();
         } else {
             System.out.println("Move aborted.");
-
         }
     }
 
     @Override
     public void placeHandicapStone(int x, int y) {
-        board.setStone(x, y, curColor, true);
+        board.setStone(x, y, curColor, true, true);
         handicapStoneCounter--;
         if (handicapStoneCounter == 0) {
+            // fileTree.insertBufferedStonesBeforeGame();
             switchColor();
         } else if (handicapStoneCounter < 0) {
             throw new IllegalStateException();
@@ -292,14 +315,14 @@ public class Game implements GameInterface {
     @Override
     public void setDemoMode(boolean demoMode) {
         this.demoMode = demoMode;
-        this.gameCommand = GameCommand.CONFIGDEMOMODE;
+        this.gameCommand = GameCommand.CONFIG_DEMO_MODE;
         fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override
     public void setConfirmationNeeded(boolean needed) {
         this.confirmationNeeded = needed;
-        this.gameCommand = GameCommand.CONFIGCONFIRMATION;
+        this.gameCommand = GameCommand.CONFIG_CONFIRMATION;
 
         fireGameEvent(new GameEvent(gameCommand));
     }
@@ -312,7 +335,7 @@ public class Game implements GameInterface {
     @Override
     public void setShowMoveNumbers(boolean show) {
         this.showMoveNumbers = show;
-        this.gameCommand = GameCommand.CONFIGSHOWMOVENUMBERS;
+        this.gameCommand = GameCommand.CONFIG_SHOWMOVENUMBERS;
 
         fireGameEvent(new GameEvent(gameCommand));
     }
@@ -325,7 +348,7 @@ public class Game implements GameInterface {
     @Override
     public void setShowCoordinates(boolean show) {
         this.showCoordinates = show;
-        this.gameCommand = GameCommand.CONFIGSHOWCOORDINATES;
+        this.gameCommand = GameCommand.CONFIG_SHOW_COORDINATES;
 
         fireGameEvent(new GameEvent(gameCommand));
     }
@@ -336,9 +359,13 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void setCapturedStones(StoneColor color, int amount) {
-        if (color == null) throw new NullPointerException();
-        if (amount < 0) throw new IllegalArgumentException();
+    public void addCapturedStones(StoneColor color, int amount) {
+        if (color == null) {
+            throw new NullPointerException();
+        }
+        if (amount < 0) {
+            throw new IllegalArgumentException();
+        }
 
         if (color == BLACK) {
             this.blackCapturedStones += amount;
@@ -350,7 +377,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public int getCapturedStones(StoneColor color) {
+    public int getStonesCapturedBy(StoneColor color) {
         if (color == null) throw new NullPointerException();
 
         if (color == BLACK) return this.blackCapturedStones;
@@ -359,6 +386,10 @@ public class Game implements GameInterface {
 
     @Override
     public double getScore(StoneColor color) {
+        if(color == null) {
+            throw new NullPointerException();
+        }
+
         return color == BLACK ? this.playerBlackScore : this.playerWhiteScore;
     }
 
@@ -367,13 +398,13 @@ public class Game implements GameInterface {
         return gameResult;
     }
 
-    private void switchColor() {
+    public void switchColor() {
         if (curColor == BLACK) {
-            curColor = WHITE;
-            this.gameCommand = GameCommand.WHITEPLAYS;
+            // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
+            setCurColor(WHITE);
         } else {
-            curColor = BLACK;
-            this.gameCommand = GameCommand.BLACKPLAYS;
+            // this.gameCommand = GameCommand.BLACK_PLAYS; // handled by setCurColor()
+            setCurColor(BLACK);
         }
         fireGameEvent(new GameEvent(gameCommand));
     }
@@ -384,6 +415,10 @@ public class Game implements GameInterface {
     -> 20230502, SeWa: changed to package private
  */
     void fireGameEvent(GameEvent e) {
+        if(e == null) {
+            throw new NullPointerException();
+        }
+
         for (GameListener l : listeners) {
             l.gameCommand(e);
         }
