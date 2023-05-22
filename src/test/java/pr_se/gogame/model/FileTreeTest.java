@@ -42,7 +42,7 @@ class FileTreeTest {
     @Test
     void addNode() {
         tree.addMove(SgfToken.AE, 1, 1);
-        assertEquals(tree.getCurrent().getToken(), "AE[bh]");
+        assertEquals(tree.getCurrent().getToken(), ";AE[bh]");
     }
 
     @Test

@@ -1,5 +1,8 @@
 package pr_se.gogame.model;
 
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
 public enum SgfToken {
 
     /**
@@ -9,7 +12,7 @@ public enum SgfToken {
     /**
      * Delete Stone/Set empty Stone
      */
-    AE("AE[%s]"),
+    AE(";AE[%s]"),
     /**
      * Move for white
      */
@@ -92,5 +95,36 @@ public enum SgfToken {
      */
     public String getValue() {
         return value;
+    }
+
+    public String getCoordinates(String str){
+        Pattern pattern = Pattern.compile("\"[A-Z]+\\[([a-z]+)\\\\]\"");
+        Matcher matcher = pattern.matcher(str);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }else {
+            return "";
+        }
+    }
+
+    public String getTextFromLabel(String str){
+        Pattern pattern = Pattern.compile("LB\\[.*:([a-zA-Z0-9]+)\\\\]");
+        Matcher matcher = pattern.matcher(str);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }else {
+            return "";
+        }
+    }
+
+    public String[] getValues(SgfToken t,String text){
+        switch (t){
+            case LB -> {
+                return new String[]{getCoordinates(text),getTextFromLabel(text)};
+            }
+            default -> {
+                return new String[]{getCoordinates(text)};
+            }
+        }
     }
 }

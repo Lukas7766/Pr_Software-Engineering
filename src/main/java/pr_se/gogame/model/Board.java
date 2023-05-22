@@ -38,7 +38,7 @@ public class Board implements BoardInterface {
     private final StoneGroupPointer[][] board;
 
     //TODO: Move this elsewere ?
-    private newFileSaver newFileSaver;
+    private FileHandler FileHandler;
 
     // TODO: Should this be moved to game?
     private int moveNumber;
@@ -61,7 +61,7 @@ public class Board implements BoardInterface {
         listeners = new LinkedList<>();
         this.board = new StoneGroupPointer[SIZE][SIZE];
         moveNumber = 1;
-        this.newFileSaver = new newFileSaver();
+        this.FileHandler = new FileHandler();
 
         int komi = game.getKomi(); // temporary variable; komi is only needed by the board here (if at all - see next comment)
 

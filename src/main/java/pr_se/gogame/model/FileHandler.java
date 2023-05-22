@@ -4,14 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
-public class newFileSaver {
+public class FileHandler {
     private Path path;
 
-    public newFileSaver(Path path) {
+    public FileHandler(Path path) {
         this.path = path;
     }
 
-    public newFileSaver() {
+    public FileHandler() {
     }
 
     public void setFilepath(Path filepath) {
@@ -24,6 +24,10 @@ public class newFileSaver {
         } catch (IOException e) {
             System.out.println("File write Error");
         }
+    }
+
+    public void loadFile(Path filepath){
+
     }
 
 }
