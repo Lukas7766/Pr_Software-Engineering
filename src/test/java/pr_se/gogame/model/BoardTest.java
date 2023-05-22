@@ -122,6 +122,19 @@ class BoardTest {
     }
 
     @Test
+    void setStone() {
+        assertTrue(board.setStone(0, 1, BLACK, false, false)); // save = false for max. code coverage
+        assertTrue(board.setStone(1, 0, WHITE, false, false));
+        assertTrue(board.setStone(board.getSize() - 1, board.getSize() - 2, BLACK, false, false));
+        assertTrue(board.setStone(board.getSize() - 2, board.getSize() - 1, WHITE, false, false));
+
+        assertEquals(BLACK, board.getColorAt(0, 1));
+        assertEquals(WHITE, board.getColorAt(1, 0));
+        assertEquals(BLACK, board.getColorAt(board.getSize() - 1, board.getSize() - 2));
+        assertEquals(WHITE, board.getColorAt(board.getSize() - 2, board.getSize() - 1));
+    }
+
+    @Test
     void setStoneSuicidePreventionIfNotAllowed() {
         assertTrue(board.setStone(9, 1, BLACK, false, true));
         assertTrue(board.setStone(9, 3, BLACK, false, true));
@@ -169,6 +182,14 @@ class BoardTest {
         assertTrue(board.setStone(10, 2, WHITE, false, true));
 
         assertEquals(4, board.getNeighbors(9, 2).size());
+
+        assertTrue(board.setStone(board.getSize() - 1, board.getSize() - 1, BLACK, false, true));
+        assertTrue(board.setStone(board.getSize() - 1, board.getSize() - 2, WHITE, false, true));
+        assertTrue(board.setStone(board.getSize() - 2, board.getSize() - 1, BLACK, false, true));
+        assertThrows(IllegalArgumentException.class, () -> board.setStone(board.getSize() - 1, board.getSize(), WHITE, false, true));
+        assertThrows(IllegalArgumentException.class, () -> board.setStone(board.getSize(), board.getSize() - 1, WHITE, false, true));
+
+        assertEquals(2, board.getNeighbors(board.getSize() - 1, board.getSize() - 1).size());
     }
 
     @Test
@@ -191,5 +212,15 @@ class BoardTest {
     void printDebugInfo() {
         assertTrue(board.setStone(0, 0, BLACK, false, true));
         assertDoesNotThrow(() -> board.printDebugInfo(0, 0));
+    }
+
+    @Test
+    void printDebugInfoRepeatedly() { // This method  really only exists for maximising branch coverage.
+        assertDoesNotThrow(() -> board.printDebugInfo(0, 0)); // board == null
+        assertTrue(board.setStone(0, 0, BLACK, false, true));
+        assertDoesNotThrow(() -> board.printDebugInfo(0, 0)); // x == lastDebugX && y == lastDebugY
+        assertTrue(board.setStone(0, 1, BLACK, false, true));
+        assertDoesNotThrow(() -> board.printDebugInfo(0, 1)); // x == lastDebugX && y != lastDebugY
+        assertDoesNotThrow(() -> board.printDebugInfo(1, 1)); // x != lastDebugX && [y == lastDebugY]
     }
 }

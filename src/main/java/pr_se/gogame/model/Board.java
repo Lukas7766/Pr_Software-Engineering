@@ -58,7 +58,7 @@ public class Board implements BoardInterface {
     public boolean setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save) {
         // Are the coordinates invalid?
         if (areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
         }
 
         // is the StoneColor invalid?
@@ -198,7 +198,7 @@ public class Board implements BoardInterface {
     @Override
     public void removeStone(int x, int y, boolean save) {
         if(areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
         }
 
         board[x][y] = null;
@@ -286,7 +286,7 @@ public class Board implements BoardInterface {
      */
     private Set getSurroundings(int x, int y, Predicate<StoneGroupPointer> check, BiFunction<Integer, Integer, ?> conversion) {
         if (areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
         }
 
         Set surroundings = new HashSet<>();
@@ -314,7 +314,7 @@ public class Board implements BoardInterface {
 
     public StoneColor getColorAt(int x, int y) {
         if(areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
         }
 
         if (board[x][y] != null) {
@@ -331,7 +331,7 @@ public class Board implements BoardInterface {
     // TODO: Remove these debug methods
     public void printDebugInfo(int x, int y) {
         if(areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + "are out of bounds for board");
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
         }
 
         if (board[x][y] != null && !(x == lastDebugX && y == lastDebugY)) {
