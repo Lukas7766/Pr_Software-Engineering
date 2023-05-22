@@ -125,7 +125,6 @@ public class FileTree {
      * @param label The laben for the coordinate
      */
     public void addLabelForCoordinate(String label, int xCoord, int yCoord) {
-        //TODO: which coordinate does this access ? research!
         if (label.length() > 2) {
             addNode(SgfToken.LB, label.substring(0, 2));
         } else {
