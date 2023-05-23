@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -129,5 +130,12 @@ class FileTreeTest {
         tree.addMove(SgfToken.B, 0, 0);
         assertEquals(expectSecond,tree.toString());
     }
+
+    /*@Test
+    void testFileLoad(){
+        Path filep = Path.of("C:\\Users\\lukas\\Downloads\\test\\test.sgf");
+        FileHandler f = new FileHandler();
+        //f.loadFile(filep);
+    }*/
 
 }

@@ -98,7 +98,7 @@ public enum SgfToken {
     }
 
     public String getCoordinates(String str){
-        Pattern pattern = Pattern.compile("\"[A-Z]+\\[([a-z]+)\\\\]\"");
+        Pattern pattern = Pattern.compile("[A-Z]+\\[([a-z]+)\\\\]");
         Matcher matcher = pattern.matcher(str);
         if (matcher.find()) {
             return matcher.group(1);

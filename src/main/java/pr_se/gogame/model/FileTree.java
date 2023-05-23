@@ -1,5 +1,6 @@
 package pr_se.gogame.model;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 
@@ -48,12 +49,12 @@ public class FileTree {
         this.viewing = current;
     }
 
+
     public FileTree(int boardSize,String namePlayerBlack,String namePlayerWhite) {
         this(boardSize);
         addName(StoneColor.BLACK,namePlayerBlack);
         addName(StoneColor.WHITE,namePlayerWhite);
     }
-
 
     /**
      * Adds a Node into the File tree
@@ -80,7 +81,7 @@ public class FileTree {
         current.setNext(newNode);
         newNode.setPrevious(current);
         current = newNode;
-        viewing = current;
+        viewing = current;//TODO DONT CHANGE VIEWING IF VIEWING ISNT CURRENT
     }
 
     /**
@@ -279,6 +280,16 @@ public class FileTree {
 
     public boolean saveFile(Path path){
         return fileHandler.saveFile(path,toString());
+    }
+
+    public int[] getGridCoords(Node node){
+        return calculateGridCoordinates(node.getToken());
+    }
+
+    public int[] calculateGridCoordinates(String s) {
+        char x = s.charAt(0);
+        char y = s.charAt(1);
+        return new int[]{x - 97, this.boardSize - ((int) s.charAt(1) - 96)};
     }
 
     //Methods vor viewing

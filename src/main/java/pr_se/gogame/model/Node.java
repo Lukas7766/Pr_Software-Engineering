@@ -1,7 +1,7 @@
 package pr_se.gogame.model;
 
 public abstract class Node {
-   //TODO: maybe include an index for a node ?
+   //TODO: include move number
 
     private Node next;
     private Node previous;

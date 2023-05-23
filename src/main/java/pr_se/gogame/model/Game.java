@@ -24,6 +24,8 @@ public class Game implements GameInterface {
 
     //global (helper) variables
     private FileTree fileTree;
+
+    private FileHandler fileHandler;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private Board board;
@@ -91,8 +93,10 @@ public class Game implements GameInterface {
 
     @Override
     public boolean importGame(Path path) {
-        //TODO: Das board überchreiben od nd
-        //return FileSaver.importFile(path);
+        this.fileHandler = new FileHandler(path);
+        fileHandler.loadFile(path);
+        this.newGame(GameCommand.BLACK_STARTS,fileHandler.boardSize,fileHandler.handicap);
+        fileHandler.setMoves(this);
         return false;
     }
 
