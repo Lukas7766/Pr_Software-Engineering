@@ -133,10 +133,30 @@ class GameTest {
     }
 
     @Test
-    void pass() {
+    void passBlackStarts() {
         StoneColor prevColor = game.getCurColor();
+        assertEquals(BLACK, prevColor);
         GameCommand prevState = game.getGameState();
+        assertEquals(BLACK_STARTS, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
+        assertEquals(0, prevMoveNumber);
+
+        game.pass();
+        assertNotEquals(prevColor, game.getCurColor());
+        prevColor = game.getCurColor();
+        assertNotEquals(prevState, game.getGameState());
+        prevState = game.getGameState();
+        assertEquals(prevMoveNumber, game.getCurMoveNumber());
+        prevMoveNumber = game.getCurMoveNumber();
+
+        game.pass();
+        assertNotEquals(prevColor, game.getCurColor());
+        prevColor = game.getCurColor();
+        assertNotEquals(prevState, game.getGameState());
+        prevState = game.getGameState();
+        assertEquals(prevMoveNumber, game.getCurMoveNumber());
+        prevMoveNumber = game.getCurMoveNumber();
+
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
         assertNotEquals(prevState, game.getGameState());
@@ -144,7 +164,40 @@ class GameTest {
     }
 
     @Test
-    void resign() {
+    void passWhiteStarts() {
+        game.newGame(WHITE_STARTS, 19, 0);
+
+        StoneColor prevColor = game.getCurColor();
+        assertEquals(WHITE, prevColor);
+        GameCommand prevState = game.getGameState();
+        assertEquals(WHITE_STARTS, prevState);
+        int prevMoveNumber = game.getCurMoveNumber();
+        assertEquals(0, prevMoveNumber);
+
+        game.pass();
+        assertNotEquals(prevColor, game.getCurColor());
+        prevColor = game.getCurColor();
+        assertNotEquals(prevState, game.getGameState());
+        prevState = game.getGameState();
+        assertEquals(prevMoveNumber, game.getCurMoveNumber());
+        prevMoveNumber = game.getCurMoveNumber();
+
+        game.pass();
+        assertNotEquals(prevColor, game.getCurColor());
+        prevColor = game.getCurColor();
+        assertNotEquals(prevState, game.getGameState());
+        prevState = game.getGameState();
+        assertEquals(prevMoveNumber, game.getCurMoveNumber());
+        prevMoveNumber = game.getCurMoveNumber();
+
+        game.pass();
+        assertNotEquals(prevColor, game.getCurColor());
+        assertNotEquals(prevState, game.getGameState());
+        assertEquals(prevMoveNumber, game.getCurMoveNumber());
+    }
+
+    @Test
+    void resignAtStart() {
         GameListener l1 = new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
@@ -160,6 +213,32 @@ class GameTest {
             @Override
             public void gameCommand(GameEvent e) {
                 assertEquals(BLACK_WON, e.getGameCommand());
+            }
+        });
+        game.resign();
+
+        assertThrows(IllegalStateException.class, () -> game.resign());
+    }
+
+    @Test
+    void resignAtPlay() {
+        GameListener l1 = new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(BLACK_WON, e.getGameCommand());
+            }
+        };
+        game.playMove(0, 0);
+        game.addListener(l1);
+        game.resign();
+
+        game.removeListener(l1);
+        game.newGame(WHITE_STARTS, 19, 0);
+        game.playMove(0, 0);
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                assertEquals(WHITE_WON, e.getGameCommand());
             }
         });
         game.resign();
@@ -338,6 +417,11 @@ class GameTest {
         assertNull(game.getColorAt(0, 0));
         game.placeHandicapStone(0, 0);
         assertEquals(BLACK, game.getColorAt(0, 0));
+    }
+
+    @Test
+    void newGameWithHandicap() {
+        game.newGame(BLACK_STARTS, 19, 3);
     }
 
     @Test
