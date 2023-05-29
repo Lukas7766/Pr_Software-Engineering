@@ -124,6 +124,10 @@ public class Board implements BoardInterface {
             }
         }
 
+        /*
+         * Merge newly-connected StoneGroups of the same color and remove the new stone's position from the liberties
+         * of all adjacent groups
+         */
         Set<StoneGroup> sameColorGroups = new HashSet<>();
         sameColorGroups.addAll(surroundingSGs);
         sameColorGroups.removeAll(otherColorGroups);
@@ -133,7 +137,7 @@ public class Board implements BoardInterface {
             firstSameColorGroup.mergeWithStoneGroup(newGroup);
         }
         for(StoneGroup sg : sameColorGroups) {
-            firstSameColorGroup.mergeWithStoneGroup(sg); // Don't remove the liberty from the now obsolete group, it's useless and only complicates undoing
+            firstSameColorGroup.mergeWithStoneGroup(sg); // Don't remove the liberty from the now obsolete group - it's pointless and only complicates undoing
         }
         firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
         for(StoneGroup sg : otherColorGroups) {

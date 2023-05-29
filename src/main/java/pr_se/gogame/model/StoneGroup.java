@@ -1,9 +1,8 @@
 package pr_se.gogame.model;
 
-import javafx.geometry.Pos;
-
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -19,7 +18,7 @@ public class StoneGroup {
     /**
      * all the Positions where stones of this StoneGroup are located
      */
-    private final LinkedList<Position> locations;
+    private final List<Position> locations;
 
     /**
      * all the free Positions surrounding this StoneGroup
@@ -67,10 +66,8 @@ public class StoneGroup {
             throw new IllegalArgumentException("Stone group must be of the same color!");
         }
 
-        final LinkedList<Position> OLD_LOCATIONS = new LinkedList<>();
-        OLD_LOCATIONS.addAll(locations);
-        final HashSet<Position> OLD_LIBERTIES = new HashSet<>();
-        OLD_LIBERTIES.addAll(liberties);
+        final List<Position> OLD_LOCATIONS = new LinkedList<>(locations);
+        final Set<Position> OLD_LIBERTIES = new HashSet<>(liberties);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
@@ -79,15 +76,15 @@ public class StoneGroup {
                 liberties.addAll(other.getLiberties());
                 other.getPointers().forEach(p -> {
                     p.setStoneGroup(StoneGroup.this);
-                    addPointer(p);
+                    pointers.add(p);
                 });
             }
 
             @Override
             public void undo() {
-                locations.remove(locations);
+                locations.clear();
                 locations.addAll(OLD_LOCATIONS);
-                liberties.remove(liberties);
+                liberties.clear();
                 liberties.addAll(OLD_LIBERTIES);
                 other.getPointers().forEach(p -> {
                     p.setStoneGroup(other);
@@ -166,7 +163,7 @@ public class StoneGroup {
         return stoneColor;
     }
 
-    public LinkedList<Position> getLocations() {
+    public List<Position> getLocations() {
         return locations;
     }
 
@@ -175,14 +172,14 @@ public class StoneGroup {
     }
 
     public void addPointer(StoneGroupPointer ptr) {
+        if(ptr == null) {
+            throw new NullPointerException();
+        }
+
         pointers.add(ptr);
     }
 
     public Set<StoneGroupPointer> getPointers() {
         return pointers;
-    }
-
-    public void removeLocation(Position location) {
-        locations.remove(location);
     }
 }
