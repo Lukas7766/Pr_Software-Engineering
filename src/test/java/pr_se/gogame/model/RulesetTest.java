@@ -37,20 +37,20 @@ class RulesetTest {
     }
 
     @Test
-    @DisplayName("testing getSuicide(), in default is false")
+    @DisplayName("testing getSuicide(), is false by default")
     void getSuicide() {
-        assertFalse(ruleset.getSuicide(null));
+        assertFalse(ruleset.getSuicide(null, null));
     }
 
     @Test
-    @DisplayName("testing getKoAmount(), in default is 2")
+    @DisplayName("testing getKoAmount(), is 2 by default")
     void getKoAmount() {
         assertEquals(2, ruleset.getKoAmount());
     }
 
 
     @Test
-    @DisplayName("testing hasDefaultHandicapPlacement(), in default is true")
+    @DisplayName("testing hasDefaultHandicapPlacement(), is true by default")
     void hasDefaultHandicapPlacement() {
         assertTrue(ruleset.hasDefaultHandicapPlacement());
     }

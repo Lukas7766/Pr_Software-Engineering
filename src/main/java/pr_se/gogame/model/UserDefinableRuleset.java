@@ -33,8 +33,8 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public boolean getSuicide(StoneGroup group) {
-        return suicideAllowed && suicideCheck.test(group);
+    public boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
+        return suicideAllowed && suicideCheck.test(existingGroup);
     }
 
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>

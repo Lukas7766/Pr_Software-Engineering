@@ -74,14 +74,6 @@ public class Board implements BoardInterface {
             }
         }
 
-        // Get neighbors at these x and y coordinates
-        Set<StoneGroup> surroundingSGs = getSurroundings(
-            x,
-            y,
-            (sgp) -> sgp != null,
-            (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
-        );
-
         // Get liberties at these x and y coordinates
         Set<Position> newStoneLiberties = getSurroundings(
             x,
@@ -91,51 +83,62 @@ public class Board implements BoardInterface {
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
-        Set<StoneGroup> removableSGs = new HashSet<>();
+        // Get neighbors at these x and y coordinates
+        Set<StoneGroup> surroundingSGs = getSurroundings(
+                x,
+                y,
+                (sgp) -> sgp != null,
+                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+        );
 
-        StoneGroup firstSameColorGroup = null;
+        // Set<StoneGroup> removableSGs = new HashSet<>();
+
+        StoneGroup firstSameColorGroup = null; // Existing group of the same colour with maximum no. of liberties (relevant for suicide-check)
 
         /*
          * Merge groups of the same color as the new stone
          */
         for (StoneGroup sg : surroundingSGs) {
-            sg.removeLiberty(new Position(x, y));
+            // sg.removeLiberty(new Position(x, y));
             if (sg.getStoneColor() == color) {
-                if (firstSameColorGroup != null) {
-                    firstSameColorGroup.mergeWithStoneGroup(sg);
-                    removableSGs.add(sg);
-                } else {
-                    sg.mergeWithStoneGroup(newGroup);
-                    removableSGs.add(newGroup);
+                if (firstSameColorGroup == null || sg.getLiberties().size() > firstSameColorGroup.getLiberties().size()) {
                     firstSameColorGroup = sg;
-                    System.out.println("Found group of same colour!");
-                }
+                    // firstSameColorGroup.mergeWithStoneGroup(sg);
+                    // removableSGs.add(sg);
+                } /*else {
+                    // sg.mergeWithStoneGroup(newGroup);
+                    // removableSGs.add(newGroup); // always pointless
+                    firstSameColorGroup = sg;
+                    // System.out.println("Found group of same colour!");
+                }*/
             }
         }
 
-        surroundingSGs.removeAll(removableSGs);
+        // surroundingSGs.removeAll(removableSGs);
 
         if (firstSameColorGroup == null) {
             firstSameColorGroup = newGroup;
-            surroundingSGs.add(newGroup);
+            // surroundingSGs.add(newGroup);
         }
 
+        // Check for suicide
         boolean permittedSuicide = false;
         boolean killAnother = false;
 
         Set<StoneGroup> otherColorGroups = surroundingSGs.stream().filter(sg -> sg.getStoneColor() != color).collect(Collectors.toSet());
 
-        if (!prepareMode && firstSameColorGroup.getLiberties().size() == 0) {
-            if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 0)) { // if there are any groups of the opposite color with 0 liberties, the attacker wins and the existing group is removed instead.
+        if (!prepareMode && newGroup.getLiberties().size() == 0 && (newGroup == firstSameColorGroup || firstSameColorGroup.getLiberties().size() == 1)) { // if adding this stone would take away all liberties from the group it's being added to
+            if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)) { // if there are any groups of the opposite color with only one liberty, the attacker wins and the existing group is removed instead.
                 System.out.println("SUICIDE DETECTED!!!");
-                if (!GAME.getRuleset().getSuicide(firstSameColorGroup)) {
-                    Position pos = new Position(x, y);
+                if (!GAME.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
+                    /*Position pos = new Position(x, y);
                     firstSameColorGroup.removeLocation(pos);
                     for (StoneGroup sg : surroundingSGs) {
                         sg.addLiberty(pos);
-                    }
+                    }*/
                     return false;
                 }
+                System.out.println("Suicide permitted.");
                 permittedSuicide = true;
             } else {
                 if (!GAME.getRuleset().predicateKoMove(x,y)) {
@@ -147,10 +150,27 @@ public class Board implements BoardInterface {
             }
         }
 
+        Set<StoneGroup> sameColorGroups = new HashSet<>();
+        sameColorGroups.addAll(surroundingSGs);
+        sameColorGroups.removeAll(otherColorGroups);
+        sameColorGroups.remove(firstSameColorGroup);
+        // sameColorGroups.remove(newGroup);
+
+        if(firstSameColorGroup != newGroup) {
+            firstSameColorGroup.mergeWithStoneGroup(newGroup);
+        }
+        for(StoneGroup sg : sameColorGroups) {
+            firstSameColorGroup.mergeWithStoneGroup(sg); // Don't remove the liberty from the now obsolete group, it's useless and only complicates undoing
+        }
+        firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
+        for(StoneGroup sg : otherColorGroups) {
+            sg.removeLiberty(new Position(x, y));
+        }
+
         if (!permittedSuicide) {
             System.out.println("Placing stone down at " + x + ", " + y);
             board[x][y] =
-                    firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
+                firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
         }
 
         if (!prepareMode) {

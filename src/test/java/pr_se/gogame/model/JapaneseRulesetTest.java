@@ -17,7 +17,7 @@ class JapaneseRulesetTest {
     @Test
     @DisplayName("testing getSuicide(), suicide is not allowed in JP ruleset")
     void getSuicide() {
-        assertFalse(japaneseRuleset.getSuicide(null));
+        assertFalse(japaneseRuleset.getSuicide(null, null));
     }
 
     @Test

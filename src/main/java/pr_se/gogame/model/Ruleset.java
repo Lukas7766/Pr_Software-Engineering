@@ -6,10 +6,11 @@ public interface Ruleset {
      * can cause the opponent some inconvenience). See https://en.wikipedia.org/wiki/Rules_of_Go#Suicide. To check
      * whether suicide is solitary or collective, the ruleset needs to see the board.
      *
-     * @param group The group that is about to commit suicide
+     * @param existingGroup The group that is about to commit suicide
+     * @param addedStone
      * @return whether the ruleset permits suicide under the given cirucmstances on the board.
      */
-    default boolean getSuicide(StoneGroup group) {
+    default boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
         return false;
     }
 
