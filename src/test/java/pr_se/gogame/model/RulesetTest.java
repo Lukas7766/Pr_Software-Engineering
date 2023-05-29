@@ -140,9 +140,9 @@ class RulesetTest {
     @DisplayName("testing setHandicapStones(), wrong input")
     void testSetHandicapStonesWI() {
         assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(null, null, 0); });
-        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Board(new Game(), StoneColor.BLACK), null, 0); });
-        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Board(new Game(), StoneColor.BLACK), StoneColor.BLACK, -1); });
-        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Board(new Game(), StoneColor.BLACK), StoneColor.BLACK, 10); });
+        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Game(), null, 0); });
+        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Game(), StoneColor.BLACK, -1); });
+        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Game(), StoneColor.BLACK, 10); });
     }
 
 

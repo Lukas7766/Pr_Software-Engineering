@@ -41,7 +41,7 @@ public class Game implements GameInterface {
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
-        this.board = new Board(this, BLACK);
+        this.board = new Board(this);
     }
 
     @Override
@@ -77,7 +77,8 @@ public class Game implements GameInterface {
         this.blackCapturedStones = 0;
         this.whiteCapturedStones = 0;
         this.curMoveNumber = 0;
-        this.board = new Board(this, curColor);
+        this.board = new Board(this);
+        this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
 
         System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
         fireGameEvent(new GameEvent(gameCommand, size, handicap));
@@ -273,6 +274,15 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y) {
+        if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS &&
+            this.gameCommand != GameCommand.BLACK_PLAYS && this.gameCommand != GameCommand.WHITE_PLAYS) {
+            throw new IllegalStateException("Can't place stone wehn game isn't being played!");
+        }
+
+        if(x < 0 || y < 0 || x >= size || y >= size) {
+            throw new IllegalArgumentException();
+        }
+
         if (board.setStone(x, y, curColor, false, true)) {
             curMoveNumber++;
             System.out.println("show move # " + showMoveNumbers);
@@ -286,13 +296,24 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapStone(int x, int y) {
-        board.setStone(x, y, curColor, true, true);
+        if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS) {
+            throw new IllegalStateException("Can't place handicap stone after game start!");
+        }
+
+        if(x < 0 || y < 0 || x >= size || y >= size) {
+            throw new IllegalArgumentException();
+        }
+
         handicapStoneCounter--;
+        if (handicapStoneCounter < 0) {
+            throw new IllegalStateException("Can't place any more handicap stones!");
+        }
+
+        board.setStone(x, y, curColor, true, true);
+
         if (handicapStoneCounter == 0) {
             // fileTree.insertBufferedStonesBeforeGame();
             switchColor();
-        } else if (handicapStoneCounter < 0) {
-            throw new IllegalStateException();
         }
     }
 

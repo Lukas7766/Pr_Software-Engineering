@@ -40,9 +40,14 @@ class GameTest {
 
     @Test
     void placeHandicapStoneArguments() {
+        game.newGame(BLACK_STARTS, 19, 1);
+        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapStone(-1, 0));
+        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapStone(0, -1));
+        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapStone(game.getSize(), 0));
+        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapStone(0, game.getSize()));
     }
 
@@ -557,5 +562,17 @@ class GameTest {
         game.switchColor();
         assertEquals(WHITE, game.getCurColor());
         assertEquals(WHITE_PLAYS, game.getGameState());
+    }
+
+    @Test
+    void dontPlaceHandicapStonesAfterStart() {
+        game.playMove(0, 0);
+        assertThrows(IllegalStateException.class, () -> game.placeHandicapStone(1, 1));
+    }
+
+    @Test
+    void dontPlayAfterGameIsOver() {
+        game.resign();
+        assertThrows(IllegalStateException.class, () -> game.playMove(0, 0));
     }
 }

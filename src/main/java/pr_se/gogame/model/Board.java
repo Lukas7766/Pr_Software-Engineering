@@ -10,7 +10,6 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import static pr_se.gogame.model.StoneColor.*;
-import java.nio.file.Path;
 
 
 /**
@@ -40,18 +39,12 @@ public class Board implements BoardInterface {
      * Creates a new Board belonging to the specified Game, containing handicap stones of the specified beginner color
      * (only if the Game has a handicap set)
      *
-     * @param game     the Game that this Board belongs to
-     * @param beginner which color player gets to start (handicap stones will be of this color)
+     * @param game the Game that this Board belongs to
      */
-    public Board(Game game, StoneColor beginner) {
+    public Board(Game game) {
         this.GAME = game;
         this.SIZE = game.getSize();
         this.board = new StoneGroupPointer[SIZE][SIZE];
-
-        int handicap = this.GAME.getHandicap(); // temporary variable; handicap will eventually need to be replaced with a simple number of handicap stones, as handicap has nothing to do with handicap stones.
-
-
-        this.GAME.getRuleset().setHandicapStones(this, beginner, handicap);
     }
 
     @Override

@@ -9,7 +9,7 @@ public class UserDefinableRuleset implements Ruleset {
 
     int koAmount = 2;
 
-    private BiConsumer<Board, Integer> handicapStoneSetter;
+    private BiConsumer<Game, Integer> handicapStoneSetter;
     private Predicate<StoneGroup> suicideCheck;
 
 
@@ -83,7 +83,7 @@ public class UserDefinableRuleset implements Ruleset {
         return hasDefaultHandicap;
     }
 
-    public void setCustomHandicapPlacement(BiConsumer<Board, Integer> stoneSetter) {
+    public void setCustomHandicapPlacement(BiConsumer<Game, Integer> stoneSetter) {
         hasDefaultHandicap = false;
         handicapStoneSetter = stoneSetter;
     }
@@ -94,9 +94,9 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public void setHandicapStones(Board board, StoneColor beginner, int noStones) {
+    public void setHandicapStones(Game game, StoneColor beginner, int noStones) {
         if(!hasDefaultHandicap) {
-            handicapStoneSetter.accept(board, noStones);
+            handicapStoneSetter.accept(game, noStones);
         }
     }
 }
