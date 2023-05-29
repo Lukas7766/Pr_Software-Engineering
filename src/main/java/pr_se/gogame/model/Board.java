@@ -92,27 +92,13 @@ public class Board implements BoardInterface {
                 (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
-        StoneGroup firstSameColorGroup = null; // Existing group of the same colour with maximum no. of liberties (relevant for suicide-check)
-
         /*
-         * Merge groups of the same color as the new stone
+         * Existing group of the same colour with maximum no. of liberties (which is relevant for the suicide-check)
          */
-        firstSameColorGroup = surroundingSGs.stream()
+        StoneGroup firstSameColorGroup = surroundingSGs.stream()
             .filter(sg -> sg.getStoneColor() == color)
             .max(Comparator.comparingInt(sg -> sg.getLiberties().size()))
             .orElse(newGroup);
-
-        /*for (StoneGroup sg : surroundingSGs) {
-            if (sg.getStoneColor() == color) {
-                if (firstSameColorGroup == null || sg.getLiberties().size() > firstSameColorGroup.getLiberties().size()) {
-                    firstSameColorGroup = sg;
-                }
-            }
-        }
-
-        if (firstSameColorGroup == null) {
-            firstSameColorGroup = newGroup;
-        }*/
 
         // Check for suicide
         boolean permittedSuicide = false;
