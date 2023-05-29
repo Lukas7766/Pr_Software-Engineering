@@ -128,8 +128,7 @@ public class Board implements BoardInterface {
          * Merge newly-connected StoneGroups of the same color and remove the new stone's position from the liberties
          * of all adjacent groups
          */
-        Set<StoneGroup> sameColorGroups = new HashSet<>();
-        sameColorGroups.addAll(surroundingSGs);
+        Set<StoneGroup> sameColorGroups = new HashSet<>(surroundingSGs);
         sameColorGroups.removeAll(otherColorGroups);
         sameColorGroups.remove(firstSameColorGroup);
 
