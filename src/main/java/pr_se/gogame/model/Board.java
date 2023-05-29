@@ -61,7 +61,7 @@ public class Board implements BoardInterface {
 
         // Is the space already occupied?
         if (board[x][y] != null) {
-            return false; // TODO: throw a custom exception? Illegalargument? Generic Exception? Or maybe not if we output it to the user?
+            return false;
         }
 
         //prevent KO
@@ -76,18 +76,18 @@ public class Board implements BoardInterface {
 
         // Get neighbors at these x and y coordinates
         Set<StoneGroup> surroundingSGs = getSurroundings(
-                x,
-                y,
-                (sgp) -> sgp != null,
-                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+            x,
+            y,
+            (sgp) -> sgp != null,
+            (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
         // Get liberties at these x and y coordinates
         Set<Position> newStoneLiberties = getSurroundings(
-                x,
-                y,
-                (sgp) -> sgp == null,
-                (neighborX, neighborY) -> new Position(neighborX, neighborY)
+            x,
+            y,
+            (sgp) -> sgp == null,
+            (neighborX, neighborY) -> new Position(neighborX, neighborY)
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 

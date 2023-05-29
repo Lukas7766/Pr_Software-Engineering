@@ -17,10 +17,10 @@ public class StoneGroupPointer {
 
     /**
      * Creates a StoneGroupPointer pointing to the supplied StoneGroup
-     * @param stoneGroup the Stonegroup this points to
+     * @param stoneGroup the StoneGroup this points to
      */
     public StoneGroupPointer(StoneGroup stoneGroup) {
-        if(stoneGroup == null) { // Checking here as well to make stack-traces shorter.
+        if(stoneGroup == null) {
             throw new NullPointerException();
         }
         setStoneGroup(stoneGroup);

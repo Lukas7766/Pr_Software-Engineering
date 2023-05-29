@@ -1,5 +1,7 @@
 package pr_se.gogame.model;
 
+import javafx.geometry.Pos;
+
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.Set;
@@ -53,24 +55,10 @@ public class StoneGroup {
     }
 
     /**
-     * Adds the locations and liberties of the StoneGroup pointed to by the supplied pointer to this StoneGroup
-     * @param other StoneGroupPointer to the StoneGroup that is to be merged with this one
-     */
-    public void mergeWithStoneGroupPtr(StoneGroupPointer other) {
-        if(other == null) {
-            throw new NullPointerException();
-        }
-
-        mergeWithStoneGroup(other.getStoneGroup());
-
-        other.setStoneGroup(this);
-    }
-
-    /**
      * Adds the locations and liberties of the supplied StoneGroup to this one
      * @param other StoneGroup that is to be merged with this one
      */
-    public void mergeWithStoneGroup(StoneGroup other) {
+    public UndoableCommand mergeWithStoneGroup(StoneGroup other) {
         if(other == null) {
             throw new NullPointerException();
         }
@@ -79,61 +67,98 @@ public class StoneGroup {
             throw new IllegalArgumentException("Stone group must be of the same color!");
         }
 
-        addLiberties(other.getLiberties());
-        locations.addAll(other.getLocations());
-        other.getPointers().forEach(p -> {
-            p.setStoneGroup(this);
-            addPointer(p);
-        });
-        other.removeAllPointers();
-    }
+        final LinkedList<Position> OLD_LOCATIONS = new LinkedList<>();
+        OLD_LOCATIONS.addAll(locations);
+        final HashSet<Position> OLD_LIBERTIES = new HashSet<>();
+        OLD_LIBERTIES.addAll(liberties);
 
-    /**
-     * Adds the supplied Set of liberties to this StoneGroup
-     * @param addedLiberties Set of liberties to be added to this StoneGroup
-     */
-    public void addLiberties(Set<Position> addedLiberties) {
-        if(addedLiberties == null) {
-            throw new NullPointerException();
-        }
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                locations.addAll(other.getLocations());
+                liberties.addAll(other.getLiberties());
+                other.getPointers().forEach(p -> {
+                    p.setStoneGroup(StoneGroup.this);
+                    addPointer(p);
+                });
+            }
 
-        liberties.addAll(addedLiberties);
-    }
+            @Override
+            public void undo() {
+                locations.remove(locations);
+                locations.addAll(OLD_LOCATIONS);
+                liberties.remove(liberties);
+                liberties.addAll(OLD_LIBERTIES);
+                other.getPointers().forEach(p -> {
+                    p.setStoneGroup(other);
+                    pointers.remove(p);
+                });
+            }
+        };
 
-    /**
-     * Removes the supplied Set of liberties from this StoneGroup
-     * @param removedLiberties Set of liberties to be removed from this StoneGroup
-     */
-    public void removeLiberties(Set<Position> removedLiberties) {
-        if(removedLiberties == null) {
-            throw new NullPointerException();
-        }
+        ret.execute();
 
-        liberties.removeAll(removedLiberties);
+        return ret;
     }
 
     /**
      * Adds the supplied liberty to this StoneGroup
      * @param liberty unoccupied Position to be added to this StoneGroup
      */
-    public void addLiberty(Position liberty) {
+    public UndoableCommand addLiberty(Position liberty) {
         if(liberty == null) {
             throw new NullPointerException();
         }
 
-        liberties.add(liberty);
+        final boolean WAS_CONTAINED = liberties.contains(liberty);
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                liberties.add(liberty);
+            }
+
+            @Override
+            public void undo() {
+                if(!WAS_CONTAINED) {
+                    liberties.remove(liberty);
+                }
+            }
+        };
+
+        ret.execute();
+
+        return ret;
     }
 
     /**
      * Removes the supplied liberty from this StoneGroup
      * @param liberty unoccupied Position to be removed from this StoneGroup
      */
-    public void removeLiberty(Position liberty) {
+    public UndoableCommand removeLiberty(Position liberty) {
         if(liberty == null) {
             throw new NullPointerException();
         }
 
-        liberties.remove(liberty);
+        final boolean WAS_CONTAINED = liberties.contains(liberty);
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                liberties.remove(liberty);
+            }
+
+            @Override
+            public void undo() {
+                if(WAS_CONTAINED) {
+                    liberties.add(liberty);
+                }
+            }
+        };
+
+        ret.execute();
+
+        return ret;
     }
 
     // Getters and Setters
@@ -151,10 +176,6 @@ public class StoneGroup {
 
     public void addPointer(StoneGroupPointer ptr) {
         pointers.add(ptr);
-    }
-
-    public void removeAllPointers() {
-        pointers.removeAll(pointers);
     }
 
     public Set<StoneGroupPointer> getPointers() {

@@ -274,10 +274,10 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y) {
-        if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS &&
+        /*if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS &&
             this.gameCommand != GameCommand.BLACK_PLAYS && this.gameCommand != GameCommand.WHITE_PLAYS) {
-            throw new IllegalStateException("Can't place stone wehn game isn't being played!");
-        }
+            throw new IllegalStateException("Can't place stone when game isn't being played! Game State was " + this.gameCommand);
+        }*/
 
         if(x < 0 || y < 0 || x >= size || y >= size) {
             throw new IllegalArgumentException();
@@ -287,6 +287,7 @@ public class Game implements GameInterface {
             curMoveNumber++;
             System.out.println("show move # " + showMoveNumbers);
             System.out.println("Move played.");
+            printDebugInfo(x, y);
             // Update current player color
             switchColor();
         } else {
@@ -296,9 +297,9 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapStone(int x, int y) {
-        if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS) {
+        /*if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS) {
             throw new IllegalStateException("Can't place handicap stone after game start!");
-        }
+        }*/
 
         if(x < 0 || y < 0 || x >= size || y >= size) {
             throw new IllegalArgumentException();
