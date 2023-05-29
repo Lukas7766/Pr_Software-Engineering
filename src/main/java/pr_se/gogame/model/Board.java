@@ -4,6 +4,7 @@ import pr_se.gogame.view_controller.DebugEvent;
 import pr_se.gogame.view_controller.StoneRemovedEvent;
 import pr_se.gogame.view_controller.StoneSetEvent;
 
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.function.BiFunction;
@@ -91,35 +92,27 @@ public class Board implements BoardInterface {
                 (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
-        // Set<StoneGroup> removableSGs = new HashSet<>();
-
         StoneGroup firstSameColorGroup = null; // Existing group of the same colour with maximum no. of liberties (relevant for suicide-check)
 
         /*
          * Merge groups of the same color as the new stone
          */
-        for (StoneGroup sg : surroundingSGs) {
-            // sg.removeLiberty(new Position(x, y));
+        firstSameColorGroup = surroundingSGs.stream()
+            .filter(sg -> sg.getStoneColor() == color)
+            .max(Comparator.comparingInt(sg -> sg.getLiberties().size()))
+            .orElse(newGroup);
+
+        /*for (StoneGroup sg : surroundingSGs) {
             if (sg.getStoneColor() == color) {
                 if (firstSameColorGroup == null || sg.getLiberties().size() > firstSameColorGroup.getLiberties().size()) {
                     firstSameColorGroup = sg;
-                    // firstSameColorGroup.mergeWithStoneGroup(sg);
-                    // removableSGs.add(sg);
-                } /*else {
-                    // sg.mergeWithStoneGroup(newGroup);
-                    // removableSGs.add(newGroup); // always pointless
-                    firstSameColorGroup = sg;
-                    // System.out.println("Found group of same colour!");
-                }*/
+                }
             }
         }
 
-        // surroundingSGs.removeAll(removableSGs);
-
         if (firstSameColorGroup == null) {
             firstSameColorGroup = newGroup;
-            // surroundingSGs.add(newGroup);
-        }
+        }*/
 
         // Check for suicide
         boolean permittedSuicide = false;
@@ -131,11 +124,6 @@ public class Board implements BoardInterface {
             if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)) { // if there are any groups of the opposite color with only one liberty, the attacker wins and the existing group is removed instead.
                 System.out.println("SUICIDE DETECTED!!!");
                 if (!GAME.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
-                    /*Position pos = new Position(x, y);
-                    firstSameColorGroup.removeLocation(pos);
-                    for (StoneGroup sg : surroundingSGs) {
-                        sg.addLiberty(pos);
-                    }*/
                     return false;
                 }
                 System.out.println("Suicide permitted.");
@@ -154,7 +142,6 @@ public class Board implements BoardInterface {
         sameColorGroups.addAll(surroundingSGs);
         sameColorGroups.removeAll(otherColorGroups);
         sameColorGroups.remove(firstSameColorGroup);
-        // sameColorGroups.remove(newGroup);
 
         if(firstSameColorGroup != newGroup) {
             firstSameColorGroup.mergeWithStoneGroup(newGroup);
