@@ -79,6 +79,7 @@ public class Game implements GameInterface {
         this.curMoveNumber = 0;
         this.board = new Board(this);
         this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
+        this.gameResult = null;
 
         System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
         fireGameEvent(new GameEvent(gameCommand, size, handicap));
@@ -111,7 +112,7 @@ public class Game implements GameInterface {
     @Override
     public void pass() {
         System.out.println("pass");
-        switchColor(); // Everything that was removed was already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
+        UndoableCommand c = switchColor(); // Everything that was removed was already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
     }
 
     @Override
@@ -249,17 +250,34 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void setCurColor(StoneColor c) {
+    public UndoableCommand setCurColor(StoneColor c) {
         if (c == null) {
             throw new NullPointerException();
         }
 
-        this.curColor = c;
-        if(this.curColor == BLACK) {
-            this.gameCommand = GameCommand.BLACK_PLAYS;
-        } else {
-            this.gameCommand = GameCommand.WHITE_PLAYS;
-        }
+        final StoneColor OLD_COLOR = this.curColor;
+        final GameCommand OLD_COMMAND = this.gameCommand;
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                Game.this.curColor = c;
+                if(Game.this.curColor == BLACK) {
+                    Game.this.gameCommand = GameCommand.BLACK_PLAYS;
+                } else {
+                    Game.this.gameCommand = GameCommand.WHITE_PLAYS;
+                }
+            }
+
+            @Override
+            public void undo() {
+                Game.this.curColor = OLD_COLOR;
+                Game.this.gameCommand = OLD_COMMAND;
+            }
+        };
+        ret.execute();
+
+        return ret;
     }
 
     @Override
@@ -420,23 +438,37 @@ public class Game implements GameInterface {
         return gameResult;
     }
 
-    public void switchColor() {
-        if (curColor == BLACK) {
-            // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
-            setCurColor(WHITE);
-        } else {
-            // this.gameCommand = GameCommand.BLACK_PLAYS; // handled by setCurColor()
-            setCurColor(BLACK);
-        }
-        fireGameEvent(new GameEvent(gameCommand));
+    public UndoableCommand switchColor() {
+        UndoableCommand ret = new UndoableCommand() {
+            UndoableCommand thisCommand;
+
+            @Override
+            public void execute() {
+                if (curColor == BLACK) {
+                    // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
+                    thisCommand = setCurColor(WHITE);
+                } else {
+                    // this.gameCommand = GameCommand.BLACK_PLAYS; // handled by setCurColor()
+                    thisCommand = setCurColor(BLACK);
+                }
+
+                fireGameEvent(new GameEvent(gameCommand));
+            }
+
+            @Override
+            public void undo() {
+                if(thisCommand != null) {
+                    thisCommand.undo();
+                    fireGameEvent(new GameEvent(gameCommand));
+                }
+            }
+        };
+        ret.execute();
+
+        return ret;
     }
 
-    /*
-    I would have liked to give it default visibility, so it's visible only in the same package, but alas IntelliJ
-    won't let me.
-    -> 20230502, SeWa: changed to package private
- */
-    void fireGameEvent(GameEvent e) {
+    void fireGameEvent(GameEvent e) { // package-private by design
         if(e == null) {
             throw new NullPointerException();
         }

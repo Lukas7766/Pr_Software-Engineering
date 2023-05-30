@@ -69,7 +69,7 @@ public interface GameInterface {
 
     StoneColor getCurColor();
 
-    void setCurColor(StoneColor c);
+    UndoableCommand setCurColor(StoneColor c);
 
     Board getBoard();
 
