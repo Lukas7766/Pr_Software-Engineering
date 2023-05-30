@@ -223,4 +223,26 @@ class BoardTest {
         assertDoesNotThrow(() -> board.printDebugInfo(0, 1)); // x == lastDebugX && y != lastDebugY
         assertDoesNotThrow(() -> board.printDebugInfo(1, 1)); // x != lastDebugX && [y == lastDebugY]
     }
+
+    @Test
+    void simpleUndoTest() {
+        board.setStone(1, 0, BLACK, false, true);
+        board.setStone(1, 2, BLACK, false, true);
+        board.setStone(0, 1, BLACK, false, true);
+        board.setStone(1, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        assertEquals(null, board.getColorAt(1, 1));
+        assertEquals(BLACK, board.getColorAt(2, 1));
+
+        c.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        c.execute();
+        assertEquals(null, board.getColorAt(1, 1));
+        assertEquals(BLACK, board.getColorAt(2, 1));
+    }
 }
