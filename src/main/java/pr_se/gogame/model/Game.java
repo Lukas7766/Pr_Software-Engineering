@@ -111,16 +111,7 @@ public class Game implements GameInterface {
     @Override
     public void pass() {
         System.out.println("pass");
-        /*switch (gameCommand) {
-            case BLACK_PLAYS, BLACK_STARTS -> {
-                this.setCurColor(WHITE);
-            }
-            case WHITE_PLAYS, WHITE_STARTS -> {
-                this.setCurColor(BLACK);
-            }
-        }
-        fireGameEvent(new GameEvent(gameCommand));*/
-        switchColor(); // Everything that was commented out is already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
+        switchColor(); // Everything that was removed was already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
     }
 
     @Override
@@ -132,17 +123,17 @@ public class Game implements GameInterface {
         switch (gameCommand) {
             case WHITE_PLAYS, WHITE_STARTS -> {
                 this.gameCommand = GameCommand.BLACK_WON;
-                sb.append("White!").append("\n\n").append("Black won!");
                 result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
+                sb.append("White!").append("\n\n").append("Black won!");
             }
             case BLACK_PLAYS, BLACK_STARTS -> {
                 this.gameCommand = GameCommand.WHITE_WON;
-                sb.append("Black!").append("\n\n").append("White won!");
                 result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
+                sb.append("Black!").append("\n\n").append("White won!");
             }
             default -> {throw new IllegalStateException("Game was not resigned! Consult your application owner!");}
         }
-        this.gameResult=result;
+        this.gameResult = result;
         fireGameEvent(new GameEvent(gameCommand));
     }
 
