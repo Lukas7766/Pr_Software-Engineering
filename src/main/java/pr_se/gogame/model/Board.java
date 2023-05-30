@@ -165,7 +165,7 @@ public class Board implements BoardInterface {
         final boolean FINAL_KILL_ANOTHER = killAnother;
 
         final UndoableCommand UC06_REMOVE_CAPTURED_STONES = new UndoableCommand() {
-            LinkedList<UndoableCommand> uC06_01_removeStoneCommands = new LinkedList<>();
+            final LinkedList<UndoableCommand> UC06_01_REMOVE_STONE_COMMANDS = new LinkedList<>();
             UndoableCommand uC06_02_addCapturedStonesCommand = null;
 
             @Override
@@ -176,7 +176,7 @@ public class Board implements BoardInterface {
                         if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !FINAL_KILL_ANOTHER)) && sg.getLiberties().size() == 0) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
-                                uC06_01_removeStoneCommands.add(removeStone(p.X, p.Y, true));
+                                UC06_01_REMOVE_STONE_COMMANDS.add(removeStone(p.X, p.Y, true));
                                 captured++;
                                 System.out.println("remove: " + p.X + " / " + p.Y);
                             }
@@ -203,7 +203,7 @@ public class Board implements BoardInterface {
 
             @Override
             public void undo() {
-                for(UndoableCommand c : uC06_01_removeStoneCommands) {
+                for(UndoableCommand c : UC06_01_REMOVE_STONE_COMMANDS) {
                     c.undo();
                 }
 
@@ -219,7 +219,9 @@ public class Board implements BoardInterface {
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute() {
-                UC01_ADD_NEW_TO_FIRST.execute();
+                if(UC01_ADD_NEW_TO_FIRST != null) {
+                    UC01_ADD_NEW_TO_FIRST.execute();
+                }
                 for(UndoableCommand c : uC02_mergeSameWithFirst) {
                     c.execute();
                 }
@@ -243,7 +245,9 @@ public class Board implements BoardInterface {
                 for(UndoableCommand c : uC02_mergeSameWithFirst) {
                     c.undo();
                 }
-                UC01_ADD_NEW_TO_FIRST.undo();
+                if(UC01_ADD_NEW_TO_FIRST != null) {
+                    UC01_ADD_NEW_TO_FIRST.undo();
+                }
             }
         };
         // No execute() this time, as we've already executed the subcommands piecemeal (though this could be changed for the sake of uniformity).
@@ -263,7 +267,7 @@ public class Board implements BoardInterface {
 
         UndoableCommand ret = new UndoableCommand() {
 
-            List<UndoableCommand> addLibertyCommands = new LinkedList<>();
+            final List<UndoableCommand> ADD_LIBERTY_COMMANDS = new LinkedList<>();
 
             @Override
             public void execute() {
@@ -280,7 +284,7 @@ public class Board implements BoardInterface {
                     (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
                 );
                 for (StoneGroup sg : surroundingSGs) {
-                    addLibertyCommands.add(sg.addLiberty(new Position(x, y)));
+                    ADD_LIBERTY_COMMANDS.add(sg.addLiberty(new Position(x, y)));
                 }
 
                 // Update UI
@@ -293,7 +297,7 @@ public class Board implements BoardInterface {
 
                 // TODO: Saving won't be undone, will it?
 
-                for(UndoableCommand c : addLibertyCommands) {
+                for(UndoableCommand c : ADD_LIBERTY_COMMANDS) {
                     c.undo();
                 }
 
