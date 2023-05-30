@@ -209,7 +209,9 @@ public class Board implements BoardInterface {
 
                 // TODO: Saving won't be undone, will it?
 
-                uC06_02_addCapturedStonesCommand.undo();
+                if(uC06_02_addCapturedStonesCommand != null) {
+                    uC06_02_addCapturedStonesCommand.undo();
+                }
 
                 fireStoneRemoved(x, y); // TODO: Do we need a check for FINAL_PERMITTED_SUICIDE here?
             }

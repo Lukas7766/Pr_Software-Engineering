@@ -245,4 +245,140 @@ class BoardTest {
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
+
+    @Test
+    void simpleUndoTest2() {
+        board.setStone(1, 0, BLACK, false, true);
+        board.setStone(1, 2, BLACK, false, true);
+        board.setStone(0, 1, BLACK, false, true);
+        board.setStone(1, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        assertEquals(null, board.getColorAt(1, 1));
+        assertEquals(BLACK, board.getColorAt(2, 1));
+
+        c.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        UndoableCommand c2 = board.setStone(2, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(2, 1));
+
+        c2.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        c.execute();
+        assertEquals(null, board.getColorAt(1, 1));
+        assertEquals(BLACK, board.getColorAt(2, 1));
+    }
+
+    @Test
+    void simpleUndoTest3() {
+        board.setStone(1, 0, BLACK, false, true);
+        board.setStone(1, 2, BLACK, false, true);
+        board.setStone(0, 1, BLACK, false, true);
+        board.setStone(1, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        UndoableCommand c2 = board.setStone(2, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(2, 1));
+
+        c2.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        assertEquals(null, board.getColorAt(1, 1));
+        assertEquals(BLACK, board.getColorAt(2, 1));
+
+        c.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+    }
+
+    @Test
+    void simpleUndoTest4() {
+        board.setStone(1, 0, BLACK, false, true);
+        board.setStone(1, 2, BLACK, false, true);
+        board.setStone(0, 1, BLACK, false, true);
+        board.setStone(1, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        UndoableCommand c2 = board.setStone(2, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(2, 1));
+
+        UndoableCommand c3 = board.setStone(3, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(2, 1));
+        assertEquals(WHITE, board.getColorAt(3, 1));
+
+        c3.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(2, 1));
+        assertEquals(null, board.getColorAt(3, 1));
+
+        c2.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+        assertEquals(null, board.getColorAt(3, 1));
+
+        UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        assertEquals(null, board.getColorAt(1, 1));
+        assertEquals(BLACK, board.getColorAt(2, 1));
+        assertEquals(null, board.getColorAt(3, 1));
+
+        c.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+        assertEquals(null, board.getColorAt(3, 1));
+    }
+
+    @Test
+    void complexUndoTest() {
+        board.setStone(1, 0, BLACK, false, true);
+        board.setStone(1, 2, BLACK, false, true);
+        board.setStone(0, 1, BLACK, false, true);
+        board.setStone(1, 1, WHITE, false, true);
+        board.setStone(2, 0, BLACK, false,true);
+        board.setStone(2, 2, BLACK, false,true);
+        board.setStone(3, 0, BLACK, false,true);
+        board.setStone(3, 2, BLACK, false,true);
+        board.setStone(3, 1, WHITE, false, true);
+        UndoableCommand c = board.setStone(4, 1, BLACK, false,true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(3, 1));
+
+        UndoableCommand c2 = board.setStone(2, 1, BLACK, false, true);
+        assertEquals(null, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(3, 1));
+        assertEquals(BLACK, board.getColorAt(2, 1));
+
+        c2.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(3, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        board.setStone(2, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1)); // due to suicide detection
+        assertEquals(WHITE, board.getColorAt(3, 1));
+
+        c.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(3, 1));
+        assertEquals(null, board.getColorAt(4, 1));
+
+        board.setStone(2, 1, WHITE, false, true);
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(2, 1)); // due to suicide detection
+        assertEquals(WHITE, board.getColorAt(3, 1));
+    }
 }
