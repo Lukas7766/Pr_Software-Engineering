@@ -4,9 +4,7 @@ import pr_se.gogame.view_controller.DebugEvent;
 import pr_se.gogame.view_controller.StoneRemovedEvent;
 import pr_se.gogame.view_controller.StoneSetEvent;
 
-import java.util.Comparator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -49,7 +47,7 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save) {
+    public UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save) {
         // Are the coordinates invalid?
         if (areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
@@ -62,14 +60,14 @@ public class Board implements BoardInterface {
 
         // Is the space already occupied?
         if (board[x][y] != null) {
-            return false;
+            return null;
         }
 
         //prevent KO
         if(GAME.getRuleset().getKoMove() != null) {
             if(GAME.getRuleset().predicateKoMove(x,y)) {
                 System.out.println("KO move is not allowed");
-                return false;
+                return null;
             } else {
                 GAME.getRuleset().resetKoMove();
             }
@@ -110,7 +108,7 @@ public class Board implements BoardInterface {
             if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)) { // if there are any groups of the opposite color with only one liberty, the attacker wins and the existing group is removed instead.
                 System.out.println("SUICIDE DETECTED!!!");
                 if (!GAME.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
-                    return false;
+                    return null;
                 }
                 System.out.println("Suicide permitted.");
                 permittedSuicide = true;
@@ -119,7 +117,7 @@ public class Board implements BoardInterface {
                     killAnother = true;
                 } else {
                     System.out.println("KO move is not allowed");
-                    return false;
+                    return null;
                 }
             }
         }
@@ -132,82 +130,180 @@ public class Board implements BoardInterface {
         sameColorGroups.removeAll(otherColorGroups);
         sameColorGroups.remove(firstSameColorGroup);
 
-        if(firstSameColorGroup != newGroup) {
-            firstSameColorGroup.mergeWithStoneGroup(newGroup);
-        }
+        final UndoableCommand UC01_ADD_NEW_TO_FIRST = (firstSameColorGroup != newGroup) ? (firstSameColorGroup.mergeWithStoneGroup(newGroup)) : (null);
+
+        List<UndoableCommand> uC02_mergeSameWithFirst = new LinkedList<>();
         for(StoneGroup sg : sameColorGroups) {
-            firstSameColorGroup.mergeWithStoneGroup(sg); // Don't remove the liberty from the now obsolete group - it's pointless and only complicates undoing
+            uC02_mergeSameWithFirst.add(firstSameColorGroup.mergeWithStoneGroup(sg)); // Don't remove the liberty from the now obsolete group - it's pointless and only complicates undoing
         }
-        firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
+        final UndoableCommand UC03_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES = firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
+        List<UndoableCommand> uC04_removeNewPosFromOtherLiberties = new LinkedList<>();
         for(StoneGroup sg : otherColorGroups) {
-            sg.removeLiberty(new Position(x, y));
+            uC04_removeNewPosFromOtherLiberties.add(sg.removeLiberty(new Position(x, y)));
         }
 
-        if (!permittedSuicide) {
-            System.out.println("Placing stone down at " + x + ", " + y);
-            board[x][y] =
-                firstSameColorGroup.getPointers().stream().findFirst().orElseGet(() -> new StoneGroupPointer(newGroup));
-        }
-
-        if (!prepareMode) {
-
-            for (StoneGroup sg : surroundingSGs) {
-                if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !killAnother)) && sg.getLiberties().size() == 0) {
-                    int captured = 0;
-                    for (Position p : sg.getLocations()) {
-                        removeStone(p.X, p.Y, true);
-                        captured++;
-                        System.out.println("remove: " + p.X + " / " + p.Y);
-                    }
-                    GAME.addCapturedStones(color, captured);
+        final boolean FINAL_PERMITTED_SUICIDE = permittedSuicide;
+        final UndoableCommand UC05_PLACE_POINTER = new UndoableCommand() {
+            @Override
+            public void execute() {
+                if (!FINAL_PERMITTED_SUICIDE) {
+                    System.out.println("Placing stone down at " + x + ", " + y);
+                    board[x][y] =
+                        firstSameColorGroup.getPointers().stream()
+                            .findFirst()
+                            .orElseGet(() -> new StoneGroupPointer(newGroup));
                 }
             }
 
-            if(save) {
-                /*
-                 * if(prepareMode) {
-                 *      GAME.getFileTree().bufferStonesBeforeGame(color, x, y);
-                 * } else {
-                 *      GAME.getFileTree().addStone(color, x, y);
-                 * }
-                 */
+            @Override
+            public void undo() {
+                board[x][y] = null;
             }
-        }
+        };
+        UC05_PLACE_POINTER.execute();
 
-        // Update UI if possible
-        if (!permittedSuicide) {
-            fireStoneSet(x, y, color, prepareMode);
-        }
+        final boolean FINAL_KILL_ANOTHER = killAnother;
+
+        final UndoableCommand UC06_REMOVE_CAPTURED_STONES = new UndoableCommand() {
+            LinkedList<UndoableCommand> uC06_01_removeStoneCommands = new LinkedList<>();
+            UndoableCommand uC06_02_addCapturedStonesCommand = null;
+
+            @Override
+            public void execute() {
+                if (!prepareMode) {
+
+                    for (StoneGroup sg : surroundingSGs) {
+                        if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !FINAL_KILL_ANOTHER)) && sg.getLiberties().size() == 0) {
+                            int captured = 0;
+                            for (Position p : sg.getLocations()) {
+                                uC06_01_removeStoneCommands.add(removeStone(p.X, p.Y, true));
+                                captured++;
+                                System.out.println("remove: " + p.X + " / " + p.Y);
+                            }
+                            uC06_02_addCapturedStonesCommand = GAME.addCapturedStones(color, captured);
+                        }
+                    }
+
+                    if(save) {
+                        /*
+                         * if(prepareMode) {
+                         *      GAME.getFileTree().bufferStonesBeforeGame(color, x, y);
+                         * } else {
+                         *      GAME.getFileTree().addStone(color, x, y);
+                         * }
+                         */
+                    }
+                }
+
+                // Update UI if possible
+                if (!FINAL_PERMITTED_SUICIDE) {
+                    fireStoneSet(x, y, color, prepareMode);
+                }
+            }
+
+            @Override
+            public void undo() {
+                for(UndoableCommand c : uC06_01_removeStoneCommands) {
+                    c.undo();
+                }
+
+                // TODO: Saving won't be undone, will it?
+
+                uC06_02_addCapturedStonesCommand.undo();
+
+                fireStoneRemoved(x, y); // TODO: Do we need a check for FINAL_PERMITTED_SUICIDE here?
+            }
+        };
+        UC06_REMOVE_CAPTURED_STONES.execute();
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                UC01_ADD_NEW_TO_FIRST.execute();
+                for(UndoableCommand c : uC02_mergeSameWithFirst) {
+                    c.execute();
+                }
+                UC03_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES.execute();
+                for(UndoableCommand c : uC04_removeNewPosFromOtherLiberties) {
+                    c.execute();
+                }
+                UC05_PLACE_POINTER.execute();
+                UC06_REMOVE_CAPTURED_STONES.execute();
+            }
+
+            @Override
+            public void undo() {
+                // Undoing it the other way round just in case.
+                UC06_REMOVE_CAPTURED_STONES.undo();
+                UC05_PLACE_POINTER.undo();
+                for(UndoableCommand c : uC04_removeNewPosFromOtherLiberties) {
+                    c.undo();
+                }
+                UC03_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES.undo();
+                for(UndoableCommand c : uC02_mergeSameWithFirst) {
+                    c.undo();
+                }
+                UC01_ADD_NEW_TO_FIRST.undo();
+            }
+        };
+        // No execute() this time, as we've already executed the subcommands piecemeal (though this could be changed for the sake of uniformity).
 
         System.out.println();
 
-        return true;
+        return ret;
     }
 
     @Override
-    public void removeStone(int x, int y, boolean save) {
+    public UndoableCommand removeStone(int x, int y, boolean save) {
         if(areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
         }
 
-        board[x][y] = null;
-        if(save) {
-            // GAME.getFileTree().removeStone(x, y);
-        }
+        final StoneGroupPointer BOARD_AT_XY_PREVIOUSLY = board[x][y];
 
-        Set<StoneGroup> surroundingSGs = getSurroundings(
-                x,
-                y,
-                (sgp) -> sgp != null,
-                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
-        );
+        UndoableCommand ret = new UndoableCommand() {
 
-        for (StoneGroup sg : surroundingSGs) {
-            sg.addLiberty(new Position(x, y));
-        }
+            List<UndoableCommand> addLibertyCommands = new LinkedList<>();
 
-        // Update UI
-        fireStoneRemoved(x, y);
+            @Override
+            public void execute() {
+                board[x][y] = null;
+
+                if(save) {
+                    // GAME.getFileTree().removeStone(x, y);
+                }
+
+                Set<StoneGroup> surroundingSGs = getSurroundings(
+                    x,
+                    y,
+                    (sgp) -> sgp != null,
+                    (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+                );
+                for (StoneGroup sg : surroundingSGs) {
+                    addLibertyCommands.add(sg.addLiberty(new Position(x, y)));
+                }
+
+                // Update UI
+                fireStoneRemoved(x, y);
+            }
+
+            @Override
+            public void undo() {
+                board[x][y] = BOARD_AT_XY_PREVIOUSLY;
+
+                // TODO: Saving won't be undone, will it?
+
+                for(UndoableCommand c : addLibertyCommands) {
+                    c.undo();
+                }
+
+                // Update UI
+                fireStoneSet(x, y, board[x][y].getStoneGroup().getStoneColor(), false);
+            }
+        };
+        ret.execute();
+
+        return ret;
     }
 
     // Private methods

@@ -10,7 +10,7 @@ public interface BoardInterface {
      * @param prepareMode Whether this stone is set before the beginning of the game (e.g., as a handicap) or by a (human or AI) player
      * @param save Whether this move is to be saved
      */
-    public boolean setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save);
+    public UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save);
 
     /**
      *
@@ -18,7 +18,7 @@ public interface BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      * @param save Whether this move is to be saved
      */
-    public void removeStone(int x, int y, boolean save);
+    public UndoableCommand removeStone(int x, int y, boolean save);
 
     // Getters
     public int getSize();

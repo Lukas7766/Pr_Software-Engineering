@@ -99,26 +99,26 @@ public class StoneGroup {
     }
 
     /**
-     * Adds the supplied liberty to this StoneGroup
-     * @param liberty unoccupied Position to be added to this StoneGroup
+     * Adds the supplied LIBERTY to this StoneGroup
+     * @param LIBERTY unoccupied Position to be added to this StoneGroup
      */
-    public UndoableCommand addLiberty(Position liberty) {
-        if(liberty == null) {
+    public UndoableCommand addLiberty(final Position LIBERTY) {
+        if(LIBERTY == null) {
             throw new NullPointerException();
         }
 
-        final boolean WAS_CONTAINED = liberties.contains(liberty);
+        final boolean WAS_CONTAINED = liberties.contains(LIBERTY);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute() {
-                liberties.add(liberty);
+                liberties.add(LIBERTY);
             }
 
             @Override
             public void undo() {
                 if(!WAS_CONTAINED) {
-                    liberties.remove(liberty);
+                    liberties.remove(LIBERTY);
                 }
             }
         };

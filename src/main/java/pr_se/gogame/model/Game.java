@@ -283,7 +283,7 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        if (board.setStone(x, y, curColor, false, true)) {
+        if (board.setStone(x, y, curColor, false, true) != null) {
             curMoveNumber++;
             System.out.println("show move # " + showMoveNumbers);
             System.out.println("Move played.");
@@ -370,7 +370,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void addCapturedStones(StoneColor color, int amount) {
+    public UndoableCommand addCapturedStones(StoneColor color, int amount) {
         if (color == null) {
             throw new NullPointerException();
         }
@@ -378,13 +378,34 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        if (color == BLACK) {
-            this.blackCapturedStones += amount;
-            this.playerBlackScore += amount;
-        } else {
-            this.whiteCapturedStones += amount;
-            this.playerWhiteScore += amount;
-        }
+        final int OLD_BLACK_CAPTURED_STONES = blackCapturedStones;
+        final int OLD_WHITE_CAPTURED_STONES = whiteCapturedStones;
+        final double OLD_BLACK_PLAYER_SCORE = playerBlackScore;
+        final double OLD_WHITE_PLAYER_SCORE = playerWhiteScore;
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                if (color == BLACK) {
+                    Game.this.blackCapturedStones += amount; // TODO: If this causes issues, maybe change to "OLD_BLACK_CAPTURED_STONES + amount" and so on?
+                    Game.this.playerBlackScore += amount;
+                } else {
+                    Game.this.whiteCapturedStones += amount;
+                    Game.this.playerWhiteScore += amount;
+                }
+            }
+
+            @Override
+            public void undo() {
+                Game.this.blackCapturedStones = OLD_BLACK_CAPTURED_STONES;
+                Game.this.whiteCapturedStones = OLD_WHITE_CAPTURED_STONES;
+                Game.this.playerBlackScore = OLD_BLACK_PLAYER_SCORE;
+                Game.this.playerWhiteScore = OLD_WHITE_PLAYER_SCORE;
+            }
+        };
+        ret.execute();
+
+        return ret;
     }
 
     @Override

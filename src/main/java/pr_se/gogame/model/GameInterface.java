@@ -63,7 +63,7 @@ public interface GameInterface {
 
     int getStonesCapturedBy(StoneColor color);
 
-    void addCapturedStones(StoneColor color, int amount);
+    UndoableCommand addCapturedStones(StoneColor color, int amount);
 
     StoneColor getColorAt(int x, int y);
 
