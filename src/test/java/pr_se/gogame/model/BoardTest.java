@@ -376,9 +376,22 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(3, 1));
         assertEquals(null, board.getColorAt(4, 1));
 
-        board.setStone(2, 1, WHITE, false, true);
+        UndoableCommand c3 = board.setStone(2, 1, WHITE, false, true);
         assertEquals(WHITE, board.getColorAt(1, 1));
-        assertEquals(WHITE, board.getColorAt(2, 1)); // due to suicide detection
+        assertEquals(WHITE, board.getColorAt(2, 1));
         assertEquals(WHITE, board.getColorAt(3, 1));
+
+        c3.undo();
+        c.execute();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(WHITE, board.getColorAt(3, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+        assertEquals(BLACK, board.getColorAt(4, 1));
+
+        c2.execute();
+        assertEquals(null, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(3, 1));
+        assertEquals(BLACK, board.getColorAt(2, 1));
+        assertEquals(BLACK, board.getColorAt(4, 1));
     }
 }
