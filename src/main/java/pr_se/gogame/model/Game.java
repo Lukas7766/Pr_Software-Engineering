@@ -111,17 +111,16 @@ public class Game implements GameInterface {
     @Override
     public void pass() {
         System.out.println("pass");
-        switch (gameCommand) {
+        /*switch (gameCommand) {
             case BLACK_PLAYS, BLACK_STARTS -> {
-                // this.gameCommand = GameCommand.WHITE_PLAYS; // moved into setCurColor()
                 this.setCurColor(WHITE);
             }
             case WHITE_PLAYS, WHITE_STARTS -> {
-                // this.gameCommand = GameCommand.BLACK_PLAYS; // moved into setCurColor()
                 this.setCurColor(BLACK);
             }
         }
-        fireGameEvent(new GameEvent(gameCommand));
+        fireGameEvent(new GameEvent(gameCommand));*/
+        switchColor(); // Everything that was commented out is already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
     }
 
     @Override
