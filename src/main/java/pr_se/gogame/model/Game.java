@@ -113,33 +113,54 @@ public class Game implements GameInterface {
     public void pass() {
         System.out.println("pass");
         UndoableCommand c = switchColor(); // Everything that was removed was already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
+
+        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
 
     @Override
     public void resign() {
         System.out.println("resign");
-        GameResult result;
-        StringBuilder sb = new StringBuilder();
-        sb.append("Game was resigned by").append(" ");
-        switch (gameCommand) {
-            case WHITE_PLAYS, WHITE_STARTS -> {
-                this.gameCommand = GameCommand.BLACK_WON;
-                result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
-                sb.append("White!").append("\n\n").append("Black won!");
+
+        final GameResult OLD_GAME_RESULT = this.gameResult;
+        final GameCommand OLD_GAME_COMMAND = this.gameCommand;
+
+        UndoableCommand c = new UndoableCommand() {
+            @Override
+            public void execute() {
+                GameResult result;
+                StringBuilder sb = new StringBuilder();
+                sb.append("Game was resigned by").append(" ");
+                switch (OLD_GAME_COMMAND) {
+                    case WHITE_PLAYS, WHITE_STARTS -> {
+                        Game.this.gameCommand = GameCommand.BLACK_WON;
+                        result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
+                        sb.append("White!").append("\n\n").append("Black won!");
+                    }
+                    case BLACK_PLAYS, BLACK_STARTS -> {
+                        Game.this.gameCommand = GameCommand.WHITE_WON;
+                        result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
+                        sb.append("Black!").append("\n\n").append("White won!");
+                    }
+                    default -> {throw new IllegalStateException("Game was not resigned! Consult your application owner!");}
+                }
+                Game.this.gameResult = result;
+                fireGameEvent(new GameEvent(gameCommand));
             }
-            case BLACK_PLAYS, BLACK_STARTS -> {
-                this.gameCommand = GameCommand.WHITE_WON;
-                result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
-                sb.append("Black!").append("\n\n").append("White won!");
+
+            @Override
+            public void undo() {
+                Game.this.gameResult = OLD_GAME_RESULT;
+                Game.this.gameCommand = OLD_GAME_COMMAND;
+                fireGameEvent(new GameEvent(gameCommand));
             }
-            default -> {throw new IllegalStateException("Game was not resigned! Consult your application owner!");}
-        }
-        this.gameResult = result;
-        fireGameEvent(new GameEvent(gameCommand));
+        };
+        c.execute();
+
+        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
 
     @Override
-    public void scoreGame() {
+    public void scoreGame() { // TODO: Is this only of cosmetic relevance or does it need to be undoable?
         System.out.println("scoreGame");
         this.gameResult = ruleset.scoreGame(this);
         this.playerBlackScore = gameResult.getScoreBlack();
@@ -184,6 +205,10 @@ public class Game implements GameInterface {
         listeners.remove(l);
     }
 
+    /*
+     * Although this method changes the state, it is only called at the beginning of the game and, hence, doesn't
+     * appear to need to be undoable.
+     */
     @Override
     public void setHandicapStoneCounter(int noStones) {
         if(noStones < 0 || noStones > handicap) {
@@ -241,7 +266,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void setCurMoveNumber(int curMoveNumber) {
+    public void setCurMoveNumber(int curMoveNumber) { // TODO: Could this method be removed? Is there ever a situation where the move number should be manually alterable?
         if (curMoveNumber < 1) {
             throw new IllegalArgumentException();
         }
@@ -250,7 +275,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public UndoableCommand setCurColor(StoneColor c) {
+    public UndoableCommand setCurColor(StoneColor c) { // TODO: Could this method be set to private? Is there ever a situation where the current color should be manually alterable during a game, outside of pass()?
         if (c == null) {
             throw new NullPointerException();
         }
@@ -291,16 +316,37 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        if (board.setStone(x, y, curColor, false, true) != null) {
-            curMoveNumber++;
-            System.out.println("show move # " + showMoveNumbers);
-            System.out.println("Move played.");
-            printDebugInfo(x, y);
-            // Update current player color
-            switchColor();
-        } else {
-            System.out.println("Move aborted.");
-        }
+        final UndoableCommand UC01_setStone = board.setStone(x, y, curColor, false, true); // returned command is already executed within board.setStone().
+
+        final int OLD_MOVE_NO = curMoveNumber;
+
+        UndoableCommand c = new UndoableCommand() {
+            UndoableCommand c_UC02_switchColor = null;
+
+            @Override
+            public void execute() {
+                if (UC01_setStone != null) {
+                    curMoveNumber++;
+                    System.out.println("show move # " + showMoveNumbers);
+                    System.out.println("Move played.");
+                    printDebugInfo(x, y);
+                    // Update current player color
+                    c_UC02_switchColor = switchColor();
+                } else {
+                    System.out.println("Move aborted.");
+                }
+            }
+
+            @Override
+            public void undo() {
+                c_UC02_switchColor.undo();
+                curMoveNumber = OLD_MOVE_NO;
+                UC01_setStone.undo();
+            }
+        };
+        c.execute();
+
+        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
 
     @Override
@@ -313,17 +359,39 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        handicapStoneCounter--;
-        if (handicapStoneCounter < 0) {
+        final int OLD_HANDICAP_COUNTER = handicapStoneCounter;
+
+        if (handicapStoneCounter == 0) {
             throw new IllegalStateException("Can't place any more handicap stones!");
         }
 
-        board.setStone(x, y, curColor, true, true);
+        UndoableCommand c = new UndoableCommand() {
+            UndoableCommand uc01_setStone = null;
+            UndoableCommand uC02_switchColor = null;
 
-        if (handicapStoneCounter == 0) {
-            // fileTree.insertBufferedStonesBeforeGame();
-            switchColor();
-        }
+            @Override
+            public void execute() {
+                handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
+                uc01_setStone = board.setStone(x, y, curColor, true, true);
+
+                if (handicapStoneCounter == 0) {
+                    // fileTree.insertBufferedStonesBeforeGame();
+                    uC02_switchColor = switchColor();
+                }
+            }
+
+            @Override
+            public void undo() {
+                if(uC02_switchColor != null) {
+                    uC02_switchColor.undo();
+                }
+                uc01_setStone.undo();
+                handicapStoneCounter = OLD_HANDICAP_COUNTER;
+            }
+        };
+        c.execute();
+
+        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
 
     @Override
@@ -438,7 +506,7 @@ public class Game implements GameInterface {
         return gameResult;
     }
 
-    public UndoableCommand switchColor() {
+    public UndoableCommand switchColor() { // TODO: Could this method be set to private? Is there ever a situation where the color should be switchable during a game, outside of pass()?
         UndoableCommand ret = new UndoableCommand() {
             UndoableCommand thisCommand;
 
