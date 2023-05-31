@@ -92,11 +92,6 @@ class GameTest {
     }
 
     @Test
-    void setCurMoveNumberArguments() {
-        assertThrows(IllegalArgumentException.class, () -> game.setCurMoveNumber(0));
-    }
-
-    @Test
     void setCurColorArguments() {
         assertThrows(NullPointerException.class, () -> game.setCurColor(null));
     }
@@ -382,12 +377,6 @@ class GameTest {
     @Test
     void getHandicapStoneCounter() {
         assertEquals(0, game.getHandicapStoneCounter());
-    }
-
-    @Test
-    void setCurMoveNumber() {
-        game.setCurMoveNumber(100);
-        assertEquals(100, game.getCurMoveNumber());
     }
 
     @Test

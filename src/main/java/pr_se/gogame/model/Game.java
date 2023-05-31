@@ -266,15 +266,6 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void setCurMoveNumber(int curMoveNumber) { // TODO: Could this method be removed? Is there ever a situation where the move number should be manually alterable?
-        if (curMoveNumber < 1) {
-            throw new IllegalArgumentException();
-        }
-
-        this.curMoveNumber = curMoveNumber;
-    }
-
-    @Override
     public UndoableCommand setCurColor(StoneColor c) { // TODO: Could this method be set to private? Is there ever a situation where the current color should be manually alterable during a game, outside of pass()?
         if (c == null) {
             throw new NullPointerException();

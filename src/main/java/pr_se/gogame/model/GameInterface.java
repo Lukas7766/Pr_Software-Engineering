@@ -59,8 +59,6 @@ public interface GameInterface {
 
     int getCurMoveNumber();
 
-    void setCurMoveNumber(int curMoveNumber);
-
     int getStonesCapturedBy(StoneColor color);
 
     UndoableCommand addCapturedStones(StoneColor color, int amount);
