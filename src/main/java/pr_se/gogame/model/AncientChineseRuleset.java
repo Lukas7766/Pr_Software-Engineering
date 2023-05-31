@@ -35,16 +35,15 @@ public class AncientChineseRuleset implements Ruleset {
     public GameResult scoreGame(Game game) {
 
         if (game == null) throw new IllegalArgumentException();
-        Board board = game.getBoard();
 
         int scoreBlack = 0;
         int scoreWhite = 0;
 
-        for (int i = 0; i < board.getSize(); i++) {
-            for (int j = 0; j < board.getSize(); j++) {
-                if (board.getColorAt(i, j) == StoneColor.BLACK) {
+        for (int i = 0; i < game.getSize(); i++) {
+            for (int j = 0; j < game.getSize(); j++) {
+                if (game.getColorAt(i, j) == StoneColor.BLACK) {
                     scoreBlack++;
-                } else if (board.getColorAt(i, j) == StoneColor.WHITE) {
+                } else if (game.getColorAt(i, j) == StoneColor.WHITE) {
                     scoreWhite++;
                 }
 

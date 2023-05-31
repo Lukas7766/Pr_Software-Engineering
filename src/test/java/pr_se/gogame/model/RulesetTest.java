@@ -67,69 +67,69 @@ class RulesetTest {
                 case 0,1 -> {
                     for (int x = 0; x < 19; x++) {
                         for (int y = 0; y < 19; y++) {
-                            assertNull(game.getBoard().getColorAt(x, y));
+                            assertNull(game.getColorAt(x, y));
                         }
                     }
                 }
                 case 2 -> {
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 3));
                 }
                 case 3 -> {
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 15));
                 }
                 case 4 -> {
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 3));
                 }
                 case 5 -> {
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(9, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(9, 9));
                 }
                 case 6 -> {
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 9));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 9));
                 }
                 case 7 -> {
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 9));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 9));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(9, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(9, 9));
                 }
                 case 8 -> {
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 9));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 9));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(9, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(9, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(9, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(9, 15));
                 }
                 case 9 -> {
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(3, 9));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(15, 9));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(9, 3));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(9, 15));
-                    assertEquals(StoneColor.BLACK, game.getBoard().getColorAt(9, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(3, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(15, 9));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(9, 3));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(9, 15));
+                    assertEquals(StoneColor.BLACK, game.getColorAt(9, 9));
                 }
 
             }
