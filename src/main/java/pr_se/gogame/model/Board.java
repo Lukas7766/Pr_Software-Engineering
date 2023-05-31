@@ -173,7 +173,7 @@ public class Board implements BoardInterface {
                 if (!prepareMode) {
 
                     for (StoneGroup sg : surroundingSGs) {
-                        if ((sg.getStoneColor() != color || (sg == firstSameColorGroup && !FINAL_KILL_ANOTHER)) && sg.getLiberties().size() == 0) {
+                        if ((sg.getStoneColor() != color || !FINAL_KILL_ANOTHER) && sg.getLiberties().size() == 0) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
                                 UC06_01_REMOVE_STONE_COMMANDS.add(removeStone(p.X, p.Y, true));
