@@ -30,6 +30,4 @@ public interface BoardInterface {
      * @return the stone color at the specified location or null if no stone is set
      */
     public StoneColor getColorAt(int x, int y);
-
-    public Game getGAME();
 }

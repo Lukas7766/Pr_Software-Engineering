@@ -204,11 +204,6 @@ class BoardTest {
     }
 
     @Test
-    void getGAME() {
-        assertEquals(game, board.getGAME());
-    }
-
-    @Test
     void printDebugInfo() {
         assertNotNull(board.setStone(0, 0, BLACK, false, true));
         assertDoesNotThrow(() -> board.printDebugInfo(0, 0));

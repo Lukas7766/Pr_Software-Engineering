@@ -415,10 +415,6 @@ public class Board implements BoardInterface {
         }
     }
 
-    public Game getGAME() {
-        return GAME;
-    }
-
     // TODO: Remove these debug methods
     public void printDebugInfo(int x, int y) {
         if(areInvalidXYCoordinates(x, y)) {
