@@ -19,7 +19,8 @@ class RulesetTest {
                 return null;
             }
 
-            private UndoableCommand resetKoMove() {
+            @Override
+            public UndoableCommand resetKoMove() {
                 return null;
             }
 

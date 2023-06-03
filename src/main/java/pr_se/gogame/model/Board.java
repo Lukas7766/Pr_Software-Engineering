@@ -63,13 +63,6 @@ public class Board implements BoardInterface {
             return null;
         }
 
-        final boolean IS_KO_MOVE = GAME.getRuleset().isKoMove(x, y);
-        final UndoableCommand UC01_CHECK_KO_MOVE = GAME.getRuleset().checkKoMove(x, y);
-        if(IS_KO_MOVE) {
-            System.out.println("Ko move is not allowed by checkKoMove().");
-            return null;
-        }
-
         // Get liberties at these x and y coordinates
         Set<Position> newStoneLiberties = getSurroundings(
             x,
@@ -81,10 +74,10 @@ public class Board implements BoardInterface {
 
         // Get neighbors at these x and y coordinates
         Set<StoneGroup> surroundingSGs = getSurroundings(
-                x,
-                y,
-                (sgp) -> sgp != null,
-                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+            x,
+            y,
+            (sgp) -> sgp != null,
+            (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
         );
 
         /*
@@ -96,7 +89,7 @@ public class Board implements BoardInterface {
             .orElse(newGroup);
 
         // Check for suicide
-        UndoableCommand uC02_updateKoMove = null;
+        final UndoableCommand UC01_UPDATE_KO_MOVE;
 
         boolean permittedSuicide = false;
         boolean killAnother = false;
@@ -110,18 +103,29 @@ public class Board implements BoardInterface {
                 }
                 System.out.println("Suicide permitted.");
                 permittedSuicide = true;
+                UC01_UPDATE_KO_MOVE = null;
             } else {
-                uC02_updateKoMove = GAME.getRuleset().updateKoMove(x, y);
-                if (!GAME.getRuleset().isKoMove(x, y)) {
+                UC01_UPDATE_KO_MOVE = GAME.getRuleset().updateKoMove(x, y);
+                // if (!GAME.getRuleset().isKoMove(x, y)) {
                     killAnother = true;
-                } else {
+                /*} else {
                     System.out.println("KO move is not allowed");
                     return null;
-                }
+                }*/
             }
+        } else {
+            UC01_UPDATE_KO_MOVE = null;
         }
 
-        final UndoableCommand UC02_UPDATE_KO_MOVE = uC02_updateKoMove;
+        // final boolean IS_KO_MOVE = ;
+        // final UndoableCommand UC01_CHECK_KO_MOVE = GAME.getRuleset().checkKoMove(x, y);
+        final UndoableCommand UC02_RESET_KO_MOVE;
+        if(GAME.getRuleset().isKoMove(x, y)) {
+            System.out.println("Ko move is not allowed by checkKoMove().");
+            return null;
+        } else {
+            UC02_RESET_KO_MOVE = GAME.getRuleset().resetKoMove();
+        }
 
         /*
          * Merge newly-connected StoneGroups of the same color and remove the new stone's position from the liberties
@@ -222,12 +226,16 @@ public class Board implements BoardInterface {
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute() {
-                if(UC01_CHECK_KO_MOVE != null) {
+                /*if(UC01_CHECK_KO_MOVE != null) {
                     UC01_CHECK_KO_MOVE.execute();
+                }*/
+
+                if(UC01_UPDATE_KO_MOVE != null) {
+                    UC01_UPDATE_KO_MOVE.execute();
                 }
 
-                if(UC02_UPDATE_KO_MOVE != null) {
-                    UC02_UPDATE_KO_MOVE.execute();
+                if(UC02_RESET_KO_MOVE != null) {
+                    UC02_RESET_KO_MOVE.execute();
                 }
 
                 if(UC03_ADD_NEW_TO_FIRST != null) {
@@ -259,12 +267,15 @@ public class Board implements BoardInterface {
                 if(UC03_ADD_NEW_TO_FIRST != null) {
                     UC03_ADD_NEW_TO_FIRST.undo();
                 }
-                if(UC02_UPDATE_KO_MOVE != null) {
-                    UC02_UPDATE_KO_MOVE.undo();
+                if(UC02_RESET_KO_MOVE != null) {
+                    UC02_RESET_KO_MOVE.undo();
                 }
-                if(UC01_CHECK_KO_MOVE != null) {
+                if(UC01_UPDATE_KO_MOVE != null) {
+                    UC01_UPDATE_KO_MOVE.undo();
+                }
+                /*if(UC01_CHECK_KO_MOVE != null) {
                     UC01_CHECK_KO_MOVE.undo();
-                }
+                }*/
             }
         };
         // No execute() this time, as we've already executed the subcommands piecemeal (though this could be changed for the sake of uniformity).

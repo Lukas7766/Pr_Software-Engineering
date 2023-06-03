@@ -43,6 +43,8 @@ public interface Ruleset {
 
     boolean isKoMove(int x, int y);
 
+    UndoableCommand resetKoMove();
+
     /** This method calculates the score of the game for both players.
      *
      * @return the score of the game for both players in an array of size 2. Index 0 is the score of black, index 1 is the score of white.

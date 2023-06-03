@@ -65,7 +65,8 @@ public class UserDefinableRuleset implements Ruleset {
         return false;
     }
 
-    private UndoableCommand resetKoMove() {
+    @Override
+    public UndoableCommand resetKoMove() {
         return null;
     }
 
