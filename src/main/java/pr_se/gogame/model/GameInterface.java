@@ -97,5 +97,9 @@ public interface GameInterface {
     void removeListener(GameListener l);
 
     void setHandicapStoneCounter(int noStones);
+
+    String getGraphicsPath();
+
+    void setGraphicsPath(String path);
 }
 

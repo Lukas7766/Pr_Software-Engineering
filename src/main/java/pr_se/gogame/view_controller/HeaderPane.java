@@ -3,6 +3,9 @@ package pr_se.gogame.view_controller;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 
@@ -100,10 +103,11 @@ public class HeaderPane extends VBox {
      */
     private Menu fileSection() {
         Menu files = new Menu();
-        files.setText("File");
+        files.setText("_File");
 
         MenuItem newGameItem = new MenuItem();
-        newGameItem.setText("New Game");
+        newGameItem.setText("_New Game");
+        newGameItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
         files.getItems().add(newGameItem);
         newGameItem.setOnAction(e -> {
 
@@ -112,7 +116,8 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem importFileItem = new MenuItem();
-        importFileItem.setText("Load Game");
+        importFileItem.setText("_Load Game");
+        importFileItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
             File f = CustomFileDialog.getFile(stage, false, filterList);//fileDialog(false, filterList);
@@ -121,8 +126,8 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem exportFileItem = new MenuItem();
-        exportFileItem.setText("Save Game");
-        exportFileItem.setDisable(true);
+        exportFileItem.setText("_Save Game");
+        exportFileItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItem);
         exportFileItem.setOnAction(e -> {
             File f = CustomFileDialog.getFile(stage, true, filterList);//fileDialog(true, filterList);
@@ -143,7 +148,8 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem exitGameItem = new MenuItem();
-        exitGameItem.setText("Exit Game");
+        exitGameItem.setText("_Quit Game");
+        exitGameItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exitGameItem);
         exitGameItem.setOnAction(e -> CustomCloseAction.onCloseAction(stage, game, null, filterList)); //onCloseAction(null)
 
@@ -168,9 +174,10 @@ public class HeaderPane extends VBox {
      */
     private Menu gameSection() {
         Menu menu = new Menu();
-        menu.setText("Game");
+        menu.setText("_Game");
 
-        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move confirmation required");
+        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("_Move confirmation required");
+        moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(game.isConfirmationNeeded());
         moveConfirmationRequired.setOnAction(e -> {
@@ -186,20 +193,20 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem passItem = new MenuItem();
-        passItem.setText("Pass");
-        //menu.getItems().add(passItem);
+        passItem.setText("_Pass");
+        passItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN));
         gameSectionItems.add(passItem);
         passItem.setOnAction(e -> game.pass());
 
         MenuItem resignItem = new MenuItem();
-        resignItem.setText("Resign");
-        //menu.getItems().add(resignItem);
+        resignItem.setText("_Resign");
+        resignItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.ALT_DOWN));
         gameSectionItems.add(resignItem);
         resignItem.setOnAction(e -> game.resign());
 
         MenuItem scoreGameItem = new MenuItem();
-        scoreGameItem.setText("Score Game");
-        //menu.getItems().add(scoreGameItem);
+        scoreGameItem.setText("_Score Game");
+        scoreGameItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN));
         gameSectionItems.add(scoreGameItem);
         scoreGameItem.setOnAction(e -> game.scoreGame());
 
@@ -241,24 +248,45 @@ public class HeaderPane extends VBox {
      */
     private Menu viewSection() {
         Menu menu = new Menu();
-        menu.setText("View");
+        menu.setText("_View");
 
         List<MenuItem> viewSectionItems = new ArrayList<>();
 
-        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Show Move Numbers");
+        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("_Move Numbers");
+        showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         viewSectionItems.add(showMoveNumbersCBtn);
         showMoveNumbersCBtn.setSelected(game.isShowMoveNumbers());
         showMoveNumbersCBtn.setOnAction(e -> {
             game.setShowMoveNumbers(showMoveNumbersCBtn.isSelected());
         });
 
-        CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("Show Coordinates");
+        CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("_Coordinates");
+        showCoordinatesCBtn.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         viewSectionItems.add(showCoordinatesCBtn);
         showCoordinatesCBtn.setSelected(game.isShowCoordinates());
         showCoordinatesCBtn.setOnAction(e -> {
             game.setShowCoordinates(showCoordinatesCBtn.isSelected());
         });
         menu.getItems().addAll(viewSectionItems);
+
+        MenuItem loadGraphicsBtn = new MenuItem("_Load Graphics Set");
+        loadGraphicsBtn.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        menu.getItems().addAll(loadGraphicsBtn);
+
+        loadGraphicsBtn.setOnAction(e -> {
+            File workingDirectory = new File(System.getProperty("user.dir")+"/src/main/resources/pr_se/gogame/");
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setInitialDirectory(workingDirectory);
+            fileChooser.setTitle("Load Graphics Set");
+            fileChooser.getExtensionFilters().addAll(
+                    new FileChooser.ExtensionFilter("ZIP", "*.zip")
+            );
+            File selectedFile = fileChooser.showOpenDialog(stage);
+            if (selectedFile != null) {
+                game.setGraphicsPath(selectedFile.getAbsolutePath());
+            }
+        });
+
 
         viewSectionItems.forEach(e -> e.setDisable(true));
 
@@ -284,10 +312,11 @@ public class HeaderPane extends VBox {
      */
     private Menu helpSection() {
         Menu menu = new Menu();
-        menu.setText("Help");
+        menu.setText("_Help");
 
         MenuItem helpItem = new MenuItem();
-        helpItem.setText("Help");
+        helpItem.setText("_Help");
+        helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         menu.getItems().add(helpItem);
         helpItem.setOnAction(ev -> {
             String url = "https://en.wikipedia.org/wiki/Go_(game)";
@@ -295,7 +324,8 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem aboutUs = new MenuItem();
-        aboutUs.setText("About Us");
+        aboutUs.setText("_About Us");
+        aboutUs.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         menu.getItems().add(aboutUs);
         aboutUs.setOnAction(e -> {
 

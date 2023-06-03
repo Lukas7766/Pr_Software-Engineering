@@ -20,6 +20,8 @@ public class Game implements GameInterface {
     private boolean showMoveNumbers = false;
     private boolean showCoordinates = true;
 
+    private String graphicsPath = "src/main/resources/pr_se/gogame/debug.zip";
+
     private boolean demoMode = false;
 
     //global (helper) variables
@@ -385,6 +387,21 @@ public class Game implements GameInterface {
     @Override
     public GameResult getGameResult() {
         return gameResult;
+    }
+
+
+    @Override
+    public String getGraphicsPath() {
+        return graphicsPath;
+    }
+
+    @Override
+    public void setGraphicsPath(String path) {
+        if(path == null) {
+            throw new NullPointerException();
+        }
+        this.graphicsPath = path;
+        fireGameEvent(new GameEvent(GameCommand.CONFIG_GRAPHICS));
     }
 
     public void switchColor() {
