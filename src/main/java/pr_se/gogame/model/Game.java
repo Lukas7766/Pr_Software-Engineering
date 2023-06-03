@@ -318,7 +318,6 @@ public class Game implements GameInterface {
             public void execute() {
                 if (UC01_setStone != null) {
                     curMoveNumber++;
-                    System.out.println("show move # " + showMoveNumbers);
                     System.out.println("Move played.");
                     printDebugInfo(x, y);
                     // Update current player color

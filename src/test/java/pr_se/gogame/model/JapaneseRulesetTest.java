@@ -39,8 +39,8 @@ class JapaneseRulesetTest {
     }
 
     @Test
-    @DisplayName("testing predicateKoMove(), repeating move (1,2) causes positive prediction")
-    void predicateKoMove() {
+    @DisplayName("testing updateKoMove(), repeating move (1,2) causes positive prediction")
+    void updateKoMove() {
         Game game = new Game();
         game.newGame(GameCommand.BLACK_STARTS, 9, 0);
         game.playMove(0, 1);
@@ -59,7 +59,8 @@ class JapaneseRulesetTest {
 
         assertEquals(new Position(1, 2), game.getRuleset().getKoMove());
         assertNull(game.getColorAt(1, 2));
-        assertFalse(game.getRuleset().predicateKoMove(2, 1));
+        game.getRuleset().updateKoMove(2, 1);
+        assertFalse(game.getRuleset().isKoMove(2, 1));
     }
 
     @Test
@@ -79,7 +80,8 @@ class JapaneseRulesetTest {
         game.playMove(1, 2);
         game.playMove(1, 1);
 
-        assertTrue(game.getRuleset().predicateKoMove(1, 2));
+        game.getRuleset().updateKoMove(1, 2);
+        assertTrue(game.getRuleset().isKoMove(1, 2));
         assertEquals(new Position(1, 2), game.getRuleset().getKoMove());
     }
 
@@ -100,7 +102,7 @@ class JapaneseRulesetTest {
         game.playMove(1, 2);
         game.playMove(1, 1);
 
-        game.getRuleset().predicateKoMove(1, 2);
+        game.getRuleset().updateKoMove(1, 2);
 
         game.playMove(1, 5);
 

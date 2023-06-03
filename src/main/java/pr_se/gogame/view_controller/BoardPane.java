@@ -155,7 +155,6 @@ public class BoardPane extends GridPane {
             if(e == null) {
                 throw new NullPointerException();
             }
-            System.out.println("show move numbers border pane " + showsMoveNumbers);
             switch(e.getGameCommand()) {
                 case BLACK_PLAYS:
                 case WHITE_PLAYS:

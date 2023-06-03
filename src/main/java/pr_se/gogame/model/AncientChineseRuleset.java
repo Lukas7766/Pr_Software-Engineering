@@ -7,28 +7,77 @@ public class AncientChineseRuleset implements Ruleset {
     private Position koMove;
 
     @Override
-    public boolean predicateKoMove(int x, int y) {
+    public UndoableCommand updateKoMove(int x, int y) {
 
-        System.out.println("predicateKoMove X:" + x + " Y: " + y);
+        System.out.println("updateKoMove X: " + x + " Y: " + y);
 
-        if (this.getKoAmount() > currentKOCnt) {
-            currentKOCnt++;
-            return false;
+        final int KO_AMOUNT = this.getKoAmount();
+        final int OLD_KO_CNT = currentKOCnt;
+        final Position OLD_KO_MOVE = koMove;
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                if (KO_AMOUNT > OLD_KO_CNT) {
+                    currentKOCnt++; // TODO: If this causes issues, maybe change to "OLD_KO_CNT + 1"?
+                } else if (koMove == null) {
+                    koMove = new Position(x, y);
+                }
+            }
+
+            @Override
+            public void undo() {
+                koMove = OLD_KO_MOVE;
+                currentKOCnt = OLD_KO_CNT;
+            }
+        };
+        ret.execute();
+
+
+        return ret;
+    }
+
+    @Override
+    public UndoableCommand checkKoMove(int x, int y) {
+        if(koMove != null) {
+            if(koMove.X != x || koMove.Y != y) {
+                return resetKoMove();
+            }
+            return null;
         }
-        if (koMove == null) koMove = new Position(x, y);
 
-        return koMove.X == x && koMove.Y == y;
+        return null;
+    }
 
+    @Override
+    public boolean isKoMove(int x, int y) {
+        return koMove != null && koMove.X == x && koMove.Y == y;
     }
 
     public Position getKoMove() {
         return koMove;
     }
 
-    @Override
-    public void resetKoMove() {
-        this.koMove = null;
-        this.currentKOCnt = 0;
+    private UndoableCommand resetKoMove() {
+        final Position OLD_KO_MOVE = this.koMove;
+        final int OLD_KO_CNT = this.currentKOCnt;
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                koMove = null;
+                currentKOCnt = 0;
+            }
+
+            @Override
+            public void undo() {
+                currentKOCnt = OLD_KO_CNT;
+                koMove = OLD_KO_MOVE;
+            }
+        };
+        ret.execute();
+
+        return ret;
     }
 
     @Override

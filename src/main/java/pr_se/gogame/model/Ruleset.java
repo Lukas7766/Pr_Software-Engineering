@@ -23,24 +23,31 @@ public interface Ruleset {
         return 2;
     }
 
-    /** This method predicates if the current move matches the KO criteria.
+    /**
+     * This method will update the internal state of the Ruleset and check if a ko move was performed.
      *
-     * @param x pass the X-axis of the verifiable move
-     * @param y pass the y-axis of the verifiable move
-     * @return true if a KO move was tried or return false if it isn't a KO move
+     * @param x pass the X-axis of the move to be verified
+     * @param y pass the y-axis of the move to be verified
+     * @return true if a ko move was tried or false if it isn't a ko move
      */
-    boolean predicateKoMove(int x, int y);
+    UndoableCommand updateKoMove(int x, int y);
+
+    /**
+     * This method will check if a ko move exists. If it does and was performed, it returns true, if it exists but was
+     * not performed, the ko move will be reset.
+     * @param x x coordinate of the move to be verified
+     * @param y y coordinate of the move to be verified
+     * @return null if a ko move was performed or none exists, an UndoableCommand to undo the resetting if a ko move exists but was not performed.
+     */
+    UndoableCommand checkKoMove(int x, int y);
+
+    boolean isKoMove(int x, int y);
 
     /** The non-repeatable KO move is stored in Position.
      *
      * @return the position of the non-repeatable KO move
      */
     Position getKoMove();
-
-    /**
-     * This method resets the KO move.
-     */
-    void resetKoMove();
 
     /** This method calculates the score of the game for both players.
      *

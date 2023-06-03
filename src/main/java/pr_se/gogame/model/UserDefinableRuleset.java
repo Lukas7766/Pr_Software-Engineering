@@ -51,7 +51,17 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public boolean predicateKoMove(int x, int y) {
+    public UndoableCommand updateKoMove(int x, int y) {
+        return null;
+    }
+
+    @Override
+    public UndoableCommand checkKoMove(int x, int y) {
+        return null;
+    }
+
+    @Override
+    public boolean isKoMove(int x, int y) {
         return false;
     }
 
@@ -60,9 +70,8 @@ public class UserDefinableRuleset implements Ruleset {
         return null;
     }
 
-    @Override
-    public void resetKoMove() {
-
+    private UndoableCommand resetKoMove() {
+        return null;
     }
 
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>

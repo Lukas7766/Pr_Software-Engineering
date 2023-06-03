@@ -14,7 +14,17 @@ public class NewZealandRuleset implements Ruleset {
     }
 
     @Override
-    public boolean predicateKoMove(int x, int y) {
+    public UndoableCommand updateKoMove(int x, int y) {
+        return null;
+    }
+
+    @Override
+    public UndoableCommand checkKoMove(int x, int y) {
+        return null;
+    }
+
+    @Override
+    public boolean isKoMove(int x, int y) {
         return false;
     }
 
@@ -23,9 +33,8 @@ public class NewZealandRuleset implements Ruleset {
         return null;
     }
 
-    @Override
-    public void resetKoMove() {
-
+    private UndoableCommand resetKoMove() {
+        return null;
     }
 
     /**

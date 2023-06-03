@@ -15,8 +15,8 @@ class RulesetTest {
         //create empty ruleset for testing default methods
         ruleset = new Ruleset() {
             @Override
-            public boolean predicateKoMove(int x, int y) {
-                return false;
+            public UndoableCommand updateKoMove(int x, int y) {
+                return null;
             }
 
             @Override
@@ -24,9 +24,18 @@ class RulesetTest {
                 return null;
             }
 
-            @Override
-            public void resetKoMove() {
+            private UndoableCommand resetKoMove() {
+                return null;
+            }
 
+            @Override
+            public UndoableCommand checkKoMove(int x, int y) {
+                return null;
+            }
+
+            @Override
+            public boolean isKoMove(int x, int y) {
+                return false;
             }
 
             @Override
