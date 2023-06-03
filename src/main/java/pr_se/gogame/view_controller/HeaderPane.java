@@ -17,6 +17,7 @@ import javafx.stage.StageStyle;
 import pr_se.gogame.model.GameCommand;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -111,7 +112,7 @@ public class HeaderPane extends VBox {
         files.getItems().add(newGameItem);
         newGameItem.setOnAction(e -> {
 
-            if(game.getGameState() == GameCommand.INIT) return;
+            if (game.getGameState() == GameCommand.INIT) return;
             CustomNewGameAction.onSaveAction(stage, game, filterList);
         });
 
@@ -121,28 +122,34 @@ public class HeaderPane extends VBox {
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
             File f = CustomFileDialog.getFile(stage, false, filterList);//fileDialog(false, filterList);
-            if (f != null) game.importGame(f.toPath());
+            if (f != null) game.loadGame(f.toPath());
             else System.out.println("Import Dialog cancelled");
         });
 
         MenuItem exportFileItem = new MenuItem();
-        exportFileItem.setText("_Save Game");
+        exportFileItem.setText("_Save");
+        exportFileItem.setDisable(true);
         exportFileItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItem);
-        exportFileItem.setOnAction(e -> {
-            File f = CustomFileDialog.getFile(stage, true, filterList);//fileDialog(true, filterList);
-            if (f != null) game.exportGame(f.toPath());
-            else System.out.println("Export Dialog cancelled");
-        });
+        exportFileItem.setOnAction(e -> saveGame(false));
+
+        MenuItem exportFileItemAs = new MenuItem();
+        exportFileItemAs.setText("_Save as");
+        exportFileItemAs.setDisable(true);
+        exportFileItemAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
+        files.getItems().add(exportFileItemAs);
+        exportFileItemAs.setOnAction(e -> saveGame(true));
+
+
         game.addListener(l -> {
-            switch (l.getGameCommand()){
+            switch (l.getGameCommand()) {
                 case BLACK_PLAYS, WHITE_PLAYS, BLACK_STARTS, WHITE_STARTS -> {
                     exportFileItem.setDisable(false);
-                    importFileItem.setDisable(true);
+                    exportFileItemAs.setDisable(false);
                 }
                 default -> {
                     exportFileItem.setDisable(true);
-                    importFileItem.setDisable(false);
+                    exportFileItemAs.setDisable(true);
                 }
             }
         });
@@ -215,29 +222,27 @@ public class HeaderPane extends VBox {
 
         game.addListener(l -> {
             switch (l.getGameCommand()) {
-                case INIT, WHITE_WON, BLACK_WON -> {
-                    //gameSectionItems.forEach(e -> e.setDisable(true));
-                    gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
-                }
-                case BLACK_PLAYS, WHITE_PLAYS, WHITE_STARTS, BLACK_STARTS -> {
-                    gameSectionItems.stream().filter(e -> e.isDisable()).forEach(e -> e.setDisable(false));
-                }
+                case INIT, WHITE_WON, BLACK_WON ->
+                        gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
+
+                case BLACK_PLAYS, WHITE_PLAYS, WHITE_STARTS, BLACK_STARTS ->
+                    gameSectionItems.stream().filter(MenuItem::isDisable).forEach(e -> e.setDisable(false));
             }
 
-    });
+        });
 
-    SeparatorMenuItem sep1 = new SeparatorMenuItem();
+        SeparatorMenuItem sep1 = new SeparatorMenuItem();
         menu.getItems().
 
-    add(1,sep1);
+                add(1, sep1);
 
-    SeparatorMenuItem sep2 = new SeparatorMenuItem();
+        SeparatorMenuItem sep2 = new SeparatorMenuItem();
         menu.getItems().
 
-    add(4,sep2);
+                add(4, sep2);
 
         return menu;
-}
+    }
 
     /**
      * Creates the view section for the menu bar <br>
@@ -256,17 +261,13 @@ public class HeaderPane extends VBox {
         showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         viewSectionItems.add(showMoveNumbersCBtn);
         showMoveNumbersCBtn.setSelected(game.isShowMoveNumbers());
-        showMoveNumbersCBtn.setOnAction(e -> {
-            game.setShowMoveNumbers(showMoveNumbersCBtn.isSelected());
-        });
+        showMoveNumbersCBtn.setOnAction(e -> game.setShowMoveNumbers(showMoveNumbersCBtn.isSelected()));
 
         CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("_Coordinates");
         showCoordinatesCBtn.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         viewSectionItems.add(showCoordinatesCBtn);
         showCoordinatesCBtn.setSelected(game.isShowCoordinates());
-        showCoordinatesCBtn.setOnAction(e -> {
-            game.setShowCoordinates(showCoordinatesCBtn.isSelected());
-        });
+        showCoordinatesCBtn.setOnAction(e -> game.setShowCoordinates(showCoordinatesCBtn.isSelected()));
         menu.getItems().addAll(viewSectionItems);
 
         MenuItem loadGraphicsBtn = new MenuItem("_Load Graphics Set");
@@ -274,7 +275,7 @@ public class HeaderPane extends VBox {
         menu.getItems().addAll(loadGraphicsBtn);
 
         loadGraphicsBtn.setOnAction(e -> {
-            File workingDirectory = new File(System.getProperty("user.dir")+"/src/main/resources/pr_se/gogame/");
+            File workingDirectory = new File(System.getProperty("user.dir") + "/src/main/resources/pr_se/gogame/");
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(workingDirectory);
             fileChooser.setTitle("Load Graphics Set");
@@ -286,7 +287,6 @@ public class HeaderPane extends VBox {
                 game.setGraphicsPath(selectedFile.getAbsolutePath());
             }
         });
-
 
         viewSectionItems.forEach(e -> e.setDisable(true));
 
@@ -436,6 +436,17 @@ public class HeaderPane extends VBox {
 
         return lane;
 
+    }
+
+    private void saveGame(boolean as) {
+        Path saveGamePath = game.getSavePath();
+
+        if (as || saveGamePath == null) {
+            File f = CustomFileDialog.getFile(stage, true, filterList);
+            if (f == null) return;
+            game.setSavePath(f.toPath());
+        }
+        if (!game.saveGame()) System.out.println("Export did not work!");
     }
 
 }

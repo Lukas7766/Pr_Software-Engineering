@@ -25,6 +25,7 @@ public class Game implements GameInterface {
     private boolean demoMode = false;
 
     //global (helper) variables
+    private Path savaGamePath;
     private FileTree fileTree;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
@@ -85,28 +86,20 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(gameCommand, size, handicap));
     }
 
-
     @Override
-    public boolean saveGame(Path path) {
-        return exportGame(path);
+    public boolean saveGame() {
+        if (savaGamePath == null) {
+            return false;
+        }
+        System.out.println("saved a file");
+        return fileTree.saveFile(savaGamePath);
     }
 
     @Override
-    public boolean importGame(Path path) {
+    public boolean loadGame(Path path) {
         //TODO: Das board überchreiben od nd
         //return FileSaver.importFile(path);
         return false;
-    }
-
-    @Override
-    public boolean exportGame(Path path) {
-        System.out.println("saved a file");
-        return fileTree.saveFile(path);
-    }
-
-    //ToDo delete this method when it is not needed anymore??
-    public boolean importFile(Path path) {
-        return true;
     }
 
     @Override
@@ -404,6 +397,17 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(GameCommand.CONFIG_GRAPHICS));
     }
 
+    @Override
+    public Path getSavePath() {
+        return savaGamePath;
+    }
+
+    @Override
+    public void setSavePath(Path path) {
+        if(path == null) return;
+        this.savaGamePath = path;
+    }
+
     public void switchColor() {
         if (curColor == BLACK) {
             // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
@@ -430,7 +434,6 @@ public class Game implements GameInterface {
         }
     }
 
-    // TODO: Remove this debug method
     public void printDebugInfo(int x, int y) {
         board.printDebugInfo(x, y);
     }

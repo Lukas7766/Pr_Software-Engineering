@@ -52,13 +52,17 @@ public class CustomCloseAction {
             switch (er.getText()) {
                 case "no" -> Platform.exit();
                 case "yes" -> {
-                    File f = CustomFileDialog.getFile(stage,true, filterList);
-                    if (f != null) {
-                        if (game.saveGame(f.toPath())) {
-                            Platform.exit();
-                            System.exit(0);
-                        }
+                    File f;
+                    if(game.getSavePath() == null){
+                        f = CustomFileDialog.getFile(stage,true, filterList);
+                        if(f != null) game.setSavePath(f.toPath());
                     }
+
+                    if (game.saveGame()) {
+                        Platform.exit();
+                        System.exit(0);
+                    }
+
                     Alert info = new Alert(Alert.AlertType.INFORMATION);
                     info.setTitle("Go Game - Close Info");
                     info.setHeaderText("Saving your game didn't work.");

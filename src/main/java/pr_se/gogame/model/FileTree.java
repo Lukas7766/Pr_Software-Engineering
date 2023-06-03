@@ -278,6 +278,7 @@ public class FileTree {
     }
 
     public boolean saveFile(Path path){
+        this.printGameTree();
         return fileHandler.saveFile(path,toString());
     }
 

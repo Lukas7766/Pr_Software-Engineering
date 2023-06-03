@@ -8,5 +8,5 @@ public enum GameCommand {
     //GamePlay Setting Commands
     CONFIG_CONFIRMATION, CONFIG_SHOWMOVENUMBERS, CONFIG_SHOW_COORDINATES, CONFIG_DEMO_MODE,
     CONFIG_GRAPHICS, //Debug Commands
-    DEBUG_INFO // TODO: Remove in final product
+    DEBUG_INFO
 }

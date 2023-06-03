@@ -32,7 +32,7 @@ public class CustomNewGameAction {
         alert.initOwner(stage);
 
         ButtonType noBtn = new ButtonType("no");
-        ButtonType saveBtn = new ButtonType("yes");
+        ButtonType saveBtn = new ButtonType("save");
         ButtonType cancelBtn = new ButtonType("cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(saveBtn, noBtn, cancelBtn);
@@ -42,11 +42,15 @@ public class CustomNewGameAction {
         btnResult.ifPresent(er -> {
             switch (er.getText()){
                 case "no" -> game.initGame();
-                case "yes" -> {
-                    File f = CustomFileDialog.getFile(stage, true, filterList);
-                    if (f != null) game.exportGame(f.toPath());
-                    else {
-                        System.out.println("Export Dialog cancelled");
+                case "save" -> {
+                    File f;
+                    if(game.getSavePath() == null){
+                        f = CustomFileDialog.getFile(stage,true, filterList);
+                        if(f != null) game.setSavePath(f.toPath());
+                    }
+
+                    if (!game.saveGame()) {
+                        System.out.println("Export did not work!");
                         Alert info = new Alert(Alert.AlertType.INFORMATION);
                         info.setTitle("Go Game - Save Game Info");
                         info.setHeaderText("Game was not saved! Try it again.");
