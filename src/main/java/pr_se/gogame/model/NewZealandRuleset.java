@@ -8,23 +8,29 @@ public class NewZealandRuleset implements Ruleset {
     }
 
     @Override
-    public boolean getSuicide(StoneGroup group) {
-        return group.getLocations().size() > 1;
+    public boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
+        // return existingGroup.getLocations().size() > 1; // Old check when newGroup used to optimistically be added to firstSameColorGroup
+        return existingGroup != addedStone;
     }
 
     @Override
-    public boolean predicateKoMove(int x, int y) {
-        return false;
-    }
-
-    @Override
-    public Position getKoMove() {
+    public UndoableCommand updateKoMove(int x, int y) {
         return null;
     }
 
     @Override
-    public void resetKoMove() {
+    public UndoableCommand checkKoMove(int x, int y) {
+        return null;
+    }
 
+    @Override
+    public boolean isKoMove(int x, int y) {
+        return false;
+    }
+
+    @Override
+    public UndoableCommand resetKoMove() {
+        return null;
     }
 
     /**
@@ -37,8 +43,8 @@ public class NewZealandRuleset implements Ruleset {
     }
 
     @Override
-    public void setHandicapStones(Board board, StoneColor beginner, int noStones) {
-        if(board == null || beginner == null) {
+    public void setHandicapStones(Game game, StoneColor beginner, int noStones) {
+        if(game == null || beginner == null) {
             throw new NullPointerException();
         }
 
@@ -46,6 +52,6 @@ public class NewZealandRuleset implements Ruleset {
             throw new IllegalArgumentException();
         }
 
-        board.getGAME().setHandicapStoneCounter(noStones);
+        game.setHandicapStoneCounter(noStones);
     }
 }

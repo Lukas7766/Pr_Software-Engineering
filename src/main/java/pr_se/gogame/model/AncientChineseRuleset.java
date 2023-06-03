@@ -7,44 +7,89 @@ public class AncientChineseRuleset implements Ruleset {
     private Position koMove;
 
     @Override
-    public boolean predicateKoMove(int x, int y) {
+    public UndoableCommand updateKoMove(int x, int y) {
 
-        System.out.println("predicateKoMove X:" + x + " Y: " + y);
+        System.out.println("updateKoMove X: " + x + " Y: " + y);
 
-        if (this.getKoAmount() > currentKOCnt) {
-            currentKOCnt++;
-            return false;
-        }
-        if (koMove == null) koMove = new Position(x, y);
+        final int KO_AMOUNT = this.getKoAmount();
+        final int OLD_KO_CNT = currentKOCnt;
+        final Position OLD_KO_MOVE = koMove;
 
-        return koMove.X == x && koMove.Y == y;
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                if (KO_AMOUNT > OLD_KO_CNT) {
+                    currentKOCnt++; // TODO: If this causes issues, maybe change to "OLD_KO_CNT + 1"?
+                } else if (koMove == null) {
+                    koMove = new Position(x, y);
+                }
+            }
 
-    }
+            @Override
+            public void undo() {
+                koMove = OLD_KO_MOVE;
+                currentKOCnt = OLD_KO_CNT;
+            }
+        };
+        ret.execute();
 
-    public Position getKoMove() {
-        return koMove;
+
+        return ret;
     }
 
     @Override
-    public void resetKoMove() {
-        this.koMove = null;
-        this.currentKOCnt = 0;
+    public UndoableCommand checkKoMove(int x, int y) {
+        if(koMove != null) {
+            if(koMove.X != x || koMove.Y != y) {
+                return resetKoMove();
+            }
+            return null;
+        }
+
+        return null;
+    }
+
+    @Override
+    public boolean isKoMove(int x, int y) {
+        return koMove != null && koMove.X == x && koMove.Y == y;
+    }
+
+    @Override
+    public UndoableCommand resetKoMove() {
+        final Position OLD_KO_MOVE = this.koMove;
+        final int OLD_KO_CNT = this.currentKOCnt;
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                koMove = null;
+                currentKOCnt = 0;
+            }
+
+            @Override
+            public void undo() {
+                currentKOCnt = OLD_KO_CNT;
+                koMove = OLD_KO_MOVE;
+            }
+        };
+        ret.execute();
+
+        return ret;
     }
 
     @Override
     public GameResult scoreGame(Game game) {
 
         if (game == null) throw new IllegalArgumentException();
-        Board board = game.getBoard();
 
         int scoreBlack = 0;
         int scoreWhite = 0;
 
-        for (int i = 0; i < board.getSize(); i++) {
-            for (int j = 0; j < board.getSize(); j++) {
-                if (board.getColorAt(i, j) == StoneColor.BLACK) {
+        for (int i = 0; i < game.getSize(); i++) {
+            for (int j = 0; j < game.getSize(); j++) {
+                if (game.getColorAt(i, j) == StoneColor.BLACK) {
                     scoreBlack++;
-                } else if (board.getColorAt(i, j) == StoneColor.WHITE) {
+                } else if (game.getColorAt(i, j) == StoneColor.WHITE) {
                     scoreWhite++;
                 }
 
@@ -65,14 +110,15 @@ public class AncientChineseRuleset implements Ruleset {
     }
 
     @Override
-    public void setHandicapStones(Board board, StoneColor beginner , int noStones) {
+    public void setHandicapStones(Game game, StoneColor beginner , int noStones) {
+        game.setHandicapStoneCounter(noStones);
         switch (noStones) {
             case 9:
-                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true, true);
+                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
                 noStones--;                                                     // set remaining no. to 8
             case 8:
-                board.setStone(board.getSize() / 2, 3, board.getGAME().getCurColor(), true, true);
-                board.setStone(board.getSize() / 2, board.getSize() - 4, beginner, true, true);
+                game.placeHandicapStone(game.getSize() / 2, 3);
+                game.placeHandicapStone(game.getSize() / 2, game.getSize() - 4);
                 noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
             default:
                 break;
@@ -80,11 +126,11 @@ public class AncientChineseRuleset implements Ruleset {
 
         switch (noStones) {
             case 7:
-                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
+                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
                 noStones--;
             case 6:
-                board.setStone(board.getSize() - 4, board.getSize() / 2, beginner, true, true);
-                board.setStone(3, board.getSize() / 2, beginner, true, true);
+                game.placeHandicapStone(game.getSize() - 4, game.getSize() / 2);
+                game.placeHandicapStone(3, game.getSize() / 2);
                 noStones -= 2;
             default:
                 break;
@@ -92,14 +138,14 @@ public class AncientChineseRuleset implements Ruleset {
 
         switch (noStones) {
             case 5:
-                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true, true);
+                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
             case 4:
-                board.setStone(3, 3, board.getGAME().getCurColor(), true, true);
+                game.placeHandicapStone(3, 3);
             case 3:
-                board.setStone(board.getSize() / 2, board.getSize() / 2, beginner, true, true);
+                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
             case 2:
-                board.setStone(board.getSize() - 4, 3, beginner, true, true);
-                board.setStone(3, board.getSize() - 4, beginner, true, true);
+                game.placeHandicapStone(game.getSize() - 4, 3);
+                game.placeHandicapStone(3, game.getSize() - 4);
             default:
                 break;
         }

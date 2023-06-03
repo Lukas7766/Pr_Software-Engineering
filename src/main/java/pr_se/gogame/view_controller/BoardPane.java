@@ -154,7 +154,6 @@ public class BoardPane extends GridPane {
             if(e == null) {
                 throw new NullPointerException();
             }
-            System.out.println("show move numbers border pane " + showsMoveNumbers);
             switch(e.getGameCommand()) {
                 case BLACK_PLAYS:
                 case WHITE_PLAYS:
@@ -420,8 +419,6 @@ public class BoardPane extends GridPane {
     /*
      * TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse
      *  might be on the board during confirmation)
-     * TODO: Although it might be said that the model should remain unchanged until confirmation, I am not sure whether
-     *  this is really the responsibility of the view.
      */
     /**
      * If moves are to be confirmed, calling this method confirms a move on the currently selected PlayableBoardCell,

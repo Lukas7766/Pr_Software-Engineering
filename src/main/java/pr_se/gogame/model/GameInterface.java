@@ -57,17 +57,15 @@ public interface GameInterface {
 
     int getCurMoveNumber();
 
-    void setCurMoveNumber(int curMoveNumber);
-
     int getStonesCapturedBy(StoneColor color);
 
-    void addCapturedStones(StoneColor color, int amount);
+    UndoableCommand addCapturedStones(StoneColor color, int amount);
 
     StoneColor getColorAt(int x, int y);
 
     StoneColor getCurColor();
 
-    void setCurColor(StoneColor c);
+    UndoableCommand setCurColor(StoneColor c);
 
     Board getBoard();
 

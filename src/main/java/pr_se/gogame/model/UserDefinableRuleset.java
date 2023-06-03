@@ -9,7 +9,7 @@ public class UserDefinableRuleset implements Ruleset {
 
     int koAmount = 2;
 
-    private BiConsumer<Board, Integer> handicapStoneSetter;
+    private BiConsumer<Game, Integer> handicapStoneSetter;
     private Predicate<StoneGroup> suicideCheck;
 
 
@@ -33,8 +33,8 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public boolean getSuicide(StoneGroup group) {
-        return suicideAllowed && suicideCheck.test(group);
+    public boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
+        return suicideAllowed && suicideCheck.test(existingGroup);
     }
 
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
@@ -51,18 +51,23 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public boolean predicateKoMove(int x, int y) {
-        return false;
-    }
-
-    @Override
-    public Position getKoMove() {
+    public UndoableCommand updateKoMove(int x, int y) {
         return null;
     }
 
     @Override
-    public void resetKoMove() {
+    public UndoableCommand checkKoMove(int x, int y) {
+        return null;
+    }
 
+    @Override
+    public boolean isKoMove(int x, int y) {
+        return false;
+    }
+
+    @Override
+    public UndoableCommand resetKoMove() {
+        return null;
     }
 
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
@@ -83,7 +88,7 @@ public class UserDefinableRuleset implements Ruleset {
         return hasDefaultHandicap;
     }
 
-    public void setCustomHandicapPlacement(BiConsumer<Board, Integer> stoneSetter) {
+    public void setCustomHandicapPlacement(BiConsumer<Game, Integer> stoneSetter) {
         hasDefaultHandicap = false;
         handicapStoneSetter = stoneSetter;
     }
@@ -94,9 +99,9 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public void setHandicapStones(Board board, StoneColor beginner, int noStones) {
+    public void setHandicapStones(Game game, StoneColor beginner, int noStones) {
         if(!hasDefaultHandicap) {
-            handicapStoneSetter.accept(board, noStones);
+            handicapStoneSetter.accept(game, noStones);
         }
     }
 }

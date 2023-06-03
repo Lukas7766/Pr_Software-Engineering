@@ -6,10 +6,11 @@ public interface Ruleset {
      * can cause the opponent some inconvenience). See https://en.wikipedia.org/wiki/Rules_of_Go#Suicide. To check
      * whether suicide is solitary or collective, the ruleset needs to see the board.
      *
-     * @param group The group that is about to commit suicide
+     * @param existingGroup The group that is about to commit suicide
+     * @param addedStone
      * @return whether the ruleset permits suicide under the given cirucmstances on the board.
      */
-    default boolean getSuicide(StoneGroup group) {
+    default boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
         return false;
     }
 
@@ -22,24 +23,27 @@ public interface Ruleset {
         return 2;
     }
 
-    /** This method predicates if the current move matches the KO criteria.
+    /**
+     * This method will update the internal state of the Ruleset and check if a ko move was performed.
      *
-     * @param x pass the X-axis of the verifiable move
-     * @param y pass the y-axis of the verifiable move
-     * @return true if a KO move was tried or return false if it isn't a KO move
+     * @param x pass the X-axis of the move to be verified
+     * @param y pass the y-axis of the move to be verified
+     * @return true if a ko move was tried or false if it isn't a ko move
      */
-    boolean predicateKoMove(int x, int y);
-
-    /** The non-repeatable KO move is stored in Position.
-     *
-     * @return the position of the non-repeatable KO move
-     */
-    Position getKoMove();
+    UndoableCommand updateKoMove(int x, int y);
 
     /**
-     * This method resets the KO move.
+     * This method will check if a ko move exists. If it does and was performed, it returns true, if it exists but was
+     * not performed, the ko move will be reset.
+     * @param x x coordinate of the move to be verified
+     * @param y y coordinate of the move to be verified
+     * @return null if a ko move was performed or none exists, an UndoableCommand to undo the resetting if a ko move exists but was not performed.
      */
-    void resetKoMove();
+    UndoableCommand checkKoMove(int x, int y);
+
+    boolean isKoMove(int x, int y);
+
+    UndoableCommand resetKoMove();
 
     /** This method calculates the score of the game for both players.
      *
@@ -58,16 +62,16 @@ public interface Ruleset {
      * Places custom handicap stones according to the ruleset, either by calling the Game.setHandicapStone method
      * for automatic placement, or by setting the handicap stone counter of Game for manual placement.
      *
-     * @param board The board that these handicap stones are to be set for (this is used to get the game, as well).
+     * @param game The game that these handicap stones are to be set for.
      * @param noStones The number of handicap stones to be placed
      */
-    default void setHandicapStones(Board board, StoneColor beginner, int noStones) {
+    default void setHandicapStones(Game game, StoneColor beginner, int noStones) {
         /*
          * This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
          *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. That is why a ruleset
          *  may override this.
          */
-        if (board == null) {
+        if (game == null) {
             throw new IllegalArgumentException("board must not be null");
         }
         if (beginner == null) {
@@ -76,15 +80,16 @@ public interface Ruleset {
         if (noStones < 0 || noStones > 9){
             throw new IllegalArgumentException("noStones must be between 0 and 9");
         }
-        final int SIZE = board.getSize();
 
+        final int SIZE = game.getSize();
+        game.setHandicapStoneCounter(noStones);
         switch (noStones) {
             case 9:
-                board.setStone(SIZE / 2, SIZE / 2, beginner, true, true);
+                game.placeHandicapStone(SIZE / 2, SIZE / 2);
                 noStones--;                                                     // set remaining no. to 8
             case 8:
-                board.setStone(SIZE / 2, 3, beginner, true, true);
-                board.setStone(SIZE / 2, SIZE - 4, beginner, true, true);
+                game.placeHandicapStone(SIZE / 2, 3);
+                game.placeHandicapStone(SIZE / 2, SIZE - 4);
                 noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
             default:
                 break;
@@ -92,11 +97,11 @@ public interface Ruleset {
 
         switch (noStones) {
             case 7:
-                board.setStone(SIZE / 2, SIZE / 2, beginner, true, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
+                game.placeHandicapStone(SIZE / 2, SIZE / 2); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
                 noStones--;
             case 6:
-                board.setStone(SIZE - 4, SIZE / 2, beginner, true, true);
-                board.setStone(3, SIZE / 2, beginner, true, true);
+                game.placeHandicapStone(SIZE - 4, SIZE / 2);
+                game.placeHandicapStone(3, SIZE / 2);
                 noStones -= 2;
             default:
                 break;
@@ -104,15 +109,14 @@ public interface Ruleset {
 
         switch (noStones) {
             case 5:
-                board.setStone(SIZE / 2, SIZE / 2, beginner, true, true);
+                game.placeHandicapStone(SIZE / 2, SIZE / 2);
             case 4:
-                board.setStone(3, 3, beginner, true, true);
+                game.placeHandicapStone(3, 3);
             case 3:
-                board.setStone(SIZE - 4, SIZE - 4, beginner, true, true);
+                game.placeHandicapStone(SIZE - 4, SIZE - 4);
             case 2:
-                board.setStone(SIZE - 4, 3, beginner, true, true);
-                board.setStone(3, SIZE - 4, beginner, true, true);
-                board.getGAME().switchColor();
+                game.placeHandicapStone(SIZE - 4, 3);
+                game.placeHandicapStone(3, SIZE - 4);
             default:
                 break;
         }

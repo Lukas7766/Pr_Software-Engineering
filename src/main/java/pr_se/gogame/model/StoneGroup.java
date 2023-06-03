@@ -2,6 +2,7 @@ package pr_se.gogame.model;
 
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,7 +18,7 @@ public class StoneGroup {
     /**
      * all the Positions where stones of this StoneGroup are located
      */
-    private final LinkedList<Position> locations;
+    private final List<Position> locations;
 
     /**
      * all the free Positions surrounding this StoneGroup
@@ -53,24 +54,10 @@ public class StoneGroup {
     }
 
     /**
-     * Adds the locations and liberties of the StoneGroup pointed to by the supplied pointer to this StoneGroup
-     * @param other StoneGroupPointer to the StoneGroup that is to be merged with this one
-     */
-    public void mergeWithStoneGroupPtr(StoneGroupPointer other) {
-        if(other == null) {
-            throw new NullPointerException();
-        }
-
-        mergeWithStoneGroup(other.getStoneGroup());
-
-        other.setStoneGroup(this);
-    }
-
-    /**
      * Adds the locations and liberties of the supplied StoneGroup to this one
      * @param other StoneGroup that is to be merged with this one
      */
-    public void mergeWithStoneGroup(StoneGroup other) {
+    public UndoableCommand mergeWithStoneGroup(StoneGroup other) {
         if(other == null) {
             throw new NullPointerException();
         }
@@ -79,61 +66,96 @@ public class StoneGroup {
             throw new IllegalArgumentException("Stone group must be of the same color!");
         }
 
-        addLiberties(other.getLiberties());
-        locations.addAll(other.getLocations());
-        other.getPointers().forEach(p -> {
-            p.setStoneGroup(this);
-            addPointer(p);
-        });
-        other.removeAllPointers();
+        final List<Position> OLD_LOCATIONS = new LinkedList<>(locations);
+        final Set<Position> OLD_LIBERTIES = new HashSet<>(liberties);
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                locations.addAll(other.getLocations());
+                liberties.addAll(other.getLiberties());
+                other.getPointers().forEach(p -> {
+                    p.setStoneGroup(StoneGroup.this);
+                    pointers.add(p);
+                });
+            }
+
+            @Override
+            public void undo() {
+                locations.clear();
+                locations.addAll(OLD_LOCATIONS);
+                liberties.clear();
+                liberties.addAll(OLD_LIBERTIES);
+                other.getPointers().forEach(p -> {
+                    p.setStoneGroup(other);
+                    pointers.remove(p);
+                });
+            }
+        };
+
+        ret.execute();
+
+        return ret;
     }
 
     /**
-     * Adds the supplied Set of liberties to this StoneGroup
-     * @param addedLiberties Set of liberties to be added to this StoneGroup
+     * Adds the supplied LIBERTY to this StoneGroup
+     * @param LIBERTY unoccupied Position to be added to this StoneGroup
      */
-    public void addLiberties(Set<Position> addedLiberties) {
-        if(addedLiberties == null) {
+    public UndoableCommand addLiberty(final Position LIBERTY) {
+        if(LIBERTY == null) {
             throw new NullPointerException();
         }
 
-        liberties.addAll(addedLiberties);
-    }
+        final boolean WAS_CONTAINED = liberties.contains(LIBERTY);
 
-    /**
-     * Removes the supplied Set of liberties from this StoneGroup
-     * @param removedLiberties Set of liberties to be removed from this StoneGroup
-     */
-    public void removeLiberties(Set<Position> removedLiberties) {
-        if(removedLiberties == null) {
-            throw new NullPointerException();
-        }
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                liberties.add(LIBERTY);
+            }
 
-        liberties.removeAll(removedLiberties);
-    }
+            @Override
+            public void undo() {
+                if(!WAS_CONTAINED) {
+                    liberties.remove(LIBERTY);
+                }
+            }
+        };
 
-    /**
-     * Adds the supplied liberty to this StoneGroup
-     * @param liberty unoccupied Position to be added to this StoneGroup
-     */
-    public void addLiberty(Position liberty) {
-        if(liberty == null) {
-            throw new NullPointerException();
-        }
+        ret.execute();
 
-        liberties.add(liberty);
+        return ret;
     }
 
     /**
      * Removes the supplied liberty from this StoneGroup
      * @param liberty unoccupied Position to be removed from this StoneGroup
      */
-    public void removeLiberty(Position liberty) {
+    public UndoableCommand removeLiberty(Position liberty) {
         if(liberty == null) {
             throw new NullPointerException();
         }
 
-        liberties.remove(liberty);
+        final boolean WAS_CONTAINED = liberties.contains(liberty);
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                liberties.remove(liberty);
+            }
+
+            @Override
+            public void undo() {
+                if(WAS_CONTAINED) {
+                    liberties.add(liberty);
+                }
+            }
+        };
+
+        ret.execute();
+
+        return ret;
     }
 
     // Getters and Setters
@@ -141,7 +163,7 @@ public class StoneGroup {
         return stoneColor;
     }
 
-    public LinkedList<Position> getLocations() {
+    public List<Position> getLocations() {
         return locations;
     }
 
@@ -150,18 +172,14 @@ public class StoneGroup {
     }
 
     public void addPointer(StoneGroupPointer ptr) {
-        pointers.add(ptr);
-    }
+        if(ptr == null) {
+            throw new NullPointerException();
+        }
 
-    public void removeAllPointers() {
-        pointers.removeAll(pointers);
+        pointers.add(ptr);
     }
 
     public Set<StoneGroupPointer> getPointers() {
         return pointers;
-    }
-
-    public void removeLocation(Position location) {
-        locations.remove(location);
     }
 }
