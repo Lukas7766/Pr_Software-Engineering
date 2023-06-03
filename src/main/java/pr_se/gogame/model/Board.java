@@ -63,25 +63,6 @@ public class Board implements BoardInterface {
             return null;
         }
 
-        /*
-         * What do we want here?
-         * - If koMove == null, do nothing
-         * - If koMove != null
-         *   - Do NOT update the counter
-         *   - Do NOT update KoMove
-         *   - Only check if we're setting a stone at the ko coordinates.
-         *   If koMove != null && we're NOT setting a stone at its coordinates
-         *   - Reset koMove
-         */
-        //prevent KO
-        /*if(GAME.getRuleset().getKoMove() != null) {
-            if(GAME.getRuleset().updateKoMove(x,y)) {
-                System.out.println("KO move is not allowed");
-                return null;
-            } else {
-                GAME.getRuleset().resetKoMove();
-            }
-        }*/
         final boolean IS_KO_MOVE = GAME.getRuleset().isKoMove(x, y);
         final UndoableCommand UC01_CHECK_KO_MOVE = GAME.getRuleset().checkKoMove(x, y);
         if(IS_KO_MOVE) {
@@ -130,11 +111,6 @@ public class Board implements BoardInterface {
                 System.out.println("Suicide permitted.");
                 permittedSuicide = true;
             } else {
-                /*
-                 * What do we want here?
-                 * - update the counter
-                 * - update KoMove
-                 */
                 uC02_updateKoMove = GAME.getRuleset().updateKoMove(x, y);
                 if (!GAME.getRuleset().isKoMove(x, y)) {
                     killAnother = true;

@@ -1,7 +1,5 @@
 package pr_se.gogame.model;
 
-import javafx.geometry.Pos;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -94,11 +92,6 @@ public class JapaneseRuleset implements Ruleset {
     @Override
     public boolean isKoMove(int x, int y) {
         return koMove != null && koMove.X == x && koMove.Y == y;
-    }
-
-    @Override
-    public Position getKoMove() {
-        return koMove;
     }
 
     private UndoableCommand resetKoMove() {

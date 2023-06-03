@@ -28,11 +28,6 @@ public class NewZealandRuleset implements Ruleset {
         return false;
     }
 
-    @Override
-    public Position getKoMove() {
-        return null;
-    }
-
     private UndoableCommand resetKoMove() {
         return null;
     }

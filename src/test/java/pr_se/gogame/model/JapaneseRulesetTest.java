@@ -57,7 +57,7 @@ class JapaneseRulesetTest {
 
         game.playMove(1, 2);
 
-        assertEquals(new Position(1, 2), game.getRuleset().getKoMove());
+        assertTrue(game.getRuleset().isKoMove(1, 2));
         assertNull(game.getColorAt(1, 2));
         game.getRuleset().updateKoMove(2, 1);
         assertFalse(game.getRuleset().isKoMove(2, 1));
@@ -82,7 +82,7 @@ class JapaneseRulesetTest {
 
         game.getRuleset().updateKoMove(1, 2);
         assertTrue(game.getRuleset().isKoMove(1, 2));
-        assertEquals(new Position(1, 2), game.getRuleset().getKoMove());
+        assertTrue(game.getRuleset().isKoMove(1, 2));
     }
 
     @Test
@@ -106,7 +106,7 @@ class JapaneseRulesetTest {
 
         game.playMove(1, 5);
 
-        assertNull(game.getRuleset().getKoMove());
+        assertFalse(game.getRuleset().isKoMove(1, 2));
 
     }
 

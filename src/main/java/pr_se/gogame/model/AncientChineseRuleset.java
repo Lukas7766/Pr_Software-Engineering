@@ -54,10 +54,6 @@ public class AncientChineseRuleset implements Ruleset {
         return koMove != null && koMove.X == x && koMove.Y == y;
     }
 
-    public Position getKoMove() {
-        return koMove;
-    }
-
     private UndoableCommand resetKoMove() {
         final Position OLD_KO_MOVE = this.koMove;
         final int OLD_KO_CNT = this.currentKOCnt;
