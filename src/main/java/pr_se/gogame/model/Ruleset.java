@@ -23,28 +23,6 @@ public interface Ruleset {
         return 2;
     }
 
-    /**
-     * This method will update the internal state of the Ruleset and check if a ko move was performed.
-     *
-     * @param x pass the X-axis of the move to be verified
-     * @param y pass the y-axis of the move to be verified
-     * @return true if a ko move was tried or false if it isn't a ko move
-     */
-    UndoableCommand updateKoMove(int x, int y);
-
-    /**
-     * This method will check if a ko move exists. If it does and was performed, it returns true, if it exists but was
-     * not performed, the ko move will be reset.
-     * @param x x coordinate of the move to be verified
-     * @param y y coordinate of the move to be verified
-     * @return null if a ko move was performed or none exists, an UndoableCommand to undo the resetting if a ko move exists but was not performed.
-     */
-    UndoableCommand checkKoMove(int x, int y);
-
-    boolean isKoMove(int x, int y);
-
-    UndoableCommand resetKoMove();
-
     UndoableCommand isKo(Game game);
 
     /** This method calculates the score of the game for both players.

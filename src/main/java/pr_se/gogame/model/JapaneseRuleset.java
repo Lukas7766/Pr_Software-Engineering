@@ -2,7 +2,6 @@ package pr_se.gogame.model;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 
 public class JapaneseRuleset implements Ruleset {
@@ -28,78 +27,9 @@ public class JapaneseRuleset implements Ruleset {
      */
     private List<Position> territory;
 
-    private final int [] boardHashes = new int [2];
+    private final int [] boardHashes = new int [getKoAmount()];
 
-    /**
-     * The JP ruleset allows only one KO move repetition.
-     *
-     * @return 1 as only one KO move is allowed.
-     */
-    @Override
-    public int getKoAmount() {
-        return 1;
-    }
-
-    /**
-     * This method predicates if a KO move is done.
-     *
-     * @param x pass the X-axis of the verifiable move
-     * @param y pass the y-axis of the verifiable move
-     * @return If the KO move is done the method returns true. If the KO move is not done the method returns false.
-     */
-    @Override
-    public UndoableCommand updateKoMove(int x, int y) {
-
-        System.out.println("updateKoMove X: " + x + " Y: " + y);
-
-        final int KO_AMOUNT = this.getKoAmount();
-        final int OLD_KO_CNT = currentKOCnt;
-        final Position OLD_KO_MOVE = koMove;
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute() {
-                if (KO_AMOUNT > OLD_KO_CNT) {
-                    currentKOCnt++; // TODO: If this causes issues, maybe change to "OLD_KO_CNT + 1"?
-                } else if (koMove == null) {
-                    koMove = new Position(x, y);
-                }
-            }
-
-            @Override
-            public void undo() {
-                koMove = OLD_KO_MOVE;
-                currentKOCnt = OLD_KO_CNT;
-            }
-        };
-        ret.execute();
-
-
-        return ret;
-    }
-
-    @Override
-    public UndoableCommand checkKoMove(int x, int y) {
-        System.out.println("checkKoMove X: " + x + ", Y: " + y);
-        if(koMove != null) {
-            System.out.println("koMove != null");
-            if(koMove.X != x || koMove.Y != y) {
-                System.out.println("resetKoMove()");
-                return resetKoMove();
-            }
-            return null;
-        }
-
-        return null;
-    }
-
-    @Override
-    public boolean isKoMove(int x, int y) {
-        return koMove != null && koMove.X == x && koMove.Y == y;
-    }
-
-    @Override
-    public UndoableCommand resetKoMove() {
+    private UndoableCommand resetKoMove() {
         final Position OLD_KO_MOVE = this.koMove;
         final int OLD_KO_CNT = this.currentKOCnt;
 

@@ -14,25 +14,6 @@ class RulesetTest {
     void setup(){
         //create empty ruleset for testing default methods
         ruleset = new Ruleset() {
-            @Override
-            public UndoableCommand updateKoMove(int x, int y) {
-                return null;
-            }
-
-            @Override
-            public UndoableCommand resetKoMove() {
-                return null;
-            }
-
-            @Override
-            public UndoableCommand checkKoMove(int x, int y) {
-                return null;
-            }
-
-            @Override
-            public boolean isKoMove(int x, int y) {
-                return false;
-            }
 
             @Override
             public UndoableCommand isKo(Game game) {

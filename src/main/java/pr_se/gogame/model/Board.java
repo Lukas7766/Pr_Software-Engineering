@@ -91,8 +91,6 @@ public class Board implements BoardInterface {
         final List<UndoableCommand> subcommands = new LinkedList<>();
 
         // Check for suicide
-        final UndoableCommand UC01_UPDATE_KO_MOVE;
-
         boolean permittedSuicide = false;
         boolean killAnother = false;
         Set<StoneGroup> otherColorGroups = surroundingSGs.stream().filter(sg -> sg.getStoneColor() != color).collect(Collectors.toSet());
@@ -105,33 +103,10 @@ public class Board implements BoardInterface {
                 }
                 System.out.println("Suicide permitted.");
                 permittedSuicide = true;
-                UC01_UPDATE_KO_MOVE = null;
             } else {
-                UC01_UPDATE_KO_MOVE = GAME.getRuleset().updateKoMove(x, y);
-                // if (!GAME.getRuleset().isKoMove(x, y)) {
-                    killAnother = true;
-                /*} else {
-                    System.out.println("KO move is not allowed");
-                    return null;
-                }*/
+                killAnother = true;
             }
-        } else {
-            UC01_UPDATE_KO_MOVE = null;
         }
-
-        subcommands.add(UC01_UPDATE_KO_MOVE);
-
-        // final boolean IS_KO_MOVE = ;
-        // final UndoableCommand UC01_CHECK_KO_MOVE = GAME.getRuleset().checkKoMove(x, y);
-        final UndoableCommand UC02_RESET_KO_MOVE;
-        if(GAME.getRuleset().isKoMove(x, y)) {
-            System.out.println("Ko move is not allowed by checkKoMove().");
-            return null;
-        } else {
-            UC02_RESET_KO_MOVE = GAME.getRuleset().resetKoMove();
-        }
-
-        subcommands.add(UC02_RESET_KO_MOVE);
 
         /*
          * Merge newly-connected StoneGroups of the same color and remove the new stone's position from the liberties
@@ -141,27 +116,22 @@ public class Board implements BoardInterface {
         sameColorGroups.removeAll(otherColorGroups);
         sameColorGroups.remove(firstSameColorGroup);
 
-        final UndoableCommand UC03_ADD_NEW_TO_FIRST = (firstSameColorGroup != newGroup) ? (firstSameColorGroup.mergeWithStoneGroup(newGroup)) : (null);
+        final UndoableCommand UC01_ADD_NEW_TO_FIRST = (firstSameColorGroup != newGroup) ? (firstSameColorGroup.mergeWithStoneGroup(newGroup)) : (null);
+        subcommands.add(UC01_ADD_NEW_TO_FIRST);
 
-        subcommands.add(UC03_ADD_NEW_TO_FIRST);
-
-        List<UndoableCommand> uC04_mergeSameWithFirst = new LinkedList<>();
         for(StoneGroup sg : sameColorGroups) {
-            // uC04_mergeSameWithFirst.add(firstSameColorGroup.mergeWithStoneGroup(sg)); // Don't remove the liberty from the now obsolete group - it's pointless and only complicates undoing
             subcommands.add(firstSameColorGroup.mergeWithStoneGroup(sg));
         }
 
-        final UndoableCommand UC05_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES = firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
-        subcommands.add(UC05_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES);
+        final UndoableCommand UC03_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES = firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
+        subcommands.add(UC03_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES);
 
-        List<UndoableCommand> uC06_removeNewPosFromOtherLiberties = new LinkedList<>();
         for(StoneGroup sg : otherColorGroups) {
-            // uC06_removeNewPosFromOtherLiberties.add(sg.removeLiberty(new Position(x, y)));
             subcommands.add(sg.removeLiberty(new Position(x, y)));
         }
 
         final boolean FINAL_PERMITTED_SUICIDE = permittedSuicide;
-        final UndoableCommand UC07_PLACE_POINTER = new UndoableCommand() {
+        final UndoableCommand UC05_PLACE_POINTER = new UndoableCommand() {
             @Override
             public void execute() {
                 if (!FINAL_PERMITTED_SUICIDE) {
@@ -178,14 +148,14 @@ public class Board implements BoardInterface {
                 board[x][y] = null;
             }
         };
-        UC07_PLACE_POINTER.execute();
-        subcommands.add(UC07_PLACE_POINTER);
+        UC05_PLACE_POINTER.execute();
+        subcommands.add(UC05_PLACE_POINTER);
 
         final boolean FINAL_KILL_ANOTHER = killAnother;
 
-        final UndoableCommand UC08_REMOVE_CAPTURED_STONES = new UndoableCommand() {
-            final LinkedList<UndoableCommand> UC08_01_REMOVE_STONE_COMMANDS = new LinkedList<>();
-            UndoableCommand uC08_02_addCapturedStonesCommand = null;
+        final UndoableCommand UC06_REMOVE_CAPTURED_STONES = new UndoableCommand() {
+            final LinkedList<UndoableCommand> UC06_01_REMOVE_STONE_COMMANDS = new LinkedList<>();
+            UndoableCommand uC06_02_addCapturedStonesCommand = null;
 
             @Override
             public void execute() {
@@ -195,11 +165,11 @@ public class Board implements BoardInterface {
                         if ((sg.getStoneColor() != color || !FINAL_KILL_ANOTHER) && sg.getLiberties().size() == 0) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
-                                UC08_01_REMOVE_STONE_COMMANDS.add(removeStone(p.X, p.Y, true));
+                                UC06_01_REMOVE_STONE_COMMANDS.add(removeStone(p.X, p.Y, true));
                                 captured++;
                                 System.out.println("remove: " + p.X + " / " + p.Y);
                             }
-                            uC08_02_addCapturedStonesCommand = GAME.addCapturedStones(color, captured);
+                            uC06_02_addCapturedStonesCommand = GAME.addCapturedStones(color, captured);
                         }
                     }
 
@@ -222,24 +192,24 @@ public class Board implements BoardInterface {
 
             @Override
             public void undo() {
-                for(UndoableCommand c : UC08_01_REMOVE_STONE_COMMANDS) {
+                for(UndoableCommand c : UC06_01_REMOVE_STONE_COMMANDS) {
                     c.undo();
                 }
 
                 // TODO: Saving won't be undone, will it?
 
-                if(uC08_02_addCapturedStonesCommand != null) {
-                    uC08_02_addCapturedStonesCommand.undo();
+                if(uC06_02_addCapturedStonesCommand != null) {
+                    uC06_02_addCapturedStonesCommand.undo();
                 }
 
                 fireStoneRemoved(x, y); // TODO: Do we need a check for FINAL_PERMITTED_SUICIDE here?
             }
         };
-        UC08_REMOVE_CAPTURED_STONES.execute();
-        subcommands.add(UC08_REMOVE_CAPTURED_STONES);
+        UC06_REMOVE_CAPTURED_STONES.execute();
+        subcommands.add(UC06_REMOVE_CAPTURED_STONES);
 
-        final UndoableCommand UC09_CHECK_KO = GAME.getRuleset().isKo(GAME);
-        subcommands.add(UC09_CHECK_KO);
+        final UndoableCommand UC07_CHECK_KO = GAME.getRuleset().isKo(GAME);
+        subcommands.add(UC07_CHECK_KO);
         final List<UndoableCommand> SUBCOMMANDS = Collections.unmodifiableList(subcommands);
 
         UndoableCommand ret = new UndoableCommand() {
@@ -248,31 +218,6 @@ public class Board implements BoardInterface {
                 for(UndoableCommand c : SUBCOMMANDS) {
                     c.execute();
                 }
-
-                /*if(UC01_CHECK_KO_MOVE != null) {
-                    UC01_CHECK_KO_MOVE.execute();
-                }
-
-                if(UC01_UPDATE_KO_MOVE != null) {
-                    UC01_UPDATE_KO_MOVE.execute();
-                }
-
-                if(UC02_RESET_KO_MOVE != null) {
-                    UC02_RESET_KO_MOVE.execute();
-                }
-
-                if(UC03_ADD_NEW_TO_FIRST != null) {
-                    UC03_ADD_NEW_TO_FIRST.execute();
-                }
-                for(UndoableCommand c : uC04_mergeSameWithFirst) {
-                    c.execute();
-                }
-                UC05_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES.execute();
-                for(UndoableCommand c : uC06_removeNewPosFromOtherLiberties) {
-                    c.execute();
-                }
-                UC07_PLACE_POINTER.execute();
-                UC08_REMOVE_CAPTURED_STONES.execute();*/
             }
 
             @Override
@@ -285,36 +230,14 @@ public class Board implements BoardInterface {
                         c.undo();
                     }
                 }
-
-                /*UC08_REMOVE_CAPTURED_STONES.undo();
-                UC07_PLACE_POINTER.undo();
-                for(UndoableCommand c : uC06_removeNewPosFromOtherLiberties) {
-                    c.undo();
-                }
-                UC05_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES.undo();
-                for(UndoableCommand c : uC04_mergeSameWithFirst) {
-                    c.undo();
-                }
-                if(UC03_ADD_NEW_TO_FIRST != null) {
-                    UC03_ADD_NEW_TO_FIRST.undo();
-                }
-                if(UC02_RESET_KO_MOVE != null) {
-                    UC02_RESET_KO_MOVE.undo();
-                }
-                if(UC01_UPDATE_KO_MOVE != null) {
-                    UC01_UPDATE_KO_MOVE.undo();
-                }
-                /*if(UC01_CHECK_KO_MOVE != null) {
-                    UC01_CHECK_KO_MOVE.undo();
-                }*/
             }
         };
-        // No execute() this time, as we've already executed the subcommands piecemeal (though this could be changed for the sake of uniformity).
+        // No execute() this time, as we've already executed the subcommands piecemeal.
 
         System.out.println();
 
 
-        if(UC09_CHECK_KO == null) {
+        if(UC07_CHECK_KO == null) {
             ret.undo();
             return null;
         }

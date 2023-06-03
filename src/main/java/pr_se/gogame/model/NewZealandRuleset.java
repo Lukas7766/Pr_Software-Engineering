@@ -14,26 +14,6 @@ public class NewZealandRuleset implements Ruleset {
     }
 
     @Override
-    public UndoableCommand updateKoMove(int x, int y) {
-        return null;
-    }
-
-    @Override
-    public UndoableCommand checkKoMove(int x, int y) {
-        return null;
-    }
-
-    @Override
-    public boolean isKoMove(int x, int y) {
-        return false;
-    }
-
-    @Override
-    public UndoableCommand resetKoMove() {
-        return null;
-    }
-
-    @Override
     public UndoableCommand isKo(Game game) {
         return null;
     }

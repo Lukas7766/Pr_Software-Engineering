@@ -9,56 +9,7 @@ public class AncientChineseRuleset implements Ruleset {
     private Position koMove;
     private int lastBoardHash;
 
-    @Override
-    public UndoableCommand updateKoMove(int x, int y) {
-
-        System.out.println("updateKoMove X: " + x + " Y: " + y);
-
-        final int KO_AMOUNT = this.getKoAmount();
-        final int OLD_KO_CNT = currentKOCnt;
-        final Position OLD_KO_MOVE = koMove;
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute() {
-                if (KO_AMOUNT > OLD_KO_CNT) {
-                    currentKOCnt++; // TODO: If this causes issues, maybe change to "OLD_KO_CNT + 1"?
-                } else if (koMove == null) {
-                    koMove = new Position(x, y);
-                }
-            }
-
-            @Override
-            public void undo() {
-                koMove = OLD_KO_MOVE;
-                currentKOCnt = OLD_KO_CNT;
-            }
-        };
-        ret.execute();
-
-
-        return ret;
-    }
-
-    @Override
-    public UndoableCommand checkKoMove(int x, int y) {
-        if(koMove != null) {
-            if(koMove.X != x || koMove.Y != y) {
-                return resetKoMove();
-            }
-            return null;
-        }
-
-        return null;
-    }
-
-    @Override
-    public boolean isKoMove(int x, int y) {
-        return koMove != null && koMove.X == x && koMove.Y == y;
-    }
-
-    @Override
-    public UndoableCommand resetKoMove() {
+    private UndoableCommand resetKoMove() {
         final Position OLD_KO_MOVE = this.koMove;
         final int OLD_KO_CNT = this.currentKOCnt;
 
