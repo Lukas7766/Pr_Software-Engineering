@@ -33,6 +33,11 @@ public class NewZealandRuleset implements Ruleset {
         return null;
     }
 
+    @Override
+    public UndoableCommand isKo(Game game) {
+        return null;
+    }
+
     /**
      * The New Zealand Ruleset allows for free placement of handicap stones. See https://en.wikipedia.org/wiki/Handicapping_in_Go#Free_placement
      * @return false

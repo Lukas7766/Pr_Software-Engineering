@@ -1,10 +1,13 @@
 package pr_se.gogame.model;
 
 
+import java.util.Arrays;
+
 public class AncientChineseRuleset implements Ruleset {
 
     private int currentKOCnt = 0;
     private Position koMove;
+    private int lastBoardHash;
 
     @Override
     public UndoableCommand updateKoMove(int x, int y) {
@@ -70,6 +73,39 @@ public class AncientChineseRuleset implements Ruleset {
             public void undo() {
                 currentKOCnt = OLD_KO_CNT;
                 koMove = OLD_KO_MOVE;
+            }
+        };
+        ret.execute();
+
+        return ret;
+    }
+
+    @Override
+    public UndoableCommand isKo(Game game) {
+        StoneColor [][] boardColor = new StoneColor[game.getSize()][game.getSize()];
+
+        for(int i = 0; i < game.getSize(); i++) {
+            for(int j = 0; j < game.getSize(); j++) {
+                boardColor[i][j] = game.getColorAt(i, j);
+            }
+        }
+
+        final int LAST_BOARD_HASH = lastBoardHash;
+        final int NEW_BOARD_HASH = Arrays.hashCode(boardColor);
+
+        if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
+            return null;
+        }
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                lastBoardHash = NEW_BOARD_HASH;
+            }
+
+            @Override
+            public void undo() {
+                lastBoardHash = LAST_BOARD_HASH;
             }
         };
         ret.execute();

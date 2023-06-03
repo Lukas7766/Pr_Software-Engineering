@@ -88,6 +88,8 @@ public class Board implements BoardInterface {
             .max(Comparator.comparingInt(sg -> sg.getLiberties().size()))
             .orElse(newGroup);
 
+        final List<UndoableCommand> subcommands = new LinkedList<>();
+
         // Check for suicide
         final UndoableCommand UC01_UPDATE_KO_MOVE;
 
@@ -117,6 +119,8 @@ public class Board implements BoardInterface {
             UC01_UPDATE_KO_MOVE = null;
         }
 
+        subcommands.add(UC01_UPDATE_KO_MOVE);
+
         // final boolean IS_KO_MOVE = ;
         // final UndoableCommand UC01_CHECK_KO_MOVE = GAME.getRuleset().checkKoMove(x, y);
         final UndoableCommand UC02_RESET_KO_MOVE;
@@ -126,6 +130,8 @@ public class Board implements BoardInterface {
         } else {
             UC02_RESET_KO_MOVE = GAME.getRuleset().resetKoMove();
         }
+
+        subcommands.add(UC02_RESET_KO_MOVE);
 
         /*
          * Merge newly-connected StoneGroups of the same color and remove the new stone's position from the liberties
@@ -137,14 +143,21 @@ public class Board implements BoardInterface {
 
         final UndoableCommand UC03_ADD_NEW_TO_FIRST = (firstSameColorGroup != newGroup) ? (firstSameColorGroup.mergeWithStoneGroup(newGroup)) : (null);
 
+        subcommands.add(UC03_ADD_NEW_TO_FIRST);
+
         List<UndoableCommand> uC04_mergeSameWithFirst = new LinkedList<>();
         for(StoneGroup sg : sameColorGroups) {
-            uC04_mergeSameWithFirst.add(firstSameColorGroup.mergeWithStoneGroup(sg)); // Don't remove the liberty from the now obsolete group - it's pointless and only complicates undoing
+            // uC04_mergeSameWithFirst.add(firstSameColorGroup.mergeWithStoneGroup(sg)); // Don't remove the liberty from the now obsolete group - it's pointless and only complicates undoing
+            subcommands.add(firstSameColorGroup.mergeWithStoneGroup(sg));
         }
+
         final UndoableCommand UC05_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES = firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
+        subcommands.add(UC05_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES);
+
         List<UndoableCommand> uC06_removeNewPosFromOtherLiberties = new LinkedList<>();
         for(StoneGroup sg : otherColorGroups) {
-            uC06_removeNewPosFromOtherLiberties.add(sg.removeLiberty(new Position(x, y)));
+            // uC06_removeNewPosFromOtherLiberties.add(sg.removeLiberty(new Position(x, y)));
+            subcommands.add(sg.removeLiberty(new Position(x, y)));
         }
 
         final boolean FINAL_PERMITTED_SUICIDE = permittedSuicide;
@@ -166,6 +179,7 @@ public class Board implements BoardInterface {
             }
         };
         UC07_PLACE_POINTER.execute();
+        subcommands.add(UC07_PLACE_POINTER);
 
         final boolean FINAL_KILL_ANOTHER = killAnother;
 
@@ -222,13 +236,22 @@ public class Board implements BoardInterface {
             }
         };
         UC08_REMOVE_CAPTURED_STONES.execute();
+        subcommands.add(UC08_REMOVE_CAPTURED_STONES);
+
+        final UndoableCommand UC09_CHECK_KO = GAME.getRuleset().isKo(GAME);
+        subcommands.add(UC09_CHECK_KO);
+        final List<UndoableCommand> SUBCOMMANDS = Collections.unmodifiableList(subcommands);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute() {
+                for(UndoableCommand c : SUBCOMMANDS) {
+                    c.execute();
+                }
+
                 /*if(UC01_CHECK_KO_MOVE != null) {
                     UC01_CHECK_KO_MOVE.execute();
-                }*/
+                }
 
                 if(UC01_UPDATE_KO_MOVE != null) {
                     UC01_UPDATE_KO_MOVE.execute();
@@ -249,13 +272,21 @@ public class Board implements BoardInterface {
                     c.execute();
                 }
                 UC07_PLACE_POINTER.execute();
-                UC08_REMOVE_CAPTURED_STONES.execute();
+                UC08_REMOVE_CAPTURED_STONES.execute();*/
             }
 
             @Override
             public void undo() {
                 // Undoing it the other way round just in case.
-                UC08_REMOVE_CAPTURED_STONES.undo();
+                ListIterator<UndoableCommand> i = SUBCOMMANDS.listIterator(SUBCOMMANDS.size());
+                while(i.hasPrevious()) {
+                    UndoableCommand c = i.previous();
+                    if(c != null) {
+                        c.undo();
+                    }
+                }
+
+                /*UC08_REMOVE_CAPTURED_STONES.undo();
                 UC07_PLACE_POINTER.undo();
                 for(UndoableCommand c : uC06_removeNewPosFromOtherLiberties) {
                     c.undo();
@@ -281,6 +312,12 @@ public class Board implements BoardInterface {
         // No execute() this time, as we've already executed the subcommands piecemeal (though this could be changed for the sake of uniformity).
 
         System.out.println();
+
+
+        if(UC09_CHECK_KO == null) {
+            ret.undo();
+            return null;
+        }
 
         return ret;
     }

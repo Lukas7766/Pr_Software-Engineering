@@ -1,6 +1,8 @@
 package pr_se.gogame.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class JapaneseRuleset implements Ruleset {
@@ -25,6 +27,8 @@ public class JapaneseRuleset implements Ruleset {
      * the score of the player if the territory is not surrounded by a different color.
      */
     private List<Position> territory;
+
+    private final int [] boardHashes = new int [2];
 
     /**
      * The JP ruleset allows only one KO move repetition.
@@ -110,6 +114,56 @@ public class JapaneseRuleset implements Ruleset {
             public void undo() {
                 currentKOCnt = OLD_KO_CNT;
                 koMove = OLD_KO_MOVE;
+            }
+        };
+        ret.execute();
+
+        return ret;
+    }
+
+    @Override
+    public UndoableCommand isKo(Game game) {
+        System.out.println("isKo()");
+
+        StoneColor [][] boardColor = new StoneColor[game.getSize()][game.getSize()];
+
+        for(int i = 0; i < game.getSize(); i++) {
+            for(int j = 0; j < game.getSize(); j++) {
+                boardColor[i][j] = game.getColorAt(i, j);
+            }
+        }
+
+        final int LAST_BOARD_HASH = boardHashes[0];
+        final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
+
+        System.out.print("boardHashes: ");
+        for(int i : boardHashes) {
+            System.out.print(i + " ");
+        }
+        System.out.println();
+        System.out.println("NEW_BOARD_HASH: " + NEW_BOARD_HASH);
+
+        if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
+            return null;
+        }
+
+        System.out.println("Not ko");
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute() {
+                for(int i = 0; i < boardHashes.length - 1; i++) {
+                    boardHashes[i] = boardHashes[i + 1];
+                }
+                boardHashes[boardHashes.length - 1] = NEW_BOARD_HASH;
+            }
+
+            @Override
+            public void undo() {
+                for(int i = boardHashes.length; i > 0; i--) {
+                    boardHashes[i] = boardHashes[i - 1];
+                }
+                boardHashes[0] = LAST_BOARD_HASH;
             }
         };
         ret.execute();

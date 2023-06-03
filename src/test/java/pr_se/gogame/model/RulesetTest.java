@@ -35,6 +35,11 @@ class RulesetTest {
             }
 
             @Override
+            public UndoableCommand isKo(Game game) {
+                return false;
+            }
+
+            @Override
             public GameResult scoreGame(Game game) {
                 return null;
             }

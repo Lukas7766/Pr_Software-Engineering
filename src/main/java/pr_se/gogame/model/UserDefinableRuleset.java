@@ -70,6 +70,11 @@ public class UserDefinableRuleset implements Ruleset {
         return null;
     }
 
+    @Override
+    public UndoableCommand isKo(Game game) {
+        return null;
+    }
+
     /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
      * Two consecutive moves (except passing) may not restore the original position.
      * @return 2
