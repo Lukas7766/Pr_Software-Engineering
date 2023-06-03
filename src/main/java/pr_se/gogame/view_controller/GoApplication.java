@@ -8,6 +8,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.control.Button;
 
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 
@@ -56,6 +57,17 @@ public class GoApplication extends Application {
         stage.setMinWidth(WIDTH + 20);
 
         stage.setScene(scene);
+
+        Screen screen = Screen.getPrimary();
+        System.out.println("DPI = " + screen.getDpi());
+        System.out.println("Output scale X = " + screen.getOutputScaleX());
+        System.out.println("Output scale Y = " + screen.getOutputScaleY());
+
+        /*
+         * This is necessary for keeping the rows and columns of the board together if Windows's DPI Scaling is set
+         * above 100 %.
+         */
+        stage.setForceIntegerRenderScale(true);
         stage.show();
 
         /*
