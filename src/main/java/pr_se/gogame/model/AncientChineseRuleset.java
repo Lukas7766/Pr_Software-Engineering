@@ -4,32 +4,7 @@ package pr_se.gogame.model;
 import java.util.Arrays;
 
 public class AncientChineseRuleset implements Ruleset {
-
-    private int currentKOCnt = 0;
-    private Position koMove;
     private int lastBoardHash;
-
-    private UndoableCommand resetKoMove() {
-        final Position OLD_KO_MOVE = this.koMove;
-        final int OLD_KO_CNT = this.currentKOCnt;
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute() {
-                koMove = null;
-                currentKOCnt = 0;
-            }
-
-            @Override
-            public void undo() {
-                currentKOCnt = OLD_KO_CNT;
-                koMove = OLD_KO_MOVE;
-            }
-        };
-        ret.execute();
-
-        return ret;
-    }
 
     @Override
     public UndoableCommand isKo(Game game) {

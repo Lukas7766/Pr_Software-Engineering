@@ -21,9 +21,9 @@ class JapaneseRulesetTest {
     }
 
     @Test
-    @DisplayName("testing getKoAmount(), allowed repeatable moves are one in JP ruleset")
+    @DisplayName("testing getKoAmount(), allowed repeatable moves are two in JP ruleset")
     void getKoAmount() {
-        assertEquals(1, japaneseRuleset.getKoAmount());
+        assertEquals(2, japaneseRuleset.getKoAmount());
     }
 
     @Test

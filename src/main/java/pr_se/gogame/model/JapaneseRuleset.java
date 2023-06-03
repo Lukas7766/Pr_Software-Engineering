@@ -7,16 +7,6 @@ import java.util.List;
 public class JapaneseRuleset implements Ruleset {
 
     /**
-     * The amount of ko moves that are done in a game. This will be reset after the KO move is aborted.
-     */
-    private int currentKOCnt = 0;
-
-    /**
-     * The position of the KO move. This will be reset after the KO move is aborted.
-     */
-    private Position koMove;
-
-    /**
      * This helps to determine if a position is already visited by the floodfill algorithm.
      */
     private boolean[][] visited;
@@ -28,28 +18,6 @@ public class JapaneseRuleset implements Ruleset {
     private List<Position> territory;
 
     private final int [] boardHashes = new int [getKoAmount()];
-
-    private UndoableCommand resetKoMove() {
-        final Position OLD_KO_MOVE = this.koMove;
-        final int OLD_KO_CNT = this.currentKOCnt;
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute() {
-                koMove = null;
-                currentKOCnt = 0;
-            }
-
-            @Override
-            public void undo() {
-                currentKOCnt = OLD_KO_CNT;
-                koMove = OLD_KO_MOVE;
-            }
-        };
-        ret.execute();
-
-        return ret;
-    }
 
     @Override
     public UndoableCommand isKo(Game game) {
