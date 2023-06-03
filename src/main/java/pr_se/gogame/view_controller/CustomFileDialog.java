@@ -19,6 +19,7 @@ public class CustomFileDialog {
     public static File getFile(Stage stage, boolean isSave, HashSet<FileChooser.ExtensionFilter> filter) {
 
         FileChooser fileChooser = new FileChooser();
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 
         if (filter != null && !filter.isEmpty()) filter.forEach(i -> fileChooser.getExtensionFilters().add(i));
 

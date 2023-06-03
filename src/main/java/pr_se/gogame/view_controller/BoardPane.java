@@ -136,17 +136,16 @@ public class BoardPane extends GridPane {
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
-     * @param graphicsPath the absolute path of the graphics pack zip-file
      */
-    public BoardPane(Game game, String graphicsPath) {
-        if(game == null || graphicsPath == null) {
+    public BoardPane(Game game) {
+        if(game == null) {
             throw new NullPointerException();
         }
 
         setMouseTransparent(true);
 
         this.game = game;
-        this.graphicsPath = graphicsPath;
+        this.graphicsPath = game.getGraphicsPath();
         this.showsMoveNumbers = game.isShowMoveNumbers();
         this.showsCoordinates = game.isShowCoordinates();
         this.needsMoveConfirmation = game.isConfirmationNeeded();
@@ -211,6 +210,9 @@ public class BoardPane extends GridPane {
                     break;
                 case CONFIG_SHOWMOVENUMBERS:
                     setShowsMoveNumbers(game.isShowMoveNumbers());
+                    break;
+                case CONFIG_GRAPHICS:
+                    setGraphicsPath(game.getGraphicsPath());
                     break;
                 case DEBUG_INFO:
                     DebugEvent de = (DebugEvent) e;

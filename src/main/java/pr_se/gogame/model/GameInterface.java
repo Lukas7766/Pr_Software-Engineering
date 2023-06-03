@@ -10,11 +10,9 @@ public interface GameInterface {
     //game operations
     void initGame();
     void newGame(GameCommand gameCommand, int size, int handicap);
-    boolean saveGame(Path path);
+    boolean loadGame(Path path);
 
-    boolean importGame(Path path);
-
-    boolean exportGame(Path path);
+    boolean saveGame();
 
     void pass();
 
@@ -95,5 +93,13 @@ public interface GameInterface {
     void removeListener(GameListener l);
 
     void setHandicapStoneCounter(int noStones);
+
+    String getGraphicsPath();
+
+    void setGraphicsPath(String path);
+
+    Path getSavePath();
+
+    void setSavePath(Path path);
 }
 

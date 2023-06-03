@@ -20,9 +20,12 @@ public class Game implements GameInterface {
     private boolean showMoveNumbers = false;
     private boolean showCoordinates = true;
 
+    private String graphicsPath = "src/main/resources/pr_se/gogame/debug.zip";
+
     private boolean demoMode = false;
 
     //global (helper) variables
+    private Path savaGamePath;
     private FileTree fileTree;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
@@ -85,28 +88,20 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(gameCommand, size, handicap));
     }
 
-
     @Override
-    public boolean saveGame(Path path) {
-        return exportGame(path);
+    public boolean saveGame() {
+        if (savaGamePath == null) {
+            return false;
+        }
+        System.out.println("saved a file");
+        return fileTree.saveFile(savaGamePath);
     }
 
     @Override
-    public boolean importGame(Path path) {
+    public boolean loadGame(Path path) {
         //TODO: Das board überchreiben od nd
         //return FileSaver.importFile(path);
         return false;
-    }
-
-    @Override
-    public boolean exportGame(Path path) {
-        System.out.println("saved a file");
-        return fileTree.saveFile(path);
-    }
-
-    //ToDo delete this method when it is not needed anymore??
-    public boolean importFile(Path path) {
-        return true;
     }
 
     @Override
@@ -496,6 +491,31 @@ public class Game implements GameInterface {
         return gameResult;
     }
 
+    @Override
+    public String getGraphicsPath() {
+        return graphicsPath;
+    }
+
+    @Override
+    public void setGraphicsPath(String path) {
+        if(path == null) {
+            throw new NullPointerException();
+        }
+        this.graphicsPath = path;
+        fireGameEvent(new GameEvent(GameCommand.CONFIG_GRAPHICS));
+    }
+
+    @Override
+    public Path getSavePath() {
+        return savaGamePath;
+    }
+
+    @Override
+    public void setSavePath(Path path) {
+        if(path == null) return;
+        this.savaGamePath = path;
+    }
+
     public UndoableCommand switchColor() { // TODO: Could this method be set to private? Is there ever a situation where the color should be switchable during a game, outside of pass()?
         UndoableCommand ret = new UndoableCommand() {
             UndoableCommand thisCommand;
@@ -524,6 +544,7 @@ public class Game implements GameInterface {
         ret.execute();
 
         return ret;
+
     }
 
     void fireGameEvent(GameEvent e) { // package-private by design
@@ -536,7 +557,6 @@ public class Game implements GameInterface {
         }
     }
 
-    // TODO: Remove this debug method
     public void printDebugInfo(int x, int y) {
         board.printDebugInfo(x, y);
     }
