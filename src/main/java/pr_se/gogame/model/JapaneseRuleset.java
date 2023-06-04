@@ -58,7 +58,7 @@ public class JapaneseRuleset implements Ruleset {
 
             @Override
             public void undo() {
-                for(int i = boardHashes.length; i > 0; i--) {
+                for(int i = boardHashes.length - 1; i > 0; i--) {
                     boardHashes[i] = boardHashes[i - 1];
                 }
                 boardHashes[0] = LAST_BOARD_HASH;
