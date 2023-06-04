@@ -16,11 +16,15 @@ import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.StoneColor;
 
+import java.io.File;
 import java.io.InputStream;
+import java.net.URISyntaxException;
 import java.util.Objects;
+import java.util.Scanner;
 import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
+import java.util.zip.ZipInputStream;
 
 import static pr_se.gogame.model.StoneColor.*;
 
@@ -574,66 +578,124 @@ public class BoardPane extends GridPane {
      * @param graphicsPath the absolute path of the graphics pack to be loaded
      */
     private void loadGraphics(String graphicsPath) {
-        try (ZipFile zip = new ZipFile(graphicsPath)) {
-            ZipEntry tileEntry = zip.getEntry("tile.png");
-            ZipEntry tileCornerEntry = zip.getEntry("tile_corner.png");
-            ZipEntry tileEdgeEntry = zip.getEntry("tile_edge.png");
-            ZipEntry outerCornerEntry = zip.getEntry("outer_corner.png");
-            ZipEntry outerEdgeEntry = zip.getEntry("outer_edge.png");
-            ZipEntry stone0Entry = zip.getEntry("stone_0.png");
-            ZipEntry stone1Entry = zip.getEntry("stone_1.png");
-            ZipEntry circleMark0Entry = zip.getEntry("mark_circle_0.png");
-            ZipEntry circleMark1Entry = zip.getEntry("mark_circle_1.png");
-            ZipEntry circleMark2Entry = zip.getEntry("mark_circle_2.png");
-            ZipEntry triangleMark0Entry = zip.getEntry("mark_triangle_0.png");
-            ZipEntry triangleMark1Entry = zip.getEntry("mark_triangle_1.png");
-            ZipEntry triangleMark2Entry = zip.getEntry("mark_triangle_2.png");
-            ZipEntry squareMark0Entry = zip.getEntry("mark_square_0.png");
-            ZipEntry squareMark1Entry = zip.getEntry("mark_square_1.png");
-            ZipEntry squareMark2Entry = zip.getEntry("mark_square_2.png");
 
-            if(Stream.of(tileEntry,
-                    tileCornerEntry,
-                    tileEdgeEntry,
-                    outerCornerEntry,
-                    outerEdgeEntry,
-                    stone0Entry,
-                    stone1Entry,
-                    circleMark0Entry,
-                    circleMark1Entry,
-                    circleMark2Entry,
-                    triangleMark0Entry,
-                    triangleMark1Entry,
-                    triangleMark2Entry,
-                    squareMark0Entry,
-                    squareMark1Entry,
-                    squareMark2Entry
-                ).anyMatch(Objects::isNull)) {
-                throw new IllegalStateException("ERROR: Graphics pack " + graphicsPath + " is missing files!");
-            }
 
-            try (InputStream tileIS = zip.getInputStream(tileEntry);
-                 InputStream tileCornerIS = zip.getInputStream(tileCornerEntry);
-                 InputStream tileEdgeIS = zip.getInputStream(tileEdgeEntry);
-                 InputStream outerCornerIS = zip.getInputStream(outerCornerEntry);
-                 InputStream outerEdgeIS = zip.getInputStream(outerEdgeEntry);
-                 InputStream stone0IS = zip.getInputStream(stone0Entry);
-                 InputStream stone1IS = zip.getInputStream(stone1Entry);
-                 InputStream circleMark0IS = zip.getInputStream(circleMark0Entry);
-                 InputStream circleMark1IS = zip.getInputStream(circleMark1Entry);
-                 InputStream circleMark2IS = zip.getInputStream(circleMark2Entry);
-                 InputStream triangleMark0IS = zip.getInputStream(triangleMark0Entry);
-                 InputStream triangleMark1IS = zip.getInputStream(triangleMark1Entry);
-                 InputStream triangleMark2IS = zip.getInputStream(triangleMark2Entry);
-                 InputStream squareMark0IS = zip.getInputStream(squareMark0Entry);
-                 InputStream squareMark1IS = zip.getInputStream(squareMark1Entry);
-                 InputStream squareMark2IS = zip.getInputStream(squareMark2Entry)
-            ) {
+
+        try (InputStream is = this.getClass().getResourceAsStream(graphicsPath)){
+                ZipInputStream zis = new ZipInputStream(is);
+                ZipEntry entry;
+
+                ZipEntry tileEntry;
+                ZipEntry tileCornerEntry;
+                ZipEntry tileEdgeEntry;
+                ZipEntry outerCornerEntry;
+                ZipEntry outerEdgeEntry;
+                ZipEntry stone0Entry;
+                ZipEntry stone1Entry;
+                ZipEntry circleMark0Entry;
+                ZipEntry circleMark1Entry;
+                ZipEntry circleMark2Entry;
+                ZipEntry triangleMark0Entry;
+                ZipEntry triangleMark1Entry;
+                ZipEntry triangleMark2Entry;
+                ZipEntry squareMark0Entry;
+                ZipEntry squareMark1Entry;
+                ZipEntry squareMark2Entry;
+
+                InputStream tileIS = null;
+                InputStream tileCornerIS= null;
+                InputStream tileEdgeIS= null;
+                InputStream outerCornerIS= null;
+                InputStream outerEdgeIS= null;
+                InputStream stone0IS= null;
+                InputStream stone1IS= null;
+                InputStream circleMark0IS= null;;
+                InputStream circleMark1IS= null;
+                InputStream circleMark2IS= null;
+                InputStream triangleMark0IS= null;
+                InputStream triangleMark1IS= null;
+                InputStream triangleMark2IS= null;
+                InputStream squareMark0IS= null;
+                InputStream squareMark1IS= null;
+                InputStream squareMark2IS= null;
+
+                while ((entry = zis.getNextEntry()) != null) {
+                    String k = entry.getName();
+                    switch (k){
+                        case "tile.png" -> {
+                            tileEntry = entry;
+                            tileIS = zis;
+                        }
+                        case "tile_corner.png" -> {
+                            tileCornerEntry = entry;
+                            tileCornerIS = zis;
+                        }
+                        case "tile_edge.png" -> {
+                            tileEdgeEntry = entry;
+                            tileEdgeIS = zis;
+                        }
+                        case "outer_corner.png" -> {
+                            outerCornerEntry = entry;
+                            outerCornerIS = zis;
+                        }
+                        case "outer_edge.png" -> {
+                            outerEdgeEntry = entry;
+                            outerEdgeIS = zis;
+                        }
+                        case "stone_0.png" -> {
+                            stone0Entry = entry;
+                            stone0IS = zis;
+                        }
+                        case "stone_1.png" -> {
+                            stone1Entry = entry;
+                            stone1IS = zis;
+                        }
+                        case "mark_circle_0.png" -> {
+                            circleMark0Entry = entry;
+                            circleMark0IS = zis;
+                        }
+                        case "mark_circle_1.png" -> {
+                            circleMark1Entry = entry;
+                            circleMark1IS = zis;
+                        }
+                        case "mark_circle_2.png" -> {
+                            circleMark2Entry = entry;
+                            circleMark2IS = zis;
+                        }
+                        case "mark_triangle_0.png" -> {
+                            triangleMark0Entry = entry;
+                            triangleMark0IS = zis;
+                        }
+                        case "mark_triangle_1.png" -> {
+                            triangleMark1Entry = entry;
+                            triangleMark1IS = zis;
+                        }
+                        case "mark_triangle_2.png" -> {
+                            triangleMark2Entry = entry;
+                            triangleMark2IS = zis;
+                        }
+                        case "mark_square_0.png" -> {
+                            squareMark0Entry = entry;
+                            squareMark0IS = zis;
+                        }
+                        case "mark_square_1.png" -> {
+                            squareMark1Entry = entry;
+                            squareMark1IS = zis;
+                        }
+                        case "mark_square_2.png" -> {
+                            squareMark2Entry = entry;
+                            squareMark2IS = zis;
+                        }
+                    }
+                    zis.closeEntry();
+                }
+
+
                 final int DEFAULT_IMAGE_SIZE = 128;
                 final boolean SMOOTH_IMAGES = false;
 
                 tile = new Image(
-                        tileIS,             // is (:InputStream)
+                        tileIS,// is (:InputStream)
                         DEFAULT_IMAGE_SIZE, // requestedWidth
                         DEFAULT_IMAGE_SIZE, // requestedHeight
                         true,               // preserveRation
@@ -657,11 +719,8 @@ public class BoardPane extends GridPane {
                 squareMarks[0] = new Image(squareMark0IS);
                 squareMarks[1] = new Image(squareMark1IS);
                 squareMarks[2] = new Image(squareMark2IS);
-            } catch (Exception e) {
-                System.err.println("ERROR: Couldn't read file from graphics pack " + graphicsPath + "!");
-                e.printStackTrace();
             }
-        } catch (Exception e) {
+        catch (Exception e) {
             System.err.println("ERROR: Couldn't open graphics pack " + graphicsPath + "!");
             e.printStackTrace();
         }
