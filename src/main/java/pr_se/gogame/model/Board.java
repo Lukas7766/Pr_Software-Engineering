@@ -216,7 +216,9 @@ public class Board implements BoardInterface {
             @Override
             public void execute() {
                 for(UndoableCommand c : SUBCOMMANDS) {
-                    c.execute();
+                    if(c != null) {
+                        c.execute();
+                    }
                 }
             }
 

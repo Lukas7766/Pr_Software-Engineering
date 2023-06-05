@@ -251,18 +251,22 @@ class BoardTest {
         assertEquals(null, board.getColorAt(2, 1));
 
         UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        assertNotNull(c);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
 
         c.undo();
+        assertNotNull(c);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
         UndoableCommand c2 = board.setStone(2, 1, WHITE, false, true);
+        assertNotNull(c2);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(2, 1));
 
         c2.undo();
+        assertNotNull(c2);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
