@@ -2,7 +2,7 @@ package pr_se.gogame.model;
 
 import java.util.Objects;
 
-public class Position /*implements Comparable<Position>*/ {
+public class Position {
     public final int X;
     public final int Y;
 
@@ -28,14 +28,4 @@ public class Position /*implements Comparable<Position>*/ {
     public String toString() {
         return "(" + X + ", " + Y + ")";
     }
-
-    /*@Override
-    public int compareTo(Position p) {
-        int retVal = this.Y - p.Y;
-        if(retVal == 0) {
-            retVal = this.X - p.X;
-        }
-
-        return retVal;
-    }*/
 }
