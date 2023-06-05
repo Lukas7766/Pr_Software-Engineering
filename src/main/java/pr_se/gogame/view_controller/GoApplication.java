@@ -28,22 +28,7 @@ public class GoApplication extends Application {
         final String iconPath = "file:src/main/resources/pr_se/gogame/";
         
         stage.getIcons().add(new Image(iconPath+"go.png"));
-
-        // TODO: In the end product, the archive could be chosen by the user (though a default should still be set) and changed at runtime
-        final String path = "src/main/resources/pr_se/gogame/";
         BoardPane bp = new BoardPane(game);
-        // bp.setBackground(new Background(new BackgroundFill(Color.LIGHTGRAY, new CornerRadii(5), null/*new Insets(5, 5, 5, 2.5)*/)));
-
-        //Button changeGFX = new Button("CGS");
-        //changeGFX.setOnAction((e) -> bp.setGraphicsPath(path + "inverted.zip"));
-        //changeGFX.setFocusTraversable(false);
-        ////Button toggleCoords = new Button("Toggle Coordinates");
-        ////toggleCoords.setOnAction((e) -> bp.setShowsCoordinates(!bp.showsCoordinates()));
-        ////Button toggleMoveNos = new Button("Toggle Move Numbers");
-        ////toggleMoveNos.setOnAction((e) -> bp.setShowsMoveNumbers(!bp.showsMoveNumbers()));
-        //VBox debugButtons = new VBox();
-        ////debugButtons.getChildren().addAll(changeGFX, toggleCoords, toggleMoveNos);
-        //debugButtons.getChildren().add(changeGFX);
 
         root.setCenter(bp);
         HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, stage, game);
