@@ -20,7 +20,7 @@ public class Game implements GameInterface {
     private boolean showMoveNumbers = false;
     private boolean showCoordinates = true;
 
-    private String graphicsPath = "src/main/resources/pr_se/gogame/debug.zip";
+    private String graphicsPath = "./src/main/resources/pr_se/gogame/debug.zip";
 
     private boolean demoMode = false;
 
