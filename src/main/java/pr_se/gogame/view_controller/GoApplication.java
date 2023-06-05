@@ -35,7 +35,6 @@ public class GoApplication extends Application {
         root.setTop(hp);
         SidePane sp = new SidePane(Color.LIGHTGRAY, stage, game);
         root.setLeft(sp);
-        //root.setRight(debugButtons);
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         stage.setMinHeight(HEIGHT + 40);
@@ -49,19 +48,19 @@ public class GoApplication extends Application {
         System.out.println("Output scale Y = " + screen.getOutputScaleY());
 
         /*
-         * This is necessary for keeping the rows and columns of the board together if Windows's DPI Scaling is set
-         * above 100 %.
-         */
-        stage.setForceIntegerRenderScale(true);
-        stage.show();
-
-        /*
          * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,
          * except, for some reason, the menu bar. This might be desirable.
          */
         scene.setOnDragDetected((e) -> {
             scene.startFullDrag();
         });
+
+        /*
+         * This is necessary for keeping the rows and columns of the board together if Windows's DPI Scaling is set
+         * above 100 %.
+         */
+        stage.setForceIntegerRenderScale(true);
+        stage.show();
     }
 
     public static void main(String[] args) {
