@@ -260,8 +260,7 @@ public class Game implements GameInterface {
         return handicapStoneCounter;
     }
 
-    @Override
-    public UndoableCommand setCurColor(StoneColor c) { // TODO: Could this method be set to private? Is there ever a situation where the current color should be manually alterable during a game, outside of pass()?
+    private UndoableCommand setCurColor(StoneColor c) {
         if (c == null) {
             throw new NullPointerException();
         }
@@ -516,7 +515,7 @@ public class Game implements GameInterface {
         this.savaGamePath = path;
     }
 
-    public UndoableCommand switchColor() { // TODO: Could this method be set to private? Is there ever a situation where the color should be switchable during a game, outside of pass()?
+    private UndoableCommand switchColor() {
         UndoableCommand ret = new UndoableCommand() {
             UndoableCommand thisCommand;
 

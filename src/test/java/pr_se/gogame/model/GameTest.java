@@ -92,11 +92,6 @@ class GameTest {
     }
 
     @Test
-    void setCurColorArguments() {
-        assertThrows(NullPointerException.class, () -> game.setCurColor(null));
-    }
-
-    @Test
     void fireGameEventArguments() {
         assertThrows(NullPointerException.class, () -> game.fireGameEvent(null));
     }
@@ -380,15 +375,6 @@ class GameTest {
     }
 
     @Test
-    void setCurColor() {
-        assertEquals(BLACK, game.getCurColor());
-        assertEquals(BLACK_STARTS, game.getGameState());
-        game.setCurColor(WHITE);
-        assertEquals(WHITE, game.getCurColor());
-        assertEquals(WHITE_PLAYS, game.getGameState());
-    }
-
-    @Test
     void playMove() {
         assertNull(game.getColorAt(0, 0));
         game.playMove(0, 0);
@@ -542,15 +528,6 @@ class GameTest {
         });
 
         assertDoesNotThrow(() -> game.printDebugInfo(0, 0));
-    }
-
-    @Test
-    void switchColor() {
-        assertEquals(BLACK, game.getCurColor());
-        assertEquals(BLACK_STARTS, game.getGameState());
-        game.switchColor();
-        assertEquals(WHITE, game.getCurColor());
-        assertEquals(WHITE_PLAYS, game.getGameState());
     }
 
     @Test

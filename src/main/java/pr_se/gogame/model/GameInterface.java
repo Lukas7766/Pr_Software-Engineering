@@ -65,8 +65,6 @@ public interface GameInterface {
 
     StoneColor getCurColor();
 
-    UndoableCommand setCurColor(StoneColor c);
-
     Board getBoard();
 
     Ruleset getRuleset();
