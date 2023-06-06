@@ -12,6 +12,13 @@ import javafx.stage.Screen;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 
+import java.io.File;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.LinkOption;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+
 public class GoApplication extends Application {
 
     private static final int WIDTH = 760;
@@ -19,12 +26,39 @@ public class GoApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        // Generate the necessary folder and extract the default the graphics pack if it is not present.
+        String graphicsDir = "./Grafiksets";
+        String graphicsPack = "/default.zip";
+        Path path = Paths.get(graphicsDir + graphicsPack);
+        if(Files.notExists(path, LinkOption.NOFOLLOW_LINKS)) {
+            System.out.println("The default graphics pack doesn't exist.");
+
+            InputStream link = this.getClass().getResourceAsStream(graphicsPack);
+            if(link == null) {
+                throw new NullPointerException("Default graphics pack is not in JAR file!");
+            }
+
+            File dir = new File(graphicsDir);
+            dir.mkdirs();
+
+            File file = new File(graphicsDir + graphicsPack);
+            Files.copy(link, file.getAbsoluteFile().toPath());
+
+            link.close();
+        } else if(!Files.exists(path)) {
+            throw new IllegalStateException("Java could not determine whether the path exists!");
+        }
+
+        // Set up the actual program
         stage.setTitle("Go Game - App");
         Game game = new Game();
 
         BorderPane root = new BorderPane();
-        
-        stage.getIcons().add(new Image("file:go.png"));
+
+        InputStream iconStream = this.getClass().getResourceAsStream("/go.png");
+        stage.getIcons().add(new Image(iconStream));
+        iconStream.close();
+
         BoardPane bp = new BoardPane(game);
 
         root.setCenter(bp);
