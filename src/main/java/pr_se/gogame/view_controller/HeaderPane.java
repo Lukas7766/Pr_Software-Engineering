@@ -275,7 +275,7 @@ public class HeaderPane extends VBox {
         menu.getItems().addAll(loadGraphicsBtn);
 
         loadGraphicsBtn.setOnAction(e -> {
-            File workingDirectory = new File(System.getProperty("user.dir") + "/src/main/resources/pr_se/gogame/");
+            File workingDirectory = new File(System.getProperty("user.dir") + "/Grafiksets/");
             FileChooser fileChooser = new FileChooser();
             fileChooser.setInitialDirectory(workingDirectory);
             fileChooser.setTitle("Load Graphics Set");

@@ -23,11 +23,8 @@ public class GoApplication extends Application {
         Game game = new Game();
 
         BorderPane root = new BorderPane();
-
-
-        final String iconPath = "file:src/main/resources/pr_se/gogame/";
         
-        stage.getIcons().add(new Image(iconPath+"go.png"));
+        stage.getIcons().add(new Image("file:go.png"));
         BoardPane bp = new BoardPane(game);
 
         root.setCenter(bp);
