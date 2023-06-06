@@ -266,26 +266,30 @@ public class BoardPane extends GridPane {
             // top
             BoardCell t = new BoardCell(this.outerEdge);
             t.getLabel().setText("" + (char)('A' + i));
-            t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
+            //t.getLabel().setAlignment(Pos.BOTTOM_CENTER);
+            t.getLabel().setAlignment(Pos.CENTER); // TODO: Some colleagues suggested during the 2nd releases's presentation that we orient the labels centrally.
             add(t, i + 1, 0);
 
             // right
             BoardCell r = new BoardCell(this.outerEdge);
             r.getLabel().setText("" + (size - i));
-            r.getLabel().setAlignment(Pos.CENTER_LEFT);
+            //r.getLabel().setAlignment(Pos.CENTER_LEFT);
+            r.getLabel().setAlignment(Pos.CENTER);
             r.getTile().setRotate(90);
             add(r, size + 1, i + 1);
 
             // bottom
             BoardCell b = new BoardCell(this.outerEdge);
             b.getLabel().setText("" + (char)('A' + i));
-            b.getLabel().setAlignment(Pos.TOP_CENTER);
+            //b.getLabel().setAlignment(Pos.TOP_CENTER);
+            b.getLabel().setAlignment(Pos.CENTER);
             add(b, i + 1, size + 1);
 
             // left
             BoardCell l = new BoardCell(this.outerEdge);
             l.getLabel().setText("" + (size - i));
-            l.getLabel().setAlignment(Pos.CENTER_RIGHT);
+            //l.getLabel().setAlignment(Pos.CENTER_RIGHT);
+            l.getLabel().setAlignment(Pos.CENTER);
             l.getTile().setRotate(90);
             add(l, 0, i + 1);
         }
@@ -550,22 +554,6 @@ public class BoardPane extends GridPane {
 
     public int getSize() {
         return size;
-    }
-
-    public Image getTile() {
-        return tile;
-    }
-
-    public Image[] getStones() {
-        return stones;
-    }
-
-    public Image getOuterEdge() {
-        return outerEdge;
-    }
-
-    public Image getOuterCorner() {
-        return outerCorner;
     }
 
     // private methods
