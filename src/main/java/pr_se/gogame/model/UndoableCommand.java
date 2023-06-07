@@ -1,7 +1,12 @@
 package pr_se.gogame.model;
 
 public interface UndoableCommand {
-    public void execute(boolean saveEffects); // TODO: We'll probably need a parameter for execute() to prevent it from re-saving an action that is simply being repeated.
+    /**
+     * Executes this UndoableCommand
+     * @param saveEffects if true, anything that might be saved to a file will actually be saved. If false, it will not
+     *                    be saved. This is to prevent corruption of the saved file when stepping through the program.
+     */
+    public void execute(boolean saveEffects);
 
     /*
      * TODO: The aforementioned parameter MIGHT be necessary here as well, although not as strictly, as one would never
