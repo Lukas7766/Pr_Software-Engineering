@@ -121,7 +121,7 @@ public class Game implements GameInterface {
 
         UndoableCommand c = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 GameResult result;
                 StringBuilder sb = new StringBuilder();
                 sb.append("Game was resigned by").append(" ");
@@ -149,7 +149,7 @@ public class Game implements GameInterface {
                 fireGameEvent(new GameEvent(gameCommand));
             }
         };
-        c.execute();
+        c.execute(true);
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
@@ -270,7 +270,7 @@ public class Game implements GameInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 Game.this.curColor = c;
                 if(Game.this.curColor == BLACK) {
                     Game.this.gameCommand = GameCommand.BLACK_PLAYS;
@@ -285,7 +285,7 @@ public class Game implements GameInterface {
                 Game.this.gameCommand = OLD_COMMAND;
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -309,7 +309,7 @@ public class Game implements GameInterface {
             UndoableCommand c_UC02_switchColor = null;
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (UC01_setStone != null) {
                     curMoveNumber++;
                     System.out.println("Move played.");
@@ -328,7 +328,7 @@ public class Game implements GameInterface {
                 UC01_setStone.undo();
             }
         };
-        c.execute();
+        c.execute(true);
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
@@ -354,7 +354,7 @@ public class Game implements GameInterface {
             UndoableCommand uC02_switchColor = null;
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
                 uc01_setStone = board.setStone(x, y, curColor, true, true);
 
@@ -373,7 +373,7 @@ public class Game implements GameInterface {
                 handicapStoneCounter = OLD_HANDICAP_COUNTER;
             }
         };
-        c.execute();
+        c.execute(true);
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
@@ -445,7 +445,7 @@ public class Game implements GameInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (color == BLACK) {
                     Game.this.blackCapturedStones += amount; // TODO: If this causes issues, maybe change to "OLD_BLACK_CAPTURED_STONES + amount" and so on?
                     Game.this.playerBlackScore += amount;
@@ -463,7 +463,7 @@ public class Game implements GameInterface {
                 Game.this.playerWhiteScore = OLD_WHITE_PLAYER_SCORE;
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -520,7 +520,7 @@ public class Game implements GameInterface {
             UndoableCommand thisCommand;
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (curColor == BLACK) {
                     // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
                     thisCommand = setCurColor(WHITE);
@@ -540,7 +540,7 @@ public class Game implements GameInterface {
                 }
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
 

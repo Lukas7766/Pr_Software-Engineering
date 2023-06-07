@@ -25,7 +25,7 @@ public class AncientChineseRuleset implements Ruleset {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 lastBoardHash = NEW_BOARD_HASH;
             }
 
@@ -34,7 +34,7 @@ public class AncientChineseRuleset implements Ruleset {
                 lastBoardHash = LAST_BOARD_HASH;
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }

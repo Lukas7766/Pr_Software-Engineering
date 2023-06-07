@@ -133,7 +133,7 @@ public class Board implements BoardInterface {
         final boolean FINAL_PERMITTED_SUICIDE = permittedSuicide;
         final UndoableCommand UC05_PLACE_POINTER = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (!FINAL_PERMITTED_SUICIDE) {
                     System.out.println("Placing stone down at " + x + ", " + y);
                     board[x][y] =
@@ -148,7 +148,7 @@ public class Board implements BoardInterface {
                 board[x][y] = null;
             }
         };
-        UC05_PLACE_POINTER.execute();
+        UC05_PLACE_POINTER.execute(true);
         subcommands.add(UC05_PLACE_POINTER);
 
         final boolean FINAL_KILL_ANOTHER = killAnother;
@@ -158,7 +158,7 @@ public class Board implements BoardInterface {
             UndoableCommand uC06_02_addCapturedStonesCommand = null;
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (!prepareMode) {
 
                     for (StoneGroup sg : surroundingSGs) {
@@ -173,7 +173,7 @@ public class Board implements BoardInterface {
                         }
                     }
 
-                    if(save) {
+                    if(save && saveEffects) {
                         /*
                          * if(prepareMode) {
                          *      GAME.getFileTree().bufferStonesBeforeGame(color, x, y);
@@ -205,7 +205,7 @@ public class Board implements BoardInterface {
                 fireStoneRemoved(x, y); // TODO: Do we need a check for FINAL_PERMITTED_SUICIDE here?
             }
         };
-        UC06_REMOVE_CAPTURED_STONES.execute();
+        UC06_REMOVE_CAPTURED_STONES.execute(true);
         subcommands.add(UC06_REMOVE_CAPTURED_STONES);
 
         final UndoableCommand UC07_CHECK_KO = GAME.getRuleset().isKo(GAME);
@@ -214,10 +214,10 @@ public class Board implements BoardInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 for(UndoableCommand c : SUBCOMMANDS) {
                     if(c != null) {
-                        c.execute();
+                        c.execute(true);
                     }
                 }
             }
@@ -260,10 +260,10 @@ public class Board implements BoardInterface {
             final List<UndoableCommand> ADD_LIBERTY_COMMANDS = new LinkedList<>();
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 board[x][y] = null;
 
-                if(save) {
+                if(save && saveEffects) {
                     // GAME.getFileTree().removeStone(x, y);
                 }
 
@@ -295,7 +295,7 @@ public class Board implements BoardInterface {
                 fireStoneSet(x, y, board[x][y].getStoneGroup().getStoneColor(), false);
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
