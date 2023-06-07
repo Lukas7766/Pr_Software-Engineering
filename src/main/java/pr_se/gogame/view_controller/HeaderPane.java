@@ -1,5 +1,7 @@
 package pr_se.gogame.view_controller;
 
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.*;
@@ -17,6 +19,7 @@ import javafx.stage.StageStyle;
 import pr_se.gogame.model.GameCommand;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -394,7 +397,8 @@ public class HeaderPane extends VBox {
         lane.getChildren().add(playbackControl);
 
         HBox gameShortCards = new HBox();
-        gameShortCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
+        gameShortCards.setPrefWidth(4 * 100);
+        // gameShortCards.prefWidthProperty().bind(this.widthProperty().subtract(playbackControl.getPrefWidth()));
         gameShortCards.setAlignment(Pos.CENTER);
         gameShortCards.setSpacing(25);
 
@@ -433,6 +437,37 @@ public class HeaderPane extends VBox {
         });
 
         lane.getChildren().add(gameShortCards);
+
+        // Create combo box for selecting graphics packs
+        ObservableList<String> comboBoxItems = FXCollections.observableArrayList();
+        final String GRAPHICS_FOLDER = "./Grafiksets";
+        File graphicsFolder = new File(GRAPHICS_FOLDER);
+        FileFilter zipFilter = new FileFilter() {
+            @Override
+            public boolean accept(File pathname) {
+                return pathname.getName().toLowerCase().endsWith(".zip");
+            }
+        };
+        for(File f : graphicsFolder.listFiles(zipFilter)) {
+            if(f.isFile()) { // We still need to check this because you could have a folder whose name ends with ".zip".
+                comboBoxItems.add(f.getName());
+                System.out.println(f.getName());
+            }
+        }
+        System.out.println();
+
+        ComboBox graphicsPackSelectorComboBox = new ComboBox(comboBoxItems);
+        graphicsPackSelectorComboBox.setValue("default.zip");
+        graphicsPackSelectorComboBox.setTooltip(new Tooltip("Select the graphics pack zip file."));
+        graphicsPackSelectorComboBox.setMaxWidth(100);
+        graphicsPackSelectorComboBox.setOnAction((e) -> {
+            System.out.println(graphicsPackSelectorComboBox.getValue());
+            game.setGraphicsPath(GRAPHICS_FOLDER + "/" + graphicsPackSelectorComboBox.getValue());
+        });
+
+        lane.getChildren().add(graphicsPackSelectorComboBox);
+
+        lane.setAlignment(Pos.CENTER_LEFT);
 
         return lane;
 
