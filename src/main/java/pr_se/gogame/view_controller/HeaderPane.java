@@ -460,6 +460,7 @@ public class HeaderPane extends VBox {
         graphicsPackSelectorComboBox.setValue("default.zip");
         graphicsPackSelectorComboBox.setTooltip(new Tooltip("Select the graphics pack zip file."));
         graphicsPackSelectorComboBox.setMaxWidth(100);
+        graphicsPackSelectorComboBox.setFocusTraversable(false);
         graphicsPackSelectorComboBox.setOnAction((e) -> {
             System.out.println(graphicsPackSelectorComboBox.getValue());
             game.setGraphicsPath(GRAPHICS_FOLDER + "/" + graphicsPackSelectorComboBox.getValue());

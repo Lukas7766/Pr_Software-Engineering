@@ -342,8 +342,6 @@ public class BoardPane extends GridPane {
         });*/
 
         setOnKeyPressed((e) -> {
-            System.out.println(e.getCode() + " PRESSED");
-
             if(keyboardCellX < 0 || keyboardCellY < 0) {
                 if(selectionPBC == null) {
                     keyboardCellX = 0;
