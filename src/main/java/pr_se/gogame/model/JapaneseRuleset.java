@@ -133,7 +133,7 @@ public class JapaneseRuleset implements Ruleset {
     }
 
     //FloodFill Algorithm, source ALGO assignment
-    public int calculateTerritoryPoints(StoneColor color, Board board) {
+    private int calculateTerritoryPoints(StoneColor color, Board board) {
         int boardSize = board.getSize();
         visited = new boolean[boardSize][boardSize];
 
@@ -171,7 +171,7 @@ public class JapaneseRuleset implements Ruleset {
     }
 
 
-    public void floodFill(Board board, int x, int y) {
+    private void floodFill(Board board, int x, int y) {
         if (x < 0) return;
         if (x >= board.getSize()) return;
         if (y < 0) return;
