@@ -59,7 +59,7 @@ public class SidePane extends StackPane {
     /**
      * list of file extension filters for file chooser/saver
      */
-    private final HashSet<FileChooser.ExtensionFilter> filterList;
+    //private final HashSet<FileChooser.ExtensionFilter> filterList;
 
     /**
      * Constructor to create a SidePane
@@ -68,8 +68,8 @@ public class SidePane extends StackPane {
      */
     public SidePane(Color backColor, Stage stage, Game game) {
         this.game = game;
-        this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
-                .collect(Collectors.toCollection(HashSet::new));
+        //this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
+                //.collect(Collectors.toCollection(HashSet::new));
 
         this.setBackground(new Background(new BackgroundFill(backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
         this.setMinWidth(250);

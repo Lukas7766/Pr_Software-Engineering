@@ -18,14 +18,28 @@ public class CustomExceptionDialog {
 
     /**
      * Creates a customised Exception Dialog
+     *
      * @param stage pass stage
-     * @param e pass Exception
+     * @param e     pass Exception
      */
     public static void show(Stage stage, Exception e) {
+        show(stage, e, null);
+    }
+
+    public static void show(Exception e, String message) {
+        show(null, e, message);
+    }
+
+    public static void show(Stage stage, Exception e, String message) {
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
-        alert.setHeaderText("Exception Dialog");
+
+        alert.setHeaderText(message != null ? message : "An error occurred!");
+
+        if (stage != null) {
+            alert.initOwner(stage);
+        }
 
         // Create expandable Exception.
         StringWriter sw = new StringWriter();

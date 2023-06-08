@@ -250,7 +250,8 @@ public class HeaderPane extends VBox {
     /**
      * Creates the view section for the menu bar <br>
      * contains at least: <br>
-     * ->
+     * -> show Move Numbers <br>
+     * -> show Coordinates <br>
      *
      * @return the view section for the menu bar
      */
@@ -273,34 +274,23 @@ public class HeaderPane extends VBox {
         showCoordinatesCBtn.setOnAction(e -> game.setShowCoordinates(showCoordinatesCBtn.isSelected()));
         menu.getItems().addAll(viewSectionItems);
 
-        MenuItem loadGraphicsBtn = new MenuItem("_Load Graphics Set");
-        loadGraphicsBtn.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        menu.getItems().addAll(loadGraphicsBtn);
+        //MenuItem loadGraphicsBtn = new MenuItem("_Load Graphics Set");
+        //loadGraphicsBtn.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        //menu.getItems().addAll(loadGraphicsBtn);
 
-        loadGraphicsBtn.setOnAction(e -> {
-            File workingDirectory = new File(System.getProperty("user.dir") + "/Grafiksets/");
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialDirectory(workingDirectory);
-            fileChooser.setTitle("Load Graphics Set");
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("ZIP", "*.zip")
-            );
-            File selectedFile = fileChooser.showOpenDialog(stage);
-            if (selectedFile != null) {
-                game.setGraphicsPath(selectedFile.getAbsolutePath());
-            }
-        });
-
-        viewSectionItems.forEach(e -> e.setDisable(true));
-
-        game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT) {
-                viewSectionItems.forEach(e -> e.setDisable(true));
-            } else {
-                viewSectionItems.forEach(e -> e.setDisable(false));
-            }
-        });
-
+        //loadGraphicsBtn.setOnAction(e -> {
+        //    File workingDirectory = new File(System.getProperty("user.dir") + "/Grafiksets/");
+        //    FileChooser fileChooser = new FileChooser();
+        //    fileChooser.setInitialDirectory(workingDirectory);
+        //    fileChooser.setTitle("Load Graphics Set");
+        //    fileChooser.getExtensionFilters().addAll(
+        //            new FileChooser.ExtensionFilter("ZIP", "*.zip")
+        //    );
+        //    File selectedFile = fileChooser.showOpenDialog(stage);
+        //    if (selectedFile != null) {
+        //        game.setGraphicsPath(selectedFile.getAbsolutePath());
+        //    }
+        //});
 
         return menu;
     }
@@ -396,9 +386,12 @@ public class HeaderPane extends VBox {
 
         lane.getChildren().add(playbackControl);
 
+        HBox gameCards = new HBox();
+        gameCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
+        gameCards.setAlignment(Pos.CENTER_LEFT);
+
         HBox gameShortCards = new HBox();
-        gameShortCards.setPrefWidth(4 * 100);
-        // gameShortCards.prefWidthProperty().bind(this.widthProperty().subtract(playbackControl.getPrefWidth()));
+        gameShortCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
         gameShortCards.setAlignment(Pos.CENTER);
         gameShortCards.setSpacing(25);
 
@@ -436,7 +429,8 @@ public class HeaderPane extends VBox {
 
         });
 
-        lane.getChildren().add(gameShortCards);
+        gameCards.getChildren().addAll(gameShortCards);
+
 
         // Create combo box for selecting graphics packs
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList();
@@ -459,16 +453,18 @@ public class HeaderPane extends VBox {
         ComboBox graphicsPackSelectorComboBox = new ComboBox(comboBoxItems);
         graphicsPackSelectorComboBox.setValue("default.zip");
         graphicsPackSelectorComboBox.setTooltip(new Tooltip("Select the graphics pack zip file."));
-        graphicsPackSelectorComboBox.setMaxWidth(100);
+        graphicsPackSelectorComboBox.setMinWidth(125);
+        graphicsPackSelectorComboBox.setTranslateX(-15);
         graphicsPackSelectorComboBox.setFocusTraversable(false);
         graphicsPackSelectorComboBox.setOnAction((e) -> {
             System.out.println(graphicsPackSelectorComboBox.getValue());
             game.setGraphicsPath(GRAPHICS_FOLDER + "/" + graphicsPackSelectorComboBox.getValue());
         });
 
-        lane.getChildren().add(graphicsPackSelectorComboBox);
+        gameShortCards.getChildren().add(graphicsPackSelectorComboBox);
 
-        lane.setAlignment(Pos.CENTER_LEFT);
+        gameCards.getChildren().add(graphicsPackSelectorComboBox);
+        lane.getChildren().add(gameCards);
 
         return lane;
 
