@@ -8,8 +8,19 @@ public interface GameInterface {
 
     //##################################################################################################################
     //game operations
+
+    /**
+     * Makes the game fire an initialisation event that notifies listening components so they may initialise themselves.
+     */
     void initGame();
-    void newGame(GameCommand gameCommand, int size, int handicap);
+
+    /**
+     * Starts a new game.
+     * @param gameCommand
+     * @param size
+     * @param handicap
+     */
+    void newGame(StoneColor startingColor, int size, int handicap);
     boolean loadGame(Path path);
 
     boolean saveGame();
@@ -24,7 +35,7 @@ public interface GameInterface {
 
     void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
 
-    void placeHandicapStone(int x, int y); // For rulesets with custom handicap stones
+    void placeHandicapStone(int x, int y);
 
 
     //##################################################################################################################

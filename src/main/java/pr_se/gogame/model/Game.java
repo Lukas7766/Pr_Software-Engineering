@@ -56,23 +56,22 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void newGame(GameCommand gameCommand, int size, int handicap) {
+    public void newGame(StoneColor startingColor, int size, int handicap) {
         if(size < 0 || handicap < 0 || handicap > 9) {
             throw new IllegalArgumentException();
         }
 
-        if(gameCommand == null) {
+        if(startingColor == null) {
             throw new NullPointerException();
         }
 
-        switch (gameCommand) {
-            case BLACK_STARTS -> this.curColor = StoneColor.BLACK;
-            case WHITE_STARTS -> this.curColor = StoneColor.WHITE;
-            default -> throw new IllegalArgumentException();
+        this.curColor = startingColor;
+        switch (startingColor) { // We already performed a null-check, so it can't be anything else.
+            case BLACK -> this.gameCommand = GameCommand.BLACK_STARTS;
+            case WHITE -> this.gameCommand = GameCommand.WHITE_STARTS;
         }
 
         this.fileTree = new FileTree(size,"Black", "White");
-        this.gameCommand = gameCommand;
         this.size = size;
         this.handicap = handicap;
         this.playerBlackScore = handicap;
@@ -82,10 +81,20 @@ public class Game implements GameInterface {
         this.curMoveNumber = 0;
         this.board = new Board(this);
         this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
+        switch(this.curColor) {
+            case BLACK:
+                this.gameCommand = GameCommand.BLACK_STARTS;
+                break;
+
+            case WHITE:
+                this.gameCommand = GameCommand.WHITE_STARTS;
+                break;
+        }
+
         this.gameResult = null;
 
         System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
-        fireGameEvent(new GameEvent(gameCommand, size, handicap));
+        fireGameEvent(new GameEvent(this.gameCommand, size, handicap));
     }
 
     @Override
@@ -375,6 +384,8 @@ public class Game implements GameInterface {
         };
         c.execute(true);
 
+        System.out.println("placeHandicapStone, handicap ctr = " + handicapStoneCounter);
+
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
 
@@ -516,6 +527,8 @@ public class Game implements GameInterface {
     }
 
     private UndoableCommand switchColor() {
+        System.out.println("Game.switchColor()");
+
         UndoableCommand ret = new UndoableCommand() {
             UndoableCommand thisCommand;
 

@@ -246,17 +246,17 @@ public class BoardPane extends GridPane {
         BoardCell corner1 = new BoardCell(this.outerCorner);
         corner1.getLabel().setVisible(false);
         add(corner1, 0, 0);
+
         BoardCell corner2 = new BoardCell(this.outerCorner);
         corner2.getLabel().setVisible(false);
-        corner2.getTile().setRotate(90);
         add(corner2, size + 1, 0);
+
         BoardCell corner3 = new BoardCell(this.outerCorner);
         corner3.getLabel().setVisible(false);
-        corner3.getTile().setRotate(180);
         add(corner3, size + 1, size + 1);
+
         BoardCell corner4 = new BoardCell(this.outerCorner);
         corner4.getLabel().setVisible(false);
-        corner4.getTile().setRotate(270);
         add(corner4, 0, size + 1);
 
         // populate the coordinate axes
@@ -273,7 +273,6 @@ public class BoardPane extends GridPane {
             r.getLabel().setText("" + (size - i));
             //r.getLabel().setAlignment(Pos.CENTER_LEFT);
             r.getLabel().setAlignment(Pos.CENTER);
-            r.getTile().setRotate(90);
             add(r, size + 1, i + 1);
 
             // bottom
@@ -288,7 +287,6 @@ public class BoardPane extends GridPane {
             l.getLabel().setText("" + (size - i));
             //l.getLabel().setAlignment(Pos.CENTER_RIGHT);
             l.getLabel().setAlignment(Pos.CENTER);
-            l.getTile().setRotate(90);
             add(l, 0, i + 1);
         }
 
@@ -489,25 +487,6 @@ public class BoardPane extends GridPane {
 
         loadGraphics(graphicsPath);
 
-        for(int i = 0; i < 4; i++) {
-            BoardCell bc = (BoardCell)getChildren().get(i);
-            bc.setBackgroundImage(outerCorner);
-            bc.getTile().setRotate(90 * i);
-        }
-
-        for(int i = 0; i < size; i++) {
-            // edges
-            for(int j = 0; j < 4; j++) {
-                BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
-                bc.setBackgroundImage(outerEdge);
-                bc.getTile().setRotate(90 * (j % 2));
-            }
-            // center
-            for(int j = 0; j < size; j++) {
-                getPlayableCell(j, i).updateImages(tile);
-            }
-        }
-
         updateGraphics();
     }
 
@@ -615,6 +594,25 @@ public class BoardPane extends GridPane {
     }
 
     private void updateGraphics() {
+        for(int i = 0; i < 4; i++) {
+            BoardCell bc = (BoardCell)getChildren().get(i);
+            bc.setBackgroundImage(outerCorner);
+            bc.getTile().setRotate(90 * i);
+        }
+
+        for(int i = 0; i < size; i++) {
+            // edges
+            for(int j = 0; j < 4; j++) {
+                BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
+                bc.setBackgroundImage(outerEdge);
+                bc.getTile().setRotate(90 * (j % 2));
+            }
+            // center
+            for(int j = 0; j < size; j++) {
+                getPlayableCell(j, i).updateImages(tile);
+            }
+        }
+
         getPlayableCell(0, 0).setBackgroundImage(tileCorner);
         getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
         getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
@@ -661,8 +659,7 @@ public class BoardPane extends GridPane {
          * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
          */
         private BoardCell(Image tile) {
-            this.TILE = getCellImageView(tile);
-            getChildren().add(this.TILE);
+            this.TILE = addCellImageView(tile);
             this.TILE.setVisible(true);
 
             this.LABEL = new Label("0");
@@ -723,11 +720,12 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
+         * Produces an instance of the provided image that is set up properly for this BoardCell and adds
+         * it to the BoardCell's children
          * @param i the image to be instantiated
          * @return a properly instantiated instance of the provided Image
          */
-        protected ResizableImageView getCellImageView(Image i) {
+        protected ResizableImageView addCellImageView(Image i) {
             if(i == null) {
                 throw new NullPointerException();
             }
@@ -737,6 +735,8 @@ public class BoardPane extends GridPane {
             iv.setMouseTransparent(true);
             iv.setSmooth(false);
             iv.setVisible(false);
+
+            getChildren().add(iv);
 
             return iv;
         }
@@ -835,37 +835,24 @@ public class BoardPane extends GridPane {
         private PlayableBoardCell(Image tile) {
             super(tile);
 
-            this.CIRCLE_MARK_ON_EMPTY = getCellImageView(circleMarks[0]);
-            getChildren().add(this.CIRCLE_MARK_ON_EMPTY);
-            this.TRIANGLE_MARK_ON_EMPTY = getCellImageView(triangleMarks[0]);
-            getChildren().add(this.TRIANGLE_MARK_ON_EMPTY);
-            this.SQUARE_MARK_ON_EMPTY = getCellImageView(squareMarks[0]);
-            getChildren().add(this.SQUARE_MARK_ON_EMPTY);
+            this.CIRCLE_MARK_ON_EMPTY = addCellImageView(circleMarks[0]);
+            this.TRIANGLE_MARK_ON_EMPTY = addCellImageView(triangleMarks[0]);
+            this.SQUARE_MARK_ON_EMPTY = addCellImageView(squareMarks[0]);
 
-            this.BLACK_HOVER = getCellImageView(stones[0]);
-            getChildren().add(this.BLACK_HOVER);
-            this.WHITE_HOVER = getCellImageView(stones[1]);
-            getChildren().add(this.WHITE_HOVER);
+            this.BLACK_HOVER = addCellImageView(stones[0]);
+            this.WHITE_HOVER = addCellImageView(stones[1]);
 
-            this.BLACK_STONE = getCellImageView(stones[0]);
-            getChildren().add(this.BLACK_STONE);
-            this.WHITE_STONE = getCellImageView(stones[1]);
-            getChildren().add(this.WHITE_STONE);
+            this.BLACK_STONE = addCellImageView(stones[0]);
+            this.WHITE_STONE = addCellImageView(stones[1]);
 
-            this.CIRCLE_MARK_ON_BLACK = getCellImageView(circleMarks[2]);
-            getChildren().add(this.CIRCLE_MARK_ON_BLACK);
-            this.CIRCLE_MARK_ON_WHITE = getCellImageView(circleMarks[1]);
-            getChildren().add(this.CIRCLE_MARK_ON_WHITE);
+            this.CIRCLE_MARK_ON_BLACK = addCellImageView(circleMarks[2]);
+            this.CIRCLE_MARK_ON_WHITE = addCellImageView(circleMarks[1]);
 
-            this.TRIANGLE_MARK_ON_BLACK = getCellImageView(triangleMarks[2]);
-            getChildren().add(this.TRIANGLE_MARK_ON_BLACK);
-            this.TRIANGLE_MARK_ON_WHITE = getCellImageView(triangleMarks[1]);
-            getChildren().add(this.TRIANGLE_MARK_ON_WHITE);
+            this.TRIANGLE_MARK_ON_BLACK = addCellImageView(triangleMarks[2]);
+            this.TRIANGLE_MARK_ON_WHITE = addCellImageView(triangleMarks[1]);
 
-            this.SQUARE_MARK_ON_BLACK = getCellImageView(squareMarks[2]);
-            getChildren().add(this.SQUARE_MARK_ON_BLACK);
-            this.SQUARE_MARK_ON_WHITE = getCellImageView(squareMarks[1]);
-            getChildren().add(this.SQUARE_MARK_ON_WHITE);
+            this.SQUARE_MARK_ON_BLACK = addCellImageView(squareMarks[2]);
+            this.SQUARE_MARK_ON_WHITE = addCellImageView(squareMarks[1]);
 
             this.CURRENTLY_SET_STONE = null;
 

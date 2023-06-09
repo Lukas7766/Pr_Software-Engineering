@@ -348,7 +348,7 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            game.newGame(GameCommand.BLACK_STARTS, actualBoardSize, handicap);
+            game.newGame(StoneColor.BLACK, actualBoardSize, handicap);
         });
         //colum, row,
         gridPane.add(startGameBtn, 1, 15);

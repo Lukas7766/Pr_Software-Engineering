@@ -16,7 +16,7 @@ class BoardTest {
     @BeforeEach
     void setUp() {
         game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 19, 0);
+        game.newGame(BLACK, 19, 0);
         board = game.getBoard();
     }
 
