@@ -2,12 +2,9 @@ package pr_se.gogame.view_controller;
 
 import javafx.application.Application;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
 import javafx.scene.image.Image;
-import javafx.scene.layout.*;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
-import javafx.scene.control.Button;
-
 import javafx.stage.Screen;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
@@ -56,8 +53,10 @@ public class GoApplication extends Application {
         BorderPane root = new BorderPane();
 
         InputStream iconStream = this.getClass().getResourceAsStream("/go.png");
-        stage.getIcons().add(new Image(iconStream));
-        iconStream.close();
+        if(iconStream != null) {
+            stage.getIcons().add(new Image(iconStream));
+            iconStream.close();
+        }
 
         BoardPane bp = new BoardPane(game);
 
@@ -82,9 +81,7 @@ public class GoApplication extends Application {
          * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,
          * except, for some reason, the menu bar. This might be desirable.
          */
-        scene.setOnDragDetected((e) -> {
-            scene.startFullDrag();
-        });
+        scene.setOnDragDetected((e) -> scene.startFullDrag());
 
         /*
          * This is necessary for keeping the rows and columns of the board together if Windows's DPI Scaling is set

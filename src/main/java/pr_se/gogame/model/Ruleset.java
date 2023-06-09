@@ -3,26 +3,32 @@ package pr_se.gogame.model;
 public interface Ruleset {
     /**
      * Because nothing is ever easy, some rulesets permit suicide, at least if it is collective suicide (apparently this
-     * can cause the opponent some inconvenience). See https://en.wikipedia.org/wiki/Rules_of_Go#Suicide. To check
-     * whether suicide is solitary or collective, the ruleset needs to see the board.
+     * can cause the opponent some inconvenience). See <a href="https://en.wikipedia.org/wiki/Rules_of_Go#Suicide">the
+     * Wikipedia article</a>. To check whether suicide is solitary or collective, the ruleset needs the involved
+     * StoneGroup.
      *
      * @param existingGroup The group that is about to commit suicide
-     * @param addedStone
+     * @param addedStone The stone that was added to the existingGroup
      * @return whether the ruleset permits suicide under the given cirucmstances on the board.
      */
     default boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
         return false;
     }
 
-    /** KO is a special rule that prevents immediate repetition of position, in which a single stone is captured and
+    /** Ko is a special rule that prevents immediate repetition of position, in which a single stone is captured and
      *  another single stone immediately taken back. <br> Depending on the ruleset a number of allowed repetition is given.
      *  <br> The default value is 2.
-     * @return the default value two as move repetition is allowed twice.
+     * @return the default value is two as move repetition is allowed twice.
      */
     default int getKoAmount() {
         return 2;
     }
 
+    /**
+     * Whether a ko move has just been committed.
+     * @param game The Game that is to be checked for ko.
+     * @return whether the last move was a ko move.
+     */
     UndoableCommand isKo(Game game);
 
     /** This method calculates the score of the game for both players.

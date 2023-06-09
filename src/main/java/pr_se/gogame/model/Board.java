@@ -387,10 +387,12 @@ public class Board implements BoardInterface {
     }
 
     // Getters and Setters
+    @Override
     public int getSize() {
         return SIZE;
     }
 
+    @Override
     public StoneColor getColorAt(int x, int y) {
         if(areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");

@@ -380,6 +380,7 @@ public class BoardPane extends GridPane {
                 case ENTER:
                     confirmMove();
                     break;
+
                 default: break;
             }
 
@@ -422,11 +423,7 @@ public class BoardPane extends GridPane {
             }
 
             if(debug) {
-                for (int i = 0; i < size; i++) {
-                    for (int j = 0; j < size; j++) {
-                        game.printDebugInfo(i, j);
-                    }
-                }
+                game.printDebugInfo(col, row);
             }
 
             /*
