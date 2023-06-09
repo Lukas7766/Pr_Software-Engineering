@@ -1,0 +1,6 @@
+Mit dem Terminal zu diesem Ordner navigieren und folgenden Befehl ausführen:
+
+jpackage --type dmg -n "GoGameMac" --dest . --main-jar GoGame.jar --input . --icon go.icns
+|
+|
+|------ Muss wahrscheinlich durch vollqualifizierten Pfad zum jpackage-Programm ersetzt werden.

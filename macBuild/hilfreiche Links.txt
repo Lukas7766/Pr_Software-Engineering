@@ -1,0 +1,2 @@
+https://codetinkering.com/how-to-use-jpackage-tool-cli-for-macos-apps/
+https://docs.oracle.com/en/java/javase/20/jpackage/support-application-features.html#GUID-8D9F0607-91F4-4070-8823-02FCAB12238D
