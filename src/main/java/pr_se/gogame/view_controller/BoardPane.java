@@ -9,10 +9,9 @@ import javafx.scene.control.Label;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.image.PixelReader;
-import javafx.scene.input.KeyCode;
 import javafx.scene.input.MouseButton;
-import javafx.scene.input.MouseEvent;
-import javafx.scene.layout.*;
+import javafx.scene.layout.GridPane;
+import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.StoneColor;
 
@@ -22,7 +21,7 @@ import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static pr_se.gogame.model.StoneColor.*;
+import static pr_se.gogame.model.StoneColor.BLACK;
 
 /**
  * View/Controller
@@ -235,7 +234,6 @@ public class BoardPane extends GridPane {
         getChildren().removeAll(getChildren());
 
         this.size = this.game.getSize();
-        // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); No, don't to that, it breaks the cells' aspect ratio (even equal insets on all four sides will)
 
         // determine cell size
         final NumberBinding MAX_CELL_DIM = Bindings.min(
@@ -315,25 +313,7 @@ public class BoardPane extends GridPane {
             }
         }
 
-        // Update the corner and edge tiles to use the proper backgrounds
-        getPlayableCell(0, 0).setBackgroundImage(tileCorner);
-        getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
-        getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
-        getPlayableCell(this.size - 1, this.size - 1).setBackgroundImage(tileCorner);
-        getPlayableCell(this.size - 1, this.size - 1).getTile().setRotate(180);
-        getPlayableCell(0, this.size - 1).setBackgroundImage(tileCorner);
-        getPlayableCell(0, this.size - 1).getTile().setRotate(270);
-
-
-        for(int i = 1; i < this.size - 1; i++) {
-            getPlayableCell(i, 0).setBackgroundImage(tileEdge);
-            getPlayableCell(this.size - 1, i).setBackgroundImage(tileEdge);
-            getPlayableCell(this.size - 1, i).getTile().setRotate(90);
-            getPlayableCell(i, this.size - 1).setBackgroundImage(tileEdge);
-            getPlayableCell(i, this.size - 1).getTile().setRotate(180);
-            getPlayableCell(0, i).setBackgroundImage(tileEdge);
-            getPlayableCell(0, i).getTile().setRotate(270);
-        }
+        updateGraphics();
 
         // Set up listeners
         // If this is active, dragging from within this BoardPane but outside the actual playable board works (might be desirable)
@@ -415,6 +395,7 @@ public class BoardPane extends GridPane {
 
         // Layout of this BoardPane
         setAlignment(Pos.CENTER);
+        // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); No, don't to that, it breaks the cells' aspect ratio (even equal insets on all four sides will)
         requestFocus();
     }
 
@@ -451,7 +432,7 @@ public class BoardPane extends GridPane {
             /*
              * This part is necessary to ensure that, once a stone has been set, keyboard controls don't originate from
              * it (as they would if it were still selected). Note that "selectionPBC = null;" must not be moved into
-             * the deselect()-method; otherwise, previous selections will no longer be cleaned up, when clicking
+             * the deselect() method; otherwise, previous selections will no longer be cleaned up when clicking
              * about, as there is no pointer.
              */
             selectionPBC.deselect();
@@ -530,24 +511,7 @@ public class BoardPane extends GridPane {
             }
         }
 
-        // Update the corner and edge tiles to use the proper backgrounds
-        getPlayableCell(0, 0).setBackgroundImage(tileCorner);
-        getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
-        getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
-        getPlayableCell(this.size - 1, this.size - 1).setBackgroundImage(tileCorner);
-        getPlayableCell(this.size - 1, this.size - 1).getTile().setRotate(180);
-        getPlayableCell(0, this.size - 1).setBackgroundImage(tileCorner);
-        getPlayableCell(0, this.size - 1).getTile().setRotate(270);
-
-        for(int i = 1; i < this.size - 1; i++) {
-            getPlayableCell(i, 0).setBackgroundImage(tileEdge);
-            getPlayableCell(this.size - 1, i).setBackgroundImage(tileEdge);
-            getPlayableCell(this.size - 1, i).getTile().setRotate(90);
-            getPlayableCell(i, this.size - 1).setBackgroundImage(tileEdge);
-            getPlayableCell(i, this.size - 1).getTile().setRotate(180);
-            getPlayableCell(0, i).setBackgroundImage(tileEdge);
-            getPlayableCell(0, i).getTile().setRotate(270);
-        }
+        updateGraphics();
     }
 
     public int getSize() {
@@ -624,10 +588,10 @@ public class BoardPane extends GridPane {
                         DEFAULT_IMAGE_SIZE, // requestedHeight
                         true,               // preserveRation
                         SMOOTH_IMAGES);     // smooth
-                this.tileEdge = new Image(tileEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                this.tileCorner = new Image(tileCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                this.outerEdge = new Image(outerEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                this.outerCorner = new Image(outerCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                tileEdge = new Image(tileEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                tileCorner = new Image(tileCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                outerEdge = new Image(outerEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
+                outerCorner = new Image(outerCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
 
                 stones[0] = new Image(stone0IS);
                 stones[1] = new Image(stone1IS);
@@ -650,6 +614,26 @@ public class BoardPane extends GridPane {
         } catch (Exception e) {
             System.err.println("ERROR: Couldn't open graphics pack " + graphicsPath + "!");
             e.printStackTrace();
+        }
+    }
+
+    private void updateGraphics() {
+        getPlayableCell(0, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
+        getPlayableCell(this.size - 1, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, this.size - 1).getTile().setRotate(180);
+        getPlayableCell(0, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(0, this.size - 1).getTile().setRotate(270);
+
+        for(int i = 1; i < this.size - 1; i++) {
+            getPlayableCell(i, 0).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).setBackgroundImage(tileEdge);
+            getPlayableCell(this.size - 1, i).getTile().setRotate(90);
+            getPlayableCell(i, this.size - 1).setBackgroundImage(tileEdge);
+            getPlayableCell(i, this.size - 1).getTile().setRotate(180);
+            getPlayableCell(0, i).setBackgroundImage(tileEdge);
+            getPlayableCell(0, i).getTile().setRotate(270);
         }
     }
 
@@ -727,11 +711,6 @@ public class BoardPane extends GridPane {
 
         // Private methods
         /**
-         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
-         * @param i the image to be instantiated
-         * @return a properly instantiated instance of the provided Image
-         */
-        /**
          * Sets the text color of this BoardCell's label to the inverse of its background tile's center color
          */
         private void updateLabelColor() {
@@ -746,6 +725,11 @@ public class BoardPane extends GridPane {
             );
         }
 
+        /**
+         * Produces an instance of the provided image that is set up properly for this PlayableBoardCell
+         * @param i the image to be instantiated
+         * @return a properly instantiated instance of the provided Image
+         */
         protected ResizableImageView getCellImageView(Image i) {
             if(i == null) {
                 throw new NullPointerException();

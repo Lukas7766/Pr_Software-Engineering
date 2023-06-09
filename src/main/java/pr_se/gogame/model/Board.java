@@ -428,7 +428,7 @@ public class Board implements BoardInterface {
     }
 
     /**
-     * Tests whether these x and y coordinates are within the bounds of the playing field
+     * Tests whether these x and y coordinates are outside the bounds of the playing field
      * @param x x coordinate starting at the left
      * @param y y coordinate starting at the top
      * @return whether these x and y coordinates are outside the playing field.
