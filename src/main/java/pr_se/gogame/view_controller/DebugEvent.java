@@ -8,8 +8,8 @@ public class DebugEvent extends StoneEvent {
     private final int ptrNo;
 
 
-    public DebugEvent(GameCommand gameCommand, int col, int row, int ptrNo, int groupNo) {
-        super(gameCommand, col, row);
+    public DebugEvent(int col, int row, int ptrNo, int groupNo) {
+        super(GameCommand.DEBUG_INFO, col, row, 0);
         this.groupNo = groupNo;
         this.ptrNo = ptrNo;
     }

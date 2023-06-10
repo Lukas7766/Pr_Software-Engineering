@@ -339,7 +339,7 @@ public class Board implements BoardInterface {
         if (GAME.getCurColor() == WHITE) {
             gc = GameCommand.WHITE_HAS_CAPTURED;
         }
-        StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
+        StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y, GAME.getCurMoveNumber());
 
         GAME.fireGameEvent(e);
     }
@@ -419,7 +419,7 @@ public class Board implements BoardInterface {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] != null) {
-                    DebugEvent e = new DebugEvent(GameCommand.DEBUG_INFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    DebugEvent e = new DebugEvent(i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
                     GAME.fireGameEvent(e);
                 }
             }

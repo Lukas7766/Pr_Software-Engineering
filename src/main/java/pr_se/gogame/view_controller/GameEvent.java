@@ -7,6 +7,10 @@ public class GameEvent {
     private final GameCommand gameCommand;
 
     public GameEvent(GameCommand gameCommand){
+        if(gameCommand == null) {
+            throw new NullPointerException();
+        }
+
         this.gameCommand = gameCommand;
     }
 
