@@ -154,8 +154,8 @@ public class BoardPane extends GridPane {
                 throw new NullPointerException();
             }
             switch(e.getGameCommand()) {
-                case BLACK_PLAYS:
-                case WHITE_PLAYS:
+                case BLACK_STONE_SET:
+                case WHITE_STONE_SET:
                     if(e instanceof StoneEvent) {//TODO: StoneEvent vs GameCommand question
                         System.out.println("StoneEvent");
                         StoneEvent sse = (StoneEvent) e;
@@ -171,6 +171,8 @@ public class BoardPane extends GridPane {
                         if(game.getHandicapStoneCounter() > 0) {
                             destinationBC.getLabel().setVisible(false);
                         }
+                    } else {
+                        throw new IllegalArgumentException();
                     }
                     break;
                 case CONFIRM_CHOICE:

@@ -311,9 +311,9 @@ public class Board implements BoardInterface {
      * @param c the StoneColor of the stone that has been set
      */
     private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
-        GameCommand gc = GameCommand.BLACK_PLAYS;
+        GameCommand gc = GameCommand.BLACK_STONE_SET;
         if (c == WHITE) {
-            gc = GameCommand.WHITE_PLAYS;
+            gc = GameCommand.WHITE_STONE_SET;
         }
 
         System.out.println("cur move number: "+GAME.getCurMoveNumber());

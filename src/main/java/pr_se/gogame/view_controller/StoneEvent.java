@@ -23,9 +23,9 @@ public class StoneEvent extends GameEvent {
 
         if(gameCommand == GameCommand.BLACK_HAS_CAPTURED || gameCommand == GameCommand.WHITE_HAS_CAPTURED || gameCommand == GameCommand.DEBUG_INFO) {
             this.COLOR = null;
-        } else if(gameCommand == GameCommand.BLACK_PLAYS) {
+        } else if(gameCommand == GameCommand.BLACK_STONE_SET) {
             this.COLOR = StoneColor.BLACK;
-        } else if(gameCommand == GameCommand.WHITE_PLAYS) {
+        } else if(gameCommand == GameCommand.WHITE_STONE_SET) {
             this.COLOR = StoneColor.WHITE;
         } else {
             throw new IllegalArgumentException();
