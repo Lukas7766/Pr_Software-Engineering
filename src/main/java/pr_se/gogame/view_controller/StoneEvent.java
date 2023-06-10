@@ -11,7 +11,7 @@ public class StoneEvent extends GameEvent {
 
     private final StoneColor COLOR;
 
-    protected StoneEvent(GameCommand gameCommand, int x, int y, int moveNumber) {
+    public StoneEvent(GameCommand gameCommand, int x, int y, int moveNumber) {
         super(gameCommand);
         if(x < 0 || y < 0 || moveNumber < 0) {
             throw new IllegalArgumentException();

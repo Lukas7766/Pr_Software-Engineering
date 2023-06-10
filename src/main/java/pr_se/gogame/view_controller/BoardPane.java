@@ -156,9 +156,9 @@ public class BoardPane extends GridPane {
             switch(e.getGameCommand()) {
                 case BLACK_PLAYS:
                 case WHITE_PLAYS:
-                    if(e instanceof StoneSetEvent) {//TODO: StoneEvent vs GameCommand question
-                        System.out.println("StoneSetEvent");
-                        StoneSetEvent sse = (StoneSetEvent) e;
+                    if(e instanceof StoneEvent) {//TODO: StoneEvent vs GameCommand question
+                        System.out.println("StoneEvent");
+                        StoneEvent sse = (StoneEvent) e;
                         PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
                         destinationBC.getLabel().setText("" + sse.getMoveNumber());
 
@@ -174,8 +174,8 @@ public class BoardPane extends GridPane {
                     break;
                 case WHITE_HAS_CAPTURED:
                 case BLACK_HAS_CAPTURED:
-                    StoneRemovedEvent sre = (StoneRemovedEvent) e;
-                    getPlayableCell(sre.getX(), sre.getY()).unset();
+                    StoneEvent se = (StoneEvent) e;
+                    getPlayableCell(se.getX(), se.getY()).unset();
                     break;
                 case INIT:
                     setMouseTransparent(true);
@@ -187,7 +187,7 @@ public class BoardPane extends GridPane {
                     break;
                 case BLACK_HANDICAP:
                 case WHITE_HANDICAP:
-                    StoneSetEvent sseH = (StoneSetEvent) e;
+                    StoneEvent sseH = (StoneEvent) e;
                     PlayableBoardCell destBC = getPlayableCell(sseH.getX(), sseH.getY());
 
                     if (sseH.getColor() == BLACK) {

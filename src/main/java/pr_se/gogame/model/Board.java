@@ -1,14 +1,15 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.DebugEvent;
-import pr_se.gogame.view_controller.StoneRemovedEvent;
-import pr_se.gogame.view_controller.StoneSetEvent;
+import pr_se.gogame.view_controller.StoneEvent;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static pr_se.gogame.model.StoneColor.*;
+
+import static pr_se.gogame.model.StoneColor.BLACK;
+import static pr_se.gogame.model.StoneColor.WHITE;
 
 
 /**
@@ -324,7 +325,7 @@ public class Board implements BoardInterface {
             }
         }
         System.out.println("cur move number: "+GAME.getCurMoveNumber());
-        StoneSetEvent e = new StoneSetEvent(gc, x, y, GAME.getCurMoveNumber());
+        StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
         GAME.fireGameEvent(e);
     }
 
@@ -339,7 +340,7 @@ public class Board implements BoardInterface {
         if (GAME.getCurColor() == WHITE) {
             gc = GameCommand.WHITE_HAS_CAPTURED;
         }
-        StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y, GAME.getCurMoveNumber());
+        StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
 
         GAME.fireGameEvent(e);
     }
