@@ -506,7 +506,7 @@ class GameTest {
 
     @Test
     void fireGameEvent() {
-        GameEvent ge = new DebugEvent(DEBUG_INFO, 0, 0, 0, 0);
+        GameEvent ge = new DebugEvent(0, 0, 0, 0);
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
