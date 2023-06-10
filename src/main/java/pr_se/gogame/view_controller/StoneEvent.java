@@ -21,14 +21,23 @@ public class StoneEvent extends GameEvent {
         this.Y = y;
         this.moveNumber = moveNumber;
 
-        if(gameCommand == GameCommand.BLACK_HAS_CAPTURED || gameCommand == GameCommand.WHITE_HAS_CAPTURED || gameCommand == GameCommand.DEBUG_INFO) {
-            this.COLOR = null;
-        } else if(gameCommand == GameCommand.BLACK_STONE_SET) {
-            this.COLOR = StoneColor.BLACK;
-        } else if(gameCommand == GameCommand.WHITE_STONE_SET) {
-            this.COLOR = StoneColor.WHITE;
-        } else {
-            throw new IllegalArgumentException();
+        switch(gameCommand) {
+            case BLACK_HAS_CAPTURED:
+            case WHITE_HAS_CAPTURED:
+            case DEBUG_INFO:
+                this.COLOR = null;
+                break;
+
+            case BLACK_STONE_SET:
+                this.COLOR = StoneColor.BLACK;
+                break;
+
+            case WHITE_STONE_SET:
+                this.COLOR = StoneColor.WHITE;
+                break;
+
+            default:
+                throw new IllegalArgumentException();
         }
     }
 
