@@ -312,18 +312,10 @@ public class Board implements BoardInterface {
      */
     private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
         GameCommand gc = GameCommand.BLACK_PLAYS;
-
-        if (prepareMode) {
-            if (c == BLACK) {
-                gc = GameCommand.BLACK_HANDICAP;
-            } else {
-                gc = GameCommand.WHITE_HANDICAP;
-            }
-        } else {
-            if (c == WHITE) {
-                gc = GameCommand.WHITE_PLAYS;
-            }
+        if (c == WHITE) {
+            gc = GameCommand.WHITE_PLAYS;
         }
+
         System.out.println("cur move number: "+GAME.getCurMoveNumber());
         StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
         GAME.fireGameEvent(e);

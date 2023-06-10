@@ -167,6 +167,10 @@ public class BoardPane extends GridPane {
                         } else {
                             destinationBC.setWhite();
                         }
+
+                        if(game.getHandicapStoneCounter() > 0) {
+                            destinationBC.getLabel().setVisible(false);
+                        }
                     }
                     break;
                 case CONFIRM_CHOICE:
@@ -184,18 +188,6 @@ public class BoardPane extends GridPane {
                 case BLACK_STARTS:
                     setMouseTransparent(false);
                     init();
-                    break;
-                case BLACK_HANDICAP:
-                case WHITE_HANDICAP:
-                    StoneEvent sseH = (StoneEvent) e;
-                    PlayableBoardCell destBC = getPlayableCell(sseH.getX(), sseH.getY());
-
-                    if (sseH.getColor() == BLACK) {
-                        destBC.setBlack();
-                    } else {
-                        destBC.setWhite();
-                    }
-                    destBC.getLabel().setVisible(false);
                     break;
                 case BLACK_WON:
                 case WHITE_WON:
