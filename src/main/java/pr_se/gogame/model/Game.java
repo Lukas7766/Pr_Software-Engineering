@@ -94,7 +94,7 @@ public class Game implements GameInterface {
         this.gameResult = null;
 
         System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
-        fireGameEvent(new GameEvent(this.gameCommand, size, handicap));
+        fireGameEvent(new GameEvent(this.gameCommand));
     }
 
     @Override
