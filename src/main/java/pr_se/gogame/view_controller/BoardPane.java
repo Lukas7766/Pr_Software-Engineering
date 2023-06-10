@@ -156,23 +156,19 @@ public class BoardPane extends GridPane {
             switch(e.getGameCommand()) {
                 case BLACK_STONE_SET:
                 case WHITE_STONE_SET:
-                    if(e instanceof StoneEvent) {//TODO: StoneEvent vs GameCommand question
-                        System.out.println("StoneEvent");
-                        StoneEvent sse = (StoneEvent) e;
-                        PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
-                        destinationBC.getLabel().setText("" + sse.getMoveNumber());
+                    System.out.println("StoneEvent");
+                    StoneEvent sse = (StoneEvent) e;
+                    PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
+                    destinationBC.getLabel().setText("" + sse.getMoveNumber());
 
-                        if (sse.getColor() == BLACK) {
-                            destinationBC.setBlack();
-                        } else {
-                            destinationBC.setWhite();
-                        }
-
-                        if(game.getHandicapStoneCounter() > 0) {
-                            destinationBC.getLabel().setVisible(false);
-                        }
+                    if (sse.getColor() == BLACK) {
+                        destinationBC.setBlack();
                     } else {
-                        throw new IllegalArgumentException();
+                        destinationBC.setWhite();
+                    }
+
+                    if(game.getHandicapStoneCounter() > 0) {
+                        destinationBC.getLabel().setVisible(false);
                     }
                     break;
                 case CONFIRM_CHOICE:
@@ -454,7 +450,10 @@ public class BoardPane extends GridPane {
         System.out.println(showsMoveNumbers);
         for(int i = 0; i < size; i++) {
             for(int j = 0; j < size; j++) {
-                getPlayableCell(j, i).showMoveNumber();
+                PlayableBoardCell pbc = getPlayableCell(j, i);
+                if(!pbc.getLabel().getText().startsWith("0")) {
+                    pbc.showMoveNumber();
+                }
             }
         }
     }

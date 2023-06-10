@@ -9,13 +9,22 @@ public class NewZealandRuleset implements Ruleset {
 
     @Override
     public boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
-        // return existingGroup.getLocations().size() > 1; // Old check when newGroup used to optimistically be added to firstSameColorGroup
         return existingGroup != addedStone;
     }
 
     @Override
     public UndoableCommand isKo(Game game) {
-        return null;
+        return new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                return;
+            }
+
+            @Override
+            public void undo() {
+                return;
+            }
+        };
     }
 
     /**

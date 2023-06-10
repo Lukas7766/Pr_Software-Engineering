@@ -27,7 +27,7 @@ public interface Ruleset {
     /**
      * Whether a ko move has just been committed.
      * @param game The Game that is to be checked for ko.
-     * @return whether the last move was a ko move.
+     * @return null if the last move was a ko move, otherwise an UndoableCommand to undo or redo the ko check.
      */
     UndoableCommand isKo(Game game);
 
@@ -106,6 +106,13 @@ public interface Ruleset {
             default:
                 break;
         }
+    }
+
+    /**
+     * Call this method when starting a new game.
+     */
+    default void reset() {
+        return;
     }
 
     /**

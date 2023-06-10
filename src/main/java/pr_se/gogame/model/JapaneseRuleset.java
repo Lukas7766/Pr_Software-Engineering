@@ -1,5 +1,8 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.view_controller.GameEvent;
+import pr_se.gogame.view_controller.GameListener;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -18,6 +21,34 @@ public class JapaneseRuleset implements Ruleset {
     private List<Position> territory;
 
     private final int [] boardHashes = new int [getKoAmount()];
+
+    /*private final Game game;
+
+    public JapaneseRuleset(Game game) {
+        this.game = game;
+        game.addListener(new GameListener() {
+            @Override
+            public void gameCommand(GameEvent e) {
+                switch(e.getGameCommand()) {
+                    case BLACK_STARTS:
+                    case WHITE_STARTS:
+                        for(int i = 0; i < boardHashes.length; i++) {
+                            boardHashes[i] = 0;
+                        }
+                        break;
+
+                    default: break;
+                }
+            }
+        });
+    }*/
+
+    @Override
+    public void reset() {
+        for(int i = 0; i < boardHashes.length; i++) {
+            boardHashes[i] = 0;
+        }
+    }
 
     @Override
     public UndoableCommand isKo(Game game) {
