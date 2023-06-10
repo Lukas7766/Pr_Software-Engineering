@@ -79,6 +79,7 @@ public class Game implements GameInterface {
         this.blackCapturedStones = 0;
         this.whiteCapturedStones = 0;
         this.curMoveNumber = 0; // Note: Indicates to the BoardPane that handicap stones are being set.
+        this.gameResult = null;
 
         this.board = new Board(this);
         this.ruleset.reset();
@@ -94,8 +95,6 @@ public class Game implements GameInterface {
                 this.gameCommand = GameCommand.WHITE_STARTS;
                 break;
         }
-
-        this.gameResult = null;
 
         System.out.println("\nnewGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n------");
     }
