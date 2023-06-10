@@ -179,14 +179,12 @@ public class BoardPane extends GridPane {
                     StoneEvent se = (StoneEvent) e;
                     getPlayableCell(se.getX(), se.getY()).unset();
                     break;
-                case INIT:
-                    setMouseTransparent(true);
-                    break;
                 case WHITE_STARTS:
                 case BLACK_STARTS:
                     setMouseTransparent(false);
                     init();
                     break;
+                case INIT:
                 case BLACK_WON:
                 case WHITE_WON:
                     setMouseTransparent(true);
