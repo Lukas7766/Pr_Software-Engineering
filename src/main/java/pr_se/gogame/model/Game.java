@@ -366,8 +366,8 @@ public class Game implements GameInterface {
 
             @Override
             public void execute(boolean saveEffects) {
-                handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
                 uc01_setStone = board.setStone(x, y, curColor, true, true);
+                handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
 
                 if (handicapStoneCounter == 0) {
                     // fileTree.insertBufferedStonesBeforeGame();
@@ -380,8 +380,9 @@ public class Game implements GameInterface {
                 if(uC02_switchColor != null) {
                     uC02_switchColor.undo();
                 }
-                uc01_setStone.undo();
                 handicapStoneCounter = OLD_HANDICAP_COUNTER;
+                uc01_setStone.undo();
+
             }
         };
         c.execute(true);

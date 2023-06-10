@@ -105,6 +105,11 @@ public class BoardPane extends GridPane {
     private Image outerCorner;
 
     /**
+     * Image for handicap slots
+     */
+    private Image handicapSlot;
+
+    /**
      * the currently selected PlayableBoardCell
      */
     private PlayableBoardCell selectionPBC = null;
@@ -282,19 +287,6 @@ public class BoardPane extends GridPane {
         for(int i = 0; i < this.size; i++) {
             for(int j = 0; j < this.size; j++) {
                 PlayableBoardCell bc = new PlayableBoardCell(this.tile);
-                /*
-                 * We have to check for the initial board condition here, as the BoardPane cannot exist when the Board
-                 * is initialised, as that happens on creating the Game, which is required to create the BoardPane.
-                 */
-                StoneColor c = this.game.getColorAt(j, i);
-                if(c != null) {
-                    if(c == BLACK) {
-                        bc.setBlack();
-                    } else {
-                        bc.setWhite();
-                    }
-                    bc.getLabel().setVisible(false);
-                }
                 add(bc, j + 1, i + 1);
             }
         }
@@ -508,6 +500,7 @@ public class BoardPane extends GridPane {
             ZipEntry squareMark0Entry = zip.getEntry("mark_square_0.png");
             ZipEntry squareMark1Entry = zip.getEntry("mark_square_1.png");
             ZipEntry squareMark2Entry = zip.getEntry("mark_square_2.png");
+            ZipEntry handicapSlotEntry = zip.getEntry("handicap_slot.png");
 
             if(Stream.of(tileEntry,
                     tileCornerEntry,
@@ -524,7 +517,8 @@ public class BoardPane extends GridPane {
                     triangleMark2Entry,
                     squareMark0Entry,
                     squareMark1Entry,
-                    squareMark2Entry
+                    squareMark2Entry,
+                    handicapSlotEntry
                 ).anyMatch(Objects::isNull)) {
                 throw new IllegalStateException("ERROR: Graphics pack " + graphicsPath + " is missing files!");
             }
@@ -544,7 +538,8 @@ public class BoardPane extends GridPane {
                  InputStream triangleMark2IS = zip.getInputStream(triangleMark2Entry);
                  InputStream squareMark0IS = zip.getInputStream(squareMark0Entry);
                  InputStream squareMark1IS = zip.getInputStream(squareMark1Entry);
-                 InputStream squareMark2IS = zip.getInputStream(squareMark2Entry)
+                 InputStream squareMark2IS = zip.getInputStream(squareMark2Entry);
+                 InputStream handicapSlotIS = zip.getInputStream(handicapSlotEntry);
             ) {
                 final int DEFAULT_IMAGE_SIZE = 128;
                 final boolean SMOOTH_IMAGES = false;
@@ -574,6 +569,8 @@ public class BoardPane extends GridPane {
                 squareMarks[0] = new Image(squareMark0IS);
                 squareMarks[1] = new Image(squareMark1IS);
                 squareMarks[2] = new Image(squareMark2IS);
+
+                handicapSlot = new Image(handicapSlotIS);
             } catch (Exception e) {
                 System.err.println("ERROR: Couldn't read file from graphics pack " + graphicsPath + "!");
                 e.printStackTrace();
@@ -1045,14 +1042,14 @@ public class BoardPane extends GridPane {
         /**
          * Makes this PlayableBoardCell display an opaque white stone to indicate that one has been set.
          */
-        private void setWhite() {
+        public void setWhite() {
             set(WHITE_STONE);
         }
 
         /**
          * Makes this PlayableBoardCell display an opaque black stone to indicate that one has been set.
          */
-        private void setBlack() {
+        public void setBlack() {
             set(BLACK_STONE);
         }
 
