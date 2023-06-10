@@ -553,7 +553,7 @@ public class BoardPane extends GridPane {
                         tileIS,             // is (:InputStream)
                         DEFAULT_IMAGE_SIZE, // requestedWidth
                         DEFAULT_IMAGE_SIZE, // requestedHeight
-                        true,               // preserveRation
+                        true,               // preserveRatio
                         SMOOTH_IMAGES);     // smooth
                 tileEdge = new Image(tileEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
                 tileCorner = new Image(tileCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
@@ -625,7 +625,7 @@ public class BoardPane extends GridPane {
 
     private PlayableBoardCell getPlayableCell(int x, int y) {
         if(x < 0 || x >= size || y < 0 || y >= size) {
-            throw new IllegalArgumentException();
+            throw new IllegalArgumentException("Coordinates X=" + x + "/Y=" + y + "out of bounds for getPlayableCell() when size is " + size);
         }
         return (PlayableBoardCell)getChildren().get(4 + size * 4 + y * size + x);
     }

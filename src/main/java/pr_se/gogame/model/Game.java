@@ -71,8 +71,6 @@ public class Game implements GameInterface {
             case WHITE -> this.gameCommand = GameCommand.WHITE_STARTS;
         }
 
-        this.ruleset.reset();
-
         this.fileTree = new FileTree(size,"Black", "White");
         this.size = size;
         this.handicap = handicap;
@@ -81,7 +79,10 @@ public class Game implements GameInterface {
         this.blackCapturedStones = 0;
         this.whiteCapturedStones = 0;
         this.curMoveNumber = 0; // Note: Indicates to the BoardPane that handicap stones are being set.
+
         this.board = new Board(this);
+        this.ruleset.reset();
+        fireGameEvent(new GameEvent(this.gameCommand));
         this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
         this.curMoveNumber = 1;
         switch(this.curColor) {
@@ -96,8 +97,7 @@ public class Game implements GameInterface {
 
         this.gameResult = null;
 
-        System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
-        fireGameEvent(new GameEvent(this.gameCommand));
+        System.out.println("\nnewGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n------");
     }
 
     @Override
