@@ -24,6 +24,7 @@ public class StoneEvent extends GameEvent {
         switch(gameCommand) {
             case BLACK_HAS_CAPTURED:
             case WHITE_HAS_CAPTURED:
+            case HANDICAP_POS:
             case DEBUG_INFO:
                 this.COLOR = null;
                 break;

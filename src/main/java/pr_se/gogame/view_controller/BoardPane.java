@@ -13,7 +13,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.StoneColor;
 
 import java.io.InputStream;
 import java.util.Objects;
@@ -22,6 +21,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import static pr_se.gogame.model.StoneColor.BLACK;
+import static pr_se.gogame.model.StoneColor.WHITE;
 
 /**
  * View/Controller
@@ -159,6 +159,7 @@ public class BoardPane extends GridPane {
                 throw new NullPointerException();
             }
             switch(e.getGameCommand()) {
+                case HANDICAP_POS:
                 case BLACK_STONE_SET:
                 case WHITE_STONE_SET:
                     System.out.println("StoneEvent");
@@ -168,11 +169,13 @@ public class BoardPane extends GridPane {
 
                     if (sse.getColor() == BLACK) {
                         destinationBC.setBlack();
-                    } else {
+                    } else if(sse.getColor() == WHITE) {
                         destinationBC.setWhite();
                     }
 
-                    if(game.getHandicapStoneCounter() > 0) {
+                    if(game.getHandicapStoneCounter() >= 0) {
+                        System.out.println("Showing handicap slot");
+                        destinationBC.showHandicapSlot();
                         destinationBC.getLabel().setVisible(false);
                     }
                     break;
@@ -394,7 +397,7 @@ public class BoardPane extends GridPane {
                 if(game.getHandicapStoneCounter() <= 0) {
                     game.playMove(col, row);
                 } else {
-                    game.placeHandicapStone(col, row);
+                    game.placeHandicapPosition(col, row, true);
                 }
             } else {
                 System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
@@ -812,6 +815,11 @@ public class BoardPane extends GridPane {
         private final ResizableImageView SQUARE_MARK_ON_WHITE;
 
         /**
+         * Instanc eof the global image for use on handicap stone slots
+         */
+        private final ResizableImageView HANDICAP_SLOT;
+
+        /**
          * Pointer to the ImageView of the currently set stone, if any
          */
         private ResizableImageView CURRENTLY_SET_STONE;
@@ -822,6 +830,8 @@ public class BoardPane extends GridPane {
          */
         private PlayableBoardCell(Image tile) {
             super(tile);
+
+            this.HANDICAP_SLOT = addCellImageView(handicapSlot);
 
             this.CIRCLE_MARK_ON_EMPTY = addCellImageView(circleMarks[0]);
             this.TRIANGLE_MARK_ON_EMPTY = addCellImageView(triangleMarks[0]);
@@ -896,12 +906,8 @@ public class BoardPane extends GridPane {
          */
         public void updateImages(Image tile) {
             setBackgroundImage(tile);
+            HANDICAP_SLOT.setImage(handicapSlot);
             if(CURRENTLY_SET_STONE != null) {
-                if(CURRENTLY_SET_STONE == BLACK_STONE) {
-                    CURRENTLY_SET_STONE.setImage(stones[0]);
-                } else {
-                    CURRENTLY_SET_STONE.setImage(stones[1]);
-                }
                 updateLabelColor();
             }
             BLACK_STONE.setImage(stones[0]);
@@ -918,6 +924,14 @@ public class BoardPane extends GridPane {
             SQUARE_MARK_ON_EMPTY.setImage(squareMarks[0]);
             SQUARE_MARK_ON_BLACK.setImage(squareMarks[2]);
             SQUARE_MARK_ON_WHITE.setImage(squareMarks[1]);
+        }
+
+        public void showHandicapSlot() {
+            HANDICAP_SLOT.setVisible(true);
+        }
+
+        public void hideHandicapSlot() {
+            HANDICAP_SLOT.setVisible(false);
         }
 
         /**

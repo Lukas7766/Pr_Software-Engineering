@@ -2,6 +2,7 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
+import pr_se.gogame.view_controller.StoneEvent;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -85,6 +86,8 @@ public class Game implements GameInterface {
         this.ruleset.reset();
         fireGameEvent(new GameEvent(this.gameCommand));
         this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
+        this.handicapStoneCounter = -1;
+
         this.curMoveNumber = 1;
         switch(this.curColor) {
             case BLACK:
@@ -345,7 +348,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void placeHandicapStone(int x, int y) {
+    public void placeHandicapPosition(int x, int y, boolean placeStone) {
         /*if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS) {
             throw new IllegalStateException("Can't place handicap stone after game start!");
         }*/
@@ -356,40 +359,43 @@ public class Game implements GameInterface {
 
         final int OLD_HANDICAP_COUNTER = handicapStoneCounter;
 
-        if (handicapStoneCounter == 0) {
-            throw new IllegalStateException("Can't place any more handicap stones!");
+        if(placeStone) {
+            if (handicapStoneCounter == 0) {
+                throw new IllegalStateException("Can't place any more handicap stones!");
+            }
+
+            UndoableCommand c = new UndoableCommand() {
+                UndoableCommand uc01_setStone = null;
+                UndoableCommand uC02_switchColor = null;
+
+                @Override
+                public void execute(boolean saveEffects) {
+                    uc01_setStone = board.setStone(x, y, curColor, true, true);
+                    handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
+
+                    if (handicapStoneCounter == 0) {
+                        // fileTree.insertBufferedStonesBeforeGame();
+                        uC02_switchColor = switchColor();
+                    }
+                }
+
+                @Override
+                public void undo() {
+                    if (uC02_switchColor != null) {
+                        uC02_switchColor.undo();
+                    }
+                    handicapStoneCounter = OLD_HANDICAP_COUNTER;
+                    uc01_setStone.undo();
+
+                }
+            };
+            c.execute(true);
+
+            // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        } else {
+            System.out.println("Only place handicap position");
+            fireGameEvent(new StoneEvent(GameCommand.HANDICAP_POS, x, y, curMoveNumber));
         }
-
-        UndoableCommand c = new UndoableCommand() {
-            UndoableCommand uc01_setStone = null;
-            UndoableCommand uC02_switchColor = null;
-
-            @Override
-            public void execute(boolean saveEffects) {
-                uc01_setStone = board.setStone(x, y, curColor, true, true);
-                handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
-
-                if (handicapStoneCounter == 0) {
-                    // fileTree.insertBufferedStonesBeforeGame();
-                    uC02_switchColor = switchColor();
-                }
-            }
-
-            @Override
-            public void undo() {
-                if(uC02_switchColor != null) {
-                    uC02_switchColor.undo();
-                }
-                handicapStoneCounter = OLD_HANDICAP_COUNTER;
-                uc01_setStone.undo();
-
-            }
-        };
-        c.execute(true);
-
-        System.out.println("placeHandicapStone, handicap ctr = " + handicapStoneCounter);
-
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
 
     @Override

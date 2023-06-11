@@ -70,43 +70,25 @@ public interface Ruleset {
         final int SIZE = game.getSize();
         final int DIST_FROM_EDGE = 2 + SIZE / 10;
         game.setHandicapStoneCounter(noStones);
-        switch (noStones) {
-            case 9:
-                game.placeHandicapStone(SIZE / 2, SIZE / 2);
-                noStones--;                                                     // set remaining no. to 8
-            case 8:
-                game.placeHandicapStone(SIZE / 2, DIST_FROM_EDGE);
-                game.placeHandicapStone(SIZE / 2, SIZE - 1 - DIST_FROM_EDGE);
-                noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
-            default:
-                break;
-        }
 
-        switch (noStones) {
-            case 7:
-                game.placeHandicapStone(SIZE / 2, SIZE / 2); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
-                noStones--;
-            case 6:
-                game.placeHandicapStone(SIZE - 1 - DIST_FROM_EDGE, SIZE / 2);
-                game.placeHandicapStone(DIST_FROM_EDGE, SIZE / 2);
-                noStones -= 2;
-            default:
-                break;
-        }
-
-        switch (noStones) {
-            case 5:
-                game.placeHandicapStone(SIZE / 2, SIZE / 2);
-            case 4:
-                game.placeHandicapStone(DIST_FROM_EDGE, DIST_FROM_EDGE);
-            case 3:
-                game.placeHandicapStone(SIZE - 1 - DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE);
-            case 2:
-                game.placeHandicapStone(SIZE - 1 - DIST_FROM_EDGE, DIST_FROM_EDGE);
-                game.placeHandicapStone(DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE);
-            default:
-                break;
-        }
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 9);
+        if(noStones == 9) noStones--;
+        game.placeHandicapPosition(SIZE / 2, DIST_FROM_EDGE, noStones == 8);
+        game.placeHandicapPosition(SIZE / 2, SIZE - 1 - DIST_FROM_EDGE, noStones == 8);
+        if(noStones == 8) noStones -= 2;
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 7);
+        if(noStones == 7) noStones--;
+        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, SIZE / 2, noStones == 6);
+        game.placeHandicapPosition(DIST_FROM_EDGE, SIZE / 2, noStones == 6);
+        if(noStones == 6) noStones -= 2;
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 5);
+        if(noStones == 5) noStones--;
+        game.placeHandicapPosition(DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 4);
+        if(noStones == 4) noStones--;
+        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 3);
+        if(noStones == 3) noStones--;
+        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 2);
+        game.placeHandicapPosition(DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 2);
     }
 
     /**

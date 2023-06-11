@@ -22,27 +22,6 @@ public class JapaneseRuleset implements Ruleset {
 
     private final int [] boardHashes = new int [getKoAmount()];
 
-    /*private final Game game;
-
-    public JapaneseRuleset(Game game) {
-        this.game = game;
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                switch(e.getGameCommand()) {
-                    case BLACK_STARTS:
-                    case WHITE_STARTS:
-                        for(int i = 0; i < boardHashes.length; i++) {
-                            boardHashes[i] = 0;
-                        }
-                        break;
-
-                    default: break;
-                }
-            }
-        });
-    }*/
-
     @Override
     public void reset() {
         for(int i = 0; i < boardHashes.length; i++) {
@@ -52,8 +31,6 @@ public class JapaneseRuleset implements Ruleset {
 
     @Override
     public UndoableCommand isKo(Game game) {
-        System.out.println("isKo()");
-
         StoneColor [][] boardColor = new StoneColor[game.getSize()][game.getSize()];
 
         for(int i = 0; i < game.getSize(); i++) {
@@ -64,13 +41,6 @@ public class JapaneseRuleset implements Ruleset {
 
         final int LAST_BOARD_HASH = boardHashes[0];
         final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
-
-        System.out.print("boardHashes: ");
-        for(int i : boardHashes) {
-            System.out.print(i + " ");
-        }
-        System.out.println();
-        System.out.println("NEW_BOARD_HASH: " + NEW_BOARD_HASH);
 
         if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
             return null;

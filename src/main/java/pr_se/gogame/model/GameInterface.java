@@ -56,10 +56,12 @@ public interface GameInterface {
     /**
      * This method places a handicap stone down for the beginner player at the specified coordinates. This only works
      * at the beginning of the game.
-     * @param x the x coordinate of the stone, starting at the left
-     * @param y the y coordinate of the stone, starting at the top
+     *
+     * @param x          the x coordinate of the stone, starting at the left
+     * @param y          the y coordinate of the stone, starting at the top
+     * @param placeStone
      */
-    void placeHandicapStone(int x, int y);
+    void placeHandicapPosition(int x, int y, boolean placeStone);
 
 
     //##################################################################################################################

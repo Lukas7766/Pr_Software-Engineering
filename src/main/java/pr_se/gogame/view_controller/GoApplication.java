@@ -72,11 +72,6 @@ public class GoApplication extends Application {
 
         stage.setScene(scene);
 
-        Screen screen = Screen.getPrimary();
-        System.out.println("DPI = " + screen.getDpi());
-        System.out.println("Output scale X = " + screen.getOutputScaleX());
-        System.out.println("Output scale Y = " + screen.getOutputScaleY());
-
         /*
          * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,
          * except, for some reason, the menu bar. This might be desirable.
