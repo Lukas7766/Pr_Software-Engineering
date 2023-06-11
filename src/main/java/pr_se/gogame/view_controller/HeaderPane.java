@@ -451,10 +451,8 @@ public class HeaderPane extends VBox {
         for(File f : graphicsFolder.listFiles(zipFilter)) {
             if(f.isFile()) { // We still need to check this because you could have a folder whose name ends with ".zip".
                 comboBoxItems.add(f.getName());
-                System.out.println(f.getName());
             }
         }
-        System.out.println();
 
         ComboBox graphicsPackSelectorComboBox = new ComboBox(comboBoxItems);
         graphicsPackSelectorComboBox.setValue("default.zip");

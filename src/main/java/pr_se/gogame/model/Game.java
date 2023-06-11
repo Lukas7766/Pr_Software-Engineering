@@ -86,7 +86,6 @@ public class Game implements GameInterface {
         this.ruleset.reset();
         fireGameEvent(new GameEvent(this.gameCommand));
         this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
-        this.handicapStoneCounter = -1;
 
         this.curMoveNumber = 1;
         switch(this.curColor) {
@@ -220,7 +219,7 @@ public class Game implements GameInterface {
      */
     @Override
     public void setHandicapStoneCounter(int noStones) {
-        if(noStones < 0 || noStones > handicap) {
+        if((noStones < 0 && noStones != -1) || noStones > handicap) {
             throw new IllegalArgumentException();
         }
 
@@ -353,6 +352,8 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place handicap stone after game start!");
         }*/
 
+        System.out.println("Game.placeHandicapPosition");
+
         if(x < 0 || y < 0 || x >= size || y >= size) {
             throw new IllegalArgumentException();
         }
@@ -360,7 +361,7 @@ public class Game implements GameInterface {
         final int OLD_HANDICAP_COUNTER = handicapStoneCounter;
 
         if(placeStone) {
-            if (handicapStoneCounter == 0) {
+            if (handicapStoneCounter < 0) {
                 throw new IllegalStateException("Can't place any more handicap stones!");
             }
 
@@ -373,7 +374,8 @@ public class Game implements GameInterface {
                     uc01_setStone = board.setStone(x, y, curColor, true, true);
                     handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
 
-                    if (handicapStoneCounter == 0) {
+                    if (handicapStoneCounter < 0) {
+                        System.out.println("handicapStoneCounter is now less than 0.");
                         // fileTree.insertBufferedStonesBeforeGame();
                         uC02_switchColor = switchColor();
                     }
