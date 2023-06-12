@@ -73,44 +73,45 @@ public class AncientChineseRuleset implements Ruleset {
 
     @Override
     public void setHandicapStones(Game game, StoneColor beginner , int noStones) {
-        game.setHandicapStoneCounter(noStones);
-        switch (noStones) {
-            case 9:
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
-                noStones--;                                                     // set remaining no. to 8
-            case 8:
-                game.placeHandicapStone(game.getSize() / 2, 3);
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() - 4);
-                noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
-            default:
-                break;
+        if (game == null) {
+            throw new IllegalArgumentException("board must not be null");
+        }
+        if (beginner == null) {
+            throw new IllegalArgumentException("beginner must not be null");
+        }
+        if (noStones < 0 || noStones > 9){
+            throw new IllegalArgumentException("noStones must be between 0 and 9");
         }
 
-        switch (noStones) {
-            case 7:
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
-                noStones--;
-            case 6:
-                game.placeHandicapStone(game.getSize() - 4, game.getSize() / 2);
-                game.placeHandicapStone(3, game.getSize() / 2);
-                noStones -= 2;
-            default:
-                break;
+        final int SIZE = game.getSize();
+        final int DIST_FROM_EDGE = 2 + SIZE / 10;
+        if(noStones > 0) {
+            game.setHandicapStoneCounter(noStones - 1);
+        } else {
+            game.setHandicapStoneCounter(noStones);
         }
 
-        switch (noStones) {
-            case 5:
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
-            case 4:
-                game.placeHandicapStone(3, 3);
-            case 3:
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
-            case 2:
-                game.placeHandicapStone(game.getSize() - 4, 3);
-                game.placeHandicapStone(3, game.getSize() - 4);
-            default:
-                break;
-        }
+
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 9);
+        if(noStones == 9) noStones--;
+        game.placeHandicapPosition(SIZE / 2, DIST_FROM_EDGE, noStones == 8);
+        game.placeHandicapPosition(SIZE / 2, SIZE - 1 - DIST_FROM_EDGE, noStones == 8);
+        if(noStones == 8) noStones -= 2;
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 7);
+        if(noStones == 7) noStones--;
+        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, SIZE / 2, noStones == 6);
+        game.placeHandicapPosition(DIST_FROM_EDGE, SIZE / 2, noStones == 6);
+        if(noStones == 6) noStones -= 2;
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 5);
+        if(noStones == 5) noStones--;
+        game.placeHandicapPosition(DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 4);
+        if(noStones == 4) noStones--;
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 3);
+        if(noStones == 3) noStones--;
+        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 2);
+        game.placeHandicapPosition(DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 2);
+
+        game.setHandicapStoneCounter(-1);
     }
 
 }

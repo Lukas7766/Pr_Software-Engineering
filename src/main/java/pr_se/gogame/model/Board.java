@@ -1,14 +1,14 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.DebugEvent;
-import pr_se.gogame.view_controller.StoneRemovedEvent;
-import pr_se.gogame.view_controller.StoneSetEvent;
+import pr_se.gogame.view_controller.StoneEvent;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static pr_se.gogame.model.StoneColor.*;
+
+import static pr_se.gogame.model.StoneColor.WHITE;
 
 
 /**
@@ -310,21 +310,13 @@ public class Board implements BoardInterface {
      * @param c the StoneColor of the stone that has been set
      */
     private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
-        GameCommand gc = GameCommand.BLACK_PLAYS;
-
-        if (prepareMode) {
-            if (c == BLACK) {
-                gc = GameCommand.BLACK_HANDICAP;
-            } else {
-                gc = GameCommand.WHITE_HANDICAP;
-            }
-        } else {
-            if (c == WHITE) {
-                gc = GameCommand.WHITE_PLAYS;
-            }
+        GameCommand gc = GameCommand.BLACK_STONE_SET;
+        if (c == WHITE) {
+            gc = GameCommand.WHITE_STONE_SET;
         }
+
         System.out.println("cur move number: "+GAME.getCurMoveNumber());
-        StoneSetEvent e = new StoneSetEvent(gc, x, y, GAME.getCurMoveNumber());
+        StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
         GAME.fireGameEvent(e);
     }
 
@@ -339,17 +331,17 @@ public class Board implements BoardInterface {
         if (GAME.getCurColor() == WHITE) {
             gc = GameCommand.WHITE_HAS_CAPTURED;
         }
-        StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
+        StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
 
         GAME.fireGameEvent(e);
     }
 
-    public Set<StoneGroup> getNeighbors(int x, int y) {
+    public Set<StoneColor> getNeighborColors(int x, int y) {
         return getSurroundings(
                 x,
                 y,
                 (sgp) -> sgp != null,
-                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup().getStoneColor()
         );
     }
 
@@ -387,10 +379,12 @@ public class Board implements BoardInterface {
     }
 
     // Getters and Setters
+    @Override
     public int getSize() {
         return SIZE;
     }
 
+    @Override
     public StoneColor getColorAt(int x, int y) {
         if(areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
@@ -417,7 +411,7 @@ public class Board implements BoardInterface {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] != null) {
-                    DebugEvent e = new DebugEvent(GameCommand.DEBUG_INFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    DebugEvent e = new DebugEvent(i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
                     GAME.fireGameEvent(e);
                 }
             }
@@ -428,7 +422,7 @@ public class Board implements BoardInterface {
     }
 
     /**
-     * Tests whether these x and y coordinates are within the bounds of the playing field
+     * Tests whether these x and y coordinates are outside the bounds of the playing field
      * @param x x coordinate starting at the left
      * @param y y coordinate starting at the top
      * @return whether these x and y coordinates are outside the playing field.

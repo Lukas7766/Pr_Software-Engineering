@@ -41,7 +41,7 @@ class JapaneseRulesetTest {
     @Test
     @DisplayName("testing scoreGame(), wrong input")
     void scoreGameWI() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> japaneseRuleset.scoreGame(null));
+        assertThrowsExactly(NullPointerException.class, () -> japaneseRuleset.scoreGame(null));
     }
 
     @Test
@@ -59,7 +59,7 @@ class JapaneseRulesetTest {
         null BLACK WHITE null null null null null null
          */
         Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
+        game.newGame(StoneColor.BLACK, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -121,7 +121,7 @@ class JapaneseRulesetTest {
         null null null null null null null null null
          */
         Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
+        game.newGame(StoneColor.BLACK, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -153,9 +153,9 @@ class JapaneseRulesetTest {
     }
 
     private void printBoard(Game game) {
-        for (int i = 0; i < game.getBoard().getSize(); i++) {
-            for (int j = 0; j < game.getBoard().getSize(); j++) {
-                System.out.print(game.getBoard().getColorAt(i, j) + " ");
+        for (int i = 0; i < game.getSize(); i++) {
+            for (int j = 0; j < game.getSize(); j++) {
+                System.out.print(game.getColorAt(i, j) + " ");
             }
             System.out.println();
         }

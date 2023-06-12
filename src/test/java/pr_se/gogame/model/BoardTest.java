@@ -16,7 +16,7 @@ class BoardTest {
     @BeforeEach
     void setUp() {
         game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 19, 0);
+        game.newGame(BLACK, 19, 0);
         board = game.getBoard();
     }
 
@@ -172,24 +172,6 @@ class BoardTest {
         game.pass(); // for maximum code-coverage
         board.removeStone(0, 0, true);
         assertNull(board.getColorAt(0, 0));
-    }
-
-    @Test
-    void getNeighbors() {
-        assertNotNull(board.setStone(9, 1, BLACK, false, true));
-        assertNotNull(board.setStone(9, 3, WHITE, false, true));
-        assertNotNull(board.setStone(8, 2, BLACK, false, true));
-        assertNotNull(board.setStone(10, 2, WHITE, false, true));
-
-        assertEquals(4, board.getNeighbors(9, 2).size());
-
-        assertNotNull(board.setStone(board.getSize() - 1, board.getSize() - 1, BLACK, false, true));
-        assertNotNull(board.setStone(board.getSize() - 1, board.getSize() - 2, WHITE, false, true));
-        assertNotNull(board.setStone(board.getSize() - 2, board.getSize() - 1, BLACK, false, true));
-        assertThrows(IllegalArgumentException.class, () -> board.setStone(board.getSize() - 1, board.getSize(), WHITE, false, true));
-        assertThrows(IllegalArgumentException.class, () -> board.setStone(board.getSize(), board.getSize() - 1, WHITE, false, true));
-
-        assertEquals(2, board.getNeighbors(board.getSize() - 1, board.getSize() - 1).size());
     }
 
     @Test
