@@ -4,10 +4,12 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.Mnemonic;
 import javafx.scene.layout.*;
 import pr_se.gogame.model.Game;
 
@@ -56,6 +58,11 @@ public class HeaderPane extends VBox {
     /**
      * List of FileChooser Extensions
      */
+
+    /**
+     * Scene of application
+     */
+    private final Scene scene;
     private final HashSet<FileChooser.ExtensionFilter> filterList;
 
     private final List<Button> playbackControlList = new ArrayList<>();
@@ -72,11 +79,12 @@ public class HeaderPane extends VBox {
      * @param stage     instance of actual stage -> needed to show file dialog
      * @param game      instance of actual game -> needed for triggering and observing changes in model
      */
-    public HeaderPane(Color backcolor, Application app, Stage stage, Game game) {
+    public HeaderPane(Color backcolor, Application app, Scene scene, Stage stage, Game game) {
         this.backColor = backcolor;
         this.app = app;
         this.stage = stage;
         this.game = game;
+        this.scene = scene;
 
         this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
                 .collect(Collectors.toCollection(HashSet::new));
@@ -358,20 +366,24 @@ public class HeaderPane extends VBox {
         Button fastBackward = new Button();
         fastBackward.setText("<<");
         fastBackward.setFocusTraversable(false);
+        fastBackward.setOnAction(e -> System.out.println("fastBackward"));
         playbackControlList.add(fastBackward);
 
         Button backward = new Button();
         backward.setText("<");
         backward.setFocusTraversable(false);
+        backward.setOnAction(e -> System.out.println("backward"));
         playbackControlList.add(backward);
 
         Button forward = new Button();
         forward.setText(">");
         forward.setFocusTraversable(false);
+        forward.setOnAction(e -> System.out.println("forward"));
         playbackControlList.add(forward);
 
         Button fastForward = new Button();
         fastForward.setText(">>");
+        fastForward.setOnAction(e -> System.out.println("fastForward"));
         fastForward.setFocusTraversable(false);
         playbackControlList.add(fastForward);
 
@@ -383,6 +395,26 @@ public class HeaderPane extends VBox {
             playbackControlList.forEach(e -> e.setDisable(!game.isDemoMode()));
 
         });
+
+        //Key Bindings for the playback control
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F), () -> {
+            if (backward.isDisabled()) return;
+            System.out.println("backward");
+        });
+
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.H), () -> {
+            if (forward.isDisabled()) return;
+            System.out.println("forward");
+        });
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T), () -> {
+            if (fastForward.isDisabled()) return;
+            System.out.println("fastForward");
+        });
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.G), () -> {
+            if (fastBackward.isDisabled()) return;
+            System.out.println("fastBackward");
+        });
+
 
         lane.getChildren().add(playbackControl);
 

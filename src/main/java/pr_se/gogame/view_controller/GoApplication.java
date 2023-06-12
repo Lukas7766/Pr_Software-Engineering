@@ -26,6 +26,10 @@ public class GoApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        //Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+        //    CustomExceptionDialog.show(e);
+        //});
+        CustomExceptionDialog.stage = stage;
         // Generate the necessary folder and extract the default the graphics pack if it is not present.
         String graphicsDir = "./Grafiksets";
         String graphicsPack = "/default.zip";
@@ -59,19 +63,21 @@ public class GoApplication extends Application {
         stage.getIcons().add(new Image(iconStream));
         iconStream.close();
 
-        BoardPane bp = new BoardPane(game);
 
-        root.setCenter(bp);
-        HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, stage, game);
-        root.setTop(hp);
-        SidePane sp = new SidePane(Color.LIGHTGRAY, stage, game);
-        root.setLeft(sp);
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         stage.setMinHeight(HEIGHT + 40);
         stage.setMinWidth(WIDTH + 20);
 
         stage.setScene(scene);
+
+        BoardPane bp = new BoardPane(game);
+
+        root.setCenter(bp);
+        HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, scene, stage, game);
+        root.setTop(hp);
+        SidePane sp = new SidePane(Color.LIGHTGRAY, stage, game);
+        root.setLeft(sp);
 
         Screen screen = Screen.getPrimary();
         System.out.println("DPI = " + screen.getDpi());

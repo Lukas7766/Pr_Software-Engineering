@@ -17,20 +17,21 @@ import java.util.HashSet;
 public class CustomExceptionDialog {
 
     /**
+     * The stage to which the dialog is attached.
+     */
+    public static Stage stage;
+
+    /**
      * Creates a customised Exception Dialog
      *
-     * @param stage pass stage
      * @param e     pass Exception
      */
-    public static void show(Stage stage, Exception e) {
-        show(stage, e, null);
+    public static void show(Throwable e) {
+        show(e, null);
     }
 
-    public static void show(Exception e, String message) {
-        show(null, e, message);
-    }
 
-    public static void show(Stage stage, Exception e, String message) {
+    public static void show(Throwable e, String message) {
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
