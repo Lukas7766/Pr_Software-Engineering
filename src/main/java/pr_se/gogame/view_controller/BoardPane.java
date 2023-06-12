@@ -239,7 +239,7 @@ public class BoardPane extends GridPane {
      * instead.
      */
     private void init() {
-        getChildren().removeAll(getChildren());
+        getChildren().clear();
 
         this.size = this.game.getSize();
 
@@ -389,10 +389,6 @@ public class BoardPane extends GridPane {
         requestFocus();
     }
 
-    /*
-     * TODO: (minor tweak) Immediately change lastMouseHover on completion (esp. if a situation arises where the mouse
-     *  might be on the board during confirmation)
-     */
     /**
      * If moves are to be confirmed, calling this method confirms a move on the currently selected PlayableBoardCell,
      * calling the game's playMove() method.
@@ -423,6 +419,14 @@ public class BoardPane extends GridPane {
              */
             selectionPBC.deselect();
             selectionPBC = null;
+
+            if(hoverPBC != null) {
+                if (game.getCurColor() == BLACK) {
+                    hoverPBC.hoverBlack();
+                } else {
+                    hoverPBC.hoverWhite();
+                }
+            }
 
             /*
              * Disable the following lines if you want CONSECUTIVE keyboard controls to originate from the last placed
@@ -975,6 +979,9 @@ public class BoardPane extends GridPane {
             if (!isSelected) {
                 BLACK_HOVER.setVisible(false);
                 WHITE_HOVER.setVisible(false);
+                if(hoverPBC == this) {
+                    hoverPBC = null;
+                }
             }
         }
 
