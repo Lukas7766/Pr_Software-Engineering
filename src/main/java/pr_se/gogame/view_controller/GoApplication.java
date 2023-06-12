@@ -23,6 +23,10 @@ public class GoApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
+        //Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
+        //    CustomExceptionDialog.show(e);
+        //});
+        CustomExceptionDialog.stage = stage;
         // Generate the necessary folder and extract the default the graphics pack if it is not present.
         String graphicsDir = "./Grafiksets";
         String graphicsPack = "/default.zip";
@@ -58,19 +62,19 @@ public class GoApplication extends Application {
             iconStream.close();
         }
 
-        BoardPane bp = new BoardPane(game);
 
-        root.setCenter(bp);
-        HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, stage, game);
-        root.setTop(hp);
-        SidePane sp = new SidePane(Color.LIGHTGRAY, stage, game);
-        root.setLeft(sp);
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
         stage.setMinHeight(HEIGHT + 40);
         stage.setMinWidth(WIDTH + 20);
 
         stage.setScene(scene);
+
+        root.setCenter(bp);
+        HeaderPane hp = new HeaderPane(Color.LIGHTGRAY, this, scene, stage, game);
+        root.setTop(hp);
+        SidePane sp = new SidePane(Color.LIGHTGRAY, stage, game);
+        root.setLeft(sp);
 
         /*
          * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,

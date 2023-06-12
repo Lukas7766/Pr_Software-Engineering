@@ -587,11 +587,15 @@ public class BoardPane extends GridPane {
 
                 handicapSlot = new Image(handicapSlotIS);
             } catch (Exception e) {
-                System.err.println("ERROR: Couldn't read file from graphics pack " + graphicsPath + "!");
+                String errMsg = "Couldn't read file from graphics pack " + graphicsPath + "!";
+                CustomExceptionDialog.show(e, errMsg);
+                System.err.println(errMsg);
                 e.printStackTrace();
             }
         } catch (Exception e) {
-            System.err.println("ERROR: Couldn't open graphics pack " + graphicsPath + "!");
+            String errMsg = "Couldn't open graphics pack " + graphicsPath + "!";
+            CustomExceptionDialog.show(e, errMsg);
+            System.err.println(errMsg);
             e.printStackTrace();
         }
     }
