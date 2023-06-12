@@ -31,7 +31,7 @@ public class Game implements GameInterface {
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private Board board;
-    private int curMoveNumber = 0;
+    private int curMoveNumber;
     private StoneColor curColor;
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
     private double playerBlackScore;
