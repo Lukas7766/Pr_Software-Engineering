@@ -534,9 +534,9 @@ class GameTest {
         assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(1, 1, true));
     }
 
-    //@Test
-    //void dontPlayAfterGameIsOver() {
-    //    game.resign();
-    //    assertThrows(IllegalStateException.class, () -> game.playMove(0, 0));
-    //}
+    /*@Test
+    void dontPlayAfterGameIsOver() {
+        game.resign();
+        assertThrows(IllegalStateException.class, () -> game.playMove(0, 0));
+    }*/
 }

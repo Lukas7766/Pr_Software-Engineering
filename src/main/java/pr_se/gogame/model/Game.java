@@ -329,7 +329,6 @@ public class Game implements GameInterface {
                 if (UC01_setStone != null) {
                     curMoveNumber++;
                     System.out.println("Move played.");
-                    printDebugInfo(x, y);
                     // Update current player color
                     c_UC02_switchColor = switchColor();
                 } else {
