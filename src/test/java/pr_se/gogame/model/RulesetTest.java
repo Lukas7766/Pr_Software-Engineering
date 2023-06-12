@@ -52,7 +52,7 @@ class RulesetTest {
         Game game;
         for (int i = 0; i < 10; i++) {
             game = new Game();
-            game.newGame(GameCommand.BLACK_STARTS, 19,i);
+            game.newGame(StoneColor.BLACK, 19,i);
 
             switch (i){
                 case 0,1 -> {

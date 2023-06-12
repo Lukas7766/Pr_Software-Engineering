@@ -59,7 +59,7 @@ class JapaneseRulesetTest {
         null BLACK WHITE null null null null null null
          */
         Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
+        game.newGame(StoneColor.BLACK, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -121,7 +121,7 @@ class JapaneseRulesetTest {
         null null null null null null null null null
          */
         Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
+        game.newGame(StoneColor.BLACK, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 

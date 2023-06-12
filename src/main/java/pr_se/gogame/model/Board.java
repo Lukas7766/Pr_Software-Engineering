@@ -1,14 +1,14 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.DebugEvent;
-import pr_se.gogame.view_controller.StoneRemovedEvent;
-import pr_se.gogame.view_controller.StoneSetEvent;
+import pr_se.gogame.view_controller.StoneEvent;
 
 import java.util.*;
 import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import static pr_se.gogame.model.StoneColor.*;
+
+import static pr_se.gogame.model.StoneColor.WHITE;
 
 
 /**
@@ -133,7 +133,7 @@ public class Board implements BoardInterface {
         final boolean FINAL_PERMITTED_SUICIDE = permittedSuicide;
         final UndoableCommand UC05_PLACE_POINTER = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (!FINAL_PERMITTED_SUICIDE) {
                     System.out.println("Placing stone down at " + x + ", " + y);
                     board[x][y] =
@@ -148,7 +148,7 @@ public class Board implements BoardInterface {
                 board[x][y] = null;
             }
         };
-        UC05_PLACE_POINTER.execute();
+        UC05_PLACE_POINTER.execute(true);
         subcommands.add(UC05_PLACE_POINTER);
 
         final boolean FINAL_KILL_ANOTHER = killAnother;
@@ -158,7 +158,7 @@ public class Board implements BoardInterface {
             UndoableCommand uC06_02_addCapturedStonesCommand = null;
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (!prepareMode) {
 
                     for (StoneGroup sg : surroundingSGs) {
@@ -173,7 +173,7 @@ public class Board implements BoardInterface {
                         }
                     }
 
-                    if(save) {
+                    if(save && saveEffects) {
                         /*
                          * if(prepareMode) {
                          *      GAME.getFileTree().bufferStonesBeforeGame(color, x, y);
@@ -205,7 +205,7 @@ public class Board implements BoardInterface {
                 fireStoneRemoved(x, y); // TODO: Do we need a check for FINAL_PERMITTED_SUICIDE here?
             }
         };
-        UC06_REMOVE_CAPTURED_STONES.execute();
+        UC06_REMOVE_CAPTURED_STONES.execute(true);
         subcommands.add(UC06_REMOVE_CAPTURED_STONES);
 
         final UndoableCommand UC07_CHECK_KO = GAME.getRuleset().isKo(GAME);
@@ -214,10 +214,10 @@ public class Board implements BoardInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 for(UndoableCommand c : SUBCOMMANDS) {
                     if(c != null) {
-                        c.execute();
+                        c.execute(true);
                     }
                 }
             }
@@ -260,10 +260,10 @@ public class Board implements BoardInterface {
             final List<UndoableCommand> ADD_LIBERTY_COMMANDS = new LinkedList<>();
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 board[x][y] = null;
 
-                if(save) {
+                if(save && saveEffects) {
                     // GAME.getFileTree().removeStone(x, y);
                 }
 
@@ -295,7 +295,7 @@ public class Board implements BoardInterface {
                 fireStoneSet(x, y, board[x][y].getStoneGroup().getStoneColor(), false);
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -310,21 +310,13 @@ public class Board implements BoardInterface {
      * @param c the StoneColor of the stone that has been set
      */
     private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
-        GameCommand gc = GameCommand.BLACK_PLAYS;
-
-        if (prepareMode) {
-            if (c == BLACK) {
-                gc = GameCommand.BLACK_HANDICAP;
-            } else {
-                gc = GameCommand.WHITE_HANDICAP;
-            }
-        } else {
-            if (c == WHITE) {
-                gc = GameCommand.WHITE_PLAYS;
-            }
+        GameCommand gc = GameCommand.BLACK_STONE_SET;
+        if (c == WHITE) {
+            gc = GameCommand.WHITE_STONE_SET;
         }
+
         System.out.println("cur move number: "+GAME.getCurMoveNumber());
-        StoneSetEvent e = new StoneSetEvent(gc, x, y, GAME.getCurMoveNumber());
+        StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
         GAME.fireGameEvent(e);
     }
 
@@ -339,7 +331,7 @@ public class Board implements BoardInterface {
         if (GAME.getCurColor() == WHITE) {
             gc = GameCommand.WHITE_HAS_CAPTURED;
         }
-        StoneRemovedEvent e = new StoneRemovedEvent(gc, x, y);
+        StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
 
         GAME.fireGameEvent(e);
     }
@@ -387,10 +379,12 @@ public class Board implements BoardInterface {
     }
 
     // Getters and Setters
+    @Override
     public int getSize() {
         return SIZE;
     }
 
+    @Override
     public StoneColor getColorAt(int x, int y) {
         if(areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
@@ -417,7 +411,7 @@ public class Board implements BoardInterface {
         for (int i = 0; i < SIZE; i++) {
             for (int j = 0; j < SIZE; j++) {
                 if (board[i][j] != null) {
-                    DebugEvent e = new DebugEvent(GameCommand.DEBUG_INFO, i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
+                    DebugEvent e = new DebugEvent(i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
                     GAME.fireGameEvent(e);
                 }
             }
@@ -428,7 +422,7 @@ public class Board implements BoardInterface {
     }
 
     /**
-     * Tests whether these x and y coordinates are within the bounds of the playing field
+     * Tests whether these x and y coordinates are outside the bounds of the playing field
      * @param x x coordinate starting at the left
      * @param y y coordinate starting at the top
      * @return whether these x and y coordinates are outside the playing field.

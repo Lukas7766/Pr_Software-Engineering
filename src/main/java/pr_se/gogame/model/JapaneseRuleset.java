@@ -1,5 +1,8 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.view_controller.GameEvent;
+import pr_se.gogame.view_controller.GameListener;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -20,9 +23,14 @@ public class JapaneseRuleset implements Ruleset {
     private final int [] boardHashes = new int [getKoAmount()];
 
     @Override
-    public UndoableCommand isKo(Game game) {
-        System.out.println("isKo()");
+    public void reset() {
+        for(int i = 0; i < boardHashes.length; i++) {
+            boardHashes[i] = 0;
+        }
+    }
 
+    @Override
+    public UndoableCommand isKo(Game game) {
         StoneColor [][] boardColor = new StoneColor[game.getSize()][game.getSize()];
 
         for(int i = 0; i < game.getSize(); i++) {
@@ -34,13 +42,6 @@ public class JapaneseRuleset implements Ruleset {
         final int LAST_BOARD_HASH = boardHashes[0];
         final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
 
-        System.out.print("boardHashes: ");
-        for(int i : boardHashes) {
-            System.out.print(i + " ");
-        }
-        System.out.println();
-        System.out.println("NEW_BOARD_HASH: " + NEW_BOARD_HASH);
-
         if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
             return null;
         }
@@ -49,7 +50,7 @@ public class JapaneseRuleset implements Ruleset {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 for(int i = 0; i < boardHashes.length - 1; i++) {
                     boardHashes[i] = boardHashes[i + 1];
                 }
@@ -64,7 +65,7 @@ public class JapaneseRuleset implements Ruleset {
                 boardHashes[0] = LAST_BOARD_HASH;
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -133,7 +134,7 @@ public class JapaneseRuleset implements Ruleset {
     }
 
     //FloodFill Algorithm, source ALGO assignment
-    public int calculateTerritoryPoints(StoneColor color, Board board) {
+    private int calculateTerritoryPoints(StoneColor color, Board board) {
         int boardSize = board.getSize();
         visited = new boolean[boardSize][boardSize];
 
@@ -171,7 +172,7 @@ public class JapaneseRuleset implements Ruleset {
     }
 
 
-    public void floodFill(Board board, int x, int y) {
+    private void floodFill(Board board, int x, int y) {
         if (x < 0) return;
         if (x >= board.getSize()) return;
         if (y < 0) return;

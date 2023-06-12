@@ -3,26 +3,32 @@ package pr_se.gogame.model;
 public interface Ruleset {
     /**
      * Because nothing is ever easy, some rulesets permit suicide, at least if it is collective suicide (apparently this
-     * can cause the opponent some inconvenience). See https://en.wikipedia.org/wiki/Rules_of_Go#Suicide. To check
-     * whether suicide is solitary or collective, the ruleset needs to see the board.
+     * can cause the opponent some inconvenience). See <a href="https://en.wikipedia.org/wiki/Rules_of_Go#Suicide">the
+     * Wikipedia article</a>. To check whether suicide is solitary or collective, the ruleset needs the involved
+     * StoneGroup.
      *
      * @param existingGroup The group that is about to commit suicide
-     * @param addedStone
+     * @param addedStone The stone that was added to the existingGroup
      * @return whether the ruleset permits suicide under the given cirucmstances on the board.
      */
     default boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
         return false;
     }
 
-    /** KO is a special rule that prevents immediate repetition of position, in which a single stone is captured and
+    /** Ko is a special rule that prevents immediate repetition of position, in which a single stone is captured and
      *  another single stone immediately taken back. <br> Depending on the ruleset a number of allowed repetition is given.
      *  <br> The default value is 2.
-     * @return the default value two as move repetition is allowed twice.
+     * @return the default value is two as move repetition is allowed twice.
      */
     default int getKoAmount() {
         return 2;
     }
 
+    /**
+     * Whether a ko move has just been committed.
+     * @param game The Game that is to be checked for ko.
+     * @return null if the last move was a ko move, otherwise an UndoableCommand to undo or redo the ko check.
+     */
     UndoableCommand isKo(Game game);
 
     /** This method calculates the score of the game for both players.
@@ -62,44 +68,41 @@ public interface Ruleset {
         }
 
         final int SIZE = game.getSize();
-        game.setHandicapStoneCounter(noStones);
-        switch (noStones) {
-            case 9:
-                game.placeHandicapStone(SIZE / 2, SIZE / 2);
-                noStones--;                                                     // set remaining no. to 8
-            case 8:
-                game.placeHandicapStone(SIZE / 2, 3);
-                game.placeHandicapStone(SIZE / 2, SIZE - 4);
-                noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
-            default:
-                break;
+        final int DIST_FROM_EDGE = 2 + SIZE / 10;
+        if(noStones > 0) {
+            game.setHandicapStoneCounter(noStones - 1);
+        } else {
+            game.setHandicapStoneCounter(noStones);
         }
 
-        switch (noStones) {
-            case 7:
-                game.placeHandicapStone(SIZE / 2, SIZE / 2); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
-                noStones--;
-            case 6:
-                game.placeHandicapStone(SIZE - 4, SIZE / 2);
-                game.placeHandicapStone(3, SIZE / 2);
-                noStones -= 2;
-            default:
-                break;
-        }
 
-        switch (noStones) {
-            case 5:
-                game.placeHandicapStone(SIZE / 2, SIZE / 2);
-            case 4:
-                game.placeHandicapStone(3, 3);
-            case 3:
-                game.placeHandicapStone(SIZE - 4, SIZE - 4);
-            case 2:
-                game.placeHandicapStone(SIZE - 4, 3);
-                game.placeHandicapStone(3, SIZE - 4);
-            default:
-                break;
-        }
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 9);
+        if(noStones == 9) noStones--;
+        game.placeHandicapPosition(SIZE / 2, DIST_FROM_EDGE, noStones == 8);
+        game.placeHandicapPosition(SIZE / 2, SIZE - 1 - DIST_FROM_EDGE, noStones == 8);
+        if(noStones == 8) noStones -= 2;
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 7);
+        if(noStones == 7) noStones--;
+        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, SIZE / 2, noStones == 6);
+        game.placeHandicapPosition(DIST_FROM_EDGE, SIZE / 2, noStones == 6);
+        if(noStones == 6) noStones -= 2;
+        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 5);
+        if(noStones == 5) noStones--;
+        game.placeHandicapPosition(DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 4);
+        if(noStones == 4) noStones--;
+        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 3);
+        if(noStones == 3) noStones--;
+        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 2);
+        game.placeHandicapPosition(DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 2);
+
+        game.setHandicapStoneCounter(-1);
+    }
+
+    /**
+     * Call this method when starting a new game.
+     */
+    default void reset() {
+        return;
     }
 
     /**

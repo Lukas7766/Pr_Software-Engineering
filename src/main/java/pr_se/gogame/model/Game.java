@@ -2,6 +2,7 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
+import pr_se.gogame.view_controller.StoneEvent;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -20,7 +21,7 @@ public class Game implements GameInterface {
     private boolean showMoveNumbers = false;
     private boolean showCoordinates = true;
 
-    private String graphicsPath = "./src/main/resources/pr_se/gogame/debug.zip";
+    private String graphicsPath = "./Grafiksets/default.zip";
 
     private boolean demoMode = false;
 
@@ -56,36 +57,48 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void newGame(GameCommand gameCommand, int size, int handicap) {
+    public void newGame(StoneColor startingColor, int size, int handicap) {
         if(size < 0 || handicap < 0 || handicap > 9) {
             throw new IllegalArgumentException();
         }
 
-        if(gameCommand == null) {
+        if(startingColor == null) {
             throw new NullPointerException();
         }
 
-        switch (gameCommand) {
-            case BLACK_STARTS -> this.curColor = StoneColor.BLACK;
-            case WHITE_STARTS -> this.curColor = StoneColor.WHITE;
-            default -> throw new IllegalArgumentException();
+        this.curColor = startingColor;
+        switch (startingColor) { // We already performed a null-check, so it can't be anything else.
+            case BLACK -> this.gameCommand = GameCommand.BLACK_STARTS;
+            case WHITE -> this.gameCommand = GameCommand.WHITE_STARTS;
         }
 
         this.fileTree = new FileTree(size,"Black", "White");
-        this.gameCommand = gameCommand;
         this.size = size;
         this.handicap = handicap;
         this.playerBlackScore = handicap;
         this.playerWhiteScore = this.ruleset.getKomi();
         this.blackCapturedStones = 0;
         this.whiteCapturedStones = 0;
-        this.curMoveNumber = 0;
-        this.board = new Board(this);
-        this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
+        this.curMoveNumber = 0; // Note: Indicates to the BoardPane that handicap stones are being set.
         this.gameResult = null;
 
-        System.out.println("newGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n");
-        fireGameEvent(new GameEvent(gameCommand, size, handicap));
+        this.board = new Board(this);
+        this.ruleset.reset();
+        fireGameEvent(new GameEvent(this.gameCommand));
+        this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
+
+        this.curMoveNumber = 1;
+        switch(this.curColor) {
+            case BLACK:
+                this.gameCommand = GameCommand.BLACK_STARTS;
+                break;
+
+            case WHITE:
+                this.gameCommand = GameCommand.WHITE_STARTS;
+                break;
+        }
+
+        System.out.println("\nnewGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n------");
     }
 
     @Override
@@ -121,7 +134,7 @@ public class Game implements GameInterface {
 
         UndoableCommand c = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 GameResult result;
                 StringBuilder sb = new StringBuilder();
                 sb.append("Game was resigned by").append(" ");
@@ -149,7 +162,7 @@ public class Game implements GameInterface {
                 fireGameEvent(new GameEvent(gameCommand));
             }
         };
-        c.execute();
+        c.execute(true);
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
@@ -206,7 +219,7 @@ public class Game implements GameInterface {
      */
     @Override
     public void setHandicapStoneCounter(int noStones) {
-        if(noStones < 0 || noStones > handicap) {
+        if((noStones < 0 && noStones != -1) || noStones > handicap) {
             throw new IllegalArgumentException();
         }
 
@@ -260,8 +273,7 @@ public class Game implements GameInterface {
         return handicapStoneCounter;
     }
 
-    @Override
-    public UndoableCommand setCurColor(StoneColor c) { // TODO: Could this method be set to private? Is there ever a situation where the current color should be manually alterable during a game, outside of pass()?
+    private UndoableCommand setCurColor(StoneColor c) {
         if (c == null) {
             throw new NullPointerException();
         }
@@ -271,7 +283,7 @@ public class Game implements GameInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 Game.this.curColor = c;
                 if(Game.this.curColor == BLACK) {
                     Game.this.gameCommand = GameCommand.BLACK_PLAYS;
@@ -286,7 +298,7 @@ public class Game implements GameInterface {
                 Game.this.gameCommand = OLD_COMMAND;
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -310,7 +322,7 @@ public class Game implements GameInterface {
             UndoableCommand c_UC02_switchColor = null;
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (UC01_setStone != null) {
                     curMoveNumber++;
                     System.out.println("Move played.");
@@ -329,16 +341,18 @@ public class Game implements GameInterface {
                 UC01_setStone.undo();
             }
         };
-        c.execute();
+        c.execute(true);
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
 
     @Override
-    public void placeHandicapStone(int x, int y) {
+    public void placeHandicapPosition(int x, int y, boolean placeStone) {
         /*if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS) {
             throw new IllegalStateException("Can't place handicap stone after game start!");
         }*/
+
+        System.out.println("Game.placeHandicapPosition");
 
         if(x < 0 || y < 0 || x >= size || y >= size) {
             throw new IllegalArgumentException();
@@ -346,37 +360,44 @@ public class Game implements GameInterface {
 
         final int OLD_HANDICAP_COUNTER = handicapStoneCounter;
 
-        if (handicapStoneCounter == 0) {
-            throw new IllegalStateException("Can't place any more handicap stones!");
+        if(placeStone) {
+            if (handicapStoneCounter < 0) {
+                throw new IllegalStateException("Can't place any more handicap stones!");
+            }
+
+            UndoableCommand c = new UndoableCommand() {
+                UndoableCommand uc01_setStone = null;
+                UndoableCommand uC02_switchColor = null;
+
+                @Override
+                public void execute(boolean saveEffects) {
+                    uc01_setStone = board.setStone(x, y, curColor, true, true);
+                    handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
+
+                    if (handicapStoneCounter < 0) {
+                        System.out.println("handicapStoneCounter is now less than 0.");
+                        // fileTree.insertBufferedStonesBeforeGame();
+                        uC02_switchColor = switchColor();
+                    }
+                }
+
+                @Override
+                public void undo() {
+                    if (uC02_switchColor != null) {
+                        uC02_switchColor.undo();
+                    }
+                    handicapStoneCounter = OLD_HANDICAP_COUNTER;
+                    uc01_setStone.undo();
+
+                }
+            };
+            c.execute(true);
+
+            // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        } else {
+            System.out.println("Only place handicap position");
+            fireGameEvent(new StoneEvent(GameCommand.HANDICAP_POS, x, y, curMoveNumber));
         }
-
-        UndoableCommand c = new UndoableCommand() {
-            UndoableCommand uc01_setStone = null;
-            UndoableCommand uC02_switchColor = null;
-
-            @Override
-            public void execute() {
-                handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
-                uc01_setStone = board.setStone(x, y, curColor, true, true);
-
-                if (handicapStoneCounter == 0) {
-                    // fileTree.insertBufferedStonesBeforeGame();
-                    uC02_switchColor = switchColor();
-                }
-            }
-
-            @Override
-            public void undo() {
-                if(uC02_switchColor != null) {
-                    uC02_switchColor.undo();
-                }
-                uc01_setStone.undo();
-                handicapStoneCounter = OLD_HANDICAP_COUNTER;
-            }
-        };
-        c.execute();
-
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
     }
 
     @Override
@@ -446,7 +467,7 @@ public class Game implements GameInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (color == BLACK) {
                     Game.this.blackCapturedStones += amount; // TODO: If this causes issues, maybe change to "OLD_BLACK_CAPTURED_STONES + amount" and so on?
                     Game.this.playerBlackScore += amount;
@@ -464,7 +485,7 @@ public class Game implements GameInterface {
                 Game.this.playerWhiteScore = OLD_WHITE_PLAYER_SCORE;
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -516,12 +537,14 @@ public class Game implements GameInterface {
         this.savaGamePath = path;
     }
 
-    public UndoableCommand switchColor() { // TODO: Could this method be set to private? Is there ever a situation where the color should be switchable during a game, outside of pass()?
+    private UndoableCommand switchColor() {
+        System.out.println("Game.switchColor()");
+
         UndoableCommand ret = new UndoableCommand() {
             UndoableCommand thisCommand;
 
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 if (curColor == BLACK) {
                     // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
                     thisCommand = setCurColor(WHITE);
@@ -541,7 +564,7 @@ public class Game implements GameInterface {
                 }
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
 

@@ -25,7 +25,7 @@ public class AncientChineseRuleset implements Ruleset {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 lastBoardHash = NEW_BOARD_HASH;
             }
 
@@ -34,7 +34,7 @@ public class AncientChineseRuleset implements Ruleset {
                 lastBoardHash = LAST_BOARD_HASH;
             }
         };
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -76,11 +76,11 @@ public class AncientChineseRuleset implements Ruleset {
         game.setHandicapStoneCounter(noStones);
         switch (noStones) {
             case 9:
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
+                game.placeHandicapPosition(game.getSize() / 2, game.getSize() / 2, true);
                 noStones--;                                                     // set remaining no. to 8
             case 8:
-                game.placeHandicapStone(game.getSize() / 2, 3);
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() - 4);
+                game.placeHandicapPosition(game.getSize() / 2, 3, true);
+                game.placeHandicapPosition(game.getSize() / 2, game.getSize() - 4, true);
                 noStones -= 2;                                                    // skip the central placement of handicap stone 7 by setting remaining no. to 6
             default:
                 break;
@@ -88,11 +88,11 @@ public class AncientChineseRuleset implements Ruleset {
 
         switch (noStones) {
             case 7:
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
+                game.placeHandicapPosition(game.getSize() / 2, game.getSize() / 2, true); // I guess we could just run this anyway, at least if trying to re-occupy a field doesn't throw an exception, but skipping is faster.
                 noStones--;
             case 6:
-                game.placeHandicapStone(game.getSize() - 4, game.getSize() / 2);
-                game.placeHandicapStone(3, game.getSize() / 2);
+                game.placeHandicapPosition(game.getSize() - 4, game.getSize() / 2, true);
+                game.placeHandicapPosition(3, game.getSize() / 2, true);
                 noStones -= 2;
             default:
                 break;
@@ -100,14 +100,14 @@ public class AncientChineseRuleset implements Ruleset {
 
         switch (noStones) {
             case 5:
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
+                game.placeHandicapPosition(game.getSize() / 2, game.getSize() / 2, true);
             case 4:
-                game.placeHandicapStone(3, 3);
+                game.placeHandicapPosition(3, 3, true);
             case 3:
-                game.placeHandicapStone(game.getSize() / 2, game.getSize() / 2);
+                game.placeHandicapPosition(game.getSize() / 2, game.getSize() / 2, true);
             case 2:
-                game.placeHandicapStone(game.getSize() - 4, 3);
-                game.placeHandicapStone(3, game.getSize() - 4);
+                game.placeHandicapPosition(game.getSize() - 4, 3, true);
+                game.placeHandicapPosition(3, game.getSize() - 4, true);
             default:
                 break;
         }

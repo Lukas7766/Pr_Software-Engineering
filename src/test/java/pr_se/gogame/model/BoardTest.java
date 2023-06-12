@@ -16,7 +16,7 @@ class BoardTest {
     @BeforeEach
     void setUp() {
         game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 19, 0);
+        game.newGame(BLACK, 19, 0);
         board = game.getBoard();
     }
 
@@ -169,7 +169,7 @@ class BoardTest {
         assertNull(board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(0, 0));
 
-        game.switchColor(); // for maximum code-coverage
+        game.pass(); // for maximum code-coverage
         board.removeStone(0, 0, true);
         assertNull(board.getColorAt(0, 0));
     }
@@ -236,7 +236,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute();
+        c.execute(true);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
@@ -270,7 +270,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute();
+        c.execute(true);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
@@ -381,13 +381,13 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(3, 1));
 
         c3.undo();
-        c.execute();
+        c.execute(true);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(3, 1));
         assertEquals(null, board.getColorAt(2, 1));
         assertEquals(BLACK, board.getColorAt(4, 1));
 
-        c2.execute();
+        c2.execute(true);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(3, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));

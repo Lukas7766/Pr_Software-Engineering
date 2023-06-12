@@ -71,7 +71,7 @@ public class StoneGroup {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 locations.addAll(other.getLocations());
                 liberties.addAll(other.getLiberties());
                 other.getPointers().forEach(p -> {
@@ -93,7 +93,7 @@ public class StoneGroup {
             }
         };
 
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -111,7 +111,7 @@ public class StoneGroup {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 liberties.add(LIBERTY);
             }
 
@@ -123,7 +123,7 @@ public class StoneGroup {
             }
         };
 
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }
@@ -141,7 +141,7 @@ public class StoneGroup {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute() {
+            public void execute(boolean saveEffects) {
                 liberties.remove(liberty);
             }
 
@@ -153,7 +153,7 @@ public class StoneGroup {
             }
         };
 
-        ret.execute();
+        ret.execute(true);
 
         return ret;
     }

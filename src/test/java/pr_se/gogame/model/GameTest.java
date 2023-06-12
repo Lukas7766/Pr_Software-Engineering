@@ -16,7 +16,7 @@ class GameTest {
     @BeforeEach
     void setUp() {
         game = new Game();
-        game.newGame(BLACK_STARTS, 19, 0);
+        game.newGame(BLACK, 19, 0);
     }
 
     // argument-checking
@@ -24,7 +24,6 @@ class GameTest {
     @Test
     void newGameArguments() {
         assertThrows(NullPointerException.class, () -> game.newGame(null, 19, 0));
-        assertThrows(IllegalArgumentException.class, () -> game.newGame(DEBUG_INFO, 19, 0));
         assertThrows(IllegalArgumentException.class, () -> game.newGame(null, -1, 0));
         assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, -1));
         assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, 10));
@@ -40,15 +39,15 @@ class GameTest {
 
     @Test
     void placeHandicapStoneArguments() {
-        game.newGame(BLACK_STARTS, 19, 1);
+        game.newGame(BLACK, 19, 1);
         game.setHandicapStoneCounter(1);
-        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapStone(-1, 0));
+        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(-1, 0, true));
         game.setHandicapStoneCounter(1);
-        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapStone(0, -1));
+        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, -1, true));
         game.setHandicapStoneCounter(1);
-        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapStone(game.getSize(), 0));
+        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(game.getSize(), 0, true));
         game.setHandicapStoneCounter(1);
-        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapStone(0, game.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, game.getSize(), true));
     }
 
     @Test
@@ -92,11 +91,6 @@ class GameTest {
     }
 
     @Test
-    void setCurColorArguments() {
-        assertThrows(NullPointerException.class, () -> game.setCurColor(null));
-    }
-
-    @Test
     void fireGameEventArguments() {
         assertThrows(NullPointerException.class, () -> game.fireGameEvent(null));
     }
@@ -116,7 +110,7 @@ class GameTest {
 
     @Test
     void newGame() {
-        game.newGame(WHITE_STARTS, 13, 1);
+        game.newGame(WHITE, 13, 1);
         assertEquals(WHITE, game.getCurColor());
         assertEquals(13, game.getSize());
         assertEquals(1, game.getHandicap());
@@ -165,7 +159,7 @@ class GameTest {
 
     @Test
     void passWhiteStarts() {
-        game.newGame(WHITE_STARTS, 19, 0);
+        game.newGame(WHITE, 19, 0);
 
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
@@ -208,7 +202,7 @@ class GameTest {
         game.resign();
 
         game.removeListener(l1);
-        game.newGame(WHITE_STARTS, 19, 0);
+        game.newGame(WHITE, 19, 0);
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
@@ -233,7 +227,7 @@ class GameTest {
         game.resign();
 
         game.removeListener(l1);
-        game.newGame(WHITE_STARTS, 19, 0);
+        game.newGame(WHITE, 19, 0);
         game.playMove(0, 0);
         game.addListener(new GameListener() {
             @Override
@@ -258,7 +252,7 @@ class GameTest {
         game.scoreGame();
 
         game.removeListener(l1);
-        game.newGame(BLACK_STARTS, 19, 9);
+        game.newGame(BLACK, 19, 9);
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
@@ -369,7 +363,7 @@ class GameTest {
 
     @Test
     void setHandicapStoneCounter() {
-        game.newGame(BLACK_STARTS, 19, 8);
+        game.newGame(BLACK, 19, 8);
         game.setHandicapStoneCounter(8);
         assertEquals(8, game.getHandicapStoneCounter());
     }
@@ -377,15 +371,6 @@ class GameTest {
     @Test
     void getHandicapStoneCounter() {
         assertEquals(0, game.getHandicapStoneCounter());
-    }
-
-    @Test
-    void setCurColor() {
-        assertEquals(BLACK, game.getCurColor());
-        assertEquals(BLACK_STARTS, game.getGameState());
-        game.setCurColor(WHITE);
-        assertEquals(WHITE, game.getCurColor());
-        assertEquals(WHITE_PLAYS, game.getGameState());
     }
 
     @Test
@@ -406,21 +391,21 @@ class GameTest {
 
     @Test
     void placeHandicapStone() {
-        game.newGame(BLACK_STARTS, 19, 1); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
+        game.newGame(BLACK, 19, 1); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
         game.setHandicapStoneCounter(1);
         assertNull(game.getColorAt(0, 0));
-        game.placeHandicapStone(0, 0);
+        game.placeHandicapPosition(0, 0, true);
         assertEquals(BLACK, game.getColorAt(0, 0));
     }
 
     @Test
     void newGameWithHandicap() {
-        game.newGame(BLACK_STARTS, 19, 3);
+        game.newGame(BLACK, 19, 3);
     }
 
     @Test
     void placeHandicapStoneNotAllowed() {
-        assertThrows(IllegalStateException.class, () -> game.placeHandicapStone(0, 0));
+        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(0, 0, true));
     }
 
     @Test
@@ -521,7 +506,7 @@ class GameTest {
 
     @Test
     void fireGameEvent() {
-        GameEvent ge = new DebugEvent(DEBUG_INFO, 0, 0, 0, 0);
+        GameEvent ge = new DebugEvent(0, 0, 0, 0);
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
@@ -545,18 +530,9 @@ class GameTest {
     }
 
     @Test
-    void switchColor() {
-        assertEquals(BLACK, game.getCurColor());
-        assertEquals(BLACK_STARTS, game.getGameState());
-        game.switchColor();
-        assertEquals(WHITE, game.getCurColor());
-        assertEquals(WHITE_PLAYS, game.getGameState());
-    }
-
-    @Test
     void dontPlaceHandicapStonesAfterStart() {
         game.playMove(0, 0);
-        assertThrows(IllegalStateException.class, () -> game.placeHandicapStone(1, 1));
+        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(1, 1, true));
     }
 
     @Test
