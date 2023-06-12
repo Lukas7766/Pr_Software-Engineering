@@ -176,15 +176,15 @@ public class JapaneseRuleset implements Ruleset {
 
 
     private void floodFill(Board board, int x, int y) {
-        if (x < 0) return;
-        if (x >= board.getSize()) return;
-        if (y < 0) return;
-        if (y >= board.getSize()) return;
-        if (visited[x][y]) return;
+        if (x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize() || visited[x][y]) {
+            return;
+        }
 
         visited[x][y] = true;
 
-        if (board.getColorAt(x, y) != null) return;
+        if (board.getColorAt(x, y) != null) {
+            return;
+        }
 
         territory.add(new Position(x, y));
         floodFill(board, x, y + 1); //top
