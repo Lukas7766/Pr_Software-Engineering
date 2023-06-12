@@ -113,7 +113,10 @@ public class Game implements GameInterface {
     @Override
     public boolean loadGame(Path path) {
         //TODO: Das board überchreiben od nd
-        //return FileSaver.importFile(path);
+        FileHandler fileHandler = new FileHandler();
+        fileHandler.loadFile(path);
+
+        this.newGame(BLACK, 19, 0);
         return false;
     }
 

@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -56,6 +57,11 @@ public class HeaderPane extends VBox {
     /**
      * List of FileChooser Extensions
      */
+
+    /**
+     * Scene of application
+     */
+    private final Scene scene;
     private final HashSet<FileChooser.ExtensionFilter> filterList;
 
     private final List<Button> playbackControlList = new ArrayList<>();
@@ -72,11 +78,12 @@ public class HeaderPane extends VBox {
      * @param stage     instance of actual stage -> needed to show file dialog
      * @param game      instance of actual game -> needed for triggering and observing changes in model
      */
-    public HeaderPane(Color backcolor, Application app, Stage stage, Game game) {
+    public HeaderPane(Color backcolor, Application app, Scene scene, Stage stage, Game game) {
         this.backColor = backcolor;
         this.app = app;
         this.stage = stage;
         this.game = game;
+        this.scene = scene;
 
         this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
                 .collect(Collectors.toCollection(HashSet::new));
@@ -168,7 +175,7 @@ public class HeaderPane extends VBox {
         SeparatorMenuItem sep2 = new SeparatorMenuItem();
 
         files.getItems().add(1, sep1);
-        files.getItems().add(4, sep2);
+        files.getItems().add(5, sep2);
 
         return files;
     }
@@ -250,7 +257,8 @@ public class HeaderPane extends VBox {
     /**
      * Creates the view section for the menu bar <br>
      * contains at least: <br>
-     * ->
+     * -> show Move Numbers <br>
+     * -> show Coordinates <br>
      *
      * @return the view section for the menu bar
      */
@@ -273,34 +281,23 @@ public class HeaderPane extends VBox {
         showCoordinatesCBtn.setOnAction(e -> game.setShowCoordinates(showCoordinatesCBtn.isSelected()));
         menu.getItems().addAll(viewSectionItems);
 
-        MenuItem loadGraphicsBtn = new MenuItem("_Load Graphics Set");
-        loadGraphicsBtn.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        menu.getItems().addAll(loadGraphicsBtn);
+        //MenuItem loadGraphicsBtn = new MenuItem("_Load Graphics Set");
+        //loadGraphicsBtn.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        //menu.getItems().addAll(loadGraphicsBtn);
 
-        loadGraphicsBtn.setOnAction(e -> {
-            File workingDirectory = new File(System.getProperty("user.dir") + "/Grafiksets/");
-            FileChooser fileChooser = new FileChooser();
-            fileChooser.setInitialDirectory(workingDirectory);
-            fileChooser.setTitle("Load Graphics Set");
-            fileChooser.getExtensionFilters().addAll(
-                    new FileChooser.ExtensionFilter("ZIP", "*.zip")
-            );
-            File selectedFile = fileChooser.showOpenDialog(stage);
-            if (selectedFile != null) {
-                game.setGraphicsPath(selectedFile.getAbsolutePath());
-            }
-        });
-
-        viewSectionItems.forEach(e -> e.setDisable(true));
-
-        game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT) {
-                viewSectionItems.forEach(e -> e.setDisable(true));
-            } else {
-                viewSectionItems.forEach(e -> e.setDisable(false));
-            }
-        });
-
+        //loadGraphicsBtn.setOnAction(e -> {
+        //    File workingDirectory = new File(System.getProperty("user.dir") + "/Grafiksets/");
+        //    FileChooser fileChooser = new FileChooser();
+        //    fileChooser.setInitialDirectory(workingDirectory);
+        //    fileChooser.setTitle("Load Graphics Set");
+        //    fileChooser.getExtensionFilters().addAll(
+        //            new FileChooser.ExtensionFilter("ZIP", "*.zip")
+        //    );
+        //    File selectedFile = fileChooser.showOpenDialog(stage);
+        //    if (selectedFile != null) {
+        //        game.setGraphicsPath(selectedFile.getAbsolutePath());
+        //    }
+        //});
 
         return menu;
     }
@@ -368,20 +365,24 @@ public class HeaderPane extends VBox {
         Button fastBackward = new Button();
         fastBackward.setText("<<");
         fastBackward.setFocusTraversable(false);
+        fastBackward.setOnAction(e -> System.out.println("fastBackward"));
         playbackControlList.add(fastBackward);
 
         Button backward = new Button();
         backward.setText("<");
         backward.setFocusTraversable(false);
+        backward.setOnAction(e -> System.out.println("backward"));
         playbackControlList.add(backward);
 
         Button forward = new Button();
         forward.setText(">");
         forward.setFocusTraversable(false);
+        forward.setOnAction(e -> System.out.println("forward"));
         playbackControlList.add(forward);
 
         Button fastForward = new Button();
         fastForward.setText(">>");
+        fastForward.setOnAction(e -> System.out.println("fastForward"));
         fastForward.setFocusTraversable(false);
         playbackControlList.add(fastForward);
 
@@ -394,11 +395,34 @@ public class HeaderPane extends VBox {
 
         });
 
+        //Key Bindings for the playback control
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F), () -> {
+            if (backward.isDisabled()) return;
+            System.out.println("backward");
+        });
+
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.H), () -> {
+            if (forward.isDisabled()) return;
+            System.out.println("forward");
+        });
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T), () -> {
+            if (fastForward.isDisabled()) return;
+            System.out.println("fastForward");
+        });
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.G), () -> {
+            if (fastBackward.isDisabled()) return;
+            System.out.println("fastBackward");
+        });
+
+
         lane.getChildren().add(playbackControl);
 
+        HBox gameCards = new HBox();
+        gameCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
+        gameCards.setAlignment(Pos.CENTER_LEFT);
+
         HBox gameShortCards = new HBox();
-        gameShortCards.setPrefWidth(4 * 100);
-        // gameShortCards.prefWidthProperty().bind(this.widthProperty().subtract(playbackControl.getPrefWidth()));
+        gameShortCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
         gameShortCards.setAlignment(Pos.CENTER);
         gameShortCards.setSpacing(25);
 
@@ -428,15 +452,14 @@ public class HeaderPane extends VBox {
         gameShortCardList.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
-            if (l.getGameCommand() == GameCommand.INIT || l.getGameCommand() == GameCommand.WHITE_WON || l.getGameCommand() == GameCommand.BLACK_WON) {
-                gameShortCardList.forEach(e -> e.setDisable(true));
-            } else {
-                gameShortCardList.forEach(e -> e.setDisable(false));
+            switch (l.getGameCommand()){
+                case INIT, WHITE_WON,BLACK_WON -> gameShortCardList.forEach(e -> e.setDisable(true));
+                case BLACK_STARTS, WHITE_STARTS, BLACK_PLAYS, WHITE_PLAYS -> gameShortCardList.forEach(e -> e.setDisable(false));
             }
-
         });
 
-        lane.getChildren().add(gameShortCards);
+        gameCards.getChildren().addAll(gameShortCards);
+
 
         // Create combo box for selecting graphics packs
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList();
@@ -457,16 +480,18 @@ public class HeaderPane extends VBox {
         ComboBox graphicsPackSelectorComboBox = new ComboBox(comboBoxItems);
         graphicsPackSelectorComboBox.setValue("default.zip");
         graphicsPackSelectorComboBox.setTooltip(new Tooltip("Select the graphics pack zip file."));
-        graphicsPackSelectorComboBox.setMaxWidth(100);
+        graphicsPackSelectorComboBox.setMinWidth(125);
+        graphicsPackSelectorComboBox.setTranslateX(-15);
         graphicsPackSelectorComboBox.setFocusTraversable(false);
         graphicsPackSelectorComboBox.setOnAction((e) -> {
             System.out.println(graphicsPackSelectorComboBox.getValue());
             game.setGraphicsPath(GRAPHICS_FOLDER + "/" + graphicsPackSelectorComboBox.getValue());
         });
 
-        lane.getChildren().add(graphicsPackSelectorComboBox);
+        gameShortCards.getChildren().add(graphicsPackSelectorComboBox);
 
-        lane.setAlignment(Pos.CENTER_LEFT);
+        gameCards.getChildren().add(graphicsPackSelectorComboBox);
+        lane.getChildren().add(gameCards);
 
         return lane;
 
