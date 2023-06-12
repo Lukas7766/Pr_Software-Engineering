@@ -17,13 +17,13 @@ class JapaneseRulesetTest {
     @Test
     @DisplayName("testing getSuicide(), suicide is not allowed in JP ruleset")
     void getSuicide() {
-        assertFalse(japaneseRuleset.getSuicide(null));
+        assertFalse(japaneseRuleset.getSuicide(null, null));
     }
 
     @Test
-    @DisplayName("testing getKoAmount(), allowed repeatable moves are one in JP ruleset")
+    @DisplayName("testing getKoAmount(), allowed repeatable moves are two in JP ruleset")
     void getKoAmount() {
-        assertEquals(1, japaneseRuleset.getKoAmount());
+        assertEquals(2, japaneseRuleset.getKoAmount());
     }
 
     @Test
@@ -39,79 +39,9 @@ class JapaneseRulesetTest {
     }
 
     @Test
-    @DisplayName("testing predicateKoMove(), repeating move (1,2) causes positive prediction")
-    void predicateKoMove() {
-        Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
-        game.playMove(0, 1);
-        game.playMove(0, 2);
-
-        game.playMove(1, 0);
-        game.playMove(1, 3);
-
-        game.playMove(2, 1);
-        game.playMove(2, 2);
-
-        game.playMove(1, 2);
-        game.playMove(1, 1);
-
-        game.playMove(1, 2);
-
-        assertEquals(new Position(1, 2), game.getRuleset().getKoMove());
-        assertNull(game.getColorAt(1, 2));
-        assertFalse(game.getRuleset().predicateKoMove(2, 1));
-    }
-
-    @Test
-    @DisplayName("testing predicateKoMove(), must return true if the same move is done twice")
-    void getKoMove() {
-        Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
-        game.playMove(0, 1);
-        game.playMove(0, 2);
-
-        game.playMove(1, 0);
-        game.playMove(1, 3);
-
-        game.playMove(2, 1);
-        game.playMove(2, 2);
-
-        game.playMove(1, 2);
-        game.playMove(1, 1);
-
-        assertTrue(game.getRuleset().predicateKoMove(1, 2));
-        assertEquals(new Position(1, 2), game.getRuleset().getKoMove());
-    }
-
-    @Test
-    @DisplayName("testing resetKoMove(), saved KO move must be null after a random move of black")
-    void resetKoMove() {
-        Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
-        game.playMove(0, 1);
-        game.playMove(0, 2);
-
-        game.playMove(1, 0);
-        game.playMove(1, 3);
-
-        game.playMove(2, 1);
-        game.playMove(2, 2);
-
-        game.playMove(1, 2);
-        game.playMove(1, 1);
-
-        game.getRuleset().predicateKoMove(1, 2);
-
-        game.playMove(1, 5);
-
-        assertNull(game.getRuleset().getKoMove());
-
-    }
-
-    @Test
     @DisplayName("testing scoreGame(), wrong input")
     void scoreGameWI() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> japaneseRuleset.scoreGame(null));
+        assertThrowsExactly(NullPointerException.class, () -> japaneseRuleset.scoreGame(null));
     }
 
     @Test
@@ -129,7 +59,7 @@ class JapaneseRulesetTest {
         null BLACK WHITE null null null null null null
          */
         Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
+        game.newGame(StoneColor.BLACK, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -191,7 +121,7 @@ class JapaneseRulesetTest {
         null null null null null null null null null
          */
         Game game = new Game();
-        game.newGame(GameCommand.BLACK_STARTS, 9, 0);
+        game.newGame(StoneColor.BLACK, 9, 0);
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -223,9 +153,9 @@ class JapaneseRulesetTest {
     }
 
     private void printBoard(Game game) {
-        for (int i = 0; i < game.getBoard().getSize(); i++) {
-            for (int j = 0; j < game.getBoard().getSize(); j++) {
-                System.out.print(game.getBoard().getColorAt(i, j) + " ");
+        for (int i = 0; i < game.getSize(); i++) {
+            for (int j = 0; j < game.getSize(); j++) {
+                System.out.print(game.getColorAt(i, j) + " ");
             }
             System.out.println();
         }

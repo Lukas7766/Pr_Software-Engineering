@@ -1,19 +1,10 @@
 package pr_se.gogame.model;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class JapaneseRuleset implements Ruleset {
-
-    /**
-     * The amount of ko moves that are done in a game. This will be reset after the KO move is aborted.
-     */
-    private int currentKOCnt = 0;
-
-    /**
-     * The position of the KO move. This will be reset after the KO move is aborted.
-     */
-    private Position koMove;
 
     /**
      * This helps to determine if a position is already visited by the floodfill algorithm.
@@ -26,56 +17,59 @@ public class JapaneseRuleset implements Ruleset {
      */
     private List<Position> territory;
 
-    /**
-     * The JP ruleset allows only one KO move repetition.
-     *
-     * @return 1 as only one KO move is allowed.
-     */
+    private final int [] boardHashes = new int [getKoAmount()];
+
     @Override
-    public int getKoAmount() {
-        return 1;
-    }
-
-    /**
-     * This method predicates if a KO move is done.
-     *
-     * @param x pass the X-axis of the verifiable move
-     * @param y pass the y-axis of the verifiable move
-     * @return If the KO move is done the method returns true. If the KO move is not done the method returns false.
-     */
-    @Override
-    public boolean predicateKoMove(int x, int y) {
-
-        System.out.println("predicateKoMove X:" + x + " Y: " + y);
-
-        if (this.getKoAmount() > currentKOCnt) {
-            currentKOCnt++;
-            return false;
+    public void reset() {
+        for(int i = 0; i < boardHashes.length; i++) {
+            boardHashes[i] = 0;
         }
-        if (koMove == null) koMove = new Position(x, y);
-
-        return koMove.X == x && koMove.Y == y;
-
     }
 
     @Override
-    public Position getKoMove() {
-        return koMove;
-    }
+    public UndoableCommand isKo(Game game) {
+        StoneColor [][] boardColor = new StoneColor[game.getSize()][game.getSize()];
 
-    @Override
-    public void resetKoMove() {
-        this.koMove = null;
-        this.currentKOCnt = 0;
+        for(int i = 0; i < game.getSize(); i++) {
+            for(int j = 0; j < game.getSize(); j++) {
+                boardColor[i][j] = game.getColorAt(i, j);
+            }
+        }
+
+        final int LAST_BOARD_HASH = boardHashes[0];
+        final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
+
+        if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
+            return null;
+        }
+
+        System.out.println("Not ko");
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                for(int i = 0; i < boardHashes.length - 1; i++) {
+                    boardHashes[i] = boardHashes[i + 1];
+                }
+                boardHashes[boardHashes.length - 1] = NEW_BOARD_HASH;
+            }
+
+            @Override
+            public void undo() {
+                for(int i = boardHashes.length - 1; i > 0; i--) {
+                    boardHashes[i] = boardHashes[i - 1];
+                }
+                boardHashes[0] = LAST_BOARD_HASH;
+            }
+        };
+        ret.execute(true);
+
+        return ret;
     }
 
     /**
      * Calculates the score of the game based on the Japanese ruleset. This is done by calculating the territory of each player.
      * The player with the most territory wins. Territory is calculated by using the floodfill algorithm.
-     * The algorithm starts at the border of the board. In the first step all empty positions will be located.
-     * In the next and final step for every empty position all neighbouring positions will be checked if a different color than the passed is present.
-     * If this is the case the territory will be added to the score of the player. If the territory is surrounded by at least one different color it will be ignored.
-     * If on the board only one color is present, this player will get all points. If the board is empty, both players will get all points.
      * ++komi ++handicap//ToDo adapt description
      *
      * @param game to calculate the score and define the winner
@@ -83,8 +77,9 @@ public class JapaneseRuleset implements Ruleset {
      */
     @Override
     public GameResult scoreGame(Game game) {
-
-        if (game == null) throw new IllegalArgumentException();
+        if (game == null) {
+            throw new NullPointerException();
+        }
 
         double komi = game.getKomi();
         int handicap = game.getHandicap();
@@ -100,40 +95,47 @@ public class JapaneseRuleset implements Ruleset {
 
         StringBuilder sb = new StringBuilder();
         StoneColor winner = null;
+        int captStone = 0;
+        int trScore = 0;
+        double sc = 0;
 
         if (scoreBlack > scoreWhite) {
             winner = StoneColor.BLACK;
             sb.append("Black won!").append("\n\n");
-        } else{
+            sb.append("Handicap:").append(" ").append(handicap).append("\n");
+            captStone = capturedStonesBlack;
+            trScore = territoryScoreBlack;
+            sc = scoreBlack;
+        } else {
             winner = StoneColor.WHITE;
             sb.append("White won!").append("\n\n");
-        }
-
-        int captStone = 0;
-        int trScore = 0;
-        double sc = 0;
-        if (winner == StoneColor.WHITE) {
             sb.append("Komi:").append(" ").append(komi).append("\n");
             captStone = capturedStonesWhite;
             trScore = territoryScoreWhite;
             sc = scoreWhite;
         }
-        else {
-            sb.append("Handicap:").append(" ").append(handicap).append("\n");
-            captStone = capturedStonesBlack;
-            trScore = territoryScoreBlack;
-            sc = scoreBlack;
-        }
+
         sb.append("+ Territory points:").append(" ").append(trScore).append("\n");
         sb.append("+ Captured stones:").append(" ").append(captStone).append("\n\n");
         sb.append("= ").append(sc).append(" points");
 
-
         return new GameResult(scoreBlack, scoreWhite, winner, sb.toString());
     }
 
-    //FloodFill Algorithm, source ALGO assignment
-    public int calculateTerritoryPoints(StoneColor color, Board board) {
+    //FloodFill Algorithm, source: ALGO assignment
+    /**
+     * The algorithm starts at the border of the board. In the first step, all empty positions will be located.
+     * In the next and final step for every empty position all neighbouring positions will be checked if a different
+     *  color than the passed one is present.
+     * If this is the case the territory will be added to the score of the player. If the territory is surrounded by at
+     *  least one different color it will be ignored.
+     * If on the board only one color is present, this player will get all points. If the board is empty, both players
+     *  will get all points.
+     * @param color which color's territory points are to be calculated
+     * @param board the board that is to be used for calculating the territory points
+     * @return how many territory points the given player has on the given board.
+     */
+    private int calculateTerritoryPoints(StoneColor color, Board board) {
         int boardSize = board.getSize();
         visited = new boolean[boardSize][boardSize];
 
@@ -149,13 +151,15 @@ public class JapaneseRuleset implements Ruleset {
                     floodFill(board, i, j);
 
                     for (Position p : territory) {
-                        for (StoneGroup n : board.getNeighbors(p.X, p.Y).stream().toList()) {
-                            if (n.getStoneColor() != color) {
-                                occupiedTerritory = false;
-                                break;
-                            }
-                        }
-                        if (!occupiedTerritory) {
+                        /*if(     (p.X > 0 && board.getColorAt(p.X - 1, p.Y) != color) ||
+                                (p.X < board.getSize() - 1 && board.getColorAt(p.X + 1, p.Y) != color) ||
+                                (p.Y > 0 && board.getColorAt(p.X, p.Y - 1) != color) ||
+                                (p.Y < board.getSize() - 1 && board.getColorAt(p.X, p.Y + 1) != color)) {
+                            occupiedTerritory = false;
+                            break;
+                        }*/
+                        if(board.getNeighborColors(p.X, p.Y).stream().anyMatch((c) -> c != color)) {
+                            occupiedTerritory = false;
                             break;
                         }
                     }
@@ -171,22 +175,22 @@ public class JapaneseRuleset implements Ruleset {
     }
 
 
-    public void floodFill(Board board, int x, int y) {
-        if (x < 0) return;
-        if (x >= board.getSize()) return;
-        if (y < 0) return;
-        if (y >= board.getSize()) return;
-        if (visited[x][y]) return;
+    private void floodFill(Board game, int x, int y) {
+        if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize() || visited[x][y]) {
+            return;
+        }
 
         visited[x][y] = true;
 
-        if (board.getColorAt(x, y) != null) return;
+        if (game.getColorAt(x, y) != null) {
+            return;
+        }
 
         territory.add(new Position(x, y));
-        floodFill(board, x, y + 1); //top
-        floodFill(board, x + 1, y); //right
-        floodFill(board, x, y - 1); //bottom
-        floodFill(board, x - 1, y); //left
+        floodFill(game, x, y + 1); //top
+        floodFill(game, x + 1, y); //right
+        floodFill(game, x, y - 1); //bottom
+        floodFill(game, x - 1, y); //left
     }
 
     @Override

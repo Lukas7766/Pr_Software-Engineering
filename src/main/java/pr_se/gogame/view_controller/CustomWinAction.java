@@ -1,9 +1,12 @@
 package pr_se.gogame.view_controller;
 
-import javafx.scene.control.Alert;
+import javafx.scene.control.*;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.util.Pair;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
+import pr_se.gogame.model.GameResult;
 
 public class CustomWinAction {
 
@@ -21,11 +24,16 @@ public class CustomWinAction {
             throw new IllegalArgumentException("Game is not over yet!");
         }
 
-        Alert alert = new Alert(Alert.AlertType.INFORMATION);
-        alert.setTitle("Game Result");
-        alert.setHeaderText(game.getGameResult().getGameResult());
-        alert.initOwner(stage);
-        alert.showAndWait();
+        Dialog<Pair<String,String>> dialog = new Dialog<>();
+
+        dialog.setTitle("Game Result");
+        dialog.setHeaderText(game.getGameResult().getGameResult());
+        dialog.initOwner(stage);
+
+        ButtonType loginButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);
+        dialog.getDialogPane().getButtonTypes().addAll(loginButtonType);
+
+        dialog.showAndWait();
 
     }
 }

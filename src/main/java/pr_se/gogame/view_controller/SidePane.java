@@ -35,7 +35,7 @@ public class SidePane extends StackPane {
     /**
      * max size of custom board
      */
-    private static final int MAX_CUSTOM_BOARD_SIZE = 26;
+    private static final int MAX_CUSTOM_BOARD_SIZE = 25;
 
     /**
      * min size of custom board
@@ -295,7 +295,7 @@ public class SidePane extends StackPane {
         gridPane.add(normal, 0, 4);
         gridPane.add(custom, 0, 5);
 
-        Spinner<Integer> customSize = new Spinner<>(MIN_CUSTOM_BOARD_SIZE, MAX_CUSTOM_BOARD_SIZE, MIN_CUSTOM_BOARD_SIZE, 1);
+        Spinner<Integer> customSize = new Spinner<>(MIN_CUSTOM_BOARD_SIZE, MAX_CUSTOM_BOARD_SIZE, MIN_CUSTOM_BOARD_SIZE, 2);
         customSize.setDisable(true);
         customSize.setMaxSize(55, 15);
         SpinnerValueFactory.IntegerSpinnerValueFactory customSizeIntFactory =
@@ -348,7 +348,7 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            game.newGame(GameCommand.BLACK_STARTS, actualBoardSize, handicap);
+            game.newGame(StoneColor.BLACK, actualBoardSize, handicap);
         });
         //colum, row,
         gridPane.add(startGameBtn, 1, 15);

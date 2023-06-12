@@ -8,25 +8,60 @@ public interface GameInterface {
 
     //##################################################################################################################
     //game operations
+
+    /**
+     * Makes the game fire an initialisation event that notifies listening components so they may initialise themselves.
+     */
     void initGame();
-    void newGame(GameCommand gameCommand, int size, int handicap);
-    boolean saveGame(Path path);
 
-    boolean importGame(Path path);
+    /**
+     * Starts a new game.
+     * @param startingColor the StoneColor of the starting player
+     * @param size the size of the board
+     * @param handicap how many handicap stones are placed in favor of the beginner
+     */
+    void newGame(StoneColor startingColor, int size, int handicap);
 
-    boolean exportGame(Path path);
+    boolean loadGame(Path path);
 
+    boolean saveGame();
+
+    /**
+     * Allows the current player to pass. After this, it is the opposite player's turn.
+     */
     void pass();
 
+    /**
+     * Allows the current player to resign. This causes the opposite player to win.
+     */
     void resign();
 
+    /**
+     * If moves have to be confirmed, this method confirms them.
+     */
     void confirmChoice();
 
+    /**
+     * This method uses the Game's Ruleset to calculate the score of each player.
+     */
     void scoreGame();
 
+    /**
+     * This method places a stone down for the current player at the specified coordinates
+     * @param x the x coordinate of the stone, starting at the left
+     * @param y the y coordinate of the stone, starting at the top
+     */
     void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
 
-    void placeHandicapStone(int x, int y); // For rulesets with custom handicap stones
+    /**
+     * This method places a handicap stone down for the beginner player at the specified coordinates. This only works
+     * at the beginning of the game.
+     *
+     * @param x          the x coordinate of the stone, starting at the left
+     * @param y          the y coordinate of the stone, starting at the top
+     * @param placeStone
+     */
+    void placeHandicapPosition(int x, int y, boolean placeStone);
 
 
     //##################################################################################################################
@@ -59,17 +94,13 @@ public interface GameInterface {
 
     int getCurMoveNumber();
 
-    void setCurMoveNumber(int curMoveNumber);
-
     int getStonesCapturedBy(StoneColor color);
 
-    void addCapturedStones(StoneColor color, int amount);
+    UndoableCommand addCapturedStones(StoneColor color, int amount);
 
     StoneColor getColorAt(int x, int y);
 
     StoneColor getCurColor();
-
-    void setCurColor(StoneColor c);
 
     Board getBoard();
 
@@ -97,5 +128,13 @@ public interface GameInterface {
     void removeListener(GameListener l);
 
     void setHandicapStoneCounter(int noStones);
+
+    String getGraphicsPath();
+
+    void setGraphicsPath(String path);
+
+    Path getSavePath();
+
+    void setSavePath(Path path);
 }
 
