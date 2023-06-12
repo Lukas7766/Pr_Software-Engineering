@@ -41,7 +41,7 @@ class JapaneseRulesetTest {
     @Test
     @DisplayName("testing scoreGame(), wrong input")
     void scoreGameWI() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> japaneseRuleset.scoreGame(null));
+        assertThrowsExactly(NullPointerException.class, () -> japaneseRuleset.scoreGame(null));
     }
 
     @Test
