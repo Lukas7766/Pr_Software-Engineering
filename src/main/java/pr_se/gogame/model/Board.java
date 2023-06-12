@@ -336,12 +336,12 @@ public class Board implements BoardInterface {
         GAME.fireGameEvent(e);
     }
 
-    public Set<StoneGroup> getNeighbors(int x, int y) {
+    public Set<StoneColor> getNeighborColors(int x, int y) {
         return getSurroundings(
                 x,
                 y,
                 (sgp) -> sgp != null,
-                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup().getStoneColor()
         );
     }
 

@@ -352,8 +352,6 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place handicap stone after game start!");
         }*/
 
-        System.out.println("Game.placeHandicapPosition");
-
         if(x < 0 || y < 0 || x >= size || y >= size) {
             throw new IllegalArgumentException();
         }
@@ -395,7 +393,6 @@ public class Game implements GameInterface {
 
             // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         } else {
-            System.out.println("Only place handicap position");
             fireGameEvent(new StoneEvent(GameCommand.HANDICAP_POS, x, y, curMoveNumber));
         }
     }

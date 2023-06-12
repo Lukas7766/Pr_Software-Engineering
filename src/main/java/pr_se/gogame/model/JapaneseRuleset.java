@@ -1,8 +1,5 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.view_controller.GameEvent;
-import pr_se.gogame.view_controller.GameListener;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -125,8 +122,7 @@ public class JapaneseRuleset implements Ruleset {
         return new GameResult(scoreBlack, scoreWhite, winner, sb.toString());
     }
 
-    //FloodFill Algorithm, source ALGO assignment
-
+    //FloodFill Algorithm, source: ALGO assignment
     /**
      * The algorithm starts at the border of the board. In the first step, all empty positions will be located.
      * In the next and final step for every empty position all neighbouring positions will be checked if a different
@@ -154,13 +150,17 @@ public class JapaneseRuleset implements Ruleset {
                     territory = new ArrayList<>();
                     floodFill(board, i, j);
 
-                    loop:
                     for (Position p : territory) {
-                        for (StoneGroup n : board.getNeighbors(p.X, p.Y).stream().toList()) {
-                            if (n.getStoneColor() != color) {
-                                occupiedTerritory = false;
-                                break loop;
-                            }
+                        /*if(     (p.X > 0 && board.getColorAt(p.X - 1, p.Y) != color) ||
+                                (p.X < board.getSize() - 1 && board.getColorAt(p.X + 1, p.Y) != color) ||
+                                (p.Y > 0 && board.getColorAt(p.X, p.Y - 1) != color) ||
+                                (p.Y < board.getSize() - 1 && board.getColorAt(p.X, p.Y + 1) != color)) {
+                            occupiedTerritory = false;
+                            break;
+                        }*/
+                        if(board.getNeighborColors(p.X, p.Y).stream().anyMatch((c) -> c != color)) {
+                            occupiedTerritory = false;
+                            break;
                         }
                     }
 
@@ -175,22 +175,22 @@ public class JapaneseRuleset implements Ruleset {
     }
 
 
-    private void floodFill(Board board, int x, int y) {
-        if (x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize() || visited[x][y]) {
+    private void floodFill(Board game, int x, int y) {
+        if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize() || visited[x][y]) {
             return;
         }
 
         visited[x][y] = true;
 
-        if (board.getColorAt(x, y) != null) {
+        if (game.getColorAt(x, y) != null) {
             return;
         }
 
         territory.add(new Position(x, y));
-        floodFill(board, x, y + 1); //top
-        floodFill(board, x + 1, y); //right
-        floodFill(board, x, y - 1); //bottom
-        floodFill(board, x - 1, y); //left
+        floodFill(game, x, y + 1); //top
+        floodFill(game, x + 1, y); //right
+        floodFill(game, x, y - 1); //bottom
+        floodFill(game, x - 1, y); //left
     }
 
     @Override
