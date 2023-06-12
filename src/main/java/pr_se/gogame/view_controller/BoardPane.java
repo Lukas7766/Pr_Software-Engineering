@@ -179,39 +179,51 @@ public class BoardPane extends GridPane {
                         destinationBC.getLabel().setVisible(false);
                     }
                     break;
+                    
                 case CONFIRM_CHOICE:
                     confirmMove();
                     break;
+
                 case WHITE_HAS_CAPTURED:
                 case BLACK_HAS_CAPTURED:
                     StoneEvent se = (StoneEvent) e;
                     getPlayableCell(se.getX(), se.getY()).unset();
                     break;
+
                 case WHITE_STARTS:
                 case BLACK_STARTS:
                     setMouseTransparent(false);
                     init();
                     break;
+
                 case INIT:
                 case BLACK_WON:
                 case WHITE_WON:
                     setMouseTransparent(true);
                     break;
+
                 case CONFIG_CONFIRMATION:
                     setMoveConfirmation(game.isConfirmationNeeded());
                     break;
+
                 case CONFIG_SHOW_COORDINATES:
                     setShowsCoordinates(game.isShowCoordinates());
                     break;
+
                 case CONFIG_SHOWMOVENUMBERS:
                     setShowsMoveNumbers(game.isShowMoveNumbers());
                     break;
+
                 case CONFIG_GRAPHICS:
                     setGraphicsPath(game.getGraphicsPath());
                     break;
+
                 case DEBUG_INFO:
                     DebugEvent de = (DebugEvent) e;
                     getPlayableCell(de.getX(), de.getY()).getLabel().setText(de.getPtrNo() + "," + de.getGroupNo());
+                    break;
+
+                default:
                     break;
             }
 
