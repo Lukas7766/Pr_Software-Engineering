@@ -17,15 +17,30 @@ import java.util.HashSet;
 public class CustomExceptionDialog {
 
     /**
-     * Creates a customised Exception Dialog
-     * @param stage pass stage
-     * @param e pass Exception
+     * The stage to which the dialog is attached.
      */
-    public static void show(Stage stage, Exception e) {
+    public static Stage stage;
+
+    /**
+     * Creates a customised Exception Dialog
+     *
+     * @param e     pass Exception
+     */
+    public static void show(Throwable e) {
+        show(e, null);
+    }
+
+
+    public static void show(Throwable e, String message) {
 
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
-        alert.setHeaderText("Exception Dialog");
+
+        alert.setHeaderText(message != null ? message : "An error occurred!");
+
+        if (stage != null) {
+            alert.initOwner(stage);
+        }
 
         // Create expandable Exception.
         StringWriter sw = new StringWriter();

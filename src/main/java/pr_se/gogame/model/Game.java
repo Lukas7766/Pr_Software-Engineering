@@ -31,7 +31,7 @@ public class Game implements GameInterface {
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private Board board;
-    private int curMoveNumber = 0;
+    private int curMoveNumber;
     private StoneColor curColor;
     private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
     private double playerBlackScore;
@@ -113,7 +113,10 @@ public class Game implements GameInterface {
     @Override
     public boolean loadGame(Path path) {
         //TODO: Das board überchreiben od nd
-        //return FileSaver.importFile(path);
+        FileHandler fileHandler = new FileHandler();
+        fileHandler.loadFile(path);
+
+        this.newGame(BLACK, 19, 0);
         return false;
     }
 

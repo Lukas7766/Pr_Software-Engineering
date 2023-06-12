@@ -2,13 +2,7 @@ package pr_se.gogame.view_controller;
 
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.ToggleGroup;
-import javafx.scene.control.RadioButton;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
-import javafx.scene.control.Button;
+import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Text;
@@ -22,7 +16,9 @@ import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
 
+import java.io.File;
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -62,6 +58,11 @@ public class SidePane extends StackPane {
     private final HashSet<FileChooser.ExtensionFilter> filterList;
 
     /**
+     * stage of application
+     */
+    private final Stage stage;
+
+    /**
      * Constructor to create a SidePane
      *
      * @param game instance of actual game -> needed for triggering and observing changes in model
@@ -70,7 +71,7 @@ public class SidePane extends StackPane {
         this.game = game;
         this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
                 .collect(Collectors.toCollection(HashSet::new));
-
+        this.stage = stage;
         this.setBackground(new Background(new BackgroundFill(backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
         this.setMinWidth(250);
         setPadding(new Insets(5, 5, 5, 5)); //top, right, bottom, left
@@ -94,15 +95,17 @@ public class SidePane extends StackPane {
                     break;
                 case BLACK_STARTS:
                 case WHITE_STARTS:
-                    this.getChildren().remove(gameSetting);
-                    this.getChildren().add(gameInfo);
-                    break;
-                case CONFIG_DEMO_MODE:
-                    if (game.isDemoMode()) {
+                    if (!this.getChildren().contains(gameInfo)) {
                         this.getChildren().remove(gameSetting);
                         this.getChildren().add(gameInfo);
                     }
                     break;
+                //case CONFIG_DEMO_MODE:
+                //    if (game.isDemoMode()) {
+                //        this.getChildren().remove(gameSetting);
+                //        this.getChildren().add(gameInfo);
+                //    }
+                //    break;
                 case BLACK_WON:
                 case WHITE_WON:
                     CustomWinAction.winAction(stage, game);
@@ -228,8 +231,10 @@ public class SidePane extends StackPane {
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                 }
                 case CONFIG_DEMO_MODE -> {
-                    if (infoPane.getChildren().contains(explanationBoad)) break;
+                    System.out.println("Demo Mode: " + game.isDemoMode());
+
                     if (game.isDemoMode()) {
+                        if (infoPane.getChildren().contains(explanationBoad)) break;
                         infoPane.getChildren().add(explanationBoad);
                     } else {
                         infoPane.getChildren().remove(explanationBoad);
@@ -348,6 +353,7 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
+            game.setDemoMode(false);
             game.newGame(StoneColor.BLACK, actualBoardSize, handicap);
         });
         //colum, row,
@@ -367,7 +373,21 @@ public class SidePane extends StackPane {
         gridPane.add(startDemoGameBtn, 0, 18);
 
         startDemoGameBtn.setOnAction(event -> {
-            game.setDemoMode(true);
+
+           File file = CustomFileDialog.getFile(stage, false,filterList);
+
+            if (file != null) {
+                game.loadGame(file.toPath());
+                game.setDemoMode(true);
+            } else {
+                Alert alert = new Alert(Alert.AlertType.INFORMATION);
+                alert.setTitle("Information");
+                alert.setHeaderText("No File selected!");
+                alert.setContentText("Please select a file to continue!");
+                alert.initOwner(stage);
+                alert.showAndWait();
+            }
+
         });
 
         return gridPane;
