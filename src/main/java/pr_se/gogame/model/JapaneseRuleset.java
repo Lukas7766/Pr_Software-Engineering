@@ -73,10 +73,6 @@ public class JapaneseRuleset implements Ruleset {
     /**
      * Calculates the score of the game based on the Japanese ruleset. This is done by calculating the territory of each player.
      * The player with the most territory wins. Territory is calculated by using the floodfill algorithm.
-     * The algorithm starts at the border of the board. In the first step all empty positions will be located.
-     * In the next and final step for every empty position all neighbouring positions will be checked if a different color than the passed is present.
-     * If this is the case the territory will be added to the score of the player. If the territory is surrounded by at least one different color it will be ignored.
-     * If on the board only one color is present, this player will get all points. If the board is empty, both players will get all points.
      * ++komi ++handicap//ToDo adapt description
      *
      * @param game to calculate the score and define the winner
@@ -134,6 +130,19 @@ public class JapaneseRuleset implements Ruleset {
     }
 
     //FloodFill Algorithm, source ALGO assignment
+
+    /**
+     * The algorithm starts at the border of the board. In the first step, all empty positions will be located.
+     * In the next and final step for every empty position all neighbouring positions will be checked if a different
+     *  color than the passed one is present.
+     * If this is the case the territory will be added to the score of the player. If the territory is surrounded by at
+     *  least one different color it will be ignored.
+     * If on the board only one color is present, this player will get all points. If the board is empty, both players
+     *  will get all points.
+     * @param color which color's territory points are to be calculated
+     * @param board the board that is to be used for calculating the territory points
+     * @return how many territory points the given player has on the given board.
+     */
     private int calculateTerritoryPoints(StoneColor color, Board board) {
         int boardSize = board.getSize();
         visited = new boolean[boardSize][boardSize];
