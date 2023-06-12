@@ -153,9 +153,9 @@ class JapaneseRulesetTest {
     }
 
     private void printBoard(Game game) {
-        for (int i = 0; i < game.getBoard().getSize(); i++) {
-            for (int j = 0; j < game.getBoard().getSize(); j++) {
-                System.out.print(game.getBoard().getColorAt(i, j) + " ");
+        for (int i = 0; i < game.getSize(); i++) {
+            for (int j = 0; j < game.getSize(); j++) {
+                System.out.print(game.getColorAt(i, j) + " ");
             }
             System.out.println();
         }

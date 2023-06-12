@@ -154,15 +154,13 @@ public class JapaneseRuleset implements Ruleset {
                     territory = new ArrayList<>();
                     floodFill(board, i, j);
 
+                    loop:
                     for (Position p : territory) {
                         for (StoneGroup n : board.getNeighbors(p.X, p.Y).stream().toList()) {
                             if (n.getStoneColor() != color) {
                                 occupiedTerritory = false;
-                                break;
+                                break loop;
                             }
-                        }
-                        if (!occupiedTerritory) {
-                            break;
                         }
                     }
 
