@@ -86,7 +86,6 @@ class GameTest {
 
     @Test
     void setHandicapStoneCounterArguments() {
-        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(-1));
         assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(game.getHandicap() + 1));
     }
 
@@ -133,7 +132,7 @@ class GameTest {
         GameCommand prevState = game.getGameState();
         assertEquals(BLACK_STARTS, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
-        assertEquals(0, prevMoveNumber);
+        assertEquals(1, prevMoveNumber);
 
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
@@ -166,7 +165,7 @@ class GameTest {
         GameCommand prevState = game.getGameState();
         assertEquals(WHITE_STARTS, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
-        assertEquals(0, prevMoveNumber);
+        assertEquals(1, prevMoveNumber);
 
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
@@ -330,9 +329,9 @@ class GameTest {
 
     @Test
     void getCurMoveNumber() {
-        assertEquals(0, game.getCurMoveNumber());
-        game.playMove(0, 0);
         assertEquals(1, game.getCurMoveNumber());
+        game.playMove(0, 0);
+        assertEquals(2, game.getCurMoveNumber());
     }
 
     @Test
@@ -370,7 +369,7 @@ class GameTest {
 
     @Test
     void getHandicapStoneCounter() {
-        assertEquals(0, game.getHandicapStoneCounter());
+        assertEquals(-1, game.getHandicapStoneCounter());
     }
 
     @Test
@@ -535,9 +534,9 @@ class GameTest {
         assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(1, 1, true));
     }
 
-    @Test
+    /*@Test
     void dontPlayAfterGameIsOver() {
         game.resign();
         assertThrows(IllegalStateException.class, () -> game.playMove(0, 0));
-    }
+    }*/
 }

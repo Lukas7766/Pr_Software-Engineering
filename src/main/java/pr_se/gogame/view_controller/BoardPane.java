@@ -158,7 +158,7 @@ public class BoardPane extends GridPane {
             if(e == null) {
                 throw new NullPointerException();
             }
-            
+
             switch(e.getGameCommand()) {
                 case HANDICAP_POS:
                 case BLACK_STONE_SET:
