@@ -151,13 +151,16 @@ public class HeaderPane extends VBox {
         exportFileItemAs.setOnAction(e -> saveGame(true));
 
 
-        game.addListener(l -> {
-            switch (l.getGameCommand()) {
-                case GAME_IS_ONGOING, NEW_GAME -> {
-                    exportFileItem.setDisable(false);
-                    exportFileItemAs.setDisable(false);
+        game.addListener(e -> {
+            switch (e.getGameCommand()) {
+                case STONE_WAS_SET -> {
+                    StoneEvent se = (StoneEvent) e;
+                    if(se.getColor() != null) {
+                        exportFileItem.setDisable(false);
+                        exportFileItemAs.setDisable(false);
+                    }
                 }
-                default -> {
+                case INIT -> {
                     exportFileItem.setDisable(true);
                     exportFileItemAs.setDisable(true);
                 }
@@ -233,9 +236,9 @@ public class HeaderPane extends VBox {
         game.addListener(l -> {
             switch (l.getGameCommand()) {
                 case INIT, GAME_WON ->
-                        gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
+                    gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
 
-                case GAME_IS_ONGOING, NEW_GAME ->
+                case NEW_GAME ->
                     gameSectionItems.stream().filter(MenuItem::isDisable).forEach(e -> e.setDisable(false));
             }
 
@@ -454,7 +457,7 @@ public class HeaderPane extends VBox {
         game.addListener(l -> {
             switch (l.getGameCommand()){
                 case INIT, GAME_WON -> gameShortCardList.forEach(e -> e.setDisable(true));
-                case NEW_GAME, GAME_IS_ONGOING -> gameShortCardList.forEach(e -> e.setDisable(false));
+                case NEW_GAME -> gameShortCardList.forEach(e -> e.setDisable(false));
             }
         });
 

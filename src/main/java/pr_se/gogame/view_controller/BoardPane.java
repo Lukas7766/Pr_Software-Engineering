@@ -171,7 +171,6 @@ public class BoardPane extends GridPane {
 
             switch(e.getGameCommand()) {
                 case STONE_WAS_SET:
-                    System.out.println("StoneEvent");
                     StoneEvent sse = (StoneEvent) e;
                     PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
                     destinationBC.getLabel().setText("" + sse.getMoveNumber());
@@ -183,7 +182,6 @@ public class BoardPane extends GridPane {
                     }
 
                     if(game.getHandicapStoneCounter() >= 0) {
-                        System.out.println("Showing handicap slot");
                         destinationBC.showHandicapSlot();
                         destinationBC.getLabel().setVisible(false);
                     }
