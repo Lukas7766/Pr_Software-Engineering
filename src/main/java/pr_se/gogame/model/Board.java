@@ -328,15 +328,6 @@ public class Board implements BoardInterface {
         GAME.fireGameEvent(e);
     }
 
-    public Set<StoneColor> getNeighborColors(int x, int y) {
-        return getSurroundings(
-                x,
-                y,
-                (sgp) -> sgp != null,
-                (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup().getStoneColor()
-        );
-    }
-
     /**
      * Checks the space above, below, to the right and left of the one marked by x and y for StoneGroupPointers
      * fulfilling the predicate check, returning a Set of at most four elements that have been converted by conversion.

@@ -21,9 +21,7 @@ public class JapaneseRuleset implements Ruleset {
 
     @Override
     public void reset() {
-        for(int i = 0; i < boardHashes.length; i++) {
-            boardHashes[i] = 0;
-        }
+        Arrays.fill(boardHashes, 0);
     }
 
     @Override
@@ -84,10 +82,10 @@ public class JapaneseRuleset implements Ruleset {
         int handicap = game.getHandicap();
 
         int capturedStonesBlack = game.getStonesCapturedBy(StoneColor.BLACK);
-        int territoryScoreBlack = calculateTerritoryPoints(StoneColor.BLACK, game.getBoard());
+        int territoryScoreBlack = calculateTerritoryPoints(StoneColor.BLACK, game);
 
         int capturedStonesWhite = game.getStonesCapturedBy(StoneColor.WHITE);
-        int territoryScoreWhite = calculateTerritoryPoints(StoneColor.WHITE, game.getBoard());
+        int territoryScoreWhite = calculateTerritoryPoints(StoneColor.WHITE, game);
 
         double scoreBlack = capturedStonesBlack + territoryScoreBlack + handicap;
         double scoreWhite = capturedStonesWhite + territoryScoreWhite + komi;
@@ -131,36 +129,32 @@ public class JapaneseRuleset implements Ruleset {
      * If on the board only one color is present, this player will get all points. If the board is empty, both players
      *  will get all points.
      * @param color which color's territory points are to be calculated
-     * @param board the board that is to be used for calculating the territory points
+     * @param game the Game to be used for calculating the territory points
      * @return how many territory points the given player has on the given board.
      */
-    private int calculateTerritoryPoints(StoneColor color, Board board) {
-        int boardSize = board.getSize();
+    private int calculateTerritoryPoints(StoneColor color, Game game) {
+        int boardSize = game.getSize();
         visited = new boolean[boardSize][boardSize];
 
         int territoryPoints = 0;
         for (int i = 0; i < boardSize; i++) {
             for (int j = 0; j < boardSize; j++) {
 
-                if (board.getColorAt(i, j) == null && !visited[i][j]) {
+                if (game.getColorAt(i, j) == null && !visited[i][j]) {
 
                     boolean occupiedTerritory = true;
 
                     territory = new ArrayList<>();
-                    floodFill(board, i, j);
+                    floodFill(game, i, j);
 
                     for (Position p : territory) {
-                        if(     (p.X > 0 && board.getColorAt(p.X - 1, p.Y) == StoneColor.getOpposite(color)) ||
-                                (p.X < board.getSize() - 1 && board.getColorAt(p.X + 1, p.Y) == StoneColor.getOpposite(color)) ||
-                                (p.Y > 0 && board.getColorAt(p.X, p.Y - 1) == StoneColor.getOpposite(color)) ||
-                                (p.Y < board.getSize() - 1 && board.getColorAt(p.X, p.Y + 1) == StoneColor.getOpposite(color))) {
+                        if(     (p.X > 0 && game.getColorAt(p.X - 1, p.Y) == StoneColor.getOpposite(color)) ||
+                                (p.X < game.getSize() - 1 && game.getColorAt(p.X + 1, p.Y) == StoneColor.getOpposite(color)) ||
+                                (p.Y > 0 && game.getColorAt(p.X, p.Y - 1) == StoneColor.getOpposite(color)) ||
+                                (p.Y < game.getSize() - 1 && game.getColorAt(p.X, p.Y + 1) == StoneColor.getOpposite(color))) {
                             occupiedTerritory = false;
                             break;
                         }
-                        /*if(board.getNeighborColors(p.X, p.Y).stream().anyMatch((c) -> c != color)) {
-                            occupiedTerritory = false;
-                            break;
-                        }*/
                     }
 
                     if (occupiedTerritory) {
@@ -174,7 +168,7 @@ public class JapaneseRuleset implements Ruleset {
     }
 
 
-    private void floodFill(Board game, int x, int y) {
+    private void floodFill(Game game, int x, int y) {
         if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize() || visited[x][y]) {
             return;
         }
