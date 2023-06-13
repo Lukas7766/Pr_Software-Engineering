@@ -18,7 +18,7 @@ public class CustomWinAction {
      */
     public static void winAction(Stage stage, Game game) {
         System.out.println("last game command: "+game.getGameState());
-        if (!(game.getGameState() != GameCommand.GAME_WON)){
+        if (game.getGameState() != GameCommand.GAME_WON){
             throw new IllegalStateException("Game is not over yet!");
         }
 

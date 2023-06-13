@@ -129,27 +129,30 @@ public class Game implements GameInterface {
             public void execute(boolean saveEffects) {
                 GameResult result;
                 StringBuilder sb = new StringBuilder();
-                sb.append("Game was resigned by").append(" ");
+                sb.append("Game was resigned by ");
                 switch (FINAL_CUR_COLOR) {
-                    case WHITE -> {
-                        result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
+                    case WHITE:
                         sb.append("White!").append("\n\n").append("Black won!");
-                    }
-                    case BLACK -> {
-                        result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
+                        result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
+                        break;
+
+                    case BLACK:
                         sb.append("Black!").append("\n\n").append("White won!");
-                    }
-                    default -> {throw new IllegalStateException("Game was not resigned! Consult your application owner!");}
+                        result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
+                        break;
+
+                    default:
+                        throw new IllegalStateException("Game was not resigned! Consult your application owner!");
                 }
-                Game.this.gameCommand = GameCommand.GAME_WON;
-                Game.this.gameResult = result;
+                gameCommand = GameCommand.GAME_WON;
+                gameResult = result;
                 fireGameEvent(new GameEvent(gameCommand));
             }
 
             @Override
             public void undo() {
-                Game.this.gameResult = OLD_GAME_RESULT;
-                Game.this.gameCommand = OLD_GAME_COMMAND;
+                gameResult = OLD_GAME_RESULT;
+                gameCommand = OLD_GAME_COMMAND;
                 fireGameEvent(new GameEvent(gameCommand));
             }
         };
