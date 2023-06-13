@@ -150,17 +150,17 @@ public class JapaneseRuleset implements Ruleset {
                     floodFill(board, i, j);
 
                     for (Position p : territory) {
-                        /*if(     (p.X > 0 && board.getColorAt(p.X - 1, p.Y) != color) ||
-                                (p.X < board.getSize() - 1 && board.getColorAt(p.X + 1, p.Y) != color) ||
-                                (p.Y > 0 && board.getColorAt(p.X, p.Y - 1) != color) ||
-                                (p.Y < board.getSize() - 1 && board.getColorAt(p.X, p.Y + 1) != color)) {
-                            occupiedTerritory = false;
-                            break;
-                        }*/
-                        if(board.getNeighborColors(p.X, p.Y).stream().anyMatch((c) -> c != color)) {
+                        if(     (p.X > 0 && board.getColorAt(p.X - 1, p.Y) == StoneColor.getOpposite(color)) ||
+                                (p.X < board.getSize() - 1 && board.getColorAt(p.X + 1, p.Y) == StoneColor.getOpposite(color)) ||
+                                (p.Y > 0 && board.getColorAt(p.X, p.Y - 1) == StoneColor.getOpposite(color)) ||
+                                (p.Y < board.getSize() - 1 && board.getColorAt(p.X, p.Y + 1) == StoneColor.getOpposite(color))) {
                             occupiedTerritory = false;
                             break;
                         }
+                        /*if(board.getNeighborColors(p.X, p.Y).stream().anyMatch((c) -> c != color)) {
+                            occupiedTerritory = false;
+                            break;
+                        }*/
                     }
 
                     if (occupiedTerritory) {
