@@ -34,9 +34,6 @@ public class Game implements GameInterface {
     private int whiteCapturedStones;
     private GameResult gameResult;
 
-
-    private boolean demoMode = false;
-
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
@@ -368,18 +365,6 @@ public class Game implements GameInterface {
         } else {
             fireGameEvent(new StoneEvent(GameCommand.STONE_WAS_SET, x, y, null, curMoveNumber));
         }
-    }
-
-    @Override
-    public boolean isDemoMode() {
-        return demoMode;
-    }
-
-    @Override
-    public void setDemoMode(boolean demoMode) {
-        this.demoMode = demoMode;
-        this.gameCommand = GameCommand.CONFIG_DEMO_MODE;
-        fireGameEvent(new GameEvent(gameCommand));
     }
 
     @Override

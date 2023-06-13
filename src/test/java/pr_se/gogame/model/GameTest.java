@@ -98,12 +98,7 @@ class GameTest {
 
     @Test
     void initGame() {
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(INIT, e.getGameCommand());
-            }
-        });
+        game.addListener(e -> assertEquals(INIT, e.getGameCommand()));
         game.initGame();
     }
 
@@ -191,24 +186,14 @@ class GameTest {
 
     @Test
     void resignAtStart() {
-        GameListener l1 = new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(GAME_WON, e.getGameCommand());
-            }
-        };;
+        GameListener l1 = e -> assertEquals(GAME_WON, e.getGameCommand());
         game.addListener(l1);
         game.resign();
         assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
         game.newGame(WHITE, 19, 0, new JapaneseRuleset());
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(GAME_WON, e.getGameCommand());
-            }
-        });
+        game.addListener(e -> assertEquals(GAME_WON, e.getGameCommand()));
         game.resign();
         assertEquals(BLACK, game.getGameResult().getWinner());
 
@@ -217,12 +202,7 @@ class GameTest {
 
     @Test
     void resignAtPlay() {
-        GameListener l1 = new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(GAME_WON, e.getGameCommand());
-            }
-        };
+        GameListener l1 = e -> assertEquals(GAME_WON, e.getGameCommand());
         game.playMove(0, 0);
         game.addListener(l1);
         game.resign();
@@ -231,12 +211,7 @@ class GameTest {
         game.removeListener(l1);
         game.newGame(WHITE, 19, 0, new JapaneseRuleset());
         game.playMove(0, 0);
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(GAME_WON, e.getGameCommand());
-            }
-        });
+        game.addListener(e -> assertEquals(GAME_WON, e.getGameCommand()));
         game.resign();
         assertEquals(WHITE, game.getGameResult().getWinner());
 
@@ -245,24 +220,14 @@ class GameTest {
 
     @Test
     void scoreGame() {
-        GameListener l1 = new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(GAME_WON, e.getGameCommand());
-            }
-        };
+        GameListener l1 = e -> assertEquals(GAME_WON, e.getGameCommand());
         game.addListener(l1);
         game.scoreGame();
         assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
         game.newGame(BLACK, 19, 9, new JapaneseRuleset());
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(GAME_WON, e.getGameCommand());
-            }
-        });
+        game.addListener(e -> assertEquals(GAME_WON, e.getGameCommand()));
         game.scoreGame();
         assertEquals(BLACK, game.getGameResult().getWinner());
     }
@@ -284,23 +249,13 @@ class GameTest {
 
     @Test
     void addListener() {
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(DEBUG_INFO, e.getGameCommand());
-            }
-        });
+        game.addListener(e -> assertEquals(DEBUG_INFO, e.getGameCommand()));
         game.printDebugInfo(0, 0);
     }
 
     @Test
     void removeListener() {
-        GameListener l1 = new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(DEBUG_INFO, e.getGameCommand());
-            }
-        };
+        GameListener l1 = e -> assertEquals(DEBUG_INFO, e.getGameCommand());
         game.addListener(l1);
         game.printDebugInfo(0, 0);
 
@@ -317,12 +272,7 @@ class GameTest {
 
     @Test
     void confirmChoice() {
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(CONFIRM_CHOICE, e.getGameCommand());
-            }
-        });
+        game.addListener(e -> assertEquals(CONFIRM_CHOICE, e.getGameCommand()));
         game.confirmChoice();
     }
 
@@ -414,17 +364,6 @@ class GameTest {
     }
 
     @Test
-    void isDemoMode() {
-        assertFalse(game.isDemoMode());
-    }
-
-    @Test
-    void setDemoMode() {
-        game.setDemoMode(true);
-        assertTrue(game.isDemoMode());
-    }
-
-    @Test
     void addCapturedStones() {
         assertEquals(0, game.getStonesCapturedBy(BLACK));
         assertEquals(0, game.getStonesCapturedBy(WHITE));
@@ -479,24 +418,14 @@ class GameTest {
     @Test
     void fireGameEvent() {
         GameEvent ge = new DebugEvent(0, 0, 0, 0);
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(ge, e);
-            }
-        });
+        game.addListener(e -> assertEquals(ge, e));
 
         game.fireGameEvent(ge);
     }
 
     @Test
     void printDebugInfo() {
-        game.addListener(new GameListener() {
-            @Override
-            public void gameCommand(GameEvent e) {
-                assertEquals(DEBUG_INFO, e.getGameCommand());
-            }
-        });
+        game.addListener(e -> assertEquals(DEBUG_INFO, e.getGameCommand()));
 
         assertDoesNotThrow(() -> game.printDebugInfo(0, 0));
     }

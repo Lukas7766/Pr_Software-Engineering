@@ -223,16 +223,18 @@ public class SidePane extends StackPane {
                     actualPlayer.setText(game.getCurColor().toString());
 
                 }
-                case CONFIG_DEMO_MODE -> {
-                    System.out.println("Demo Mode: " + game.isDemoMode());
+            }
+        });
 
-                    if (game.isDemoMode()) {
-                        if (infoPane.getChildren().contains(explanationBoard)) break;
-                        infoPane.getChildren().add(explanationBoard);
-                    } else {
-                        infoPane.getChildren().remove(explanationBoard);
-                    }
+        GlobalSettings.addListener(() -> {
+            if(GlobalSettings.isDemoMode()) {
+                System.out.println("Demo Mode: " + GlobalSettings.isDemoMode());
+
+                if (!infoPane.getChildren().contains(explanationBoard)) {
+                    infoPane.getChildren().add(explanationBoard);
                 }
+            } else {
+                infoPane.getChildren().remove(explanationBoard);
             }
         });
 
@@ -346,7 +348,7 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            game.setDemoMode(false);
+            GlobalSettings.setDemoMode(false);
             game.newGame(StoneColor.BLACK, actualBoardSize, handicap, new JapaneseRuleset());
         });
         //colum, row,
@@ -371,7 +373,7 @@ public class SidePane extends StackPane {
 
             if (file != null) {
                 game.loadGame(file.toPath());
-                game.setDemoMode(true);
+                GlobalSettings.setDemoMode(true);
             } else {
                 Alert alert = new Alert(Alert.AlertType.INFORMATION);
                 alert.setTitle("Information");

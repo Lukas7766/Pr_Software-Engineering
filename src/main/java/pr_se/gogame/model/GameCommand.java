@@ -4,8 +4,5 @@ public enum GameCommand {
 
     INIT, NEW_GAME, GAME_WON, CONFIRM_CHOICE,
     COLOR_HAS_CHANGED, STONE_WAS_SET, STONE_WAS_CAPTURED,  // Added by Gerald
-
-    //GamePlay Setting Commands
-    CONFIG_DEMO_MODE,
     DEBUG_INFO
 }

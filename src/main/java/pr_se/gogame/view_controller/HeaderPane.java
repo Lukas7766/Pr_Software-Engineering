@@ -356,10 +356,8 @@ public class HeaderPane extends VBox {
         playbackControl.getChildren().addAll(playbackControlList);
         playbackControlList.forEach(e -> e.setDisable(true));
 
-        game.addListener(l -> {
-            if (l.getGameCommand() != GameCommand.CONFIG_DEMO_MODE) return;
-            playbackControlList.forEach(e -> e.setDisable(!game.isDemoMode()));
-
+        GlobalSettings.addListener(() -> {
+            playbackControlList.forEach(e -> e.setDisable(!GlobalSettings.isDemoMode()));
         });
 
         //Key Bindings for the playback control

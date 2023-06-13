@@ -68,10 +68,6 @@ public interface GameInterface {
 
     //##################################################################################################################
     //game settings
-
-    boolean isDemoMode();
-
-    void setDemoMode(boolean demoMode);
     GameCommand getGameState();
 
     int getSize();
