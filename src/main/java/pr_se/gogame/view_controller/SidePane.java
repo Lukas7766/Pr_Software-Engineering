@@ -229,18 +229,6 @@ public class SidePane extends StackPane {
             }
         });
 
-        /*GlobalSettings.addListener(() -> {
-            if(GlobalSettings.isDemoMode()) {
-                System.out.println("Demo Mode: " + GlobalSettings.isDemoMode());
-
-                if (!infoPane.getChildren().contains(explanationBoard)) {
-                    infoPane.getChildren().add(explanationBoard);
-                }
-            } else {
-                infoPane.getChildren().remove(explanationBoard);
-            }
-        });*/
-
         return infoPane;
     }
 
@@ -351,42 +339,10 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            GlobalSettings.setDemoMode(false);
             game.newGame(StoneColor.BLACK, actualBoardSize, handicap, new JapaneseRuleset());
         });
         //colum, row,
         gridPane.add(startGameBtn, 1, 15);
-
-        Pane spacer = new Pane();
-        spacer.setMinSize(10, 10);
-        gridPane.add(spacer, 0, 16);
-
-        Label demoLbl = new Label();
-        demoLbl.setFont(Font.font(null, FontWeight.BOLD, 13));
-        demoLbl.setText("Demo");
-        gridPane.add(demoLbl, 0, 17);
-
-        //start DemoGame
-        Button startDemoGameBtn = new Button("start Demo");
-        gridPane.add(startDemoGameBtn, 0, 18);
-
-        startDemoGameBtn.setOnAction(event -> {
-
-           File file = CustomFileDialog.getFile(stage, false,filterList);
-
-            if (file != null) {
-                game.loadGame(file.toPath());
-                GlobalSettings.setDemoMode(true);
-            } else {
-                Alert alert = new Alert(Alert.AlertType.INFORMATION);
-                alert.setTitle("Information");
-                alert.setHeaderText("No File selected!");
-                alert.setContentText("Please select a file to continue!");
-                alert.initOwner(stage);
-                alert.showAndWait();
-            }
-
-        });
 
         return gridPane;
     }

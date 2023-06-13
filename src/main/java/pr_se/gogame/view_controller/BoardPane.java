@@ -1044,11 +1044,6 @@ public class BoardPane extends GridPane {
          * Removes all set AND all selection indicators on this PlayableBoardCell.
          */
         public void unset() {
-            System.out.println("PlayableBoardCell.unset()");
-            if(currentlySetStone != null) {
-                System.out.println("*****\nHelp me I'm being unset.\n*****");
-            }
-            System.out.println();
             deselect();
             BLACK_STONE.setVisible(false);
             WHITE_STONE.setVisible(false);

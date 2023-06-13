@@ -359,11 +359,7 @@ public class HeaderPane extends VBox {
         fastForward.setOnAction(e -> game.skipToEnd());
 
         playbackControl.getChildren().addAll(playbackControlList);
-        /*playbackControlList.forEach(e -> e.setDisable(true));
-
-        GlobalSettings.addListener(() -> {
-            playbackControlList.forEach(e -> e.setDisable(!GlobalSettings.isDemoMode()));
-        });*/
+        /*playbackControlList.forEach(e -> e.setDisable(true));*/
 
         //Key Bindings for the playback control
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F), () -> {

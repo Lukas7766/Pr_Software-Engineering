@@ -13,8 +13,6 @@ public class GlobalSettings {
 
     private static String graphicsPath = "./Grafiksets/default.zip";
 
-    private static boolean demoMode = false;
-
     private static final List<ViewListener> listeners = new LinkedList<>();
 
     public static void addListener(ViewListener l) {
@@ -72,15 +70,6 @@ public class GlobalSettings {
             throw new NullPointerException();
         }
         GlobalSettings.graphicsPath = graphicsPath;
-        update();
-    }
-
-    public static boolean isDemoMode() {
-        return demoMode;
-    }
-
-    public static void setDemoMode(boolean demoMode) {
-        GlobalSettings.demoMode = demoMode;
         update();
     }
 }
