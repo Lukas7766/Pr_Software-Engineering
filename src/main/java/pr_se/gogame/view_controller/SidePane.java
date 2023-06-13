@@ -13,12 +13,10 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
 
 import java.io.File;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -93,8 +91,7 @@ public class SidePane extends StackPane {
                         this.getChildren().remove(gameInfo);
                     }
                     break;
-                case BLACK_STARTS:
-                case WHITE_STARTS:
+                case NEW_GAME:
                     if (!this.getChildren().contains(gameInfo)) {
                         this.getChildren().remove(gameSetting);
                         this.getChildren().add(gameInfo);
@@ -106,8 +103,7 @@ public class SidePane extends StackPane {
                 //        this.getChildren().add(gameInfo);
                 //    }
                 //    break;
-                case BLACK_WON:
-                case WHITE_WON:
+                case GAME_WON:
                     CustomWinAction.winAction(stage, game);
                     break;
             }
@@ -218,7 +214,7 @@ public class SidePane extends StackPane {
         game.addListener(l -> {
 
             switch (l.getGameCommand()) {
-                case WHITE_PLAYS, WHITE_STARTS, BLACK_PLAYS, BLACK_STARTS -> {
+                case WHITE_PLAYS, BLACK_PLAYS, NEW_GAME -> {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                     switch (game.getCurColor()) {
@@ -226,7 +222,7 @@ public class SidePane extends StackPane {
                         case WHITE -> actualPlayer.setText("White");
                     }
                 }
-                case BLACK_WON, WHITE_WON -> {
+                case GAME_WON -> {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                 }

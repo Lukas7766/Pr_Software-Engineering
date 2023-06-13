@@ -62,10 +62,7 @@ public class Game implements GameInterface {
         }
 
         this.curColor = startingColor;
-        switch (startingColor) { // We already performed a null-check, so it can't be anything else.
-            case BLACK -> this.gameCommand = GameCommand.BLACK_STARTS;
-            case WHITE -> this.gameCommand = GameCommand.WHITE_STARTS;
-        }
+        this.gameCommand = GameCommand.NEW_GAME;
 
         this.fileTree = new FileTree(size,"Black", "White");
         this.size = size;
@@ -83,15 +80,7 @@ public class Game implements GameInterface {
         this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
 
         this.curMoveNumber = 1;
-        switch(this.curColor) {
-            case BLACK:
-                this.gameCommand = GameCommand.BLACK_STARTS;
-                break;
-
-            case WHITE:
-                this.gameCommand = GameCommand.WHITE_STARTS;
-                break;
-        }
+        this.gameCommand = GameCommand.NEW_GAME;
 
         System.out.println("\nnewGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n------");
     }
@@ -125,10 +114,15 @@ public class Game implements GameInterface {
 
     @Override
     public void resign() {
+        if(this.gameCommand == GameCommand.GAME_WON) {
+            throw new IllegalStateException("Game has already ended!");
+        }
+
         System.out.println("resign");
 
         final GameResult OLD_GAME_RESULT = this.gameResult;
         final GameCommand OLD_GAME_COMMAND = this.gameCommand;
+        final StoneColor FINAL_CUR_COLOR = this.curColor;
 
         UndoableCommand c = new UndoableCommand() {
             @Override
@@ -136,19 +130,18 @@ public class Game implements GameInterface {
                 GameResult result;
                 StringBuilder sb = new StringBuilder();
                 sb.append("Game was resigned by").append(" ");
-                switch (OLD_GAME_COMMAND) {
-                    case WHITE_PLAYS, WHITE_STARTS -> {
-                        Game.this.gameCommand = GameCommand.BLACK_WON;
+                switch (FINAL_CUR_COLOR) {
+                    case WHITE -> {
                         result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
                         sb.append("White!").append("\n\n").append("Black won!");
                     }
-                    case BLACK_PLAYS, BLACK_STARTS -> {
-                        Game.this.gameCommand = GameCommand.WHITE_WON;
+                    case BLACK -> {
                         result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
                         sb.append("Black!").append("\n\n").append("White won!");
                     }
                     default -> {throw new IllegalStateException("Game was not resigned! Consult your application owner!");}
                 }
+                Game.this.gameCommand = GameCommand.GAME_WON;
                 Game.this.gameResult = result;
                 fireGameEvent(new GameEvent(gameCommand));
             }
@@ -171,12 +164,8 @@ public class Game implements GameInterface {
         this.gameResult = ruleset.scoreGame(this);
         this.playerBlackScore = gameResult.getScoreBlack();
         this.playerWhiteScore = gameResult.getScoreWhite();
+        this.gameCommand = GameCommand.GAME_WON;
 
-        if (gameResult.getWinner() == BLACK) {
-            this.gameCommand = GameCommand.BLACK_WON;
-        } else {
-            this.gameCommand = GameCommand.WHITE_WON;
-        }
         fireGameEvent(new GameEvent(gameCommand));
     }
 
@@ -303,7 +292,7 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y) {
-        /*if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS &&
+        /*if(this.gameCommand != GameCommand.BLACK_STARTS &&
             this.gameCommand != GameCommand.BLACK_PLAYS && this.gameCommand != GameCommand.WHITE_PLAYS) {
             throw new IllegalStateException("Can't place stone when game isn't being played! Game State was " + this.gameCommand);
         }*/
@@ -345,7 +334,7 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapPosition(int x, int y, boolean placeStone) {
-        /*if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS) {
+        /*if(this.gameCommand != GameCommand.BLACK_STARTS) {
             throw new IllegalStateException("Can't place handicap stone after game start!");
         }*/
 

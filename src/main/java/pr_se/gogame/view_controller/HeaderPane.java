@@ -153,7 +153,7 @@ public class HeaderPane extends VBox {
 
         game.addListener(l -> {
             switch (l.getGameCommand()) {
-                case BLACK_PLAYS, WHITE_PLAYS, BLACK_STARTS, WHITE_STARTS -> {
+                case BLACK_PLAYS, WHITE_PLAYS, NEW_GAME -> {
                     exportFileItem.setDisable(false);
                     exportFileItemAs.setDisable(false);
                 }
@@ -232,10 +232,10 @@ public class HeaderPane extends VBox {
 
         game.addListener(l -> {
             switch (l.getGameCommand()) {
-                case INIT, WHITE_WON, BLACK_WON ->
+                case INIT, GAME_WON ->
                         gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
 
-                case BLACK_PLAYS, WHITE_PLAYS, WHITE_STARTS, BLACK_STARTS ->
+                case BLACK_PLAYS, WHITE_PLAYS, NEW_GAME ->
                     gameSectionItems.stream().filter(MenuItem::isDisable).forEach(e -> e.setDisable(false));
             }
 
@@ -453,8 +453,8 @@ public class HeaderPane extends VBox {
 
         game.addListener(l -> {
             switch (l.getGameCommand()){
-                case INIT, WHITE_WON,BLACK_WON -> gameShortCardList.forEach(e -> e.setDisable(true));
-                case BLACK_STARTS, WHITE_STARTS, BLACK_PLAYS, WHITE_PLAYS -> gameShortCardList.forEach(e -> e.setDisable(false));
+                case INIT, GAME_WON -> gameShortCardList.forEach(e -> e.setDisable(true));
+                case NEW_GAME, BLACK_PLAYS, WHITE_PLAYS -> gameShortCardList.forEach(e -> e.setDisable(false));
             }
         });
 

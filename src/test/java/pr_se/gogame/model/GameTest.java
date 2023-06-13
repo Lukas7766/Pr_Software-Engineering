@@ -130,7 +130,7 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(BLACK, prevColor);
         GameCommand prevState = game.getGameState();
-        assertEquals(BLACK_STARTS, prevState);
+        assertEquals(NEW_GAME, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
@@ -163,7 +163,7 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
         GameCommand prevState = game.getGameState();
-        assertEquals(WHITE_STARTS, prevState);
+        assertEquals(NEW_GAME, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
@@ -194,21 +194,23 @@ class GameTest {
         GameListener l1 = new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
-                assertEquals(WHITE_WON, e.getGameCommand());
+                assertEquals(GAME_WON, e.getGameCommand());
             }
-        };
+        };;
         game.addListener(l1);
         game.resign();
+        assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
         game.newGame(WHITE, 19, 0);
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
-                assertEquals(BLACK_WON, e.getGameCommand());
+                assertEquals(GAME_WON, e.getGameCommand());
             }
         });
         game.resign();
+        assertEquals(BLACK, game.getGameResult().getWinner());
 
         assertThrows(IllegalStateException.class, () -> game.resign());
     }
@@ -218,12 +220,13 @@ class GameTest {
         GameListener l1 = new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
-                assertEquals(BLACK_WON, e.getGameCommand());
+                assertEquals(GAME_WON, e.getGameCommand());
             }
         };
         game.playMove(0, 0);
         game.addListener(l1);
         game.resign();
+        assertEquals(BLACK, game.getGameResult().getWinner());
 
         game.removeListener(l1);
         game.newGame(WHITE, 19, 0);
@@ -231,10 +234,11 @@ class GameTest {
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
-                assertEquals(WHITE_WON, e.getGameCommand());
+                assertEquals(GAME_WON, e.getGameCommand());
             }
         });
         game.resign();
+        assertEquals(WHITE, game.getGameResult().getWinner());
 
         assertThrows(IllegalStateException.class, () -> game.resign());
     }
@@ -244,21 +248,23 @@ class GameTest {
         GameListener l1 = new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
-                assertEquals(WHITE_WON, e.getGameCommand());
+                assertEquals(GAME_WON, e.getGameCommand());
             }
         };
         game.addListener(l1);
         game.scoreGame();
+        assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
         game.newGame(BLACK, 19, 9);
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
-                assertEquals(BLACK_WON, e.getGameCommand());
+                assertEquals(GAME_WON, e.getGameCommand());
             }
         });
         game.scoreGame();
+        assertEquals(BLACK, game.getGameResult().getWinner());
     }
 
     @Test
@@ -304,7 +310,7 @@ class GameTest {
 
     @Test
     void getGameState() {
-        assertEquals(BLACK_STARTS, game.getGameState());
+        assertEquals(NEW_GAME, game.getGameState());
         game.playMove(0, 0);
         assertEquals(WHITE_PLAYS, game.getGameState());
     }

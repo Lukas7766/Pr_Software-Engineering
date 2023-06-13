@@ -200,15 +200,13 @@ public class BoardPane extends GridPane {
                     getPlayableCell(se.getX(), se.getY()).unset();
                     break;
 
-                case WHITE_STARTS:
-                case BLACK_STARTS:
+                case NEW_GAME:
                     setMouseTransparent(false);
                     init();
                     break;
 
                 case INIT:
-                case BLACK_WON:
-                case WHITE_WON:
+                case GAME_WON:
                     setMouseTransparent(true);
                     break;
 
