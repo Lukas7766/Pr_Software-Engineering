@@ -211,6 +211,8 @@ public class SidePane extends StackPane {
         textArea.setContent(textFlow);
         explanationBoard.getChildren().add(textArea);
 
+        infoPane.getChildren().add(explanationBoard);
+
         /*
          * Adds listener to Game to update the currently displayed player name
          */
@@ -226,7 +228,7 @@ public class SidePane extends StackPane {
             }
         });
 
-        GlobalSettings.addListener(() -> {
+        /*GlobalSettings.addListener(() -> {
             if(GlobalSettings.isDemoMode()) {
                 System.out.println("Demo Mode: " + GlobalSettings.isDemoMode());
 
@@ -236,7 +238,7 @@ public class SidePane extends StackPane {
             } else {
                 infoPane.getChildren().remove(explanationBoard);
             }
-        });
+        });*/
 
         return infoPane;
     }
