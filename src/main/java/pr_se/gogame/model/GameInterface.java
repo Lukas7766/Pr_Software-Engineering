@@ -16,11 +16,13 @@ public interface GameInterface {
 
     /**
      * Starts a new game.
+     *
      * @param startingColor the StoneColor of the starting player
-     * @param size the size of the board
-     * @param handicap how many handicap stones are placed in favor of the beginner
+     * @param size          the size of the board
+     * @param handicap      how many handicap stones are placed in favor of the beginner
+     * @param ruleset
      */
-    void newGame(StoneColor startingColor, int size, int handicap);
+    void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset);
 
     boolean loadGame(Path path);
 

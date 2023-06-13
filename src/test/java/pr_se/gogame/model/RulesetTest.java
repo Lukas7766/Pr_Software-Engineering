@@ -52,7 +52,7 @@ class RulesetTest {
         Game game;
         for (int i = 0; i < 10; i++) {
             game = new Game();
-            game.newGame(StoneColor.BLACK, 19,i);
+            game.newGame(StoneColor.BLACK, 19,i, new JapaneseRuleset());
 
             switch (i){
                 case 0,1 -> {

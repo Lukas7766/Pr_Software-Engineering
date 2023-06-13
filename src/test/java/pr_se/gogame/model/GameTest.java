@@ -16,17 +16,17 @@ class GameTest {
     @BeforeEach
     void setUp() {
         game = new Game();
-        game.newGame(BLACK, 19, 0);
+        game.newGame(BLACK, 19, 0, new JapaneseRuleset());
     }
 
     // argument-checking
 
     @Test
     void newGameArguments() {
-        assertThrows(NullPointerException.class, () -> game.newGame(null, 19, 0));
-        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, -1, 0));
-        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, -1));
-        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, 10));
+        assertThrows(NullPointerException.class, () -> game.newGame(null, 19, 0, new JapaneseRuleset()));
+        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, -1, 0, new JapaneseRuleset()));
+        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, -1, new JapaneseRuleset()));
+        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, 10, new JapaneseRuleset()));
     }
 
     @Test
@@ -39,7 +39,7 @@ class GameTest {
 
     @Test
     void placeHandicapStoneArguments() {
-        game.newGame(BLACK, 19, 1);
+        game.newGame(BLACK, 19, 1, new JapaneseRuleset());
         game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(-1, 0, true));
         game.setHandicapStoneCounter(1);
@@ -109,7 +109,7 @@ class GameTest {
 
     @Test
     void newGame() {
-        game.newGame(WHITE, 13, 1);
+        game.newGame(WHITE, 13, 1, new JapaneseRuleset());
         assertEquals(WHITE, game.getCurColor());
         assertEquals(13, game.getSize());
         assertEquals(1, game.getHandicap());
@@ -158,7 +158,7 @@ class GameTest {
 
     @Test
     void passWhiteStarts() {
-        game.newGame(WHITE, 19, 0);
+        game.newGame(WHITE, 19, 0, new JapaneseRuleset());
 
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
@@ -202,7 +202,7 @@ class GameTest {
         assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
-        game.newGame(WHITE, 19, 0);
+        game.newGame(WHITE, 19, 0, new JapaneseRuleset());
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
@@ -229,7 +229,7 @@ class GameTest {
         assertEquals(BLACK, game.getGameResult().getWinner());
 
         game.removeListener(l1);
-        game.newGame(WHITE, 19, 0);
+        game.newGame(WHITE, 19, 0, new JapaneseRuleset());
         game.playMove(0, 0);
         game.addListener(new GameListener() {
             @Override
@@ -256,7 +256,7 @@ class GameTest {
         assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
-        game.newGame(BLACK, 19, 9);
+        game.newGame(BLACK, 19, 9, new JapaneseRuleset());
         game.addListener(new GameListener() {
             @Override
             public void gameCommand(GameEvent e) {
@@ -368,7 +368,7 @@ class GameTest {
 
     @Test
     void setHandicapStoneCounter() {
-        game.newGame(BLACK, 19, 8);
+        game.newGame(BLACK, 19, 8, new JapaneseRuleset());
         game.setHandicapStoneCounter(8);
         assertEquals(8, game.getHandicapStoneCounter());
     }
@@ -396,7 +396,7 @@ class GameTest {
 
     @Test
     void placeHandicapStone() {
-        game.newGame(BLACK, 19, 1); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
+        game.newGame(BLACK, 19, 1, new JapaneseRuleset()); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
         game.setHandicapStoneCounter(1);
         assertNull(game.getColorAt(0, 0));
         game.placeHandicapPosition(0, 0, true);
@@ -405,7 +405,7 @@ class GameTest {
 
     @Test
     void newGameWithHandicap() {
-        game.newGame(BLACK, 19, 3);
+        game.newGame(BLACK, 19, 3, new JapaneseRuleset());
     }
 
     @Test

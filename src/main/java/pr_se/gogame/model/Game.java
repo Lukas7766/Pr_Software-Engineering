@@ -14,7 +14,7 @@ import static pr_se.gogame.model.StoneColor.WHITE;
 public class Game implements GameInterface {
 
     //Settings
-    private final Ruleset ruleset = new JapaneseRuleset();
+    private Ruleset ruleset = new JapaneseRuleset();
     private int size = 19; // TODO: Just a thought, but technically, this is really just a property of the board, so maybe the Game shouldn't save this at all and instead just provide a method to obtain the board size via its interface (said method would then return board.getSize()).
     private int handicap = 0;
 
@@ -52,7 +52,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void newGame(StoneColor startingColor, int size, int handicap) {
+    public void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset) {
         if(size < 0 || handicap < 0 || handicap > 9) {
             throw new IllegalArgumentException();
         }
@@ -62,11 +62,14 @@ public class Game implements GameInterface {
         }
 
         this.curColor = startingColor;
+        this.size = size;
+        this.handicap = handicap;
+        this.ruleset = ruleset;
+
         this.gameCommand = GameCommand.NEW_GAME;
 
         this.fileTree = new FileTree(size,"Black", "White");
-        this.size = size;
-        this.handicap = handicap;
+
         this.playerBlackScore = handicap;
         this.playerWhiteScore = this.ruleset.getKomi();
         this.blackCapturedStones = 0;
@@ -100,7 +103,7 @@ public class Game implements GameInterface {
         FileHandler fileHandler = new FileHandler();
         fileHandler.loadFile(path);
 
-        this.newGame(BLACK, 19, 0);
+        this.newGame(BLACK, 19, 0, new JapaneseRuleset());
         return false;
     }
 

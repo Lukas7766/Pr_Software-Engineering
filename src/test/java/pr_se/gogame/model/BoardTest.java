@@ -9,6 +9,27 @@ import static org.junit.jupiter.api.Assertions.*;
 import static pr_se.gogame.model.StoneColor.*;
 
 class BoardTest {
+    private Ruleset permissiveRuleset = new Ruleset() {
+        @Override
+        public UndoableCommand isKo(Game game) {
+            return new UndoableCommand() {
+                @Override
+                public void execute(boolean saveEffects) {
+
+                }
+
+                @Override
+                public void undo() {
+
+                }
+            };
+        }
+
+        @Override
+        public GameResult scoreGame(Game game) {
+            return null;
+        }
+    };
 
     Game game;
     Board board;
@@ -16,8 +37,8 @@ class BoardTest {
     @BeforeEach
     void setUp() {
         game = new Game();
-        game.newGame(BLACK, 19, 0);
-        board = game.getBoard();
+        game.newGame(BLACK, 19, 0, permissiveRuleset);
+        board = new Board(game);
     }
 
     @AfterEach
@@ -106,6 +127,8 @@ class BoardTest {
 
     @Test
     void setStoneKoPrevention() {
+        game.newGame(BLACK, 19, 0, new JapaneseRuleset());
+
         assertNotNull(board.setStone(9, 1, BLACK, false, true));
         assertNotNull(board.setStone(10, 1, WHITE, false, true));
         assertNotNull(board.setStone(9, 3, BLACK, false, true));

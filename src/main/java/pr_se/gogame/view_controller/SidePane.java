@@ -13,6 +13,7 @@ import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.model.JapaneseRuleset;
 import pr_se.gogame.model.StoneColor;
 
 import java.io.File;
@@ -346,7 +347,7 @@ public class SidePane extends StackPane {
             else actualBoardSize = Integer.parseInt(selected.getId());
 
             game.setDemoMode(false);
-            game.newGame(StoneColor.BLACK, actualBoardSize, handicap);
+            game.newGame(StoneColor.BLACK, actualBoardSize, handicap, new JapaneseRuleset());
         });
         //colum, row,
         gridPane.add(startGameBtn, 1, 15);
