@@ -214,7 +214,7 @@ public class SidePane extends StackPane {
         game.addListener(l -> {
 
             switch (l.getGameCommand()) {
-                case WHITE_PLAYS, BLACK_PLAYS, NEW_GAME -> {
+                case GAME_IS_ONGOING, NEW_GAME -> {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                     switch (game.getCurColor()) {

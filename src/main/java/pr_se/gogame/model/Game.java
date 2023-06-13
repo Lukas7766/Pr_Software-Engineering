@@ -272,11 +272,7 @@ public class Game implements GameInterface {
             @Override
             public void execute(boolean saveEffects) {
                 Game.this.curColor = c;
-                if(Game.this.curColor == BLACK) {
-                    Game.this.gameCommand = GameCommand.BLACK_PLAYS;
-                } else {
-                    Game.this.gameCommand = GameCommand.WHITE_PLAYS;
-                }
+                Game.this.gameCommand = GameCommand.GAME_IS_ONGOING;
             }
 
             @Override
@@ -292,8 +288,7 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y) {
-        /*if(this.gameCommand != GameCommand.BLACK_STARTS &&
-            this.gameCommand != GameCommand.BLACK_PLAYS && this.gameCommand != GameCommand.WHITE_PLAYS) {
+        /*if(this.gameCommand != GameCommand.NEW_GAME && this.gameCommand != GameCommand.GAME_IS_ONGOING) {
             throw new IllegalStateException("Can't place stone when game isn't being played! Game State was " + this.gameCommand);
         }*/
 
@@ -476,10 +471,8 @@ public class Game implements GameInterface {
             @Override
             public void execute(boolean saveEffects) {
                 if (curColor == BLACK) {
-                    // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
                     thisCommand = setCurColor(WHITE);
                 } else {
-                    // this.gameCommand = GameCommand.BLACK_PLAYS; // handled by setCurColor()
                     thisCommand = setCurColor(BLACK);
                 }
 
