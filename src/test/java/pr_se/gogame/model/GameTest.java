@@ -125,14 +125,14 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(BLACK, prevColor);
         GameCommand prevState = game.getGameState();
-        assertEquals(NEW_GAME, prevState);
+        assertEquals(COLOR_HAS_CHANGED, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
         prevColor = game.getCurColor();
-        assertNotEquals(prevState, game.getGameState());
+        assertEquals(prevState, game.getGameState());
         prevState = game.getGameState();
         assertEquals(prevMoveNumber, game.getCurMoveNumber());
         prevMoveNumber = game.getCurMoveNumber();
@@ -158,14 +158,14 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
         GameCommand prevState = game.getGameState();
-        assertEquals(NEW_GAME, prevState);
+        assertEquals(COLOR_HAS_CHANGED, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
         prevColor = game.getCurColor();
-        assertNotEquals(prevState, game.getGameState());
+        assertEquals(prevState, game.getGameState());
         prevState = game.getGameState();
         assertEquals(prevMoveNumber, game.getCurMoveNumber());
         prevMoveNumber = game.getCurMoveNumber();
@@ -265,7 +265,7 @@ class GameTest {
 
     @Test
     void getGameState() {
-        assertEquals(NEW_GAME, game.getGameState());
+        assertEquals(COLOR_HAS_CHANGED, game.getGameState());
         game.playMove(0, 0);
         assertEquals(COLOR_HAS_CHANGED, game.getGameState());
     }

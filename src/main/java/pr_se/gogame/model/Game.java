@@ -69,7 +69,7 @@ public class Game implements GameInterface {
         this.handicap = handicap;
         this.ruleset = ruleset;
 
-        this.gameCommand = GameCommand.NEW_GAME;
+        // this.gameCommand = GameCommand.NEW_GAME;
 
         this.fileTree = new FileTree(size,"Black", "White");
 
@@ -82,11 +82,12 @@ public class Game implements GameInterface {
 
         this.board = new Board(this);
         this.ruleset.reset();
-        fireGameEvent(new GameEvent(this.gameCommand));
+        fireGameEvent(new GameEvent(GameCommand.NEW_GAME));
+        this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
         this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
 
         this.curMoveNumber = 1;
-        this.gameCommand = GameCommand.NEW_GAME;
+        this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
 
         System.out.println("\nnewGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n------");
     }
