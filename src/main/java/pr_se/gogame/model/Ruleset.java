@@ -9,7 +9,7 @@ public interface Ruleset {
      *
      * @param existingGroup The group that is about to commit suicide
      * @param addedStone The stone that was added to the existingGroup
-     * @return whether the ruleset permits suicide under the given cirucmstances on the board.
+     * @return whether the ruleset permits suicide under the given circumstances on the board.
      */
     default boolean getSuicide(StoneGroup existingGroup, StoneGroup addedStone) {
         return false;
