@@ -317,7 +317,9 @@ public class Game implements GameInterface {
 
             @Override
             public void undo() {
-                c_UC02_switchColor.undo();
+                if(c_UC02_switchColor != null) {
+                    c_UC02_switchColor.undo();
+                }
                 curMoveNumber = OLD_MOVE_NO;
             }
         };
@@ -352,20 +354,27 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        final int OLD_HANDICAP_COUNTER = handicapStoneCounter;
-
         if(placeStone) {
             if (handicapStoneCounter < 0) {
                 throw new IllegalStateException("Can't place any more handicap stones!");
             }
 
-            UndoableCommand c = new UndoableCommand() {
-                UndoableCommand uc01_setStone = null;
+            final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, true, true); // UC01_SET_STONE is already executed within board.setStone().
+
+            if(UC01_SET_STONE == null) {
+                System.out.println("Move aborted.");
+                return;
+            }
+
+            // Assertion: UC01_SET_STONE != null and was hence a valid move.
+
+            final int OLD_HANDICAP_COUNTER = handicapStoneCounter;
+
+            final UndoableCommand UC02_UPDATE_COUNTER = new UndoableCommand() {
                 UndoableCommand uC02_switchColor = null;
 
                 @Override
                 public void execute(boolean saveEffects) {
-                    uc01_setStone = board.setStone(x, y, curColor, true, true);
                     handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
 
                     if (handicapStoneCounter < 0) {
@@ -377,15 +386,28 @@ public class Game implements GameInterface {
 
                 @Override
                 public void undo() {
-                    if (uC02_switchColor != null) {
+                    if(uC02_switchColor != null) {
                         uC02_switchColor.undo();
                     }
                     handicapStoneCounter = OLD_HANDICAP_COUNTER;
-                    uc01_setStone.undo();
-
                 }
             };
-            c.execute(true);
+            UC02_UPDATE_COUNTER.execute(true);
+
+            UndoableCommand c = new UndoableCommand() {
+                @Override
+                public void execute(boolean saveEffects) {
+                    UC01_SET_STONE.execute(saveEffects);
+                    UC02_UPDATE_COUNTER.execute(saveEffects);
+                }
+
+                @Override
+                public void undo() {
+                    UC02_UPDATE_COUNTER.undo();
+                    UC01_SET_STONE.undo();
+                }
+            };
+            // c was already executed piecemeal
 
             // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
             geraldsHistory.addNode(new GeraldsNode(c, "placeHandicapPosition(" + x + ", " + y + ")"));

@@ -184,7 +184,7 @@ public class Board implements BoardInterface {
 
                 // Update UI if possible
                 if (!FINAL_PERMITTED_SUICIDE) {
-                    fireStoneSet(x, y, color, prepareMode);
+                    fireStoneSet(x, y, color);
                 }
             }
 
@@ -290,7 +290,7 @@ public class Board implements BoardInterface {
                 }
 
                 // Update UI
-                fireStoneSet(x, y, board[x][y].getStoneGroup().getStoneColor(), false);
+                fireStoneSet(x, y, board[x][y].getStoneGroup().getStoneColor());
             }
         };
         ret.execute(true);
@@ -307,7 +307,7 @@ public class Board implements BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      * @param c the StoneColor of the stone that has been set
      */
-    private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
+    private void fireStoneSet(int x, int y, StoneColor c) {
         GameCommand gc = GameCommand.STONE_WAS_SET;
 
         StoneEvent e = new StoneEvent(gc, x, y, c, GAME.getCurMoveNumber());
