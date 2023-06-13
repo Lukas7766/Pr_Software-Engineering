@@ -145,14 +145,14 @@ class GameTest {
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
         prevColor = game.getCurColor();
-        assertNotEquals(prevState, game.getGameState());
+        assertEquals(prevState, game.getGameState());
         prevState = game.getGameState();
         assertEquals(prevMoveNumber, game.getCurMoveNumber());
         prevMoveNumber = game.getCurMoveNumber();
 
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
-        assertNotEquals(prevState, game.getGameState());
+        assertEquals(prevState, game.getGameState());
         assertEquals(prevMoveNumber, game.getCurMoveNumber());
     }
 
@@ -178,14 +178,14 @@ class GameTest {
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
         prevColor = game.getCurColor();
-        assertNotEquals(prevState, game.getGameState());
+        assertEquals(prevState, game.getGameState());
         prevState = game.getGameState();
         assertEquals(prevMoveNumber, game.getCurMoveNumber());
         prevMoveNumber = game.getCurMoveNumber();
 
         game.pass();
         assertNotEquals(prevColor, game.getCurColor());
-        assertNotEquals(prevState, game.getGameState());
+        assertEquals(prevState, game.getGameState());
         assertEquals(prevMoveNumber, game.getCurMoveNumber());
     }
 
