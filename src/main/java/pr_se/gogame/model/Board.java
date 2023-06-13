@@ -327,10 +327,7 @@ public class Board implements BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      */
     private void fireStoneRemoved(int x, int y) {
-        GameCommand gc = GameCommand.BLACK_HAS_CAPTURED;
-        if (GAME.getCurColor() == WHITE) {
-            gc = GameCommand.WHITE_HAS_CAPTURED;
-        }
+        GameCommand gc = GameCommand.STONE_WAS_CAPTURED;
         StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
 
         GAME.fireGameEvent(e);

@@ -195,8 +195,7 @@ public class BoardPane extends GridPane {
                     confirmMove();
                     break;
 
-                case WHITE_HAS_CAPTURED:
-                case BLACK_HAS_CAPTURED:
+                case STONE_WAS_CAPTURED:
                     StoneEvent se = (StoneEvent) e;
                     getPlayableCell(se.getX(), se.getY()).unset();
                     break;

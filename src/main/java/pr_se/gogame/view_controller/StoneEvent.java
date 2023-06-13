@@ -22,8 +22,7 @@ public class StoneEvent extends GameEvent {
         this.moveNumber = moveNumber;
 
         switch(gameCommand) {
-            case BLACK_HAS_CAPTURED:
-            case WHITE_HAS_CAPTURED:
+            case STONE_WAS_CAPTURED:
             case HANDICAP_POS:
             case DEBUG_INFO:
                 this.COLOR = null;
