@@ -127,25 +127,9 @@ public class Game implements GameInterface {
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                GameResult result;
-                StringBuilder sb = new StringBuilder();
-                sb.append("Game was resigned by ");
-                switch (FINAL_CUR_COLOR) {
-                    case WHITE:
-                        sb.append("White!").append("\n\n").append("Black won!");
-                        result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
-                        break;
-
-                    case BLACK:
-                        sb.append("Black!").append("\n\n").append("White won!");
-                        result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
-                        break;
-
-                    default:
-                        throw new IllegalStateException("Game was not resigned! Consult your application owner!");
-                }
+                String msg = "Game was resigned by " + FINAL_CUR_COLOR + "!\n\n" + StoneColor.getOpposite(FINAL_CUR_COLOR) + " won!";
+                gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(FINAL_CUR_COLOR), msg);
                 gameCommand = GameCommand.GAME_WON;
-                gameResult = result;
                 fireGameEvent(new GameEvent(gameCommand));
             }
 

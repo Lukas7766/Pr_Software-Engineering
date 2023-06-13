@@ -91,18 +91,21 @@ public class SidePane extends StackPane {
                         this.getChildren().remove(gameInfo);
                     }
                     break;
+
                 case NEW_GAME:
                     if (!this.getChildren().contains(gameInfo)) {
                         this.getChildren().remove(gameSetting);
                         this.getChildren().add(gameInfo);
                     }
                     break;
+
                 //case CONFIG_DEMO_MODE:
                 //    if (game.isDemoMode()) {
                 //        this.getChildren().remove(gameSetting);
                 //        this.getChildren().add(gameInfo);
                 //    }
                 //    break;
+
                 case GAME_WON:
                     CustomWinAction.winAction(stage, game);
                     break;
