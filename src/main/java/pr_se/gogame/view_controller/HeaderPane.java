@@ -113,11 +113,9 @@ public class HeaderPane extends VBox {
      * @return the file section for the menu bar
      */
     private Menu fileSection() {
-        Menu files = new Menu();
-        files.setText("_File");
+        Menu files = new Menu("_File");
 
-        MenuItem newGameItem = new MenuItem();
-        newGameItem.setText("_New Game");
+        MenuItem newGameItem = new MenuItem("_New Game");
         newGameItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
         files.getItems().add(newGameItem);
         newGameItem.setOnAction(e -> {
@@ -126,8 +124,7 @@ public class HeaderPane extends VBox {
             CustomNewGameAction.onSaveAction(stage, game, filterList);
         });
 
-        MenuItem importFileItem = new MenuItem();
-        importFileItem.setText("_Load Game");
+        MenuItem importFileItem = new MenuItem("L_oad Game");
         importFileItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
@@ -136,15 +133,13 @@ public class HeaderPane extends VBox {
             else System.out.println("Import Dialog cancelled");
         });
 
-        MenuItem exportFileItem = new MenuItem();
-        exportFileItem.setText("_Save");
+        MenuItem exportFileItem = new MenuItem("_Save");
         exportFileItem.setDisable(true);
         exportFileItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItem);
         exportFileItem.setOnAction(e -> saveGame(false));
 
-        MenuItem exportFileItemAs = new MenuItem();
-        exportFileItemAs.setText("_Save as");
+        MenuItem exportFileItemAs = new MenuItem("Save _as");
         exportFileItemAs.setDisable(true);
         exportFileItemAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItemAs);
@@ -167,8 +162,7 @@ public class HeaderPane extends VBox {
             }
         });
 
-        MenuItem exitGameItem = new MenuItem();
-        exitGameItem.setText("_Quit Game");
+        MenuItem exitGameItem = new MenuItem("_Quit Game");
         exitGameItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exitGameItem);
         exitGameItem.setOnAction(e -> CustomCloseAction.onCloseAction(stage, game, null, filterList)); //onCloseAction(null)
@@ -193,10 +187,9 @@ public class HeaderPane extends VBox {
      * @return the game section for the menu bar
      */
     private Menu gameSection() {
-        Menu menu = new Menu();
-        menu.setText("_Game");
+        Menu menu = new Menu("_Game");
 
-        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("_Move confirmation required");
+        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
         moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
@@ -212,20 +205,17 @@ public class HeaderPane extends VBox {
             }
         });
 
-        MenuItem passItem = new MenuItem();
-        passItem.setText("_Pass");
+        MenuItem passItem = new MenuItem("_Pass");
         passItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN));
         gameSectionItems.add(passItem);
         passItem.setOnAction(e -> game.pass());
 
-        MenuItem resignItem = new MenuItem();
-        resignItem.setText("_Resign");
+        MenuItem resignItem = new MenuItem("_Resign");
         resignItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.ALT_DOWN));
         gameSectionItems.add(resignItem);
         resignItem.setOnAction(e -> game.resign());
 
-        MenuItem scoreGameItem = new MenuItem();
-        scoreGameItem.setText("_Score Game");
+        MenuItem scoreGameItem = new MenuItem("_Score Game");
         scoreGameItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN));
         gameSectionItems.add(scoreGameItem);
         scoreGameItem.setOnAction(e -> game.scoreGame());
@@ -266,12 +256,11 @@ public class HeaderPane extends VBox {
      * @return the view section for the menu bar
      */
     private Menu viewSection() {
-        Menu menu = new Menu();
-        menu.setText("_View");
+        Menu menu = new Menu("_View");
 
         List<MenuItem> viewSectionItems = new ArrayList<>();
 
-        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("_Move Numbers");
+        CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Move _Numbers");
         showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         viewSectionItems.add(showMoveNumbersCBtn);
         showMoveNumbersCBtn.setSelected(GlobalSettings.isShowMoveNumbers());
@@ -283,24 +272,6 @@ public class HeaderPane extends VBox {
         showCoordinatesCBtn.setSelected(GlobalSettings.isShowCoordinates());
         showCoordinatesCBtn.setOnAction(e -> GlobalSettings.setShowCoordinates(showCoordinatesCBtn.isSelected()));
         menu.getItems().addAll(viewSectionItems);
-
-        //MenuItem loadGraphicsBtn = new MenuItem("_Load Graphics Set");
-        //loadGraphicsBtn.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        //menu.getItems().addAll(loadGraphicsBtn);
-
-        //loadGraphicsBtn.setOnAction(e -> {
-        //    File workingDirectory = new File(System.getProperty("user.dir") + "/Grafiksets/");
-        //    FileChooser fileChooser = new FileChooser();
-        //    fileChooser.setInitialDirectory(workingDirectory);
-        //    fileChooser.setTitle("Load Graphics Set");
-        //    fileChooser.getExtensionFilters().addAll(
-        //            new FileChooser.ExtensionFilter("ZIP", "*.zip")
-        //    );
-        //    File selectedFile = fileChooser.showOpenDialog(stage);
-        //    if (selectedFile != null) {
-        //        game.setGraphicsPath(selectedFile.getAbsolutePath());
-        //    }
-        //});
 
         return menu;
     }
@@ -314,11 +285,9 @@ public class HeaderPane extends VBox {
      * @return the help section for the menu bar
      */
     private Menu helpSection() {
-        Menu menu = new Menu();
-        menu.setText("_Help");
+        Menu menu = new Menu("_Help");
 
-        MenuItem helpItem = new MenuItem();
-        helpItem.setText("_Help");
+        MenuItem helpItem = new MenuItem("_Help");
         helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         menu.getItems().add(helpItem);
         helpItem.setOnAction(ev -> {
@@ -326,8 +295,7 @@ public class HeaderPane extends VBox {
             app.getHostServices().showDocument(url);
         });
 
-        MenuItem aboutUs = new MenuItem();
-        aboutUs.setText("_About Us");
+        MenuItem aboutUs = new MenuItem("_About Us");
         aboutUs.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         menu.getItems().add(aboutUs);
         aboutUs.setOnAction(e -> {
@@ -365,26 +333,22 @@ public class HeaderPane extends VBox {
         playbackControl.setAlignment(Pos.CENTER);
         playbackControl.setSpacing(5);
 
-        Button fastBackward = new Button();
-        fastBackward.setText("<<");
+        Button fastBackward = new Button("<<");
         fastBackward.setFocusTraversable(false);
         fastBackward.setOnAction(e -> System.out.println("fastBackward"));
         playbackControlList.add(fastBackward);
 
-        Button backward = new Button();
-        backward.setText("<");
+        Button backward = new Button("<");
         backward.setFocusTraversable(false);
         backward.setOnAction(e -> System.out.println("backward"));
         playbackControlList.add(backward);
 
-        Button forward = new Button();
-        forward.setText(">");
+        Button forward = new Button(">");
         forward.setFocusTraversable(false);
         forward.setOnAction(e -> System.out.println("forward"));
         playbackControlList.add(forward);
 
-        Button fastForward = new Button();
-        fastForward.setText(">>");
+        Button fastForward = new Button(">>");
         fastForward.setOnAction(e -> System.out.println("fastForward"));
         fastForward.setFocusTraversable(false);
         playbackControlList.add(fastForward);
