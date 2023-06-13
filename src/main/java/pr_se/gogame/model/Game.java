@@ -127,7 +127,10 @@ public class Game implements GameInterface {
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                String msg = "Game was resigned by " + FINAL_CUR_COLOR + "!\n\n" + StoneColor.getOpposite(FINAL_CUR_COLOR) + " won!";
+                String msg =
+                        "Game was resigned by " + FINAL_CUR_COLOR + "!\n" +
+                        "\n" +
+                        StoneColor.getOpposite(FINAL_CUR_COLOR) + " won!";
                 gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(FINAL_CUR_COLOR), msg);
                 gameCommand = GameCommand.GAME_WON;
                 fireGameEvent(new GameEvent(gameCommand));

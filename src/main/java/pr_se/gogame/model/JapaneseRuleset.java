@@ -101,14 +101,14 @@ public class JapaneseRuleset implements Ruleset {
 
         if (scoreBlack > scoreWhite) {
             winner = StoneColor.BLACK;
-            sb.append("Black won!").append("\n\n");
+            sb.append(StoneColor.BLACK + " won!").append("\n\n");
             sb.append("Handicap:").append(" ").append(handicap).append("\n");
             captStone = capturedStonesBlack;
             trScore = territoryScoreBlack;
             sc = scoreBlack;
         } else {
             winner = StoneColor.WHITE;
-            sb.append("White won!").append("\n\n");
+            sb.append(StoneColor.WHITE + " won!").append("\n\n");
             sb.append("Komi:").append(" ").append(komi).append("\n");
             captStone = capturedStonesWhite;
             trScore = territoryScoreWhite;
