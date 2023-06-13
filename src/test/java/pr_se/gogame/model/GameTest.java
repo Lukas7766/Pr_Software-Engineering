@@ -312,7 +312,7 @@ class GameTest {
     void getGameState() {
         assertEquals(NEW_GAME, game.getGameState());
         game.playMove(0, 0);
-        assertEquals(GAME_IS_ONGOING, game.getGameState());
+        assertEquals(COLOR_HAS_CHANGED, game.getGameState());
     }
 
     @Test

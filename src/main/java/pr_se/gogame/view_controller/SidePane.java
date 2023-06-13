@@ -211,13 +211,12 @@ public class SidePane extends StackPane {
         explanationBoard.getChildren().add(textArea);
 
         /*
-         * Comment by Gerald:
          * Adds listener to Game to update the currently displayed player name
          */
         game.addListener(l -> {
 
             switch (l.getGameCommand()) {
-                case GAME_IS_ONGOING, NEW_GAME, GAME_WON -> {
+                case COLOR_HAS_CHANGED, NEW_GAME, GAME_WON -> {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                     actualPlayer.setText(game.getCurColor().toString());

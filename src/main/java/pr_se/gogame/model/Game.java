@@ -262,7 +262,7 @@ public class Game implements GameInterface {
             @Override
             public void execute(boolean saveEffects) {
                 Game.this.curColor = c;
-                Game.this.gameCommand = GameCommand.GAME_IS_ONGOING;
+                Game.this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
             }
 
             @Override
