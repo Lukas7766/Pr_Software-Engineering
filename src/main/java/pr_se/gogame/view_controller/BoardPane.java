@@ -149,7 +149,7 @@ public class BoardPane extends GridPane {
         setMouseTransparent(true);
 
         this.game = game;
-        this.graphicsPath = game.getGraphicsPath();
+        this.graphicsPath = GlobalSettings.getGraphicsPath();
         this.showsMoveNumbers = GlobalSettings.isShowMoveNumbers();
         this.showsCoordinates = GlobalSettings.isShowCoordinates();
         this.needsMoveConfirmation = GlobalSettings.isConfirmationNeeded();
@@ -160,6 +160,7 @@ public class BoardPane extends GridPane {
                 setMoveConfirmation(GlobalSettings.isConfirmationNeeded());
                 setShowsCoordinates(GlobalSettings.isShowCoordinates());
                 setShowsMoveNumbers(GlobalSettings.isShowMoveNumbers());
+                setGraphicsPath(GlobalSettings.getGraphicsPath());
             }
         });
 
@@ -210,10 +211,6 @@ public class BoardPane extends GridPane {
                 case BLACK_WON:
                 case WHITE_WON:
                     setMouseTransparent(true);
-                    break;
-
-                case CONFIG_GRAPHICS:
-                    setGraphicsPath(game.getGraphicsPath());
                     break;
 
                 case DEBUG_INFO:
@@ -477,6 +474,10 @@ public class BoardPane extends GridPane {
     public void setGraphicsPath(String graphicsPath) {
         if(graphicsPath == null) {
             throw new NullPointerException();
+        }
+
+        if(this.graphicsPath.equals(graphicsPath)) {
+            return; // Don't unnecessarily reload the entire graphics pack.
         }
 
         this.graphicsPath = graphicsPath;

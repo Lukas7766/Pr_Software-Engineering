@@ -7,6 +7,5 @@ public enum GameCommand {
 
     //GamePlay Setting Commands
     CONFIG_DEMO_MODE,
-    CONFIG_GRAPHICS, //Debug Commands
     DEBUG_INFO
 }

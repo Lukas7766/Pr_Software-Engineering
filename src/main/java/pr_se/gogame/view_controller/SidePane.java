@@ -187,11 +187,11 @@ public class SidePane extends StackPane {
         infoPane.getChildren().add(spring2);
 
 
-        VBox explanationBoad = new VBox();
+        VBox explanationBoard = new VBox();
         Label explanationLabel = new Label();
         explanationLabel.setFont(Font.font(null, FontWeight.BOLD, 13));
         explanationLabel.setText("Turn Explanation:");
-        explanationBoad.getChildren().add(explanationLabel);
+        explanationBoard.getChildren().add(explanationLabel);
 
         ScrollPane textArea = new ScrollPane();
         textArea.setFitToWidth(true);
@@ -209,7 +209,7 @@ public class SidePane extends StackPane {
         textFlow.getChildren().add(explanation);
 
         textArea.setContent(textFlow);
-        explanationBoad.getChildren().add(textArea);
+        explanationBoard.getChildren().add(textArea);
 
         /*
          * Comment by Gerald:
@@ -234,10 +234,10 @@ public class SidePane extends StackPane {
                     System.out.println("Demo Mode: " + game.isDemoMode());
 
                     if (game.isDemoMode()) {
-                        if (infoPane.getChildren().contains(explanationBoad)) break;
-                        infoPane.getChildren().add(explanationBoad);
+                        if (infoPane.getChildren().contains(explanationBoard)) break;
+                        infoPane.getChildren().add(explanationBoard);
                     } else {
-                        infoPane.getChildren().remove(explanationBoad);
+                        infoPane.getChildren().remove(explanationBoard);
                     }
                 }
             }

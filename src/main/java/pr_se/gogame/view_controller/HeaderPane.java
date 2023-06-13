@@ -485,7 +485,7 @@ public class HeaderPane extends VBox {
         graphicsPackSelectorComboBox.setFocusTraversable(false);
         graphicsPackSelectorComboBox.setOnAction((e) -> {
             System.out.println(graphicsPackSelectorComboBox.getValue());
-            game.setGraphicsPath(GRAPHICS_FOLDER + "/" + graphicsPackSelectorComboBox.getValue());
+            GlobalSettings.setGraphicsPath(GRAPHICS_FOLDER + "/" + graphicsPackSelectorComboBox.getValue());
         });
 
         gameShortCards.getChildren().add(graphicsPackSelectorComboBox);

@@ -117,10 +117,6 @@ public interface GameInterface {
 
     void setHandicapStoneCounter(int noStones);
 
-    String getGraphicsPath();
-
-    void setGraphicsPath(String path);
-
     Path getSavePath();
 
     void setSavePath(Path path);

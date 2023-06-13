@@ -18,8 +18,6 @@ public class Game implements GameInterface {
     private int size = 19; // TODO: Just a thought, but technically, this is really just a property of the board, so maybe the Game shouldn't save this at all and instead just provide a method to obtain the board size via its interface (said method would then return board.getSize()).
     private int handicap = 0;
 
-    private String graphicsPath = "./Grafiksets/default.zip";
-
     //global (helper) variables
     private Path savaGamePath;
     private FileTree fileTree;
@@ -467,20 +465,6 @@ public class Game implements GameInterface {
     @Override
     public GameResult getGameResult() {
         return gameResult;
-    }
-
-    @Override
-    public String getGraphicsPath() {
-        return graphicsPath;
-    }
-
-    @Override
-    public void setGraphicsPath(String path) {
-        if(path == null) {
-            throw new NullPointerException();
-        }
-        this.graphicsPath = path;
-        fireGameEvent(new GameEvent(GameCommand.CONFIG_GRAPHICS));
     }
 
     @Override
