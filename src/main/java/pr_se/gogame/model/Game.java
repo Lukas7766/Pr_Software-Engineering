@@ -297,7 +297,6 @@ public class Game implements GameInterface {
             public void execute(boolean saveEffects) {
                 if (UC01_setStone != null) {
                     curMoveNumber++;
-                    System.out.println("Move played.");
                     // Update current player color
                     c_UC02_switchColor = switchColor();
                 } else {
@@ -453,8 +452,6 @@ public class Game implements GameInterface {
     }
 
     private UndoableCommand switchColor() {
-        System.out.println("Game.switchColor()");
-
         UndoableCommand ret = new UndoableCommand() {
             UndoableCommand thisCommand;
 
@@ -488,7 +485,7 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
-        System.out.println("Firing " + e.getGameCommand());
+        // System.out.println("Firing " + e.getGameCommand());
 
         for (GameListener l : listeners) {
             l.gameCommand(e);

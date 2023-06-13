@@ -133,7 +133,7 @@ public class Board implements BoardInterface {
             @Override
             public void execute(boolean saveEffects) {
                 if (!FINAL_PERMITTED_SUICIDE) {
-                    System.out.println("Placing stone down at " + x + ", " + y);
+                    System.out.println("Placing " + color + " stone down at " + x + ", " + y);
                     board[x][y] =
                         firstSameColorGroup.getPointers().stream()
                             .findFirst()

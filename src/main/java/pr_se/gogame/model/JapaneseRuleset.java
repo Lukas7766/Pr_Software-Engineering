@@ -40,10 +40,9 @@ public class JapaneseRuleset implements Ruleset {
         final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
 
         if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
+            System.out.println("Ko Detected. Move aborted.");
             return null;
         }
-
-        System.out.println("Not ko");
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
@@ -102,14 +101,14 @@ public class JapaneseRuleset implements Ruleset {
         if (scoreBlack > scoreWhite) {
             winner = StoneColor.BLACK;
             sb.append(StoneColor.BLACK + " won!").append("\n\n");
-            sb.append("Handicap:").append(" ").append(handicap).append("\n");
+            sb.append("Handicap: ").append(handicap).append("\n");
             captStone = capturedStonesBlack;
             trScore = territoryScoreBlack;
             sc = scoreBlack;
         } else {
             winner = StoneColor.WHITE;
             sb.append(StoneColor.WHITE + " won!").append("\n\n");
-            sb.append("Komi:").append(" ").append(komi).append("\n");
+            sb.append("Komi: ").append(komi).append("\n");
             captStone = capturedStonesWhite;
             trScore = territoryScoreWhite;
             sc = scoreWhite;

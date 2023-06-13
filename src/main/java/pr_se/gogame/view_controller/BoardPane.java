@@ -14,6 +14,7 @@ import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -491,105 +492,66 @@ public class BoardPane extends GridPane {
      */
     private void loadGraphics(String graphicsPath) {
         try (ZipFile zip = new ZipFile(graphicsPath)) {
-            ZipEntry tileEntry = zip.getEntry("tile.png");
-            ZipEntry tileCornerEntry = zip.getEntry("tile_corner.png");
-            ZipEntry tileEdgeEntry = zip.getEntry("tile_edge.png");
-            ZipEntry outerCornerEntry = zip.getEntry("outer_corner.png");
-            ZipEntry outerEdgeEntry = zip.getEntry("outer_edge.png");
-            ZipEntry stone0Entry = zip.getEntry("stone_0.png");
-            ZipEntry stone1Entry = zip.getEntry("stone_1.png");
-            ZipEntry circleMark0Entry = zip.getEntry("mark_circle_0.png");
-            ZipEntry circleMark1Entry = zip.getEntry("mark_circle_1.png");
-            ZipEntry circleMark2Entry = zip.getEntry("mark_circle_2.png");
-            ZipEntry triangleMark0Entry = zip.getEntry("mark_triangle_0.png");
-            ZipEntry triangleMark1Entry = zip.getEntry("mark_triangle_1.png");
-            ZipEntry triangleMark2Entry = zip.getEntry("mark_triangle_2.png");
-            ZipEntry squareMark0Entry = zip.getEntry("mark_square_0.png");
-            ZipEntry squareMark1Entry = zip.getEntry("mark_square_1.png");
-            ZipEntry squareMark2Entry = zip.getEntry("mark_square_2.png");
-            ZipEntry handicapSlotEntry = zip.getEntry("handicap_slot.png");
-
-            if(Stream.of(tileEntry,
-                    tileCornerEntry,
-                    tileEdgeEntry,
-                    outerCornerEntry,
-                    outerEdgeEntry,
-                    stone0Entry,
-                    stone1Entry,
-                    circleMark0Entry,
-                    circleMark1Entry,
-                    circleMark2Entry,
-                    triangleMark0Entry,
-                    triangleMark1Entry,
-                    triangleMark2Entry,
-                    squareMark0Entry,
-                    squareMark1Entry,
-                    squareMark2Entry,
-                    handicapSlotEntry
-                ).anyMatch(Objects::isNull)) {
-                throw new IllegalStateException("ERROR: Graphics pack " + graphicsPath + " is missing files!");
-            }
-
-            try (InputStream tileIS = zip.getInputStream(tileEntry);
-                 InputStream tileCornerIS = zip.getInputStream(tileCornerEntry);
-                 InputStream tileEdgeIS = zip.getInputStream(tileEdgeEntry);
-                 InputStream outerCornerIS = zip.getInputStream(outerCornerEntry);
-                 InputStream outerEdgeIS = zip.getInputStream(outerEdgeEntry);
-                 InputStream stone0IS = zip.getInputStream(stone0Entry);
-                 InputStream stone1IS = zip.getInputStream(stone1Entry);
-                 InputStream circleMark0IS = zip.getInputStream(circleMark0Entry);
-                 InputStream circleMark1IS = zip.getInputStream(circleMark1Entry);
-                 InputStream circleMark2IS = zip.getInputStream(circleMark2Entry);
-                 InputStream triangleMark0IS = zip.getInputStream(triangleMark0Entry);
-                 InputStream triangleMark1IS = zip.getInputStream(triangleMark1Entry);
-                 InputStream triangleMark2IS = zip.getInputStream(triangleMark2Entry);
-                 InputStream squareMark0IS = zip.getInputStream(squareMark0Entry);
-                 InputStream squareMark1IS = zip.getInputStream(squareMark1Entry);
-                 InputStream squareMark2IS = zip.getInputStream(squareMark2Entry);
-                 InputStream handicapSlotIS = zip.getInputStream(handicapSlotEntry);
-            ) {
-                final int DEFAULT_IMAGE_SIZE = 128;
-                final boolean SMOOTH_IMAGES = false;
-
-                tile = new Image(
-                        tileIS,             // is (:InputStream)
-                        DEFAULT_IMAGE_SIZE, // requestedWidth
-                        DEFAULT_IMAGE_SIZE, // requestedHeight
-                        true,               // preserveRatio
-                        SMOOTH_IMAGES);     // smooth
-                tileEdge = new Image(tileEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                tileCorner = new Image(tileCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                outerEdge = new Image(outerEdgeIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-                outerCorner = new Image(outerCornerIS, DEFAULT_IMAGE_SIZE, DEFAULT_IMAGE_SIZE, true, SMOOTH_IMAGES);
-
-                stones[0] = new Image(stone0IS);
-                stones[1] = new Image(stone1IS);
-
-                circleMarks[0] = new Image(circleMark0IS);
-                circleMarks[1] = new Image(circleMark1IS);
-                circleMarks[2] = new Image(circleMark2IS);
-
-                triangleMarks[0] = new Image(triangleMark0IS);
-                triangleMarks[1] = new Image(triangleMark1IS);
-                triangleMarks[2] = new Image(triangleMark2IS);
-
-                squareMarks[0] = new Image(squareMark0IS);
-                squareMarks[1] = new Image(squareMark1IS);
-                squareMarks[2] = new Image(squareMark2IS);
-
-                handicapSlot = new Image(handicapSlotIS);
-            } catch (Exception e) {
-                String errMsg = "Couldn't read file from graphics pack " + graphicsPath + "!";
-                CustomExceptionDialog.show(e, errMsg);
-                System.err.println(errMsg);
-                e.printStackTrace();
-            }
+            tile = loadImageFromGraphicsPack("tile.png", zip);
+            tileCorner = loadImageFromGraphicsPack("tile_corner.png", zip);
+            tileEdge = loadImageFromGraphicsPack("tile_edge.png", zip);
+            outerCorner = loadImageFromGraphicsPack("outer_corner.png", zip);
+            outerEdge = loadImageFromGraphicsPack("outer_edge.png", zip);
+            stones[0] = loadImageFromGraphicsPack("stone_0.png", zip);
+            stones[1] = loadImageFromGraphicsPack("stone_1.png", zip);
+            circleMarks[0] = loadImageFromGraphicsPack("mark_circle_0.png", zip);
+            circleMarks[1] = loadImageFromGraphicsPack("mark_circle_1.png", zip);
+            circleMarks[2] = loadImageFromGraphicsPack("mark_circle_2.png", zip);
+            triangleMarks[0] = loadImageFromGraphicsPack("mark_triangle_0.png", zip);
+            triangleMarks[1] = loadImageFromGraphicsPack("mark_triangle_1.png", zip);
+            triangleMarks[2] = loadImageFromGraphicsPack("mark_triangle_2.png", zip);
+            squareMarks[0] = loadImageFromGraphicsPack("mark_square_0.png", zip);
+            squareMarks[1] = loadImageFromGraphicsPack("mark_square_1.png", zip);
+            squareMarks[2] = loadImageFromGraphicsPack("mark_square_2.png", zip);
+            handicapSlot = loadImageFromGraphicsPack("handicap_slot.png", zip);
         } catch (Exception e) {
             String errMsg = "Couldn't open graphics pack " + graphicsPath + "!";
             CustomExceptionDialog.show(e, errMsg);
             System.err.println(errMsg);
             e.printStackTrace();
         }
+    }
+
+    private Image loadImageFromGraphicsPack(String fileName, ZipFile zip) {
+        if(fileName == null || zip == null) {
+            throw new NullPointerException();
+        }
+
+        ZipEntry zipEntry = zip.getEntry(fileName);
+
+        if(zipEntry == null) {
+            IOException e = new IOException();
+            String errMsg = "File " + fileName + " is not present in graphics pack " + graphicsPath + "!";
+            CustomExceptionDialog.show(e, errMsg);
+            System.err.println(errMsg);
+            e.printStackTrace();
+        }
+
+        Image ret = null;
+
+        try (InputStream is = zip.getInputStream(zipEntry)) {
+            final int DEFAULT_IMAGE_SIZE = 128;
+            final boolean SMOOTH_IMAGES = false;
+
+            ret = new Image(
+                is,             // is (:InputStream)
+                DEFAULT_IMAGE_SIZE, // requestedWidth
+                DEFAULT_IMAGE_SIZE, // requestedHeight
+                true,               // preserveRatio
+                SMOOTH_IMAGES);     // smooth
+        } catch (IOException e) {
+            String errMsg = "File " + fileName + " appears to be present but unreadable in graphics pack " + graphicsPath + "!";
+            CustomExceptionDialog.show(e, errMsg);
+            System.err.println(errMsg);
+            e.printStackTrace();
+        }
+
+        return ret;
     }
 
     private void updateGraphics() {
