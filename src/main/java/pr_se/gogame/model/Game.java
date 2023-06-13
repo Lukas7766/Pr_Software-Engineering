@@ -374,7 +374,7 @@ public class Game implements GameInterface {
 
             // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         } else {
-            fireGameEvent(new StoneEvent(GameCommand.HANDICAP_POS, x, y, curMoveNumber));
+            fireGameEvent(new StoneEvent(GameCommand.STONE_WAS_SET, x, y, null, curMoveNumber));
         }
     }
 

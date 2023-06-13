@@ -11,34 +11,20 @@ public class StoneEvent extends GameEvent {
 
     private final StoneColor COLOR;
 
-    public StoneEvent(GameCommand gameCommand, int x, int y, int moveNumber) {
+    public StoneEvent(GameCommand gameCommand, int x, int y, StoneColor c, int moveNumber) {
         super(gameCommand);
         if(x < 0 || y < 0 || moveNumber < 0) {
             throw new IllegalArgumentException();
         }
 
+        if(this.getGameCommand() != GameCommand.STONE_WAS_SET && this.getGameCommand() != GameCommand.STONE_WAS_CAPTURED && this.getGameCommand() != GameCommand.DEBUG_INFO) {
+            throw new IllegalArgumentException("StoneEvent must pertain to stones");
+        }
+
         this.X = x;
         this.Y = y;
+        this.COLOR = c;
         this.moveNumber = moveNumber;
-
-        switch(gameCommand) {
-            case STONE_WAS_CAPTURED:
-            case HANDICAP_POS:
-            case DEBUG_INFO:
-                this.COLOR = null;
-                break;
-
-            case BLACK_STONE_SET:
-                this.COLOR = StoneColor.BLACK;
-                break;
-
-            case WHITE_STONE_SET:
-                this.COLOR = StoneColor.WHITE;
-                break;
-
-            default:
-                throw new IllegalArgumentException();
-        }
     }
 
     public int getX() {

@@ -8,8 +8,6 @@ import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static pr_se.gogame.model.StoneColor.WHITE;
-
 
 /**
  * Model
@@ -310,13 +308,10 @@ public class Board implements BoardInterface {
      * @param c the StoneColor of the stone that has been set
      */
     private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
-        GameCommand gc = GameCommand.BLACK_STONE_SET;
-        if (c == WHITE) {
-            gc = GameCommand.WHITE_STONE_SET;
-        }
+        GameCommand gc = GameCommand.STONE_WAS_SET;
 
         System.out.println("cur move number: "+GAME.getCurMoveNumber());
-        StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
+        StoneEvent e = new StoneEvent(gc, x, y, c, GAME.getCurMoveNumber());
         GAME.fireGameEvent(e);
     }
 
@@ -328,7 +323,7 @@ public class Board implements BoardInterface {
      */
     private void fireStoneRemoved(int x, int y) {
         GameCommand gc = GameCommand.STONE_WAS_CAPTURED;
-        StoneEvent e = new StoneEvent(gc, x, y, GAME.getCurMoveNumber());
+        StoneEvent e = new StoneEvent(gc, x, y, null, GAME.getCurMoveNumber());
 
         GAME.fireGameEvent(e);
     }

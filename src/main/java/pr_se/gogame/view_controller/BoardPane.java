@@ -170,9 +170,7 @@ public class BoardPane extends GridPane {
             }
 
             switch(e.getGameCommand()) {
-                case HANDICAP_POS:
-                case BLACK_STONE_SET:
-                case WHITE_STONE_SET:
+                case STONE_WAS_SET:
                     System.out.println("StoneEvent");
                     StoneEvent sse = (StoneEvent) e;
                     PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
