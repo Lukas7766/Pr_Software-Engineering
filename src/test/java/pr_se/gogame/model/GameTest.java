@@ -419,39 +419,6 @@ class GameTest {
     }
 
     @Test
-    void setConfirmationNeeded() {
-        game.setConfirmationNeeded(true);
-        assertTrue(game.isConfirmationNeeded());
-    }
-
-    @Test
-    void isConfirmationNeeded() {
-        assertFalse(game.isConfirmationNeeded());
-    }
-
-    @Test
-    void setShowMoveNumbers() {
-        game.setShowMoveNumbers(true);
-        assertTrue(game.isShowMoveNumbers());
-    }
-
-    @Test
-    void isShowMoveNumbers() {
-        assertFalse(game.isShowMoveNumbers());
-    }
-
-    @Test
-    void setShowCoordinates() {
-        game.setShowCoordinates(false);
-        assertFalse(game.isShowCoordinates());
-    }
-
-    @Test
-    void isShowCoordinates() {
-        assertTrue(game.isShowCoordinates());
-    }
-
-    @Test
     void addCapturedStones() {
         assertEquals(0, game.getStonesCapturedBy(BLACK));
         assertEquals(0, game.getStonesCapturedBy(WHITE));

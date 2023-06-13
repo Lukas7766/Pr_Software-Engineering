@@ -77,18 +77,6 @@ public interface GameInterface {
     int getHandicap();
 
     double getKomi();
-
-    boolean isConfirmationNeeded();
-
-    void setConfirmationNeeded(boolean needed);
-
-    boolean isShowMoveNumbers();
-
-    void setShowMoveNumbers(boolean show);
-
-    boolean isShowCoordinates();
-
-    void setShowCoordinates(boolean show);
     //##################################################################################################################
     //game information
 

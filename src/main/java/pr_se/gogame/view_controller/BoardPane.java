@@ -150,9 +150,18 @@ public class BoardPane extends GridPane {
 
         this.game = game;
         this.graphicsPath = game.getGraphicsPath();
-        this.showsMoveNumbers = game.isShowMoveNumbers();
-        this.showsCoordinates = game.isShowCoordinates();
-        this.needsMoveConfirmation = game.isConfirmationNeeded();
+        this.showsMoveNumbers = GlobalSettings.isShowMoveNumbers();
+        this.showsCoordinates = GlobalSettings.isShowCoordinates();
+        this.needsMoveConfirmation = GlobalSettings.isConfirmationNeeded();
+
+        GlobalSettings.addListener(new ViewListener() {
+            @Override
+            public void fire() {
+                setMoveConfirmation(GlobalSettings.isConfirmationNeeded());
+                setShowsCoordinates(GlobalSettings.isShowCoordinates());
+                setShowsMoveNumbers(GlobalSettings.isShowMoveNumbers());
+            }
+        });
 
         game.addListener(e -> {
             if(e == null) {
@@ -201,18 +210,6 @@ public class BoardPane extends GridPane {
                 case BLACK_WON:
                 case WHITE_WON:
                     setMouseTransparent(true);
-                    break;
-
-                case CONFIG_CONFIRMATION:
-                    setMoveConfirmation(game.isConfirmationNeeded());
-                    break;
-
-                case CONFIG_SHOW_COORDINATES:
-                    setShowsCoordinates(game.isShowCoordinates());
-                    break;
-
-                case CONFIG_SHOWMOVENUMBERS:
-                    setShowsMoveNumbers(game.isShowMoveNumbers());
                     break;
 
                 case CONFIG_GRAPHICS:

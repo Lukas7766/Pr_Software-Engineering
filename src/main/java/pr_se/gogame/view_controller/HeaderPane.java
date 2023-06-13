@@ -196,16 +196,16 @@ public class HeaderPane extends VBox {
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("_Move confirmation required");
         moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         gameSectionItems.add(moveConfirmationRequired);
-        moveConfirmationRequired.setSelected(game.isConfirmationNeeded());
+        moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
         moveConfirmationRequired.setOnAction(e -> {
             var k = this.gameShortCardList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
             if (moveConfirmationRequired.isSelected()) {
                 k.ifPresent(button -> button.setVisible(true));
-                game.setConfirmationNeeded(true);
+                GlobalSettings.setConfirmationNeeded(true);
 
             } else {
                 k.ifPresent(button -> button.setVisible(false));
-                game.setConfirmationNeeded(false);
+                GlobalSettings.setConfirmationNeeded(false);
             }
         });
 
@@ -271,14 +271,14 @@ public class HeaderPane extends VBox {
         CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("_Move Numbers");
         showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         viewSectionItems.add(showMoveNumbersCBtn);
-        showMoveNumbersCBtn.setSelected(game.isShowMoveNumbers());
-        showMoveNumbersCBtn.setOnAction(e -> game.setShowMoveNumbers(showMoveNumbersCBtn.isSelected()));
+        showMoveNumbersCBtn.setSelected(GlobalSettings.isShowMoveNumbers());
+        showMoveNumbersCBtn.setOnAction(e -> GlobalSettings.setShowMoveNumbers(showMoveNumbersCBtn.isSelected()));
 
         CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("_Coordinates");
         showCoordinatesCBtn.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         viewSectionItems.add(showCoordinatesCBtn);
-        showCoordinatesCBtn.setSelected(game.isShowCoordinates());
-        showCoordinatesCBtn.setOnAction(e -> game.setShowCoordinates(showCoordinatesCBtn.isSelected()));
+        showCoordinatesCBtn.setSelected(GlobalSettings.isShowCoordinates());
+        showCoordinatesCBtn.setOnAction(e -> GlobalSettings.setShowCoordinates(showCoordinatesCBtn.isSelected()));
         menu.getItems().addAll(viewSectionItems);
 
         //MenuItem loadGraphicsBtn = new MenuItem("_Load Graphics Set");
@@ -444,7 +444,7 @@ public class HeaderPane extends VBox {
 
         Button confirm = new Button("Confirm");
         confirm.setFocusTraversable(false);
-        confirm.setVisible(game.isConfirmationNeeded());
+        confirm.setVisible(GlobalSettings.isConfirmationNeeded());
         confirm.setOnAction(e -> game.confirmChoice());
         gameShortCardList.add(confirm);
 

@@ -17,13 +17,8 @@ public class Game implements GameInterface {
     private final Ruleset ruleset = new JapaneseRuleset();
     private int size = 19; // TODO: Just a thought, but technically, this is really just a property of the board, so maybe the Game shouldn't save this at all and instead just provide a method to obtain the board size via its interface (said method would then return board.getSize()).
     private int handicap = 0;
-    private boolean confirmationNeeded = false;
-    private boolean showMoveNumbers = false;
-    private boolean showCoordinates = true;
 
     private String graphicsPath = "./Grafiksets/default.zip";
-
-    private boolean demoMode = false;
 
     //global (helper) variables
     private Path savaGamePath;
@@ -41,6 +36,8 @@ public class Game implements GameInterface {
     private int whiteCapturedStones;
     private GameResult gameResult;
 
+
+    private boolean demoMode = false;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -409,45 +406,6 @@ public class Game implements GameInterface {
         this.demoMode = demoMode;
         this.gameCommand = GameCommand.CONFIG_DEMO_MODE;
         fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public void setConfirmationNeeded(boolean needed) {
-        this.confirmationNeeded = needed;
-        this.gameCommand = GameCommand.CONFIG_CONFIRMATION;
-
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public boolean isConfirmationNeeded() {
-        return this.confirmationNeeded;
-    }
-
-    @Override
-    public void setShowMoveNumbers(boolean show) {
-        this.showMoveNumbers = show;
-        this.gameCommand = GameCommand.CONFIG_SHOWMOVENUMBERS;
-
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public boolean isShowMoveNumbers() {
-        return this.showMoveNumbers;
-    }
-
-    @Override
-    public void setShowCoordinates(boolean show) {
-        this.showCoordinates = show;
-        this.gameCommand = GameCommand.CONFIG_SHOW_COORDINATES;
-
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public boolean isShowCoordinates() {
-        return this.showCoordinates;
     }
 
     @Override
