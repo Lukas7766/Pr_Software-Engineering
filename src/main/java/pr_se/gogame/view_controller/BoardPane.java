@@ -16,8 +16,6 @@ import pr_se.gogame.model.Game;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Objects;
-import java.util.stream.Stream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -170,6 +168,8 @@ public class BoardPane extends GridPane {
                 throw new NullPointerException();
             }
 
+            System.out.println("BoardPane received " + e.getGameCommand());
+
             switch(e.getGameCommand()) {
                 case STONE_WAS_SET:
                     StoneEvent sse = (StoneEvent) e;
@@ -195,7 +195,7 @@ public class BoardPane extends GridPane {
 
                 case STONE_WAS_CAPTURED:
                     StoneEvent se = (StoneEvent) e;
-                    System.out.println("Stone was removed at " + se.getX() + "/" + se.getY());
+                    System.out.println("Boardpane removing stone removed at " + se.getX() + "/" + se.getY());
                     getPlayableCell(se.getX(), se.getY()).unset();
                     break;
 
@@ -794,7 +794,7 @@ public class BoardPane extends GridPane {
         /**
          * Pointer to the ImageView of the currently set stone, if any
          */
-        private ResizableImageView CURRENTLY_SET_STONE;
+        private ResizableImageView currentlySetStone;
 
         /**
          * Creates a new PlayableBoardCell with the specified background Image, images for the black and white
@@ -824,7 +824,7 @@ public class BoardPane extends GridPane {
             this.SQUARE_MARK_ON_BLACK = addCellImageView(squareMarks[2]);
             this.SQUARE_MARK_ON_WHITE = addCellImageView(squareMarks[1]);
 
-            this.CURRENTLY_SET_STONE = null;
+            this.currentlySetStone = null;
 
             this.LABEL.setVisible(false);
             this.LABEL.setAlignment(Pos.CENTER);
@@ -879,7 +879,7 @@ public class BoardPane extends GridPane {
         public void updateImages(Image tile) {
             setBackgroundImage(tile);
             HANDICAP_SLOT.setImage(handicapSlot);
-            if(CURRENTLY_SET_STONE != null) {
+            if(currentlySetStone != null) {
                 updateLabelColor();
             }
             BLACK_STONE.setImage(stones[0]);
@@ -911,7 +911,7 @@ public class BoardPane extends GridPane {
          * BoardPane's showsMoveNumbers attributes
          */
         public void showMoveNumber() {
-            LABEL.setVisible(CURRENTLY_SET_STONE != null && showsMoveNumbers);
+            LABEL.setVisible(currentlySetStone != null && showsMoveNumbers);
             updateLabelColor();
         }
 
@@ -956,7 +956,7 @@ public class BoardPane extends GridPane {
                 hoverPBC.unhover();             // necessary due to keyboard controls
                 hoverPBC = null;
             }
-            if(CURRENTLY_SET_STONE == null && !isSelected) {
+            if(currentlySetStone == null && !isSelected) {
                 iv.setOpacity(0.5);
                 iv.setVisible(true);
             }
@@ -1046,11 +1046,16 @@ public class BoardPane extends GridPane {
          * Removes all set AND all selection indicators on this PlayableBoardCell.
          */
         public void unset() {
+            System.out.println("PlayableBoardCell.unset()");
+            if(currentlySetStone != null) {
+                System.out.println("*****\nHelp me I'm being unset.\n*****");
+            }
+            System.out.println();
             deselect();
             BLACK_STONE.setVisible(false);
             WHITE_STONE.setVisible(false);
             LABEL.setVisible(false);
-            CURRENTLY_SET_STONE = null;
+            currentlySetStone = null;
 
             updateMarks();
         }
@@ -1062,7 +1067,7 @@ public class BoardPane extends GridPane {
         private void set(ResizableImageView iv) {
             deselect();
             iv.setVisible(true);
-            CURRENTLY_SET_STONE = iv;
+            currentlySetStone = iv;
             if(showsMoveNumbers) {
                 updateLabelColor();
                 LABEL.setVisible(true);
@@ -1102,9 +1107,9 @@ public class BoardPane extends GridPane {
          * @param onWhite the ResizableImageView constituting the mark to be used on white stones or empty spaces
          */
         private void mark(ResizableImageView onEmpty, ResizableImageView onBlack, ResizableImageView onWhite) {
-            if(CURRENTLY_SET_STONE  == BLACK_STONE) {
+            if(currentlySetStone == BLACK_STONE) {
                 onBlack.setVisible(true);
-            } else if(CURRENTLY_SET_STONE == WHITE_STONE) {
+            } else if(currentlySetStone == WHITE_STONE) {
                 onWhite.setVisible(true);
             } else {
                 onEmpty.setVisible(true);
@@ -1150,11 +1155,11 @@ public class BoardPane extends GridPane {
          */
         private void updateMarks(boolean isMarked, ResizableImageView onEmpty, ResizableImageView onBlack, ResizableImageView onWhite) {
             if(isMarked) {
-                if(CURRENTLY_SET_STONE == BLACK_STONE) {
+                if(currentlySetStone == BLACK_STONE) {
                     onEmpty.setVisible(false);
                     onBlack.setVisible(true);
                     onWhite.setVisible(false);
-                } else if(CURRENTLY_SET_STONE == WHITE_STONE) {
+                } else if(currentlySetStone == WHITE_STONE) {
                     onEmpty.setVisible(false);
                     onBlack.setVisible(false);
                     onWhite.setVisible(true);
@@ -1180,12 +1185,12 @@ public class BoardPane extends GridPane {
          * is currently set.
          */
         private void updateLabelColor() {
-            if(CURRENTLY_SET_STONE != null) {
-                PixelReader p = CURRENTLY_SET_STONE.getImage().getPixelReader();
+            if(currentlySetStone != null) {
+                PixelReader p = currentlySetStone.getImage().getPixelReader();
                 if(p == null) {
                     throw new NullPointerException("Can't get stone color");
                 }
-                LABEL.setTextFill(p.getColor((int)(CURRENTLY_SET_STONE.getImage().getWidth() / 2), (int)(CURRENTLY_SET_STONE.getImage().getHeight() / 2)).invert());
+                LABEL.setTextFill(p.getColor((int)(currentlySetStone.getImage().getWidth() / 2), (int)(currentlySetStone.getImage().getHeight() / 2)).invert());
             } else {
                 super.updateLabelColor();
             }
