@@ -39,13 +39,6 @@ class RulesetTest {
         assertEquals(2, ruleset.getKoAmount());
     }
 
-
-    @Test
-    @DisplayName("testing hasDefaultHandicapPlacement(), is true by default")
-    void hasDefaultHandicapPlacement() {
-        assertTrue(ruleset.hasDefaultHandicapPlacement());
-    }
-
     @Test
     @DisplayName("testing setHandicapStones(), applying default mechanism")
     void testSetHandicapStones() {

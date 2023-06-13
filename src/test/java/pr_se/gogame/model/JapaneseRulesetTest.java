@@ -27,12 +27,6 @@ class JapaneseRulesetTest {
     }
 
     @Test
-    @DisplayName("testing hasDefaultHandicapPlacement(), default handicap placement is active")
-    void hasDefaultHandicapPlacement() {
-        assertTrue(japaneseRuleset.hasDefaultHandicapPlacement());
-    }
-
-    @Test
     @DisplayName("testing getKomi(), 6.5 komi points are defined in JP ruleset")
     void getKomi() {
         assertEquals(6.5, japaneseRuleset.getKomi());

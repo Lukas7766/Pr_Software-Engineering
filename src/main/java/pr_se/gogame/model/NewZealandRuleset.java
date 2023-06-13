@@ -32,11 +32,6 @@ public class NewZealandRuleset implements Ruleset {
      * @return false
      */
     @Override
-    public boolean hasDefaultHandicapPlacement() {
-        return false;
-    }
-
-    @Override
     public void setHandicapStones(Game game, StoneColor beginner, int noStones) {
         if(game == null || beginner == null) {
             throw new NullPointerException();

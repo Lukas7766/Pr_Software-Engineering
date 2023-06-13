@@ -68,11 +68,6 @@ public class UserDefinableRuleset implements Ruleset {
         return new GameResult(1, 1, null,"");
     }
 
-    @Override
-    public boolean hasDefaultHandicapPlacement() {
-        return hasDefaultHandicap;
-    }
-
     public void setCustomHandicapPlacement(BiConsumer<Game, Integer> stoneSetter) {
         hasDefaultHandicap = false;
         handicapStoneSetter = stoneSetter;
@@ -87,6 +82,8 @@ public class UserDefinableRuleset implements Ruleset {
     public void setHandicapStones(Game game, StoneColor beginner, int noStones) {
         if(!hasDefaultHandicap) {
             handicapStoneSetter.accept(game, noStones);
+        } else {
+            Ruleset.super.setHandicapStones(game, beginner, noStones);
         }
     }
 }

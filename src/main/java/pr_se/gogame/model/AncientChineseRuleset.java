@@ -64,13 +64,6 @@ public class AncientChineseRuleset implements Ruleset {
 
     }
 
-
-
-    @Override
-    public boolean hasDefaultHandicapPlacement() {
-        return false;
-    }
-
     @Override
     public void setHandicapStones(Game game, StoneColor beginner , int noStones) {
         if (game == null) {

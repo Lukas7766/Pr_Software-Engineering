@@ -38,13 +38,6 @@ public interface Ruleset {
     GameResult scoreGame(Game game);
 
     /**
-     * @return whether the RuleSet uses the default placement of handicap stones or not
-     */
-    default boolean hasDefaultHandicapPlacement() {
-        return true;
-    }
-
-    /**
      * Places custom handicap stones according to the ruleset, either by calling the Game.setHandicapStone method
      * for automatic placement, or by setting the handicap stone counter of Game for manual placement.
      *
