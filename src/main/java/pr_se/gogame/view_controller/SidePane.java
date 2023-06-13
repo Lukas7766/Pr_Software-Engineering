@@ -156,7 +156,7 @@ public class SidePane extends StackPane {
 
         GridPane scorePane = new GridPane();
 
-        Label p1 = new Label("Black:");
+        Label p1 = new Label(StoneColor.BLACK + ":");
         p1.setFont(Font.font(null, FontWeight.BOLD, 13));
         scorePane.add(p1, 0, 0);
 
@@ -166,7 +166,7 @@ public class SidePane extends StackPane {
         scorePane.add(scoreCountBlackLbl, 1, 0);
 
 
-        Label p2 = new Label("White:");
+        Label p2 = new Label(StoneColor.WHITE + ":");
         p2.setFont(Font.font(null, FontWeight.BOLD, 13));
         scorePane.add(p2, 0, 1);
 
@@ -214,17 +214,11 @@ public class SidePane extends StackPane {
         game.addListener(l -> {
 
             switch (l.getGameCommand()) {
-                case GAME_IS_ONGOING, NEW_GAME -> {
+                case GAME_IS_ONGOING, NEW_GAME, GAME_WON -> {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
-                    switch (game.getCurColor()) {
-                        case BLACK -> actualPlayer.setText("Black");
-                        case WHITE -> actualPlayer.setText("White");
-                    }
-                }
-                case GAME_WON -> {
-                    scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
-                    scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
+                    actualPlayer.setText(game.getCurColor().toString());
+
                 }
                 case CONFIG_DEMO_MODE -> {
                     System.out.println("Demo Mode: " + game.isDemoMode());

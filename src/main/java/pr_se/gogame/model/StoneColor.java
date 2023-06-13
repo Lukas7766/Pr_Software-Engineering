@@ -1,7 +1,13 @@
 package pr_se.gogame.model;
 
 public enum StoneColor {
-    BLACK, WHITE;
+    BLACK("Black"), WHITE("White");
+
+    private String name;
+
+    StoneColor(String name) {
+        this.name = name;
+    }
 
     public static StoneColor getOpposite(StoneColor color) {
         if(color == null) {
@@ -13,6 +19,11 @@ public enum StoneColor {
         }
 
         return BLACK;
+    }
+
+    @Override
+    public String toString() {
+        return name;
     }
 }
 
