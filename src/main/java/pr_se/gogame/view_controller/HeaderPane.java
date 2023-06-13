@@ -18,6 +18,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.GameCommand;
+import pr_se.gogame.model.GeraldsHistory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -337,21 +338,25 @@ public class HeaderPane extends VBox {
         fastBackward.setFocusTraversable(false);
         fastBackward.setOnAction(e -> System.out.println("fastBackward"));
         playbackControlList.add(fastBackward);
+        fastBackward.setOnAction(e -> game.rewind());
 
         Button backward = new Button("<");
         backward.setFocusTraversable(false);
         backward.setOnAction(e -> System.out.println("backward"));
         playbackControlList.add(backward);
+        backward.setOnAction(e -> game.stepBack());
 
         Button forward = new Button(">");
         forward.setFocusTraversable(false);
         forward.setOnAction(e -> System.out.println("forward"));
         playbackControlList.add(forward);
+        forward.setOnAction(e -> game.stepForward());
 
         Button fastForward = new Button(">>");
         fastForward.setOnAction(e -> System.out.println("fastForward"));
         fastForward.setFocusTraversable(false);
         playbackControlList.add(fastForward);
+        fastForward.setOnAction(e -> game.skipToEnd());
 
         playbackControl.getChildren().addAll(playbackControlList);
         /*playbackControlList.forEach(e -> e.setDisable(true));

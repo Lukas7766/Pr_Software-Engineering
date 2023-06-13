@@ -215,7 +215,7 @@ public class Board implements BoardInterface {
             public void execute(boolean saveEffects) {
                 for(UndoableCommand c : SUBCOMMANDS) {
                     if(c != null) {
-                        c.execute(true);
+                        c.execute(saveEffects);
                     }
                 }
             }
@@ -310,7 +310,6 @@ public class Board implements BoardInterface {
     private void fireStoneSet(int x, int y, StoneColor c, boolean prepareMode) {
         GameCommand gc = GameCommand.STONE_WAS_SET;
 
-        System.out.println("cur move number: "+GAME.getCurMoveNumber());
         StoneEvent e = new StoneEvent(gc, x, y, c, GAME.getCurMoveNumber());
         GAME.fireGameEvent(e);
     }

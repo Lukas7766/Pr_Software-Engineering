@@ -34,6 +34,9 @@ public class Game implements GameInterface {
     private int whiteCapturedStones;
     private GameResult gameResult;
 
+    // TODO: Remove this temporary helper class
+    private GeraldsHistory geraldsHistory = new GeraldsHistory();
+
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
@@ -57,6 +60,9 @@ public class Game implements GameInterface {
         if(startingColor == null) {
             throw new NullPointerException();
         }
+
+        //TODO: Remove this when GeraldsHistory is removed
+        geraldsHistory = new GeraldsHistory();
 
         this.curColor = startingColor;
         this.size = size;
@@ -110,6 +116,7 @@ public class Game implements GameInterface {
         UndoableCommand c = switchColor(); // Everything that was removed was already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        geraldsHistory.addNode(new GeraldsNode(c, "pass"));
     }
 
     @Override
@@ -146,6 +153,7 @@ public class Game implements GameInterface {
         c.execute(true);
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        geraldsHistory.addNode(new GeraldsNode(c, "resign"));
     }
 
     @Override
@@ -286,34 +294,52 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        final UndoableCommand UC01_setStone = board.setStone(x, y, curColor, false, true); // returned command is already executed within board.setStone().
+        final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, false, true); // UC01_SET_STONE is already executed within board.setStone().
+
+        if(UC01_SET_STONE == null) {
+            System.out.println("Move aborted.");
+            return;
+        }
+
+        // Assertion: UC01_SET_STONE != null and was hence a valid move.
 
         final int OLD_MOVE_NO = curMoveNumber;
 
-        UndoableCommand c = new UndoableCommand() {
+        final UndoableCommand UC02_SWITCH_COLOR = new UndoableCommand() {
             UndoableCommand c_UC02_switchColor = null;
 
             @Override
             public void execute(boolean saveEffects) {
-                if (UC01_setStone != null) {
-                    curMoveNumber++;
-                    // Update current player color
-                    c_UC02_switchColor = switchColor();
-                } else {
-                    System.out.println("Move aborted.");
-                }
+                curMoveNumber++;
+                // Update current player color
+                c_UC02_switchColor = switchColor();
             }
 
             @Override
             public void undo() {
                 c_UC02_switchColor.undo();
                 curMoveNumber = OLD_MOVE_NO;
-                UC01_setStone.undo();
             }
         };
-        c.execute(true);
+        UC02_SWITCH_COLOR.execute(true);
+
+        UndoableCommand c = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                UC01_SET_STONE.execute(saveEffects);
+                UC02_SWITCH_COLOR.execute(saveEffects);
+            }
+
+            @Override
+            public void undo() {
+                UC02_SWITCH_COLOR.undo();
+                UC01_SET_STONE.undo();
+            }
+        };
+        // c was already executed piecemeal
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        geraldsHistory.addNode(new GeraldsNode(c, "playMove(" + x + ", " + y + ")"));
     }
 
     @Override
@@ -362,9 +388,26 @@ public class Game implements GameInterface {
             c.execute(true);
 
             // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+            geraldsHistory.addNode(new GeraldsNode(c, "placeHandicapPosition(" + x + ", " + y + ")"));
         } else {
             fireGameEvent(new StoneEvent(GameCommand.STONE_WAS_SET, x, y, null, curMoveNumber));
         }
+    }
+
+    public void stepBack() {
+        geraldsHistory.stepBack();
+    }
+
+    public void stepForward() {
+        geraldsHistory.stepForward();
+    }
+
+    public void rewind() {
+        geraldsHistory.rewind();
+    }
+
+    public void skipToEnd() {
+        geraldsHistory.skipToEnd();
     }
 
     @Override
