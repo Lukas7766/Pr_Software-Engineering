@@ -52,4 +52,8 @@ public class GeraldsHistory {
         System.out.println();
         counter++;
     }
+
+    public String currentComment() {
+        return current.getComment();
+    }
 }

@@ -216,14 +216,15 @@ public class SidePane extends StackPane {
         /*
          * Adds listener to Game to update the currently displayed player name
          */
-        game.addListener(l -> {
+        game.addListener(e -> {
 
-            switch (l.getGameCommand()) {
+            switch (e.getGameCommand()) {
                 case COLOR_HAS_CHANGED, NEW_GAME, GAME_WON -> {
+                    System.out.println("Received " + e.getGameCommand());
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                     actualPlayer.setText(game.getCurColor().toString());
-
+                    explanation.setText(game.getComment()); // TODO: this doesn't display the right text for the move yet, but we'll figure this out.
                 }
             }
         });

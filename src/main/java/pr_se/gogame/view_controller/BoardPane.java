@@ -168,8 +168,6 @@ public class BoardPane extends GridPane {
                 throw new NullPointerException();
             }
 
-            System.out.println("BoardPane received " + e.getGameCommand());
-
             switch(e.getGameCommand()) {
                 case STONE_WAS_SET:
                     StoneEvent sse = (StoneEvent) e;

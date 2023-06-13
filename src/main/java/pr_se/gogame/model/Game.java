@@ -433,6 +433,10 @@ public class Game implements GameInterface {
         geraldsHistory.skipToEnd();
     }
 
+    public String getComment() {
+        return geraldsHistory.currentComment();
+    }
+
     @Override
     public UndoableCommand addCapturedStones(StoneColor color, int amount) {
         if (color == null) {
