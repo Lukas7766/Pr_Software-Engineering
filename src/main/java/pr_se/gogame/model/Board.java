@@ -150,6 +150,10 @@ public class Board implements BoardInterface {
         subcommands.add(UC05_PLACE_POINTER);
 
         final boolean FINAL_KILL_ANOTHER = killAnother;
+        final boolean PREPARE_MODE = prepareMode;
+        final int X = x;
+        final int Y = y;
+        final StoneColor COLOR = color;
 
         final UndoableCommand UC06_REMOVE_CAPTURED_STONES = new UndoableCommand() {
             final LinkedList<UndoableCommand> UC06_01_REMOVE_STONE_COMMANDS = new LinkedList<>();
@@ -157,17 +161,17 @@ public class Board implements BoardInterface {
 
             @Override
             public void execute(boolean saveEffects) {
-                if (!prepareMode) {
+                if (!PREPARE_MODE) {
 
                     for (StoneGroup sg : surroundingSGs) {
-                        if ((sg.getStoneColor() != color || !FINAL_KILL_ANOTHER) && sg.getLiberties().size() == 0) {
+                        if ((sg.getStoneColor() != COLOR || !FINAL_KILL_ANOTHER) && sg.getLiberties().size() == 0) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
                                 UC06_01_REMOVE_STONE_COMMANDS.add(removeStone(p.X, p.Y, true));
                                 captured++;
                                 System.out.println("remove: " + p.X + " / " + p.Y);
                             }
-                            uC06_02_addCapturedStonesCommand = GAME.addCapturedStones(color, captured);
+                            uC06_02_addCapturedStonesCommand = GAME.addCapturedStones(COLOR, captured);
                         }
                     }
 
@@ -184,7 +188,7 @@ public class Board implements BoardInterface {
 
                 // Update UI if possible
                 if (!FINAL_PERMITTED_SUICIDE) {
-                    fireStoneSet(x, y, color);
+                    fireStoneSet(X, Y, COLOR);
                 }
             }
 
@@ -200,7 +204,9 @@ public class Board implements BoardInterface {
                     uC06_02_addCapturedStonesCommand.undo();
                 }
 
-                fireStoneRemoved(x, y); // TODO: Do we need a check for FINAL_PERMITTED_SUICIDE here?
+                System.out.println("Removing the stone");
+
+                fireStoneRemoved(X, Y); // TODO: Do we need a check for FINAL_PERMITTED_SUICIDE here?
             }
         };
         UC06_REMOVE_CAPTURED_STONES.execute(true);
@@ -233,8 +239,6 @@ public class Board implements BoardInterface {
             }
         };
         // No execute() this time, as we've already executed the subcommands piecemeal.
-
-        System.out.println();
 
 
         if(UC07_CHECK_KO == null) {

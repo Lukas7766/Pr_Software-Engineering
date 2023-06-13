@@ -173,6 +173,7 @@ public class BoardPane extends GridPane {
             switch(e.getGameCommand()) {
                 case STONE_WAS_SET:
                     StoneEvent sse = (StoneEvent) e;
+                    System.out.println("Stone was set at " + sse.getX() + "/" + sse.getY());
                     PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
                     destinationBC.getLabel().setText("" + sse.getMoveNumber());
 
@@ -194,6 +195,7 @@ public class BoardPane extends GridPane {
 
                 case STONE_WAS_CAPTURED:
                     StoneEvent se = (StoneEvent) e;
+                    System.out.println("Stone was removed at " + se.getX() + "/" + se.getY());
                     getPlayableCell(se.getX(), se.getY()).unset();
                     break;
 

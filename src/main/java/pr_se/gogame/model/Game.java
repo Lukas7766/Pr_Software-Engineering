@@ -538,8 +538,6 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
-        // System.out.println("Firing " + e.getGameCommand());
-
         for (GameListener l : listeners) {
             l.gameCommand(e);
         }
