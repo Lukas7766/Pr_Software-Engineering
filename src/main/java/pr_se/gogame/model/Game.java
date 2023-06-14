@@ -224,11 +224,6 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public Board getBoard() {
-        return this.board;
-    }
-
-    @Override
     public int getCurMoveNumber() {
         return this.curMoveNumber;
     }

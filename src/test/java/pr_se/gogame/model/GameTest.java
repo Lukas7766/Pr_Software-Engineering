@@ -277,13 +277,6 @@ class GameTest {
     }
 
     @Test
-    void getBoard() {
-        Board board = game.getBoard();
-        assertNotNull(board);
-        assertEquals(game.getSize(), board.getSize());
-    }
-
-    @Test
     void getCurMoveNumber() {
         assertEquals(1, game.getCurMoveNumber());
         game.playMove(0, 0);

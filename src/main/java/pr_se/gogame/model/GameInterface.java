@@ -88,8 +88,6 @@ public interface GameInterface {
 
     StoneColor getCurColor();
 
-    Board getBoard();
-
     Ruleset getRuleset();
 
     FileTree getFileTree();
