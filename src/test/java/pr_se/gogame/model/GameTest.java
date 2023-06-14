@@ -271,12 +271,6 @@ class GameTest {
     }
 
     @Test
-    void confirmChoice() {
-        game.addListener(e -> assertEquals(CONFIRM_CHOICE, e.getGameCommand()));
-        game.confirmChoice();
-    }
-
-    @Test
     void getCurMoveNumber() {
         assertEquals(1, game.getCurMoveNumber());
         game.playMove(0, 0);

@@ -26,9 +26,15 @@ public class GlobalSettings {
         GlobalSettings.listeners.remove(l);
     }
 
+    public static void confirmMove() {
+        for(ViewListener l : listeners) {
+            l.onMoveConfirmed();
+        }
+    }
+
     private static void update() {
         for(ViewListener l : listeners) {
-            l.fire();
+            l.onSettingsUpdated();
         }
     }
 

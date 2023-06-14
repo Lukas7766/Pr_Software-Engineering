@@ -405,7 +405,7 @@ public class HeaderPane extends VBox {
         Button confirm = new Button("Confirm");
         confirm.setFocusTraversable(false);
         confirm.setVisible(GlobalSettings.isConfirmationNeeded());
-        confirm.setOnAction(e -> game.confirmChoice());
+        confirm.setOnAction(e -> GlobalSettings.confirmMove());
         gameShortCardList.add(confirm);
 
         gameShortCards.getChildren().addAll(gameShortCardList);

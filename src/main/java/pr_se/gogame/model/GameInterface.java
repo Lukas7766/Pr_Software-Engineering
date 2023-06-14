@@ -39,11 +39,6 @@ public interface GameInterface {
     void resign();
 
     /**
-     * If moves have to be confirmed, this method confirms them.
-     */
-    void confirmChoice();
-
-    /**
      * This method uses the Game's Ruleset to calculate the score of each player.
      */
     void scoreGame();

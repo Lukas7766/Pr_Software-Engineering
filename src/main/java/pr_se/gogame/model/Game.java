@@ -216,13 +216,6 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void confirmChoice() {
-        this.gameCommand = GameCommand.CONFIRM_CHOICE;
-        System.out.println(this.gameCommand);
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
     public int getCurMoveNumber() {
         return this.curMoveNumber;
     }

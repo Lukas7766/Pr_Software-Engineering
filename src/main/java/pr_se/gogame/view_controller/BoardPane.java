@@ -155,11 +155,16 @@ public class BoardPane extends GridPane {
 
         GlobalSettings.addListener(new ViewListener() {
             @Override
-            public void fire() {
+            public void onSettingsUpdated() {
                 setMoveConfirmation(GlobalSettings.isConfirmationNeeded());
                 setShowsCoordinates(GlobalSettings.isShowCoordinates());
                 setShowsMoveNumbers(GlobalSettings.isShowMoveNumbers());
                 setGraphicsPath(GlobalSettings.getGraphicsPath());
+            }
+
+            @Override
+            public void onMoveConfirmed() {
+                confirmMove();
             }
         });
 
@@ -183,10 +188,6 @@ public class BoardPane extends GridPane {
                         destinationBC.showHandicapSlot();
                         destinationBC.getLabel().setVisible(false);
                     }
-                    break;
-
-                case CONFIRM_CHOICE:
-                    confirmMove();
                     break;
 
                 case STONE_WAS_CAPTURED:
