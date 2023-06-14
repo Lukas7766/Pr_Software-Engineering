@@ -515,12 +515,7 @@ public class Game implements GameInterface {
 
             @Override
             public void execute(boolean saveEffects) {
-                if (curColor == BLACK) {
-                    thisCommand = setCurColor(WHITE);
-                } else {
-                    thisCommand = setCurColor(BLACK);
-                }
-
+                thisCommand = setCurColor(StoneColor.getOpposite(curColor));
                 fireGameEvent(new GameEvent(gameCommand));
             }
 

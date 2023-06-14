@@ -35,9 +35,9 @@ public class GeraldsHistory {
 
     public boolean stepForward() {
         if(current.getNext() != null) {
+            System.out.println("Re-Doing " + current.getComment());
             current = current.getNext();
             current.getCommand().execute(false);
-            System.out.println("Re-Doing " + current.getComment());
 
             return true;
         }
