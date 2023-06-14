@@ -170,14 +170,12 @@ public class BoardPane extends GridPane {
 
             switch(e.getGameCommand()) {
                 case STONE_WAS_SET:
-                    StoneEvent sse = (StoneEvent) e;
-                    System.out.println("Stone was set at " + sse.getX() + "/" + sse.getY());
-                    PlayableBoardCell destinationBC = getPlayableCell(sse.getX(), sse.getY());
-                    destinationBC.getLabel().setText("" + sse.getMoveNumber());
+                    PlayableBoardCell destinationBC = getPlayableCell(e.getX(), e.getY());
+                    destinationBC.getLabel().setText("" + e.getMoveNumber());
 
-                    if (sse.getColor() == BLACK) {
+                    if (e.getColor() == BLACK) {
                         destinationBC.setBlack();
-                    } else if(sse.getColor() == WHITE) {
+                    } else if(e.getColor() == WHITE) {
                         destinationBC.setWhite();
                     }
 
@@ -192,9 +190,7 @@ public class BoardPane extends GridPane {
                     break;
 
                 case STONE_WAS_CAPTURED:
-                    StoneEvent se = (StoneEvent) e;
-                    System.out.println("Boardpane removing stone removed at " + se.getX() + "/" + se.getY());
-                    getPlayableCell(se.getX(), se.getY()).unset();
+                    getPlayableCell(e.getX(), e.getY()).unset();
                     break;
 
                 case NEW_GAME:

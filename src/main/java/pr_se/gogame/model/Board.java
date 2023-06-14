@@ -1,7 +1,7 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.DebugEvent;
-import pr_se.gogame.view_controller.StoneEvent;
+import pr_se.gogame.view_controller.GameEvent;
 
 import java.util.*;
 import java.util.function.BiFunction;
@@ -304,10 +304,7 @@ public class Board implements BoardInterface {
      * @param c the StoneColor of the stone that has been set
      */
     private void fireStoneSet(int x, int y, StoneColor c) {
-        GameCommand gc = GameCommand.STONE_WAS_SET;
-
-        StoneEvent e = new StoneEvent(gc, x, y, c, GAME.getCurMoveNumber());
-        GAME.fireGameEvent(e);
+        GAME.fireGameEvent(new GameEvent(GameCommand.STONE_WAS_SET, x, y, c, GAME.getCurMoveNumber()));
     }
 
     /**
@@ -317,10 +314,7 @@ public class Board implements BoardInterface {
      * @param y Vertical coordinate from 0 to size-1, starting on the top
      */
     private void fireStoneRemoved(int x, int y) {
-        GameCommand gc = GameCommand.STONE_WAS_CAPTURED;
-        StoneEvent e = new StoneEvent(gc, x, y, null, GAME.getCurMoveNumber());
-
-        GAME.fireGameEvent(e);
+        GAME.fireGameEvent(new GameEvent(GameCommand.STONE_WAS_CAPTURED, x, y, null, GAME.getCurMoveNumber()));
     }
 
     /**

@@ -18,7 +18,6 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.GameCommand;
-import pr_se.gogame.model.GeraldsHistory;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -54,10 +53,6 @@ public class HeaderPane extends VBox {
      * Instance of game
      */
     private final Game game;
-
-    /**
-     * List of FileChooser Extensions
-     */
 
     /**
      * Scene of application
@@ -150,8 +145,7 @@ public class HeaderPane extends VBox {
         game.addListener(e -> {
             switch (e.getGameCommand()) {
                 case STONE_WAS_SET -> {
-                    StoneEvent se = (StoneEvent) e;
-                    if(se.getColor() != null) {
+                    if(e.getColor() != null) {
                         exportFileItem.setDisable(false);
                         exportFileItemAs.setDisable(false);
                     }

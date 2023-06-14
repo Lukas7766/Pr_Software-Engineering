@@ -2,7 +2,6 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
-import pr_se.gogame.view_controller.StoneEvent;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -417,7 +416,7 @@ public class Game implements GameInterface {
             // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
             geraldsHistory.addNode(new GeraldsNode(c, "placeHandicapPosition(" + x + ", " + y + ")"));
         } else {
-            fireGameEvent(new StoneEvent(GameCommand.STONE_WAS_SET, x, y, null, curMoveNumber));
+            fireGameEvent(new GameEvent(GameCommand.STONE_WAS_SET, x, y, null, curMoveNumber));
         }
     }
 
