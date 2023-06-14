@@ -9,7 +9,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static pr_se.gogame.model.StoneColor.BLACK;
-import static pr_se.gogame.model.StoneColor.WHITE;
 
 public class Game implements GameInterface {
 
@@ -304,38 +303,48 @@ public class Game implements GameInterface {
 
         // Assertion: UC01_SET_STONE != null and was hence a valid move.
 
+        final UndoableCommand UC02_IS_KO = ruleset.isKo(this);
+
+        if(UC02_IS_KO == null) {
+            UC01_SET_STONE.undo();
+            System.out.println("Ko detected. Move aborted.");
+            return;
+        }
+
         final int OLD_MOVE_NO = curMoveNumber;
 
-        final UndoableCommand UC02_SWITCH_COLOR = new UndoableCommand() {
-            UndoableCommand c_UC02_switchColor = null;
+        final UndoableCommand UC03_SWITCH_COLOR = new UndoableCommand() {
+            UndoableCommand UC03_01_switchColor = null;
 
             @Override
             public void execute(boolean saveEffects) {
                 curMoveNumber++;
                 // Update current player color
-                c_UC02_switchColor = switchColor();
+                UC03_01_switchColor = switchColor();
             }
 
             @Override
             public void undo() {
-                if(c_UC02_switchColor != null) {
-                    c_UC02_switchColor.undo();
+                if(UC03_01_switchColor != null) {
+                    UC03_01_switchColor.undo();
                 }
                 curMoveNumber = OLD_MOVE_NO;
             }
         };
-        UC02_SWITCH_COLOR.execute(true);
+        UC03_SWITCH_COLOR.execute(true);
 
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
                 UC01_SET_STONE.execute(saveEffects);
-                UC02_SWITCH_COLOR.execute(saveEffects);
+                UC02_IS_KO.execute(saveEffects);
+                UC03_SWITCH_COLOR.execute(saveEffects);
             }
 
             @Override
             public void undo() {
-                UC02_SWITCH_COLOR.undo();
+                UC03_SWITCH_COLOR.undo();
+                UC02_IS_KO.undo();
                 UC01_SET_STONE.undo();
             }
         };

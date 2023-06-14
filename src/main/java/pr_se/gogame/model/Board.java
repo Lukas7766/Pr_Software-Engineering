@@ -212,8 +212,6 @@ public class Board implements BoardInterface {
         UC06_REMOVE_CAPTURED_STONES.execute(true);
         subcommands.add(UC06_REMOVE_CAPTURED_STONES);
 
-        final UndoableCommand UC07_CHECK_KO = GAME.getRuleset().isKo(GAME);
-        subcommands.add(UC07_CHECK_KO);
         final List<UndoableCommand> SUBCOMMANDS = Collections.unmodifiableList(subcommands);
 
         UndoableCommand ret = new UndoableCommand() {
@@ -239,12 +237,6 @@ public class Board implements BoardInterface {
             }
         };
         // No execute() this time, as we've already executed the subcommands piecemeal.
-
-
-        if(UC07_CHECK_KO == null) {
-            ret.undo();
-            return null;
-        }
 
         return ret;
     }
