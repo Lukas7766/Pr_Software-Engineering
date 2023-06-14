@@ -35,10 +35,10 @@ public class GeraldsHistory {
             System.out.println("Undoing " + current.getComment());
             current.getCommand().undo();
             ListIterator<GameEvent> i = current.getCommand().getUndoEvents().listIterator(current.getCommand().getUndoEvents().size());
+            current = current.getPrev();
             while(i.hasPrevious()) {
                 game.fireGameEvent(i.previous());
             }
-            current = current.getPrev();
 
             return true;
         }

@@ -111,12 +111,13 @@ public class Game implements GameInterface {
     public void pass() {
         System.out.println("pass");
         UndoableCommand c = switchColor();
-        for(GameEvent e : c.getExecuteEvents()) {
-            fireGameEvent(e);
-        }
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         geraldsHistory.addNode(new GeraldsNode(c, "pass"));
+
+        for(GameEvent e : c.getExecuteEvents()) {
+            fireGameEvent(e);
+        }
     }
 
     @Override
@@ -156,6 +157,10 @@ public class Game implements GameInterface {
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         geraldsHistory.addNode(new GeraldsNode(c, "resign"));
+
+        for(GameEvent e : c.getExecuteEvents()) {
+            fireGameEvent(e);
+        }
     }
 
     @Override
@@ -348,12 +353,12 @@ public class Game implements GameInterface {
         c.getUndoEvents().addAll(UC01_SET_STONE.getUndoEvents());
         c.getUndoEvents().addAll(UC03_SWITCH_COLOR.getUndoEvents());
 
+        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        geraldsHistory.addNode(new GeraldsNode(c, "playMove(" + x + ", " + y + ")"));
+
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
         }
-
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
-        geraldsHistory.addNode(new GeraldsNode(c, "playMove(" + x + ", " + y + ")"));
     }
 
     @Override
@@ -429,13 +434,13 @@ public class Game implements GameInterface {
             c.getUndoEvents().addAll(UC01_SET_STONE.getUndoEvents());
             c.getUndoEvents().addAll(UC02_UPDATE_COUNTER.getUndoEvents());
 
+            // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+            geraldsHistory.addNode(new GeraldsNode(c, "placeHandicapPosition(" + x + ", " + y + ")"));
+
             for(GameEvent e : c.getExecuteEvents()) {
                 System.out.println(e);
                 fireGameEvent(e);
             }
-
-            // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
-            geraldsHistory.addNode(new GeraldsNode(c, "placeHandicapPosition(" + x + ", " + y + ")"));
         } else {
             fireGameEvent(new GameEvent(GameCommand.STONE_WAS_SET, x, y, null, curMoveNumber));
         }
