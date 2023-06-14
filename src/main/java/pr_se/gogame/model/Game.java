@@ -356,6 +356,12 @@ public class Game implements GameInterface {
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         geraldsHistory.addNode(new GeraldsNode(c, "playMove(" + x + ", " + y + ")"));
 
+        /*
+         * Setting the handicapStoneCounter to -1 after (the first occurence of) playMove() seems to be the least
+         * semantically confusing way to ensure that
+         */
+        handicapStoneCounter = -1;
+
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
         }
@@ -372,7 +378,7 @@ public class Game implements GameInterface {
         }
 
         if(placeStone) {
-            if (handicapStoneCounter < 0) {
+            if (handicapStoneCounter <= 0) {
                 throw new IllegalStateException("Can't place any more handicap stones!");
             }
 
@@ -394,7 +400,7 @@ public class Game implements GameInterface {
                 public void execute(boolean saveEffects) {
                     handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
 
-                    if (handicapStoneCounter < 0) {
+                    if (handicapStoneCounter <= 0) {
                         System.out.println("handicapStoneCounter is now less than 0.");
                         // fileTree.insertBufferedStonesBeforeGame();
                         uC02_switchColor = switchColor();

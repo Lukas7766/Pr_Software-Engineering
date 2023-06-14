@@ -41,6 +41,6 @@ public class NewZealandRuleset implements Ruleset {
             throw new IllegalArgumentException();
         }
 
-        game.setHandicapStoneCounter(noStones - 1);
+        game.setHandicapStoneCounter(noStones);
     }
 }

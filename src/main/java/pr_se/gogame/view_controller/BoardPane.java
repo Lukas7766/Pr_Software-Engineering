@@ -384,7 +384,7 @@ public class BoardPane extends GridPane {
             int col = getColumnIndex(selectionPBC) - 1;
             int row = getRowIndex(selectionPBC) - 1;
             if(col >= 0 && row >= 0) {
-                if(game.getHandicapStoneCounter() < 0) {
+                if(game.getHandicapStoneCounter() <= 0) {
                     game.playMove(col, row);
                 } else {
                     game.placeHandicapPosition(col, row, true);

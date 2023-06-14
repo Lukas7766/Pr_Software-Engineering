@@ -62,11 +62,9 @@ public interface Ruleset {
 
         final int SIZE = game.getSize();
         final int DIST_FROM_EDGE = 2 + SIZE / 10;
-        if(noStones > 0) {
-            game.setHandicapStoneCounter(noStones - 1);
-        } else {
-            game.setHandicapStoneCounter(noStones);
-        }
+
+        game.setHandicapStoneCounter(noStones);
+
 
 
         game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 9);

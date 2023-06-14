@@ -14,6 +14,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.JapaneseRuleset;
+import pr_se.gogame.model.NewZealandRuleset;
 import pr_se.gogame.model.StoneColor;
 
 import java.io.File;
