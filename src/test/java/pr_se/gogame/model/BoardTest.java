@@ -9,28 +9,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static pr_se.gogame.model.StoneColor.*;
 
 class BoardTest {
-    /*private Ruleset permissiveRuleset = new Ruleset() {
-        @Override
-        public UndoableCommand isKo(Game game) {
-            return new UndoableCommand() {
-                @Override
-                public void execute(boolean saveEffects) {
-
-                }
-
-                @Override
-                public void undo() {
-
-                }
-            };
-        }
-
-        @Override
-        public GameResult scoreGame(Game game) {
-            return null;
-        }
-    };*/
-
     Game game;
     Board board;
 
