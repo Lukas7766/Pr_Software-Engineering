@@ -20,7 +20,7 @@ public class GameEvent {
             throw new NullPointerException();
         }
 
-        if(gameCommand == GameCommand.STONE_WAS_SET || gameCommand == GameCommand.STONE_WAS_CAPTURED || gameCommand == GameCommand.DEBUG_INFO) {
+        if(isStoneRelated()) {
             throw new IllegalArgumentException("GameCommand " + gameCommand + " is incompatible with GameCommand-only constructor.");
         }
 
@@ -36,7 +36,9 @@ public class GameEvent {
             throw new NullPointerException();
         }
 
-        if(gameCommand != GameCommand.STONE_WAS_SET && gameCommand != GameCommand.STONE_WAS_CAPTURED && gameCommand != GameCommand.DEBUG_INFO) {
+        this.gameCommand = gameCommand;
+
+        if(!isStoneRelated()) {
             throw new IllegalArgumentException("GameCommand " + gameCommand + " is incompatible with constructor for stone-related events.");
         }
 
@@ -44,7 +46,6 @@ public class GameEvent {
             throw new IllegalArgumentException();
         }
 
-        this.gameCommand = gameCommand;
         this.X = x;
         this.Y = y;
         this.COLOR = c;
@@ -56,34 +57,34 @@ public class GameEvent {
     }
 
     public int getX() {
-        if(!isStoneRelated(this)) {
+        if(!isStoneRelated()) {
             throw new IllegalStateException("Cannot query x coordinate from non stone-related event.");
         }
         return X;
     }
 
     public int getY() {
-        if(!isStoneRelated(this)) {
+        if(!isStoneRelated()) {
             throw new IllegalStateException("Cannot query y coordinate from non stone-related event.");
         }
         return Y;
     }
 
     public int getMoveNumber() {
-        if(!isStoneRelated(this)) {
+        if(!isStoneRelated()) {
             throw new IllegalStateException("Cannot query move number from non stone-related event.");
         }
         return moveNumber;
     }
 
     public StoneColor getColor() {
-        if(!isStoneRelated(this)) {
+        if(!isStoneRelated()) {
             throw new IllegalStateException("Cannot query color from non stone-related event.");
         }
         return COLOR;
     }
 
-    private static boolean isStoneRelated(GameEvent e) {
-        return e.getGameCommand() == GameCommand.STONE_WAS_SET || e.getGameCommand() == GameCommand.STONE_WAS_CAPTURED || e.getGameCommand() == GameCommand.DEBUG_INFO;
+    private boolean isStoneRelated() {
+        return gameCommand == GameCommand.STONE_WAS_SET || gameCommand == GameCommand.STONE_WAS_CAPTURED || gameCommand == GameCommand.DEBUG_INFO;
     }
 }
