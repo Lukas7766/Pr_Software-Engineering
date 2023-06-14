@@ -65,8 +65,6 @@ public interface Ruleset {
 
         game.setHandicapStoneCounter(noStones);
 
-
-
         game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 9);
         if(noStones == 9) noStones--;
         game.placeHandicapPosition(SIZE / 2, DIST_FROM_EDGE, noStones == 8);
