@@ -93,8 +93,6 @@ public interface Ruleset {
         if(noStones == 3) noStones--;
         game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 2);
         game.placeHandicapPosition(DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 2);
-
-        // game.setHandicapStoneCounter(-1);
     }
 
     /**
