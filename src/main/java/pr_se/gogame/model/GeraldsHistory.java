@@ -64,8 +64,6 @@ public class GeraldsHistory {
     public void addNode(GeraldsNode addedNode) {
         current.setNext(addedNode);
         current = current.getNext();
-        System.out.println("Added node no. " + counter);
-        System.out.println();
         counter++;
     }
 

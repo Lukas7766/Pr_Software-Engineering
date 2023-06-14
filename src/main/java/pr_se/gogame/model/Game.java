@@ -211,7 +211,7 @@ public class Game implements GameInterface {
      */
     @Override
     public void setHandicapStoneCounter(int noStones) {
-        if((noStones < 0 && noStones != -1) || noStones > handicap) {
+        if((noStones < 0 && noStones != -1)) {
             throw new IllegalArgumentException();
         }
 
@@ -371,8 +371,12 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
+        final int OLD_HANDICAP_CTR = handicapStoneCounter;
+        handicapStoneCounter--;
+        final int NEW_HANDICAP_CTR = handicapStoneCounter;
+
         if(placeStone) {
-            if (handicapStoneCounter <= 0) {
+            if (OLD_HANDICAP_CTR <= 0) {
                 throw new IllegalStateException("Can't place any more handicap stones!");
             }
 
@@ -385,16 +389,14 @@ public class Game implements GameInterface {
 
             // Assertion: UC01_SET_STONE != null and was hence a valid move.
 
-            final int OLD_HANDICAP_COUNTER = handicapStoneCounter;
-
             final UndoableCommand UC02_UPDATE_COUNTER = new UndoableCommand() {
                 UndoableCommand uC02_switchColor = null;
 
                 @Override
                 public void execute(boolean saveEffects) {
-                    handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
+                    handicapStoneCounter = NEW_HANDICAP_CTR;
 
-                    if (handicapStoneCounter <= 0) {
+                    if (NEW_HANDICAP_CTR <= 0) {
                         System.out.println("handicapStoneCounter is now less than 0.");
                         // fileTree.insertBufferedStonesBeforeGame();
                         uC02_switchColor = switchColor();
@@ -410,7 +412,7 @@ public class Game implements GameInterface {
                     if(uC02_switchColor != null) {
                         uC02_switchColor.undo();
                     }
-                    handicapStoneCounter = OLD_HANDICAP_COUNTER;
+                    handicapStoneCounter = OLD_HANDICAP_CTR;
                 }
             };
             UC02_UPDATE_COUNTER.execute(true);
@@ -444,6 +446,8 @@ public class Game implements GameInterface {
         }
 
         fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
+        System.out.println("Handicap Ctr now: " + handicapStoneCounter);
+        System.out.println();
     }
 
     public void stepBack() {

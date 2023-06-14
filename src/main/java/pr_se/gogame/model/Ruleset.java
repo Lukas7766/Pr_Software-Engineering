@@ -63,20 +63,30 @@ public interface Ruleset {
         final int SIZE = game.getSize();
         final int DIST_FROM_EDGE = 2 + SIZE / 10;
 
-        game.setHandicapStoneCounter(noStones);
+        game.setHandicapStoneCounter(9);
 
-        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 9);
-        if(noStones == 9) noStones--;
+        boolean centerSet = false;
+
+        if(noStones == 9) {
+            game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 9);
+            centerSet = true;
+            noStones--;
+        }
         game.placeHandicapPosition(SIZE / 2, DIST_FROM_EDGE, noStones == 8);
         game.placeHandicapPosition(SIZE / 2, SIZE - 1 - DIST_FROM_EDGE, noStones == 8);
         if(noStones == 8) noStones -= 2;
-        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 7);
-        if(noStones == 7) noStones--;
+        if(noStones == 7) {
+            game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 7);
+            centerSet = true;
+            noStones--;
+        }
         game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, SIZE / 2, noStones == 6);
         game.placeHandicapPosition(DIST_FROM_EDGE, SIZE / 2, noStones == 6);
         if(noStones == 6) noStones -= 2;
-        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 5);
-        if(noStones == 5) noStones--;
+        if(!centerSet) {
+            game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 5);
+        }
+        if (noStones == 5) noStones--;
         game.placeHandicapPosition(DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 4);
         if(noStones == 4) noStones--;
         game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 3);
@@ -84,7 +94,7 @@ public interface Ruleset {
         game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 2);
         game.placeHandicapPosition(DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 2);
 
-        game.setHandicapStoneCounter(-1);
+        // game.setHandicapStoneCounter(-1);
     }
 
     /**
