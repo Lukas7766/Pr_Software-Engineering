@@ -13,6 +13,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -184,15 +185,20 @@ public class BoardPane extends GridPane {
                         destinationBC.setWhite();
                     }
 
-                    if(game.getHandicapStoneCounter() >= 0) {
-                        destinationBC.showHandicapSlot();
-                        destinationBC.getLabel().setVisible(false);
-                    }
                     break;
 
                 case STONE_WAS_CAPTURED:
                     getPlayableCell(e.getX(), e.getY()).unset();
                     break;
+
+                case HANDICAP_SET:
+                    PlayableBoardCell destBC = getPlayableCell(e.getX(), e.getY());
+
+                    destBC.showHandicapSlot();
+                    destBC.getLabel().setVisible(false);
+
+                    break;
+
 
                 case NEW_GAME:
                     setMouseTransparent(false);

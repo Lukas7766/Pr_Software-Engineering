@@ -3,6 +3,8 @@ package pr_se.gogame.view_controller;
 import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
 
+import static pr_se.gogame.model.GameCommand.*;
+
 public class GameEvent {
 
     private final GameCommand gameCommand;
@@ -85,7 +87,7 @@ public class GameEvent {
     }
 
     private boolean isStoneRelated() {
-        return gameCommand == GameCommand.STONE_WAS_SET || gameCommand == GameCommand.STONE_WAS_CAPTURED || gameCommand == GameCommand.DEBUG_INFO;
+        return gameCommand == STONE_WAS_SET || gameCommand == STONE_WAS_CAPTURED || gameCommand == HANDICAP_SET || gameCommand == DEBUG_INFO;
     }
 
     @Override
