@@ -167,7 +167,12 @@ public class Board implements BoardInterface {
                         if ((sg.getStoneColor() != COLOR || !FINAL_KILL_ANOTHER) && sg.getLiberties().size() == 0) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
-                                UC06_01_REMOVE_STONE_COMMANDS.add(removeStone(p.X, p.Y, true));
+                                UndoableCommand tmpCmd = removeStone(p.X, p.Y, true);
+                                UC06_01_REMOVE_STONE_COMMANDS.add(tmpCmd);
+                                if(saveEffects) {
+                                    getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
+                                    getUndoEvents().addAll(tmpCmd.getUndoEvents());
+                                }
                                 captured++;
                                 System.out.println("remove: " + p.X + " / " + p.Y);
                             }
@@ -187,8 +192,9 @@ public class Board implements BoardInterface {
                 }
 
                 // Update UI if possible
-                if (!FINAL_PERMITTED_SUICIDE) {
-                    fireStoneSet(X, Y, COLOR);
+                if (!FINAL_PERMITTED_SUICIDE && saveEffects) {
+                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, COLOR, GAME.getCurMoveNumber()));
+                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_CAPTURED, x, y, null, GAME.getCurMoveNumber()));
                 }
             }
 
@@ -205,8 +211,6 @@ public class Board implements BoardInterface {
                 }
 
                 System.out.println("Removing the stone");
-
-                fireStoneRemoved(X, Y); // TODO: Do we need a check for FINAL_PERMITTED_SUICIDE here?
             }
         };
         UC06_REMOVE_CAPTURED_STONES.execute(true);
@@ -237,6 +241,8 @@ public class Board implements BoardInterface {
             }
         };
         // No execute() this time, as we've already executed the subcommands piecemeal.
+        ret.getExecuteEvents().addAll(UC06_REMOVE_CAPTURED_STONES.getExecuteEvents());
+        ret.getUndoEvents().addAll(UC06_REMOVE_CAPTURED_STONES.getUndoEvents());
 
         return ret;
     }
@@ -272,7 +278,10 @@ public class Board implements BoardInterface {
                 }
 
                 // Update UI
-                fireStoneRemoved(x, y);
+                if(saveEffects) {
+                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_CAPTURED, x, y, null, GAME.getCurMoveNumber())); // TOOD: Should all parameters be saved into and read from final vars outside of this anonymous class?
+                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, BOARD_AT_XY_PREVIOUSLY.getStoneGroup().getStoneColor(), GAME.getCurMoveNumber()));
+                }
             }
 
             @Override
@@ -284,9 +293,6 @@ public class Board implements BoardInterface {
                 for(UndoableCommand c : ADD_LIBERTY_COMMANDS) {
                     c.undo();
                 }
-
-                // Update UI
-                fireStoneSet(x, y, board[x][y].getStoneGroup().getStoneColor());
             }
         };
         ret.execute(true);
@@ -295,27 +301,6 @@ public class Board implements BoardInterface {
     }
 
     // Private methods
-
-    /**
-     * Notifies all listeners that a stone has been set.
-     *
-     * @param x Horizontal coordinate from 0 to size-1, starting on the left
-     * @param y Vertical coordinate from 0 to size-1, starting on the top
-     * @param c the StoneColor of the stone that has been set
-     */
-    private void fireStoneSet(int x, int y, StoneColor c) {
-        GAME.fireGameEvent(new GameEvent(GameCommand.STONE_WAS_SET, x, y, c, GAME.getCurMoveNumber()));
-    }
-
-    /**
-     * Notifies all listeners that a stone has been removed.
-     *
-     * @param x Horizontal coordinate from 0 to size-1, starting on the left
-     * @param y Vertical coordinate from 0 to size-1, starting on the top
-     */
-    private void fireStoneRemoved(int x, int y) {
-        GAME.fireGameEvent(new GameEvent(GameCommand.STONE_WAS_CAPTURED, x, y, null, GAME.getCurMoveNumber()));
-    }
 
     /**
      * Checks the space above, below, to the right and left of the one marked by x and y for StoneGroupPointers

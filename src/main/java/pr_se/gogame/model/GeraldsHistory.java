@@ -1,6 +1,14 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.view_controller.GameEvent;
+
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.ListIterator;
+
 public class GeraldsHistory {
+
+    private final Game game;
 
     private final GeraldsNode head;
 
@@ -8,7 +16,8 @@ public class GeraldsHistory {
 
     private int counter = 0;
 
-    public GeraldsHistory() {
+    public GeraldsHistory(Game game) {
+        this.game = game;
         head = new GeraldsNode(null, null);
         current = head;
     }
@@ -25,6 +34,10 @@ public class GeraldsHistory {
         if(current.getPrev() != null) {
             System.out.println("Undoing " + current.getComment());
             current.getCommand().undo();
+            ListIterator<GameEvent> i = current.getCommand().getUndoEvents().listIterator(current.getCommand().getUndoEvents().size());
+            while(i.hasPrevious()) {
+                game.fireGameEvent(i.previous());
+            }
             current = current.getPrev();
 
             return true;
@@ -38,6 +51,9 @@ public class GeraldsHistory {
             System.out.println("Re-Doing " + current.getComment());
             current = current.getNext();
             current.getCommand().execute(false);
+            for(GameEvent e : current.getCommand().getExecuteEvents()) {
+                game.fireGameEvent(e);
+            }
 
             return true;
         }

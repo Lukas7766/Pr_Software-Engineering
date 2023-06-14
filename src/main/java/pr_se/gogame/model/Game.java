@@ -33,7 +33,7 @@ public class Game implements GameInterface {
     private GameResult gameResult;
 
     // TODO: Remove this temporary helper class
-    private GeraldsHistory geraldsHistory = new GeraldsHistory();
+    private GeraldsHistory geraldsHistory;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -60,14 +60,12 @@ public class Game implements GameInterface {
         }
 
         //TODO: Remove this when GeraldsHistory is removed
-        geraldsHistory = new GeraldsHistory();
+        geraldsHistory = new GeraldsHistory(this);
 
         this.curColor = startingColor;
         this.size = size;
         this.handicap = handicap;
         this.ruleset = ruleset;
-
-        // this.gameCommand = GameCommand.NEW_GAME;
 
         this.fileTree = new FileTree(size,"Black", "White");
 
@@ -112,7 +110,10 @@ public class Game implements GameInterface {
     @Override
     public void pass() {
         System.out.println("pass");
-        UndoableCommand c = switchColor(); // Everything that was removed was already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
+        UndoableCommand c = switchColor();
+        for(GameEvent e : c.getExecuteEvents()) {
+            fireGameEvent(e);
+        }
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         geraldsHistory.addNode(new GeraldsNode(c, "pass"));
@@ -139,14 +140,18 @@ public class Game implements GameInterface {
                         StoneColor.getOpposite(FINAL_CUR_COLOR) + " won!";
                 gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(FINAL_CUR_COLOR), msg);
                 gameCommand = GameCommand.GAME_WON;
-                fireGameEvent(new GameEvent(gameCommand));
+                if(saveEffects) {
+                    //fireGameEvent(new GameEvent(gameCommand));
+                    getExecuteEvents().add(new GameEvent(gameCommand));
+                    getUndoEvents().add(new GameEvent(gameCommand));
+                }
             }
 
             @Override
             public void undo() {
                 gameResult = OLD_GAME_RESULT;
                 gameCommand = OLD_GAME_COMMAND;
-                fireGameEvent(new GameEvent(gameCommand));
+                //fireGameEvent(new GameEvent(gameCommand));
             }
         };
         c.execute(true);
@@ -308,6 +313,10 @@ public class Game implements GameInterface {
                 curMoveNumber++;
                 // Update current player color
                 UC03_01_switchColor = switchColor();
+                if(saveEffects) {
+                    getExecuteEvents().addAll(UC03_01_switchColor.getExecuteEvents());
+                    getUndoEvents().addAll(UC03_01_switchColor.getUndoEvents());
+                }
             }
 
             @Override
@@ -336,6 +345,14 @@ public class Game implements GameInterface {
             }
         };
         // c was already executed piecemeal
+        c.getExecuteEvents().addAll(UC01_SET_STONE.getExecuteEvents());
+        c.getExecuteEvents().addAll(UC03_SWITCH_COLOR.getExecuteEvents());
+        c.getUndoEvents().addAll(UC01_SET_STONE.getUndoEvents());
+        c.getUndoEvents().addAll(UC03_SWITCH_COLOR.getUndoEvents());
+
+        for(GameEvent e : c.getExecuteEvents()) {
+            fireGameEvent(e);
+        }
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         geraldsHistory.addNode(new GeraldsNode(c, "playMove(" + x + ", " + y + ")"));
@@ -378,6 +395,10 @@ public class Game implements GameInterface {
                         System.out.println("handicapStoneCounter is now less than 0.");
                         // fileTree.insertBufferedStonesBeforeGame();
                         uC02_switchColor = switchColor();
+                        if(saveEffects) {
+                            getExecuteEvents().addAll(uC02_switchColor.getExecuteEvents());
+                            getUndoEvents().addAll(uC02_switchColor.getUndoEvents());
+                        }
                     }
                 }
 
@@ -405,6 +426,15 @@ public class Game implements GameInterface {
                 }
             };
             // c was already executed piecemeal
+            c.getExecuteEvents().addAll(UC01_SET_STONE.getExecuteEvents());
+            c.getExecuteEvents().addAll(UC02_UPDATE_COUNTER.getExecuteEvents());
+            c.getUndoEvents().addAll(UC01_SET_STONE.getUndoEvents());
+            c.getUndoEvents().addAll(UC02_UPDATE_COUNTER.getUndoEvents());
+
+            for(GameEvent e : c.getExecuteEvents()) {
+                System.out.println(e);
+                fireGameEvent(e);
+            }
 
             // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
             geraldsHistory.addNode(new GeraldsNode(c, "placeHandicapPosition(" + x + ", " + y + ")"));
@@ -512,14 +542,18 @@ public class Game implements GameInterface {
             @Override
             public void execute(boolean saveEffects) {
                 thisCommand = setCurColor(StoneColor.getOpposite(curColor));
-                fireGameEvent(new GameEvent(gameCommand));
+                if(saveEffects) {
+                    //fireGameEvent(new GameEvent(gameCommand));
+                    getExecuteEvents().add(new GameEvent(gameCommand));
+                    getUndoEvents().add(new GameEvent(gameCommand));
+                }
             }
 
             @Override
             public void undo() {
                 if(thisCommand != null) {
                     thisCommand.undo();
-                    fireGameEvent(new GameEvent(gameCommand));
+                    //fireGameEvent(new GameEvent(gameCommand));
                 }
             }
         };

@@ -87,4 +87,9 @@ public class GameEvent {
     private boolean isStoneRelated() {
         return gameCommand == GameCommand.STONE_WAS_SET || gameCommand == GameCommand.STONE_WAS_CAPTURED || gameCommand == GameCommand.DEBUG_INFO;
     }
+
+    @Override
+    public String toString() {
+        return "GameEvent: " + gameCommand;
+    }
 }
