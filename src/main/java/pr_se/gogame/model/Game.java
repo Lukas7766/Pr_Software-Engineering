@@ -281,7 +281,7 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y) {
-        /*if(this.gameCommand != GameCommand.NEW_GAME && this.gameCommand != GameCommand.GAME_IS_ONGOING) {
+        /*if(this.gameCommand != GameCommand.NEW_GAME && this.gameCommand != GameCommand.COLOR_HAS_CHANGED) {
             throw new IllegalStateException("Can't place stone when game isn't being played! Game State was " + this.gameCommand);
         }*/
 
@@ -351,7 +351,7 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapPosition(int x, int y, boolean placeStone) {
-        /*if(this.gameCommand != GameCommand.BLACK_STARTS) {
+        /*if(this.gameCommand != GameCommand.COLOR_HAS_CHANGED) {
             throw new IllegalStateException("Can't place handicap stone after game start!");
         }*/
 
