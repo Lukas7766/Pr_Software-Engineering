@@ -513,6 +513,12 @@ public class BoardPane extends GridPane {
         }
     }
 
+    /**
+     * Loads a particular image from the graphics pack zip file
+     * @param fileName the file name of the image
+     * @param zip the ZipFile of the graphics pack
+     * @return the fully instantiated image
+     */
     private Image loadImageFromGraphicsPack(String fileName, ZipFile zip) {
         if(fileName == null || zip == null) {
             throw new NullPointerException();
@@ -550,10 +556,13 @@ public class BoardPane extends GridPane {
         return ret;
     }
 
+    /**
+     * Assigns the currently loaded images to the correct BoardCells.
+     */
     private void updateGraphics() {
         for(int i = 0; i < 4; i++) {
             BoardCell bc = (BoardCell)getChildren().get(i);
-            bc.setBackgroundImage(outerCorner);
+            bc.updateImages(outerCorner);
             bc.getTile().setRotate(90 * i);
         }
 
@@ -561,7 +570,7 @@ public class BoardPane extends GridPane {
             // edges
             for(int j = 0; j < 4; j++) {
                 BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
-                bc.setBackgroundImage(outerEdge);
+                bc.updateImages(outerEdge);
                 bc.getTile().setRotate(90 * (j % 2));
             }
             // center
@@ -570,25 +579,32 @@ public class BoardPane extends GridPane {
             }
         }
 
-        getPlayableCell(0, 0).setBackgroundImage(tileCorner);
-        getPlayableCell(this.size - 1, 0).setBackgroundImage(tileCorner);
+        getPlayableCell(0, 0).updateImages(tileCorner);
+        getPlayableCell(this.size - 1, 0).updateImages(tileCorner);
         getPlayableCell(this.size - 1, 0).getTile().setRotate(90);
-        getPlayableCell(this.size - 1, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(this.size - 1, this.size - 1).updateImages(tileCorner);
         getPlayableCell(this.size - 1, this.size - 1).getTile().setRotate(180);
-        getPlayableCell(0, this.size - 1).setBackgroundImage(tileCorner);
+        getPlayableCell(0, this.size - 1).updateImages(tileCorner);
         getPlayableCell(0, this.size - 1).getTile().setRotate(270);
 
         for(int i = 1; i < this.size - 1; i++) {
-            getPlayableCell(i, 0).setBackgroundImage(tileEdge);
-            getPlayableCell(this.size - 1, i).setBackgroundImage(tileEdge);
+            getPlayableCell(i, 0).updateImages(tileEdge);
+            getPlayableCell(this.size - 1, i).updateImages(tileEdge);
             getPlayableCell(this.size - 1, i).getTile().setRotate(90);
-            getPlayableCell(i, this.size - 1).setBackgroundImage(tileEdge);
+            getPlayableCell(i, this.size - 1).updateImages(tileEdge);
             getPlayableCell(i, this.size - 1).getTile().setRotate(180);
-            getPlayableCell(0, i).setBackgroundImage(tileEdge);
+            getPlayableCell(0, i).updateImages(tileEdge);
             getPlayableCell(0, i).getTile().setRotate(270);
         }
     }
 
+    /**
+     * This method is used to more easily and maintainably obtain a PlayableBoardCell from this BoardPane's list of
+     * children.
+     * @param x the x coordinate starting at the left
+     * @param y the y coordinate starting at the top
+     * @return the PlayableBoardCell at the specified coordinates
+     */
     private PlayableBoardCell getPlayableCell(int x, int y) {
         if(x < 0 || x >= size || y < 0 || y >= size) {
             throw new IllegalArgumentException("Coordinates X=" + x + "/Y=" + y + "out of bounds for getPlayableCell() when size is " + size);
@@ -642,7 +658,7 @@ public class BoardPane extends GridPane {
          * the graphics pack (PlayableBoardCells call this automatically in their updateImages() method)
          * @param tile the background Image (not to be confused with BackgroundImage) to be used for this BoardCell
          */
-        public void setBackgroundImage(Image tile) {
+        public void updateImages(Image tile) {
             TILE.setImage(tile);
             updateLabelColor();
         }
@@ -870,8 +886,9 @@ public class BoardPane extends GridPane {
          * Changes all Images used by this PlayableBoardCell to the current global Images from the graphics pack.
          * Call this for each PlayableBoardCell after loading a different graphics pack
          */
+        @Override
         public void updateImages(Image tile) {
-            setBackgroundImage(tile);
+            super.updateImages(tile);
             HANDICAP_SLOT.setImage(handicapSlot);
             if(currentlySetStone != null) {
                 updateLabelColor();
