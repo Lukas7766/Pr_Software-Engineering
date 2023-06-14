@@ -141,7 +141,6 @@ public class Game implements GameInterface {
                 gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(FINAL_CUR_COLOR), msg);
                 gameCommand = GameCommand.GAME_WON;
                 if(saveEffects) {
-                    //fireGameEvent(new GameEvent(gameCommand));
                     getExecuteEvents().add(new GameEvent(gameCommand));
                     getUndoEvents().add(new GameEvent(gameCommand));
                 }
@@ -151,7 +150,6 @@ public class Game implements GameInterface {
             public void undo() {
                 gameResult = OLD_GAME_RESULT;
                 gameCommand = OLD_GAME_COMMAND;
-                //fireGameEvent(new GameEvent(gameCommand));
             }
         };
         c.execute(true);
@@ -543,7 +541,6 @@ public class Game implements GameInterface {
             public void execute(boolean saveEffects) {
                 thisCommand = setCurColor(StoneColor.getOpposite(curColor));
                 if(saveEffects) {
-                    //fireGameEvent(new GameEvent(gameCommand));
                     getExecuteEvents().add(new GameEvent(gameCommand));
                     getUndoEvents().add(new GameEvent(gameCommand));
                 }
@@ -553,7 +550,6 @@ public class Game implements GameInterface {
             public void undo() {
                 if(thisCommand != null) {
                     thisCommand.undo();
-                    //fireGameEvent(new GameEvent(gameCommand));
                 }
             }
         };
