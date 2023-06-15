@@ -143,7 +143,7 @@ public class Game implements GameInterface {
                 gameCommand = GameCommand.GAME_WON;
                 if(saveEffects) {
                     getExecuteEvents().add(new GameEvent(gameCommand));
-                    getUndoEvents().add(new GameEvent(gameCommand));
+                    getUndoEvents().add(new GameEvent(OLD_GAME_COMMAND));
                 }
             }
 
@@ -289,7 +289,7 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, false, true); // UC01_SET_STONE is already executed within board.setStone().
+        final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, false); // UC01_SET_STONE is already executed within board.setStone().
 
         if(UC01_SET_STONE == null) {
             System.out.println("Move aborted.");
@@ -380,7 +380,7 @@ public class Game implements GameInterface {
                 throw new IllegalStateException("Can't place any more handicap stones!");
             }
 
-            final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, true, true); // UC01_SET_STONE is already executed within board.setStone().
+            final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, true); // UC01_SET_STONE is already executed within board.setStone().
 
             if(UC01_SET_STONE == null) {
                 System.out.println("Move aborted.");

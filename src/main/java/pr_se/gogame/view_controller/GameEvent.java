@@ -87,7 +87,7 @@ public class GameEvent {
     }
 
     private boolean isStoneRelated() {
-        return gameCommand == STONE_WAS_SET || gameCommand == STONE_WAS_CAPTURED || gameCommand == HANDICAP_SET || gameCommand == DEBUG_INFO;
+        return gameCommand == STONE_WAS_SET || gameCommand == STONE_WAS_REMOVED || gameCommand == HANDICAP_SET || gameCommand == DEBUG_INFO;
     }
 
     @Override

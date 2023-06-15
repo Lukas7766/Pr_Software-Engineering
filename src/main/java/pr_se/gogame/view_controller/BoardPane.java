@@ -13,7 +13,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameCommand;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -187,7 +186,7 @@ public class BoardPane extends GridPane {
 
                     break;
 
-                case STONE_WAS_CAPTURED:
+                case STONE_WAS_REMOVED:
                     getPlayableCell(e.getX(), e.getY()).unset();
                     break;
 

@@ -8,6 +8,6 @@ public enum GameCommand {
     COLOR_HAS_CHANGED,  // Used after every move; is basically the normal state of the game
     HANDICAP_SET,       // Used to indicate that a handicap position has been set (if the GameEvent's color is null, this means that only the slot is to be displayed)
     STONE_WAS_SET,      // Used to indicate that a stone has been set
-    STONE_WAS_CAPTURED, // Used to indicate that a stone has been removed
+    STONE_WAS_REMOVED, // Used to indicate that a stone has been removed
     DEBUG_INFO          // Used to trigger debug output; TODO: might be removed
 }

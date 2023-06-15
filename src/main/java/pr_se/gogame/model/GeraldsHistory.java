@@ -2,8 +2,6 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.GameEvent;
 
-import java.util.Collections;
-import java.util.Iterator;
 import java.util.ListIterator;
 
 public class GeraldsHistory {
@@ -13,8 +11,6 @@ public class GeraldsHistory {
     private final GeraldsNode head;
 
     private GeraldsNode current;
-
-    private int counter = 0;
 
     public GeraldsHistory(Game game) {
         this.game = game;
@@ -48,8 +44,8 @@ public class GeraldsHistory {
 
     public boolean stepForward() {
         if(current.getNext() != null) {
-            System.out.println("Re-Doing " + current.getComment());
             current = current.getNext();
+            System.out.println("Re-Doing " + current.getComment());
             current.getCommand().execute(false);
             for(GameEvent e : current.getCommand().getExecuteEvents()) {
                 game.fireGameEvent(e);
@@ -64,7 +60,6 @@ public class GeraldsHistory {
     public void addNode(GeraldsNode addedNode) {
         current.setNext(addedNode);
         current = current.getNext();
-        counter++;
     }
 
     public String currentComment() {

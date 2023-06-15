@@ -45,7 +45,7 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save) {
+    public UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode) {
         // Are the coordinates invalid?
         if (areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
@@ -167,7 +167,7 @@ public class Board implements BoardInterface {
                         if ((sg.getStoneColor() != COLOR || !FINAL_KILL_ANOTHER) && sg.getLiberties().size() == 0) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
-                                UndoableCommand tmpCmd = removeStone(p.X, p.Y, true);
+                                UndoableCommand tmpCmd = removeStone(p.X, p.Y);
                                 UC06_01_REMOVE_STONE_COMMANDS.add(tmpCmd);
                                 if(saveEffects) {
                                     getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
@@ -180,7 +180,7 @@ public class Board implements BoardInterface {
                         }
                     }
 
-                    if(save && saveEffects) {
+                    if(saveEffects) {
                         /*
                          * if(prepareMode) {
                          *      GAME.getFileTree().bufferStonesBeforeGame(color, x, y);
@@ -194,7 +194,7 @@ public class Board implements BoardInterface {
                 // Update UI if possible
                 if (!FINAL_PERMITTED_SUICIDE && saveEffects) {
                     getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, COLOR, GAME.getCurMoveNumber()));
-                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_CAPTURED, x, y, null, GAME.getCurMoveNumber()));
+                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, GAME.getCurMoveNumber()));
                 }
             }
 
@@ -248,7 +248,7 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public UndoableCommand removeStone(int x, int y, boolean save) {
+    public UndoableCommand removeStone(int x, int y) {
         if(areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
         }
@@ -263,7 +263,7 @@ public class Board implements BoardInterface {
             public void execute(boolean saveEffects) {
                 board[x][y] = null;
 
-                if(save && saveEffects) {
+                if(saveEffects) {
                     // GAME.getFileTree().removeStone(x, y);
                 }
 
@@ -279,7 +279,7 @@ public class Board implements BoardInterface {
 
                 // Update UI
                 if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_CAPTURED, x, y, null, GAME.getCurMoveNumber())); // TOOD: Should all parameters be saved into and read from final vars outside of this anonymous class?
+                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, GAME.getCurMoveNumber())); // TOOD: Should all parameters be saved into and read from final vars outside of this anonymous class?
                     getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, BOARD_AT_XY_PREVIOUSLY.getStoneGroup().getStoneColor(), GAME.getCurMoveNumber()));
                 }
             }
