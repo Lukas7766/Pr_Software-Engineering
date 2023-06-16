@@ -198,6 +198,9 @@ public class BoardPane extends GridPane {
 
                     break;
 
+                case COLOR_HAS_CHANGED:
+                    setMouseTransparent(false);
+                    break;
 
                 case NEW_GAME:
                     setMouseTransparent(false);

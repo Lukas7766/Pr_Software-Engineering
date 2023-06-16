@@ -223,7 +223,7 @@ public class HeaderPane extends VBox {
                 case INIT, GAME_WON ->
                     gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
 
-                case NEW_GAME ->
+                case NEW_GAME, COLOR_HAS_CHANGED ->
                     gameSectionItems.stream().filter(MenuItem::isDisable).forEach(e -> e.setDisable(false));
             }
 
@@ -414,7 +414,7 @@ public class HeaderPane extends VBox {
         game.addListener(l -> {
             switch (l.getGameCommand()){
                 case INIT, GAME_WON -> gameShortCardList.forEach(e -> e.setDisable(true));
-                case NEW_GAME -> gameShortCardList.forEach(e -> e.setDisable(false));
+                case NEW_GAME, COLOR_HAS_CHANGED -> gameShortCardList.forEach(e -> e.setDisable(false));
             }
         });
 
