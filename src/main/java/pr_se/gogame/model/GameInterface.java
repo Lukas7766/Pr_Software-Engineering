@@ -2,6 +2,7 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.GameListener;
 
+import java.io.File;
 import java.nio.file.Path;
 
 public interface GameInterface {
@@ -20,7 +21,7 @@ public interface GameInterface {
      * @param startingColor the StoneColor of the starting player
      * @param size          the size of the board
      * @param handicap      how many handicap stones are placed in favor of the beginner
-     * @param ruleset
+     * @param ruleset       the Ruleset that this Game uses
      */
     void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset);
 
@@ -56,7 +57,7 @@ public interface GameInterface {
      *
      * @param x          the x coordinate of the stone, starting at the left
      * @param y          the y coordinate of the stone, starting at the top
-     * @param placeStone
+     * @param placeStone whether a stone is to be placed. If false, the handicap slot is still placed.
      */
     void placeHandicapPosition(int x, int y, boolean placeStone);
 
@@ -85,8 +86,6 @@ public interface GameInterface {
 
     Ruleset getRuleset();
 
-    FileTree getFileTree();
-
     /*
      *  Note by Gerald: I simply added this to GameInterface so that BoardPane could exclusively talk to Game, reducing
      * coupling. If anyone has a better, more generic idea for such a method, I'm entirely open to suggestions.
@@ -101,15 +100,15 @@ public interface GameInterface {
     GameResult getGameResult();
 
     //##################################################################################################################
-    //Oberserver pattern
+    //Observer pattern
     void addListener(GameListener l);
 
     void removeListener(GameListener l);
 
     void setHandicapStoneCounter(int noStones);
 
-    Path getSavePath();
+    File getSaveFile();
 
-    void setSavePath(Path path);
+    void setSaveFile(File saveFile);
 }
 

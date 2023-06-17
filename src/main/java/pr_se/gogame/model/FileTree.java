@@ -33,7 +33,7 @@ public class FileTree {
      */
     private ArrayList<String> blackBuffer = new ArrayList<>();
 
-    private FileHandler fileHandler = new FileHandler();
+    private FileHandler fileHandler = null;
 
     /**
      * The constructor for a File tree
@@ -194,7 +194,7 @@ public class FileTree {
             for (String s : coordinatesBlack) {
                 bufferBlack.append("[").append(s).append("]");
             }
-            current.setNext(new TreeNode(SgfToken.ABF, bufferBlack.toString()));
+            // current.setNext(new TreeNode(SgfToken.ABF, bufferBlack.toString()));
         } else {
             for (String s : coordinatesBlack) {
                 bufferBlack.append("[").append(s).append("]");
@@ -203,7 +203,7 @@ public class FileTree {
                     coordinatesWhite) {
                 bufferWhite.append("[").append(s).append("]");
             }
-            addNode(SgfToken.AWF, bufferWhite.toString());
+            // addNode(SgfToken.AWF, bufferWhite.toString());
             addNode(SgfToken.AB, bufferBlack.toString());
         }
     }
@@ -277,10 +277,10 @@ public class FileTree {
         return start;
     }
 
-    public boolean saveFile(Path path){
+    /*public boolean saveFile(Path path){
         this.printGameTree();
         return fileHandler.saveFile(path,toString());
-    }
+    }*/
 
     //Methods vor viewing
 

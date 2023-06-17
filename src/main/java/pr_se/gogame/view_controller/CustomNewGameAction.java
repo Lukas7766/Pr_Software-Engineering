@@ -44,9 +44,9 @@ public class CustomNewGameAction {
                 case "no" -> game.initGame();
                 case "save" -> {
                     File f;
-                    if(game.getSavePath() == null){
+                    if(game.getSaveFile() == null){
                         f = CustomFileDialog.getFile(stage,true, filterList);
-                        if(f != null) game.setSavePath(f.toPath());
+                        if(f != null) game.setSaveFile(f);
                     }
 
                     if (!game.saveGame()) {

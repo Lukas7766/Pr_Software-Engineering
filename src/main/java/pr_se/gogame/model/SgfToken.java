@@ -9,34 +9,26 @@ public enum SgfToken {
      * Move for black
      */
     B(";B[%s]"),
+
     /**
      * Delete Stone/Set empty Stone
      */
     AE(";AE[%s]"),
+
     /**
      * Move for white
      */
     W(";W[%s]"),
 
     /**
-     * Add white stone First for handicap
-     */
-    AWF(";AW%s"),
-
-    /**
-     * Add black stone First for handicap
-     */
-    ABF(";AB%s"),
-
-    /**
      * Add white stone for handicap
      */
-    AW("AW%s"),
+    AW(";AW[%s]"),
 
     /**
      * Add black stone for handicap
      */
-    AB("AB%s"),
+    AB(";AB[%s]"),
 
     /**
      * Name for Player black

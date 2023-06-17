@@ -8,14 +8,11 @@ public class GeraldsHistory {
 
     private final Game game;
 
-    private final GeraldsNode head;
-
     private GeraldsNode current;
 
     public GeraldsHistory(Game game) {
         this.game = game;
-        head = new GeraldsNode(null, null, null, null);
-        current = head;
+        current = new GeraldsNode(null, null, null, null); // This solely exists so that the first move can be undone without an edge case.
     }
 
     public void rewind() {
@@ -64,5 +61,17 @@ public class GeraldsHistory {
 
     public String currentComment() {
         return current.getComment();
+    }
+
+    public GeraldsNode getCurrentNode() {
+        return current;
+    }
+
+    public boolean isAtEnd() {
+        return current.getNext() == null;
+    }
+
+    public boolean isAtBeginning() {
+        return current.getPrev() == null;
     }
 }

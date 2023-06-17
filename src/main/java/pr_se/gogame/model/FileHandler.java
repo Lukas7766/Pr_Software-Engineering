@@ -1,52 +1,110 @@
 package pr_se.gogame.model;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.lang.reflect.Array;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.util.*;
-import java.util.function.BiConsumer;
-import java.util.function.Consumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+
+import static pr_se.gogame.model.StoneColor.BLACK;
+import static pr_se.gogame.model.StoneColor.WHITE;
 
 public class FileHandler {
-
-    FileTree tree;
 
     String namePlayerBlack;
 
     String getNamePlayerWhite;
 
-    int boardSize = 0;
+    // private final Map<Pattern, BiConsumer<Pattern, String>> patternToMethod = createPatternMap();
 
-    private final Map<Pattern, BiConsumer<Pattern, String>> patternToMethod = createPatternMap();
+    private final Game game;
 
-    int handicap ;
-    private Path path;
-
-    public FileHandler(Path path) {
-        this.path = path;
+    public FileHandler(Game game) {
+        this.game = game;
     }
 
-    public FileHandler() {
-    }
+    public boolean saveFile(File file, GeraldsHistory history) {
+        history.rewind();
 
-    public void setFilepath(Path filepath) {
-        this.path = filepath;
-    }
+        try (FileWriter output = new FileWriter(file)) {
 
-    public boolean saveFile(Path filepath, String data) {
-        try {
-            Files.write(filepath, data.getBytes());
-            return true;
-        } catch (IOException e) {
-            System.out.println("File write Error");
-            return false;
+            try {
+                output.write(String.format(SgfToken.START.getValue() + "\n\n(", game.getSize()));
+            } catch(IOException e) {
+                System.out.println("Couldn't write file header!");
+            }
+
+            try {
+                boolean handicapMode = false;
+
+                while (!history.isAtEnd()) {
+                    history.stepForward();
+                    GeraldsNode n = history.getCurrentNode();
+                    SgfToken t;
+
+                    switch (n.getSaveToken()) {
+                        case HANDICAP:
+                            if (n.getColor() == BLACK) {
+                                t = SgfToken.AB;
+                            } else if (n.getColor() == WHITE) {
+                                t = SgfToken.AW;
+                            } else {
+                                throw new IllegalStateException("AE token not supported!");
+                            }
+
+                            String outputFormatString;
+
+                            if(handicapMode) {
+                                outputFormatString = "[%s]";
+                            } else {
+                                handicapMode = true;
+                                outputFormatString = t.getValue();
+                            }
+
+                            output.write(String.format(outputFormatString, calculateCoordinates(n.getX(), n.getY())));
+                            break;
+
+                        case MOVE:
+                            if(n.getColor() == BLACK) {
+                                t = SgfToken.B;
+                            } else {
+                                t = SgfToken.W;
+                            }
+
+                            output.write(String.format("\n" + t.getValue(), calculateCoordinates(n.getX(), n.getY())));
+                            break;
+
+                        case PASS:
+                            if(n.getColor() == BLACK) {
+                                t = SgfToken.B;
+                            } else {
+                                t = SgfToken.W;
+                            }
+
+                            output.write("\n" + String.format(t.getValue(), "")); // Passing is done by having an empty move.
+                            break;
+
+                        case RESIGN:
+                            break;
+
+                        default:
+                            break;
+                    }
+                }
+
+                output.write(")\n\n)");
+                return true;
+            } catch (IOException e) {
+                System.out.println("File write Error");
+                return false;
+            }
+        } catch(IOException e) {
+            System.out.println("Couldn't open file output stream!");
+            e.printStackTrace();
         }
+
+        return true;
     }
 
-    public void loadFile(Path filepath) {
+    /*public void loadFile(Path filepath) {
         String content;
         try {
             content = Files.readString(filepath);
@@ -93,38 +151,13 @@ public class FileHandler {
         }
     }
 
-    private void addStoneBlack(Pattern p, String s) {
-        tree.addStone(StoneColor.BLACK, calculateGridCoordinates(s)[0], calculateGridCoordinates(s)[1]);
-    }
-
-    private void addStoneWhite(Pattern p, String s) {
-        tree.addStone(StoneColor.WHITE, calculateGridCoordinates(s)[0], calculateGridCoordinates(s)[1]);
-    }
-
     private void processStartOfFile(Pattern p, String s) {
         Matcher m = p.matcher(s);
         if (m.matches()) {
             this.tree = new FileTree(Integer.parseInt(m.group(0)));
-            tree.addName(StoneColor.BLACK, m.group(1));
-            tree.addName(StoneColor.WHITE, m.group(2));
+            tree.addName(BLACK, m.group(1));
+            tree.addName(WHITE, m.group(2));
         }
-    }
-
-    private void addNameBlack(Pattern p, String s) {
-        // do something with s
-    }
-
-    private void addNameWhite(Pattern p, String s) {
-        // do something with s
-    }
-
-    private void addHandicap(Pattern p, String s) {
-        // do something with s
-    }
-
-
-    private void addEmpty(Pattern p, String s) {
-        // do something with s
     }
 
 
@@ -145,6 +178,17 @@ public class FileHandler {
             }
             start = start.getNext();
         }
+    }*/
+
+    /**
+     * Calculates the coordinates for the sgf File
+     *
+     * @param x column of Stone
+     * @param y row of Stone
+     * @return The x and y-axis in letter format
+     */
+    public String calculateCoordinates(int x, int y) {
+        return "" + (char) (x + 97) + (char) (97 + y);
     }
 
 }

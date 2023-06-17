@@ -3,6 +3,7 @@ package pr_se.gogame.model;
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
 
+import java.io.File;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -17,8 +18,7 @@ public class Game implements GameInterface {
     private int handicap = 0;
 
     //global (helper) variables
-    private Path savaGamePath;
-    private FileTree fileTree;
+    private File saveFile;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private Board board;
@@ -32,8 +32,9 @@ public class Game implements GameInterface {
     private int whiteCapturedStones;
     private GameResult gameResult;
 
-    // TODO: Remove this temporary helper class
     private GeraldsHistory geraldsHistory;
+
+    private FileHandler fileHandler;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -60,14 +61,14 @@ public class Game implements GameInterface {
         }
 
         //TODO: Remove this when GeraldsHistory is removed
-        geraldsHistory = new GeraldsHistory(this);
+        this.geraldsHistory = new GeraldsHistory(this);
 
         this.curColor = startingColor;
         this.size = size;
         this.handicap = handicap;
         this.ruleset = ruleset;
 
-        this.fileTree = new FileTree(size,"Black", "White");
+        this.fileHandler = new FileHandler(this);
 
         this.playerBlackScore = handicap;
         this.playerWhiteScore = this.ruleset.getKomi();
@@ -90,20 +91,20 @@ public class Game implements GameInterface {
 
     @Override
     public boolean saveGame() {
-        if (savaGamePath == null) {
+        if (saveFile == null) {
             return false;
         }
         System.out.println("saved a file");
-        return fileTree.saveFile(savaGamePath);
+        return fileHandler.saveFile(saveFile, geraldsHistory);
     }
 
     @Override
     public boolean loadGame(Path path) {
-        //TODO: Das board überchreiben od nd
-        FileHandler fileHandler = new FileHandler();
-        fileHandler.loadFile(path);
+        // FileHandler fileHandler = new FileHandler(this, );
+        /*fileHandler.loadFile(path);
 
         this.newGame(BLACK, 19, 0, new JapaneseRuleset());
+        return false;*/
         return false;
     }
 
@@ -236,11 +237,6 @@ public class Game implements GameInterface {
     @Override
     public Ruleset getRuleset() {
         return this.ruleset;
-    }
-
-    @Override
-    public FileTree getFileTree() {
-        return fileTree;
     }
 
     @Override
@@ -538,14 +534,16 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public Path getSavePath() {
-        return savaGamePath;
+    public File getSaveFile() {
+        return saveFile;
     }
 
     @Override
-    public void setSavePath(Path path) {
-        if(path == null) return;
-        this.savaGamePath = path;
+    public void setSaveFile(File saveFile) {
+        if(saveFile == null) {
+            throw new NullPointerException();
+        }
+        this.saveFile = saveFile;
     }
 
     private UndoableCommand switchColor() {

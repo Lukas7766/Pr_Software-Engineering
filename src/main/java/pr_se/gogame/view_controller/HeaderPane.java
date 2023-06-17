@@ -458,12 +458,12 @@ public class HeaderPane extends VBox {
     }
 
     private void saveGame(boolean as) {
-        Path saveGamePath = game.getSavePath();
+        File saveGameFile = game.getSaveFile();
 
-        if (as || saveGamePath == null) {
+        if (as || saveGameFile == null) {
             File f = CustomFileDialog.getFile(stage, true, filterList);
             if (f == null) return;
-            game.setSavePath(f.toPath());
+            game.setSaveFile(f);
         }
         if (!game.saveGame()) System.out.println("Export did not work!");
     }
