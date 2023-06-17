@@ -14,7 +14,7 @@ public class GeraldsHistory {
 
     public GeraldsHistory(Game game) {
         this.game = game;
-        head = new GeraldsNode(null, null);
+        head = new GeraldsNode(null, null, null, null);
         current = head;
     }
 

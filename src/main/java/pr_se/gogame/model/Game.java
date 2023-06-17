@@ -113,7 +113,7 @@ public class Game implements GameInterface {
         UndoableCommand c = switchColor();
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
-        geraldsHistory.addNode(new GeraldsNode(c, "pass"));
+        geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "pass")); // StoneColor.getOpposite() because we switched colors before
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -156,7 +156,7 @@ public class Game implements GameInterface {
         c.execute(true);
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
-        geraldsHistory.addNode(new GeraldsNode(c, "resign"));
+        geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.RESIGN, FINAL_CUR_COLOR, "resign"));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -354,7 +354,10 @@ public class Game implements GameInterface {
         c.getUndoEvents().addAll(UC03_SWITCH_COLOR.getUndoEvents());
 
         // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
-        geraldsHistory.addNode(new GeraldsNode(c, "playMove(" + x + ", " + y + ")"));
+        /*
+         * StoneColor.getOpposite() because we previously switched colors
+         */
+        geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), x, y, "playMove(" + x + ", " + y + ")"));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -437,7 +440,10 @@ public class Game implements GameInterface {
             c.getUndoEvents().addAll(UC02_UPDATE_COUNTER.getUndoEvents());
 
             // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
-            geraldsHistory.addNode(new GeraldsNode(c, "placeHandicapPosition(" + x + ", " + y + ")"));
+            /*
+             * StoneColor.getOpposite() because we previously switched colors
+             */
+            geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.HANDICAP, StoneColor.getOpposite(curColor), x, y, "placeHandicapPosition(" + x + ", " + y + ")"));
 
             for(GameEvent e : c.getExecuteEvents()) {
                 System.out.println(e);
