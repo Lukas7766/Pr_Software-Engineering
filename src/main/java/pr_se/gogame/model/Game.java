@@ -33,8 +33,6 @@ public class Game implements GameInterface {
 
     private GeraldsHistory geraldsHistory;
 
-    private FileHandler fileHandler;
-
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
@@ -66,8 +64,6 @@ public class Game implements GameInterface {
         this.handicap = handicap;
         this.ruleset = ruleset;
 
-        this.fileHandler = new FileHandler(this);
-
         this.playerBlackScore = handicap;
         this.playerWhiteScore = this.ruleset.getKomi();
         this.blackCapturedStones = 0;
@@ -93,18 +89,12 @@ public class Game implements GameInterface {
             return false;
         }
         System.out.println("saved a file");
-        return fileHandler.saveFile(saveFile, geraldsHistory);
+        return FileHandler.saveFile(this, saveFile, geraldsHistory);
     }
 
     @Override
     public boolean loadGame(File file) {
-        // FileHandler fileHandler = new FileHandler(this, );
-        /*fileHandler.loadFile(path);
-
-        this.newGame(BLACK, 19, 0, new JapaneseRuleset());
-        return false;*/
-        FileHandler fH = new FileHandler(this);
-        fH.loadFile(file);
+        FileHandler.loadFile(this, file);
         return true;
     }
 
