@@ -69,7 +69,7 @@ public class SGFScanner {
                 attribute = getAttribute();
                 break;
 
-            case 'C':
+            case 'C': // TODO: Do something with comments and *maybe* allow comments to be written by the program (to ease implementation of the problems and solutions).
                 t = C;
                 getNextChar();
                 attribute = getAttribute();

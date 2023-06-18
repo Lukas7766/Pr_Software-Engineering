@@ -15,6 +15,8 @@ public class FileHandler {
 
     static String getNamePlayerWhite;
 
+    // TOOD: FileHandler should keep track of the current save file's path.
+
     public static boolean saveFile(Game game, File file, GeraldsHistory history) {
         history.rewind();
 
