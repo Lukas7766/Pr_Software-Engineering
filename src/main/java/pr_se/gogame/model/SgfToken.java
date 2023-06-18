@@ -49,17 +49,60 @@ public enum SgfToken {
     C("C[%s]"),
 
     /**
-     * Handicap
+     * Handicap (number of stones)
      */
     HA("HA[%s]"),
+
     /**
      * Markup f.ex. with an x
      */
     MA("MA[%s]"),
+
     /**
      * label for a coordinate
      */
     LB("LB[%s:%s]"),
+
+    /**
+     * The version of the SGF format that is used. We are using version 4.
+     */
+    FF("FF[%s]"),
+
+    /**
+     * Game Type. 1 is Go.
+     */
+    GM("GM[%s]"),
+
+    /**
+     * Board size.
+     */
+    SZ("SZ[%s]"),
+
+    /**
+     * Opening parenthesis indicating beginning of subtree (probably unused by our program).
+     */
+    LPAR("("),
+
+    /**
+     * Opening parenthesis indicating end of subtree (probably unused by our program).
+     */
+    RPAR(")"),
+
+    /**
+     * Prepended to some tokens. I'm unsure what it means, but we'll read it in separately just in case.
+     */
+    SEMICOLON(";"),
+
+    /**
+     * Sometimes, a token can have multiple attributes. This is what this token signifies.
+     */
+    LONE_ATTRIBUTE("[%s]"),
+
+    /**
+     * Marks the end of the file.
+     */
+    EOF("EOF"),
+
     /**
      * The format for the first line of a File
      */

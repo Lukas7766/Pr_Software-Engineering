@@ -3,7 +3,6 @@ package pr_se.gogame.model;
 import pr_se.gogame.view_controller.GameListener;
 
 import java.io.File;
-import java.nio.file.Path;
 
 public interface GameInterface {
 
@@ -25,7 +24,7 @@ public interface GameInterface {
      */
     void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset);
 
-    boolean loadGame(Path path);
+    boolean loadGame(File file);
 
     boolean saveGame();
 

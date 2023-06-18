@@ -4,7 +4,6 @@ import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -60,7 +59,6 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
-        //TODO: Remove this when GeraldsHistory is removed
         this.geraldsHistory = new GeraldsHistory(this);
 
         this.curColor = startingColor;
@@ -99,13 +97,15 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public boolean loadGame(Path path) {
+    public boolean loadGame(File file) {
         // FileHandler fileHandler = new FileHandler(this, );
         /*fileHandler.loadFile(path);
 
         this.newGame(BLACK, 19, 0, new JapaneseRuleset());
         return false;*/
-        return false;
+        FileHandler fH = new FileHandler(this);
+        fH.loadFile(file);
+        return true;
     }
 
     @Override
@@ -113,7 +113,6 @@ public class Game implements GameInterface {
         System.out.println("pass");
         UndoableCommand c = switchColor();
 
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "pass")); // StoneColor.getOpposite() because we switched colors before
 
         for(GameEvent e : c.getExecuteEvents()) {
@@ -156,7 +155,6 @@ public class Game implements GameInterface {
         };
         c.execute(true);
 
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.RESIGN, FINAL_CUR_COLOR, "resign"));
 
         for(GameEvent e : c.getExecuteEvents()) {
@@ -349,7 +347,6 @@ public class Game implements GameInterface {
         c.getUndoEvents().addAll(UC01_SET_STONE.getUndoEvents());
         c.getUndoEvents().addAll(UC03_SWITCH_COLOR.getUndoEvents());
 
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
         /*
          * StoneColor.getOpposite() because we previously switched colors
          */
@@ -435,7 +432,6 @@ public class Game implements GameInterface {
             c.getUndoEvents().addAll(UC01_SET_STONE.getUndoEvents());
             c.getUndoEvents().addAll(UC02_UPDATE_COUNTER.getUndoEvents());
 
-            // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
             /*
              * StoneColor.getOpposite() because we previously switched colors
              */
