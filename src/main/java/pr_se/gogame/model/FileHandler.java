@@ -15,7 +15,7 @@ public class FileHandler {
 
     static String getNamePlayerWhite;
 
-    // TOOD: FileHandler should keep track of the current save file's path.
+    // TODO: FileHandler should keep track of the current save file's path.
 
     public static boolean saveFile(Game game, File file, GeraldsHistory history) {
         history.rewind();
@@ -23,7 +23,8 @@ public class FileHandler {
         try (FileWriter output = new FileWriter(file)) {
 
             try {
-                output.write(String.format(START.getValue() + "\n\n(", game.getSize()));
+                output.write(String.format(START.getValue() + "\n\n", game.getSize()));
+                output.write(String.format(HA.getValue() + "\n\n", game.getHandicap())); // Used to include an opening '(' at the end.
             } catch(IOException e) {
                 System.out.println("Couldn't write file header!");
             }
@@ -33,14 +34,14 @@ public class FileHandler {
 
                 while (!history.isAtEnd()) {
                     history.stepForward();
-                    GeraldsNode n = history.getCurrentNode();
+                    GeraldsNode node = history.getCurrentNode();
                     SgfToken t;
 
-                    switch (n.getSaveToken()) {
+                    switch (node.getSaveToken()) {
                         case HANDICAP:
-                            if (n.getColor() == BLACK) {
+                            if (node.getColor() == BLACK) {
                                 t = SgfToken.AB;
-                            } else if (n.getColor() == WHITE) {
+                            } else if (node.getColor() == WHITE) {
                                 t = SgfToken.AW;
                             } else {
                                 throw new IllegalStateException("AE token not supported!");
@@ -55,21 +56,21 @@ public class FileHandler {
                                 outputFormatString = t.getValue();
                             }
 
-                            output.write(String.format(outputFormatString, calculateCoordinates(n.getX(), n.getY())));
+                            output.write(String.format(outputFormatString, calculateCoordinates(node.getX(), node.getY())));
                             break;
 
                         case MOVE:
-                            if(n.getColor() == BLACK) {
+                            if(node.getColor() == BLACK) {
                                 t = SgfToken.B;
                             } else {
                                 t = SgfToken.W;
                             }
 
-                            output.write(String.format("\n" + t.getValue(), calculateCoordinates(n.getX(), n.getY())));
+                            output.write(String.format("\n" + t.getValue(), calculateCoordinates(node.getX(), node.getY())));
                             break;
 
                         case PASS:
-                            if(n.getColor() == BLACK) {
+                            if(node.getColor() == BLACK) {
                                 t = SgfToken.B;
                             } else {
                                 t = SgfToken.W;
@@ -86,7 +87,7 @@ public class FileHandler {
                     }
                 }
 
-                output.write(")\n\n)");
+                output.write("\n\n)"); // Used to have a closing ')' a the beginning.
                 return true;
             } catch (IOException e) {
                 System.out.println("File write Error");
@@ -104,141 +105,144 @@ public class FileHandler {
         try (FileReader input = new FileReader(file)) {
             SGFScanner scanner = new SGFScanner(input);
 
-            ScannedToken t;
+            ScannedToken t = scanner.next();
 
-            do {
+            System.out.println("Reading preparatory Token ...");
+
+            if(t.getToken() != LPAR) {
+                unexpected(LPAR.getValue(), t);
+            }
+
+            t = scanner.next();
+
+            if(t.getToken() != SEMICOLON) {
+                unexpected(SEMICOLON.getValue(), t);
+            }
+
+            int size = -1;
+            int handicap = -1;
+
+            loop:
+            for(;;) {
                 t = scanner.next();
 
-                System.out.println("Reading preparatory Token ...");
+                switch (t.getToken()) {
+                    case FF:
+                        if (Integer.parseInt(t.getAttributeValue()) != 4) {
+                            throw new IOException("Illegal SGF version! Must be 4 but was '" + t.getAttributeValue() + "'");
+                        }
+                        break;
 
-                if(t.getToken() != LPAR) {
-                    unexpected(LPAR.getValue(), t);
+                    case GM:
+                        if (Integer.parseInt(t.getAttributeValue()) != 1) {
+                            throw new IOException("SGF file is for wrong game! Must be 1 but is '" + t.getAttributeValue() + "'");
+                        }
+                        break;
+
+                    case SZ:
+                        size = Integer.parseInt(t.getAttributeValue());
+                        break;
+
+                    case HA:
+                        handicap = Integer.parseInt(t.getAttributeValue());
+                        break;
+
+                    case LPAR:
+                        throw new IOException("This program does not support multiple GameTrees!");
+
+                    case SEMICOLON:
+                    case RPAR:
+                        break loop;
+
+                    default:
+                        unexpected("Game info tokens", t);
+                        break loop;
                 }
+            }
 
-                t = scanner.next();
+            if(size < 0) {
+                throw new IOException("Invalid Size in SGF file!");
+            }
 
-                if(t.getToken() != SEMICOLON) {
-                    unexpected(SEMICOLON.getValue(), t);
-                }
+            if(handicap < 0) {
+                handicap = 0;
+            }
+            game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
+            game.setHandicapStoneCounter(handicap);
 
-                int size = -1;
-                int handicap = -1;
-
-                loop:
-                for(;;) {
-                    t = scanner.next();
-
-                    switch (t.getToken()) {
-                        case FF:
-                            if (Integer.parseInt(t.getAttributeValue()) != 4) {
-                                throw new IOException("Illegal SGF version! Must be 4 but was '" + t.getAttributeValue() + "'");
-                            }
-                            break;
-
-                        case GM:
-                            if (Integer.parseInt(t.getAttributeValue()) != 1) {
-                                throw new IOException("SGF file is for wrong game! Must be 1 but is '" + t.getAttributeValue() + "'");
-                            }
-                            break;
-
-                        case SZ:
-                            size = Integer.parseInt(t.getAttributeValue());
-                            break;
-
-                        case HA:
-                            handicap = Integer.parseInt(t.getAttributeValue());
-                            break;
-
-                        case LPAR:
-                        case RPAR:
-                            break loop;
-
-                        default:
-                            unexpected("Game info tokens", t);
-                            break loop;
-                    }
-                }
-
-                if(size < 0) {
-                    throw new IOException("Invalid Size in SGF file!");
-                }
-
-                if(t.getToken() != LPAR && t.getToken() != RPAR) {
-                    unexpected(LPAR.getValue() + " or " + RPAR.getValue(), t);
-                }
-
-                game.newGame(BLACK, size, Math.max(handicap, 0), new JapaneseRuleset());
+            if(t.getToken() != RPAR) {
+                StoneColor handicapMode = null;
 
                 loop2:
-                if(t.getToken() == LPAR) {
-                    t = scanner.next(); // Skip the parenthesis
+                for (;;) {
+                    t = scanner.next();
 
-                    StoneColor handicapMode = null;
+                    int[] decodedCoords = null;
 
-                    for(;;) {
-                        t = scanner.next();
+                    switch (t.getToken()) {
+                        case SEMICOLON:
+                            break;
 
-                        int [] decodedCoords = null;
+                        case AW: // TODO: Maybe add boolean param to Game.newGame() so handicap stones aren't set twice. At the moment, the Ruleset is always asked to set the handicap stones.
+                            handicapMode = WHITE;
+                            decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                            break;
 
-                        switch (t.getToken()) {
-                            case SEMICOLON:
-                                break;
+                        case AB:
+                            handicapMode = BLACK;
+                            decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            break;
 
-                            case AW: // TODO: Maybe add boolean param to Game.newGame() so handicap stones aren't set twice. At the moment, the Ruleset is always asked to set the handicap stones.
-                                handicapMode = WHITE;
+                        case LONE_ATTRIBUTE:
+                            if (handicapMode == null) {
+                                throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
+                            }
+                            decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            break;
+
+                        case B: // TODO: Maybe check this earlier to determine who starts. At the moment, black always starts (which can lead to wrong results if there were handicap stones).
+                            if (t.getAttributeValue().equals("")) {
+                                game.pass();
+                            } else {
                                 decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                                break;
+                                game.playMove(decodedCoords[0], decodedCoords[1]);
+                            }
+                            break;
 
-                            case AB:
-                                handicapMode = BLACK;
+                        case W:
+                            if (t.getAttributeValue().equals("")) {
+                                game.pass();
+                            } else {
                                 decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                                break;
+                                game.playMove(decodedCoords[0], decodedCoords[1]);
+                            }
+                            break;
 
-                            case LONE_ATTRIBUTE:
-                                if(handicapMode == null) {
-                                    throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
-                                }
-                                break;
+                        case RPAR:
+                            // t = scanner.next();
+                            break loop2;
 
-                            case B: // TODO: Maybe check this earlier to determine who starts. At the moment, black always starts (which can lead to wrong results if there were handicap stones).
-                                if(t.getAttributeValue().equals("")) {
-                                    game.pass();
-                                } else {
-                                    decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                                    game.playMove(decodedCoords[0], decodedCoords[1]);
-                                }
-                                break;
+                        case LPAR:
+                            throw new IOException("This SGF file has multiple branches, a feature currently unsupported by this program.");
 
-                            case W:
-                                if(t.getAttributeValue().equals("")) {
-                                    game.pass();
-                                } else {
-                                    decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                                    game.playMove(decodedCoords[0], decodedCoords[1]);
-                                }
-                                break;
-
-                            case RPAR:
-                                t = scanner.next();
-                                break loop2;
-
-                            case LPAR:
-                                throw new IOException("This SGF file has multiple branches, a feature currently unsupported by this program.");
-                                // break loop2;
-
-                            default:
-                                throw new IOException("Unsupported token \"" + t.getToken() + "\" read at line " + t.getLine() + ", col " + t.getCol());
-                                // break loop2;
-                        }
+                        default:
+                            throw new IOException("Unsupported token \"" + t.getToken() + "\" read at line " + t.getLine() + ", col " + t.getCol());
                     }
                 }
+            }
 
-                if(t.getToken() != RPAR) {
-                    unexpected(RPAR.getValue(), t);
-                }
+            if(t.getToken() != RPAR) {
+                unexpected(RPAR.getValue(), t);
+            }
 
-                t = scanner.next(); // Do this one last time so we can check if we're at EOF.
-            } while(t.getToken() != EOF);
+            t = scanner.next(); // Do this one last time so we can check if we're at EOF.
+
+            if(t.getToken() != EOF) {
+                unexpected(EOF.getValue(), t);
+            }
+
         } catch(IOException e) {
             System.out.println("Couldn't properly read SGF file!");
             e.printStackTrace();

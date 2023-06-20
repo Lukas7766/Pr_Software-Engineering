@@ -49,6 +49,11 @@ public class Game implements GameInterface {
 
     @Override
     public void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset) {
+        newGame(startingColor, size, handicap, ruleset, true);
+    }
+
+    @Override
+    public void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset, boolean letRulesetPlaceHandicapStones) {
         if(size < 0 || handicap < 0 || handicap > 9) {
             throw new IllegalArgumentException();
         }
@@ -75,7 +80,12 @@ public class Game implements GameInterface {
         this.ruleset.reset();
         fireGameEvent(new GameEvent(GameCommand.NEW_GAME));
         this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
-        this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
+
+        int tempHandicap = 0;
+        if(letRulesetPlaceHandicapStones) {
+            tempHandicap = this.handicap;
+        }
+        this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
 
         this.curMoveNumber = 1;
         this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
@@ -425,7 +435,11 @@ public class Game implements GameInterface {
             /*
              * StoneColor.getOpposite() because we previously switched colors
              */
-            geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.HANDICAP, StoneColor.getOpposite(curColor), x, y, "placeHandicapPosition(" + x + ", " + y + ")"));
+            StoneColor col = curColor;
+            if(NEW_HANDICAP_CTR <= 0) {
+                col = StoneColor.getOpposite(curColor);
+            }
+            geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.HANDICAP, col, x, y, "placeHandicapPosition(" + x + ", " + y + ")"));
 
             for(GameEvent e : c.getExecuteEvents()) {
                 System.out.println(e);

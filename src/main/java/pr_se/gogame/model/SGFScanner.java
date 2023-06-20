@@ -94,6 +94,16 @@ public class SGFScanner {
                 attribute = getAttribute();
                 break;
 
+            case 'H':
+                getNextChar();
+                if(ch != 'A') {
+                    unexpected("A");
+                }
+                t = HA;
+                getNextChar();
+                attribute = getAttribute();
+                break;
+
             case 'S':
                 getNextChar();
                 if(ch != 'Z') {
@@ -109,7 +119,7 @@ public class SGFScanner {
                 break;
 
             default:
-                throw new IOException("Invalid token!");
+                throw new IOException("Invalid token '" + ch + "'!");
         }
 
         return new ScannedToken(t, attribute, line, col);

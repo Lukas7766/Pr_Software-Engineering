@@ -24,6 +24,8 @@ public interface GameInterface {
      */
     void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset);
 
+    void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset, boolean letRulesetPlaceHandicapStones);
+
     boolean loadGame(File file);
 
     boolean saveGame();
