@@ -52,6 +52,8 @@ public interface GameInterface {
      */
     void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
 
+    void playMove(int x, int y, StoneColor color);
+
     /**
      * This method places a handicap stone down for the beginner player at the specified coordinates. This only works
      * at the beginning of the game.

@@ -183,9 +183,14 @@ public class FileHandler {
                         case SEMICOLON:
                             break;
 
-                        case AW: // TODO: Maybe add boolean param to Game.newGame() so handicap stones aren't set twice. At the moment, the Ruleset is always asked to set the handicap stones.
+                        /*
+                         * // TODO: Maybe check this earlier to determine who starts. At the moment, black always starts
+                         *     (which can lead to wrong results if there were handicap stones).
+                         */
+                        case AW:
                             handicapMode = WHITE;
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
                             break;
 
                         case AB:
@@ -199,15 +204,19 @@ public class FileHandler {
                                 throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
                             }
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            if(handicapMode == BLACK) {
+                                game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            } else {
+                                game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            }
                             break;
 
-                        case B: // TODO: Maybe check this earlier to determine who starts. At the moment, black always starts (which can lead to wrong results if there were handicap stones).
+                        case B:
                             if (t.getAttributeValue().equals("")) {
                                 game.pass();
                             } else {
                                 decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                                game.playMove(decodedCoords[0], decodedCoords[1]);
+                                game.playMove(decodedCoords[0], decodedCoords[1], BLACK);
                             }
                             break;
 
@@ -216,7 +225,7 @@ public class FileHandler {
                                 game.pass();
                             } else {
                                 decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                                game.playMove(decodedCoords[0], decodedCoords[1]);
+                                game.playMove(decodedCoords[0], decodedCoords[1], WHITE);
                             }
                             break;
 

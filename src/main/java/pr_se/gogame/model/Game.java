@@ -275,6 +275,11 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y) {
+        playMove(x, y, this.curColor);
+    }
+
+    @Override
+    public void playMove(int x, int y, StoneColor color) {
         /*if(this.gameCommand != GameCommand.NEW_GAME && this.gameCommand != GameCommand.COLOR_HAS_CHANGED) {
             throw new IllegalStateException("Can't place stone when game isn't being played! Game State was " + this.gameCommand);
         }*/
@@ -283,69 +288,77 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, false); // UC01_SET_STONE is already executed within board.setStone().
+        final UndoableCommand UC01_SET_COLOR = setCurColor(color);
 
-        if(UC01_SET_STONE == null) {
+        final UndoableCommand UC02_SET_STONE = board.setStone(x, y, curColor, false); // UC02_SET_STONE is already executed within board.setStone().
+
+        if(UC02_SET_STONE == null) {
             System.out.println("Move aborted.");
             return;
         }
 
-        // Assertion: UC01_SET_STONE != null and was hence a valid move.
+        // Assertion: UC02_SET_STONE != null and was hence a valid move.
 
-        final UndoableCommand UC02_IS_KO = ruleset.isKo(this);
+        final UndoableCommand UC03_IS_KO = ruleset.isKo(this);
 
-        if(UC02_IS_KO == null) {
-            UC01_SET_STONE.undo();
+        if(UC03_IS_KO == null) {
+            UC02_SET_STONE.undo();
             System.out.println("Ko detected. Move aborted.");
             return;
         }
 
         final int OLD_MOVE_NO = curMoveNumber;
 
-        final UndoableCommand UC03_SWITCH_COLOR = new UndoableCommand() {
-            UndoableCommand UC03_01_switchColor = null;
+        final UndoableCommand UC04_SWITCH_COLOR = new UndoableCommand() {
+            UndoableCommand thisCommand = null;
 
             @Override
             public void execute(boolean saveEffects) {
                 curMoveNumber++;
                 // Update current player color
-                UC03_01_switchColor = switchColor();
+                thisCommand = switchColor();
                 if(saveEffects) {
-                    getExecuteEvents().addAll(UC03_01_switchColor.getExecuteEvents());
-                    getUndoEvents().addAll(UC03_01_switchColor.getUndoEvents());
+                    getExecuteEvents().addAll(thisCommand.getExecuteEvents());
+                    getUndoEvents().addAll(thisCommand.getUndoEvents());
                 }
             }
 
             @Override
             public void undo() {
-                if(UC03_01_switchColor != null) {
-                    UC03_01_switchColor.undo();
+                if(thisCommand != null) {
+                    thisCommand.undo();
                 }
                 curMoveNumber = OLD_MOVE_NO;
             }
         };
-        UC03_SWITCH_COLOR.execute(true);
+        UC04_SWITCH_COLOR.execute(true);
 
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                UC01_SET_STONE.execute(saveEffects);
-                UC02_IS_KO.execute(saveEffects);
-                UC03_SWITCH_COLOR.execute(saveEffects);
+                UC01_SET_COLOR.execute(saveEffects);
+                UC02_SET_STONE.execute(saveEffects);
+                UC03_IS_KO.execute(saveEffects);
+                UC04_SWITCH_COLOR.execute(saveEffects);
             }
 
             @Override
             public void undo() {
-                UC03_SWITCH_COLOR.undo();
-                UC02_IS_KO.undo();
-                UC01_SET_STONE.undo();
+                UC04_SWITCH_COLOR.undo();
+                UC03_IS_KO.undo();
+                UC02_SET_STONE.undo();
+                UC01_SET_COLOR.undo();
             }
         };
         // c was already executed piecemeal
-        c.getExecuteEvents().addAll(UC01_SET_STONE.getExecuteEvents());
-        c.getExecuteEvents().addAll(UC03_SWITCH_COLOR.getExecuteEvents());
-        c.getUndoEvents().addAll(UC01_SET_STONE.getUndoEvents());
-        c.getUndoEvents().addAll(UC03_SWITCH_COLOR.getUndoEvents());
+
+        /*
+         * UC02 and UC04 fire events, so those have to be added to the command containing them.
+         */
+        c.getExecuteEvents().addAll(UC02_SET_STONE.getExecuteEvents());
+        c.getExecuteEvents().addAll(UC04_SWITCH_COLOR.getExecuteEvents());
+        c.getUndoEvents().addAll(UC02_SET_STONE.getUndoEvents());
+        c.getUndoEvents().addAll(UC04_SWITCH_COLOR.getUndoEvents());
 
         /*
          * StoneColor.getOpposite() because we previously switched colors
