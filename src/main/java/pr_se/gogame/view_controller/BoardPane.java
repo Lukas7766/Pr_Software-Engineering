@@ -200,6 +200,7 @@ public class BoardPane extends GridPane {
 
                 case COLOR_HAS_CHANGED:
                     setMouseTransparent(false);
+                    requestFocus();
                     break;
 
                 case NEW_GAME:

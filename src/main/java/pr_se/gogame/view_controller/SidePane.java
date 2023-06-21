@@ -168,23 +168,38 @@ public class SidePane extends StackPane {
         explanationLabel.setText("Turn Explanation:");
         explanationBoard.getChildren().add(explanationLabel);
 
-        ScrollPane textArea = new ScrollPane();
-        textArea.setFitToWidth(true);
-        textArea.prefHeightProperty().bind(infoPane.heightProperty());
-        textArea.setPrefWidth(infoPane.getWidth());
+        ScrollPane textScrollPane = new ScrollPane();
+        textScrollPane.setFitToWidth(true);
+        textScrollPane.prefHeightProperty().bind(infoPane.heightProperty());
+        textScrollPane.setPrefWidth(infoPane.getWidth());
 
-        TextFlow textFlow = new TextFlow();
+        // TextFlow textFlow = new TextFlow();
+        TextArea textFlow = new TextArea();
         textFlow.setPadding(new Insets(3));
-        textFlow.setTextAlignment(TextAlignment.JUSTIFY);
+        textFlow.setFocusTraversable(false);
+        textFlow.setWrapText(true);
+        textFlow.prefHeightProperty().bind(explanationBoard.heightProperty());
+        textFlow.setPrefWidth(explanationBoard.getWidth());
+        // textFlow.setTextAlignment(TextAlignment.JUSTIFY);
 
-        Text explanation = new Text();
+        /*Text explanation = new Text();
         explanation.setFocusTraversable(false);
-        //explanation.setText("Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Lorem ipsum dolor sit amet, consectetuer adipiscing elit, sed diam nonummy nibh euismod tincidunt ut laoreet dolore magna aliquam erat volutpat. Ut wisi enim ad minim veniam, quis nostrud exerci tation ullamcorper suscipit lobortis nisl ut aliquip ex ea commodo consequat. Duis autem vel eum iriure dolor in hendrerit in vulputate velit esse molestie consequat, vel illum dolore eu feugiat nulla facilisis at vero et accumsan et iusto odio dignissim qui blandit praesent luptatum zzril delenit augue duis dolore te feugait nulla facilisi. Nam liber tempor cum soluta nobis eleifend option congue nihil imperdiet doming id quod mazim placerat facer possim assum.");//
         explanation.setText("");
-        textFlow.getChildren().add(explanation);
+        textFlow.getChildren().add(explanation);*/
 
-        textArea.setContent(textFlow);
-        explanationBoard.getChildren().add(textArea);
+        /*textScrollPane.setContent(textFlow);
+        explanationBoard.getChildren().add(textScrollPane);*/
+        explanationBoard.getChildren().add(textFlow);
+
+        Button saveCommentButton = new Button("Save Explanation");
+        saveCommentButton.setFocusTraversable(false);
+        saveCommentButton.prefWidthProperty().bind(explanationBoard.widthProperty());
+        saveCommentButton.setAlignment(Pos.CENTER);
+        saveCommentButton.setOnAction(e -> {
+            game.commentCurrentMove(textFlow.getText());
+        });
+
+        explanationBoard.getChildren().add(saveCommentButton);
 
         infoPane.getChildren().add(explanationBoard);
 
@@ -199,7 +214,7 @@ public class SidePane extends StackPane {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                     actualPlayer.setText(game.getCurColor().toString());
-                    explanation.setText(game.getComment()); // TODO: this doesn't display the right text for the move yet, but we'll figure this out.
+                    textFlow.setText(game.getComment());
                 }
             }
         });
@@ -303,7 +318,7 @@ public class SidePane extends StackPane {
 
         //start Button
         Button startGameBtn = new Button();
-        startGameBtn.setText("start Game");
+        startGameBtn.setText("Start game");
         startGameBtn.setAlignment(Pos.BOTTOM_RIGHT);
         startGameBtn.setOnAction(event -> {
             //this.getChildren().remove(gridPane);
