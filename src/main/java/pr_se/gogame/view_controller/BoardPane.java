@@ -133,9 +133,6 @@ public class BoardPane extends GridPane {
      */
     private int keyboardCellY = -1;
 
-    // TODO: Remove in final product (or maybe not)
-    private final boolean debug = false;
-
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
@@ -430,7 +427,7 @@ public class BoardPane extends GridPane {
                 }
             }
 
-            if(debug) {
+            if(GlobalSettings.DEBUG) {
                 game.printDebugInfo(col, row);
             }
 
