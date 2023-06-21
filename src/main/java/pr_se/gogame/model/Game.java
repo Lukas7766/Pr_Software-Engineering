@@ -588,26 +588,32 @@ public class Game implements GameInterface {
     }
 
     // Methods controlling the history
+    @Override
     public void undo() {
         geraldsHistory.stepBack();
     }
 
+    @Override
     public void redo() {
         geraldsHistory.stepForward();
     }
 
+    @Override
     public void rewind() {
         geraldsHistory.rewind();
     }
 
+    @Override
     public void goToEnd() {
         geraldsHistory.skipToEnd();
     }
 
+    @Override
     public String getComment() {
         return geraldsHistory.currentComment();
     }
 
+    @Override
     public void commentCurrentMove(String comment) {
         if(comment == null) {
             throw new NullPointerException();

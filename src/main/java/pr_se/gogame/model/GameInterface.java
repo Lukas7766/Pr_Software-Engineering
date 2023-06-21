@@ -112,5 +112,18 @@ public interface GameInterface {
     void removeListener(GameListener l);
 
     void setHandicapStoneCounter(int noStones);
+
+    // Methods controlling the history
+    void undo();
+
+    void redo();
+
+    void rewind();
+
+    void goToEnd();
+
+    String getComment();
+
+    void commentCurrentMove(String comment);
 }
 
