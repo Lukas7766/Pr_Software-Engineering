@@ -67,6 +67,7 @@ public class FileHandler {
                 }
             } catch(IOException e) {
                 System.out.println("Couldn't write file header!");
+                return false;
             }
 
             output.write("\n\n");
@@ -109,8 +110,7 @@ public class FileHandler {
                     node = history.getCurrentNode();
                 }
 
-                output.write("\n\n)"); // Used to have a closing ')' a the beginning.
-                return true;
+                output.write("\n\n)"); // Used to have a closing ')' at the beginning.
             } catch (IOException e) {
                 System.out.println("File write Error");
                 return false;
@@ -118,12 +118,13 @@ public class FileHandler {
         } catch(IOException e) {
             System.out.println("Couldn't open file output stream!");
             e.printStackTrace();
+            return false;
         }
 
         return true;
     }
 
-    public static void loadFile(Game game, File file) {
+    public static boolean loadFile(Game game, File file) {
         if(file == null) {
             throw new NullPointerException();
         }

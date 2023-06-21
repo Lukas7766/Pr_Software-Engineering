@@ -123,8 +123,7 @@ public class Game implements GameInterface {
 
     @Override
     public boolean loadGame(File file) {
-        FileHandler.loadFile(this, file);
-        return true;
+        return FileHandler.loadFile(this, file);
     }
 
     @Override
