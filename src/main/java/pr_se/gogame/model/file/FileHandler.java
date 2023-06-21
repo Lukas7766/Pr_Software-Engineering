@@ -101,7 +101,7 @@ public class FileHandler {
                     }
 
                     if(!node.getComment().equals("")) {
-                        output.write(String.format(C.getValue(), node.getComment()));
+                        output.write(String.format(C.getValue(), node.getComment())); // TODO: Reformat the string according to the SGF "text" value specification
                     }
 
                     if(history.isAtEnd()) {
@@ -303,6 +303,7 @@ public class FileHandler {
                             break;
 
                         case C:
+                            // TODO: Reformat the string according to the SGF "text" value specification
                             if(moveWasMade) {
                                 game.commentCurrentMove(t.getAttributeValue());
                             } else {

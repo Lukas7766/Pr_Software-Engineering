@@ -622,6 +622,7 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(GameCommand.COLOR_HAS_CHANGED));
     }
 
+    // TODO: Have this affect the history and, consequently, the file saver.
     @Override
     public void markCircle(int x, int y) {
         fireGameEvent(new GameEvent(GameCommand.MARK_CIRCLE, x, y, curMoveNumber));
