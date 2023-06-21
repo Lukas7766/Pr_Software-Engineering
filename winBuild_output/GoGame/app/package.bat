@@ -1,0 +1,1 @@
+"C:\Program Files\Java\jdk-19\bin\jpackage.exe" --type app-image -n "GoGame" --dest ../winBuild_output --main-jar GoGame.jar --input . --icon go.ico
