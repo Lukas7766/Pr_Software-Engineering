@@ -10,6 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
+import pr_se.gogame.model.FileHandler;
 import pr_se.gogame.model.Game;
 
 import javafx.application.Application;
@@ -21,7 +22,6 @@ import pr_se.gogame.model.GameCommand;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -381,10 +381,10 @@ public class HeaderPane extends VBox {
         gameCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
         gameCards.setAlignment(Pos.CENTER_LEFT);
 
-        HBox gameShortCards = new HBox();
-        gameShortCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
-        gameShortCards.setAlignment(Pos.CENTER);
-        gameShortCards.setSpacing(25);
+        HBox gameShortCuts = new HBox();
+        gameShortCuts.prefWidthProperty().bind(this.widthProperty().subtract(250));
+        gameShortCuts.setAlignment(Pos.CENTER);
+        gameShortCuts.setSpacing(25);
 
 
         Button pass = new Button("Pass");
@@ -408,7 +408,7 @@ public class HeaderPane extends VBox {
         confirm.setOnAction(e -> GlobalSettings.confirmMove());
         gameShortCardList.add(confirm);
 
-        gameShortCards.getChildren().addAll(gameShortCardList);
+        gameShortCuts.getChildren().addAll(gameShortCardList);
         gameShortCardList.forEach(e -> e.setDisable(true));
 
         game.addListener(l -> {
@@ -418,7 +418,7 @@ public class HeaderPane extends VBox {
             }
         });
 
-        gameCards.getChildren().addAll(gameShortCards);
+        gameCards.getChildren().addAll(gameShortCuts);
 
 
         // Create combo box for selecting graphics packs
@@ -448,7 +448,7 @@ public class HeaderPane extends VBox {
             GlobalSettings.setGraphicsPath(GRAPHICS_FOLDER + "/" + graphicsPackSelectorComboBox.getValue());
         });
 
-        gameShortCards.getChildren().add(graphicsPackSelectorComboBox);
+        gameShortCuts.getChildren().add(graphicsPackSelectorComboBox);
 
         gameCards.getChildren().add(graphicsPackSelectorComboBox);
         lane.getChildren().add(gameCards);
@@ -458,14 +458,15 @@ public class HeaderPane extends VBox {
     }
 
     private void saveGame(boolean as) {
-        File saveGameFile = game.getSaveFile();
+        File saveGameFile = FileHandler.getCurrentFile();
 
         if (as || saveGameFile == null) {
-            File f = CustomFileDialog.getFile(stage, true, filterList);
-            if (f == null) return;
-            game.setSaveFile(f);
+            saveGameFile = CustomFileDialog.getFile(stage, true, filterList);
+            if (saveGameFile == null) {
+                return;
+            }
         }
-        if (!game.saveGame()) System.out.println("Export did not work!");
+        if (!game.saveGame(saveGameFile)) System.out.println("Export did not work!");
     }
 
 }

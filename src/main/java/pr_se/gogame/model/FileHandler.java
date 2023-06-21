@@ -15,9 +15,15 @@ public class FileHandler {
 
     static String getNamePlayerWhite;
 
-    // TODO: FileHandler should keep track of the current save file's path.
+    private static File currentFile;
 
     public static boolean saveFile(Game game, File file, GeraldsHistory history) {
+        if(file == null) {
+            throw new NullPointerException();
+        }
+
+        currentFile = file;
+
         history.rewind();
 
         try (FileWriter output = new FileWriter(file)) {
@@ -118,6 +124,12 @@ public class FileHandler {
     }
 
     public static void loadFile(Game game, File file) {
+        if(file == null) {
+            throw new NullPointerException();
+        }
+
+        currentFile = file;
+
         try (FileReader input = new FileReader(file)) {
             SGFScanner scanner = new SGFScanner(input);
 
@@ -322,5 +334,11 @@ public class FileHandler {
 
     private static int[] calculateGridCoordinates(String s) {
         return new int[]{s.charAt(0) - 97, s.charAt(1) - 97};
+    }
+
+    // Getters and setters
+
+    public static File getCurrentFile() {
+        return currentFile;
     }
 }

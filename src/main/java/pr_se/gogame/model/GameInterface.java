@@ -28,7 +28,7 @@ public interface GameInterface {
 
     boolean loadGame(File file);
 
-    boolean saveGame();
+    boolean saveGame(File file);
 
     /**
      * Allows the current player to pass. After this, it is the opposite player's turn.
@@ -109,9 +109,5 @@ public interface GameInterface {
     void removeListener(GameListener l);
 
     void setHandicapStoneCounter(int noStones);
-
-    File getSaveFile();
-
-    void setSaveFile(File saveFile);
 }
 

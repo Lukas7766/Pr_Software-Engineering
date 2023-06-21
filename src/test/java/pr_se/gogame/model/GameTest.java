@@ -111,12 +111,12 @@ class GameTest {
     }
 
     @Test
-    void importGame() {
+    void loadGame() {
         fail();
     }
 
     @Test
-    void exportGame() {
+    void saveGame() {
         fail();
     }
 

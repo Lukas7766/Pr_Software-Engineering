@@ -7,6 +7,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import pr_se.gogame.model.FileHandler;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
 
@@ -52,13 +53,15 @@ public class CustomCloseAction {
             switch (er.getText()) {
                 case "no" -> Platform.exit();
                 case "yes" -> {
-                    File f;
-                    if(game.getSaveFile() == null){
+                    File f = FileHandler.getCurrentFile();
+                    if(f == null){
                         f = CustomFileDialog.getFile(stage,true, filterList);
-                        if(f != null) game.setSaveFile(f);
+                        if(f == null) {
+                            return;
+                        }
                     }
 
-                    if (game.saveGame()) {
+                    if (game.saveGame(f)) {
                         Platform.exit();
                         System.exit(0);
                     }

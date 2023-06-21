@@ -37,7 +37,6 @@ public class Game implements GameInterface {
     private int handicap = 0;
 
     //global (helper) variables
-    private File saveFile;
     private GameCommand gameCommand;
     private final List<GameListener> listeners;
     private Board board;
@@ -114,12 +113,12 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public boolean saveGame() {
-        if (saveFile == null) {
+    public boolean saveGame(File file) {
+        if (file == null) {
             return false;
         }
         System.out.println("saved a file");
-        return FileHandler.saveFile(this, saveFile, geraldsHistory);
+        return FileHandler.saveFile(this, file, geraldsHistory);
     }
 
     @Override
@@ -564,19 +563,6 @@ public class Game implements GameInterface {
     @Override
     public GameResult getGameResult() {
         return gameResult;
-    }
-
-    @Override
-    public File getSaveFile() {
-        return saveFile;
-    }
-
-    @Override
-    public void setSaveFile(File saveFile) {
-        if(saveFile == null) {
-            throw new NullPointerException();
-        }
-        this.saveFile = saveFile;
     }
 
     private UndoableCommand switchColor() {
