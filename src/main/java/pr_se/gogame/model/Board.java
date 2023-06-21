@@ -151,8 +151,6 @@ public class Board implements BoardInterface {
 
         final boolean FINAL_KILL_ANOTHER = killAnother;
         final boolean PREPARE_MODE = prepareMode;
-        final int X = x;
-        final int Y = y;
         final StoneColor COLOR = color;
 
         final UndoableCommand UC06_REMOVE_CAPTURED_STONES = new UndoableCommand() {
@@ -179,16 +177,6 @@ public class Board implements BoardInterface {
                             uC06_02_addCapturedStonesCommand = GAME.addCapturedStones(COLOR, captured);
                         }
                     }
-
-                    if(saveEffects) {
-                        /*
-                         * if(prepareMode) {
-                         *      GAME.getFileTree().bufferStonesBeforeGame(color, x, y);
-                         * } else {
-                         *      GAME.getFileTree().addStone(color, x, y);
-                         * }
-                         */
-                    }
                 }
 
                 // Update UI if possible
@@ -203,8 +191,6 @@ public class Board implements BoardInterface {
                 for(UndoableCommand c : UC06_01_REMOVE_STONE_COMMANDS) {
                     c.undo();
                 }
-
-                // TODO: Saving won't be undone, will it?
 
                 if(uC06_02_addCapturedStonesCommand != null) {
                     uC06_02_addCapturedStonesCommand.undo();
@@ -263,10 +249,6 @@ public class Board implements BoardInterface {
             public void execute(boolean saveEffects) {
                 board[x][y] = null;
 
-                if(saveEffects) {
-                    // GAME.getFileTree().removeStone(x, y);
-                }
-
                 Set<StoneGroup> surroundingSGs = getSurroundings(
                     x,
                     y,
@@ -287,8 +269,6 @@ public class Board implements BoardInterface {
             @Override
             public void undo() {
                 board[x][y] = BOARD_AT_XY_PREVIOUSLY;
-
-                // TODO: Saving won't be undone, will it?
 
                 for(UndoableCommand c : ADD_LIBERTY_COMMANDS) {
                     c.undo();

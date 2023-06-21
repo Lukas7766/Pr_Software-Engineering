@@ -127,7 +127,7 @@ public class SGFScanner {
     }
 
     private void unexpected(String expected) throws IOException {
-        throw new IOException("Expected \'" + expected + "\' but scanned \'" + ch + "\' on line " + line + ", col " + col);
+        throw new IOException("Expected '" + expected + "' but scanned '" + ch + "' on line " + line + ", col " + col);
     }
 
     private String getAttribute() throws IOException {

@@ -195,7 +195,7 @@ public class SidePane extends StackPane {
         infoPane.getChildren().add(explanationBoard);
 
         /*
-         * Adds listener to Game to update the currently displayed player name
+         * This listener updates the currently displayed game info
          */
         game.addListener(e -> {
 

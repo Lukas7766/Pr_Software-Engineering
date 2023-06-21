@@ -10,11 +10,6 @@ import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
 
 public class FileHandler {
-
-    static String namePlayerBlack;
-
-    static String getNamePlayerWhite;
-
     private static File currentFile;
 
     public static boolean saveFile(Game game, File file, GeraldsHistory history) {
@@ -28,7 +23,7 @@ public class FileHandler {
 
         try (FileWriter output = new FileWriter(file)) {
 
-            GeraldsNode node = null;
+            GeraldsNode node;
             SgfToken t;
 
             try {
@@ -153,7 +148,6 @@ public class FileHandler {
             }
 
             int size = -1;
-            int handicap = -1;
 
             loop:
             for(;;) {
@@ -192,11 +186,11 @@ public class FileHandler {
                         break loop;
                 }
             }
-            int[] decodedCoords = null;
+            int[] decodedCoords;
             String currentComment = null;
 
             if(t.getToken() == HA) {
-                handicap = Integer.parseInt(t.getAttributeValue());
+                int handicap = Integer.parseInt(t.getAttributeValue());
                 if(handicap < Game.MIN_HANDICAP_AMOUNT || handicap > Game.MAX_HANDICAP_AMOUNT) {
                     throw new IOException("Invalid handicap amount of " + handicap + "!");
                 }
@@ -330,7 +324,7 @@ public class FileHandler {
                 unexpected(RPAR.getValue(), t);
             }
 
-            t = scanner.next(); // Do this one last time so we can check if we're at EOF.
+            t = scanner.next(); // Do this one last time so that we can check if we're at EOF.
 
             if(t.getToken() != EOF) {
                 unexpected(EOF.getValue(), t);
