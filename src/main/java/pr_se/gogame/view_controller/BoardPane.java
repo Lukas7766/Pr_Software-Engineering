@@ -398,8 +398,6 @@ public class BoardPane extends GridPane {
                 } else {
                     game.placeHandicapPosition(col, row, true);
                 }
-            } else {
-                System.out.println("Confirmation outside of actual board on " + selectionPBC); // TODO: Remove in finished product
             }
 
             if(debug) {
