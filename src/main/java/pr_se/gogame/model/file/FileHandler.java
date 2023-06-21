@@ -1,11 +1,13 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.file;
+
+import pr_se.gogame.model.*;
 
 import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 
-import static pr_se.gogame.model.SgfToken.*;
+import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
 
@@ -24,7 +26,7 @@ public class FileHandler {
         try (FileWriter output = new FileWriter(file)) {
 
             GeraldsNode node;
-            SgfToken t;
+            SGFToken t;
 
             try {
                 output.write(String.format(START.getValue() + "\n\n", game.getSize()));
@@ -38,9 +40,9 @@ public class FileHandler {
 
                     while(!history.isAtEnd() && node.getSaveToken() == GeraldsNode.AbstractSaveToken.HANDICAP) {
                         if (node.getColor() == BLACK) {
-                            t = SgfToken.AB;
+                            t = SGFToken.AB;
                         } else if (node.getColor() == WHITE) {
-                            t = SgfToken.AW;
+                            t = SGFToken.AW;
                         } else {
                             throw new IllegalStateException("AE token not supported!");
                         }
@@ -48,7 +50,7 @@ public class FileHandler {
                         String outputFormatString;
 
                         if(handicapMode) {
-                            outputFormatString = SgfToken.LONE_ATTRIBUTE.getValue();
+                            outputFormatString = SGFToken.LONE_ATTRIBUTE.getValue();
                         } else {
                             handicapMode = true;
                             outputFormatString = t.getValue();
@@ -72,9 +74,9 @@ public class FileHandler {
                     switch (node.getSaveToken()) {
                         case MOVE:
                             if(node.getColor() == BLACK) {
-                                t = SgfToken.B;
+                                t = SGFToken.B;
                             } else {
-                                t = SgfToken.W;
+                                t = SGFToken.W;
                             }
 
                             output.write(String.format("\n" + t.getValue(), calculateCoordinates(node.getX(), node.getY())));
@@ -82,9 +84,9 @@ public class FileHandler {
 
                         case PASS:
                             if(node.getColor() == BLACK) {
-                                t = SgfToken.B;
+                                t = SGFToken.B;
                             } else {
-                                t = SgfToken.W;
+                                t = SGFToken.W;
                             }
 
                             output.write("\n" + String.format(t.getValue(), "")); // Passing is done by having an empty move.

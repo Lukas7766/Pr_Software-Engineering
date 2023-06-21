@@ -1,9 +1,9 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.file;
 
 import java.io.FileReader;
 import java.io.IOException;
 
-import static pr_se.gogame.model.SgfToken.*;
+import static pr_se.gogame.model.file.SGFToken.*;
 
 public class SGFScanner {
     private static final char eof = (char)-1;
@@ -23,7 +23,7 @@ public class SGFScanner {
             getNextChar();
         } while(Character.isWhitespace(ch));
 
-        SgfToken t = null;
+        SGFToken t = null;
         String attribute = "";
 
         switch (ch) {

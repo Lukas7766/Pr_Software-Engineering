@@ -1,7 +1,7 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.file;
 
 public class ScannedToken {
-    private final SgfToken token;
+    private final SGFToken token;
 
     private final String attributeValue;
 
@@ -9,14 +9,14 @@ public class ScannedToken {
 
     private final int col;
 
-    public ScannedToken(SgfToken token, String attributeValue, int line, int col) {
+    public ScannedToken(SGFToken token, String attributeValue, int line, int col) {
         this.token = token;
         this.attributeValue = attributeValue;
         this.line = line;
         this.col = col;
     }
 
-    public SgfToken getToken() {
+    public SGFToken getToken() {
         return token;
     }
 

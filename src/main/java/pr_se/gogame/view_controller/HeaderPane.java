@@ -10,7 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
-import pr_se.gogame.model.FileHandler;
+import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.Game;
 
 import javafx.application.Application;
