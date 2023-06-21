@@ -9,7 +9,7 @@ public class DebugEvent extends GameEvent {
 
 
     public DebugEvent(int col, int row, int ptrNo, int groupNo) {
-        super(GameCommand.DEBUG_INFO, col, row, null, 0);
+        super(GameCommand.DEBUG_INFO, col, row, 0);
         this.groupNo = groupNo;
         this.ptrNo = ptrNo;
     }

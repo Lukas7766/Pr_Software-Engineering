@@ -106,6 +106,19 @@ public interface GameInterface {
     GameResult getGameResult();
 
     //##################################################################################################################
+    // Methods regarding "move metadata"
+    String getComment();
+
+    void commentCurrentMove(String comment);
+
+    void markCircle(int x, int y);
+
+    void markSquare(int x, int y);
+
+    void markTriangle(int x, int y);
+
+    void unmark(int x, int y);
+    //##################################################################################################################
     //Observer pattern
     void addListener(GameListener l);
 
@@ -121,9 +134,5 @@ public interface GameInterface {
     void rewind();
 
     void goToEnd();
-
-    String getComment();
-
-    void commentCurrentMove(String comment);
 }
 

@@ -622,5 +622,25 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(GameCommand.COLOR_HAS_CHANGED));
     }
 
+    @Override
+    public void markCircle(int x, int y) {
+        fireGameEvent(new GameEvent(GameCommand.MARK_CIRCLE, x, y, curMoveNumber));
+    }
+
+    @Override
+    public void markSquare(int x, int y) {
+        fireGameEvent(new GameEvent(GameCommand.MARK_SQUARE, x, y, curMoveNumber));
+    }
+
+    @Override
+    public void markTriangle(int x, int y) {
+        fireGameEvent(new GameEvent(GameCommand.MARK_TRIANGLE, x, y, curMoveNumber));
+    }
+
+    @Override
+    public void unmark(int x, int y) {
+        fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
+    }
+
 }
 

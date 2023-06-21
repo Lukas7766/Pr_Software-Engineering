@@ -173,15 +173,17 @@ public class BoardPane extends GridPane {
                 throw new NullPointerException();
             }
 
+            PlayableBoardCell destinationPBC;
+
             switch(e.getGameCommand()) {
                 case STONE_WAS_SET:
-                    PlayableBoardCell destinationBC = getPlayableCell(e.getX(), e.getY());
-                    destinationBC.getLabel().setText("" + e.getMoveNumber());
+                    destinationPBC = getPlayableCell(e.getX(), e.getY());
+                    destinationPBC.getLabel().setText("" + e.getMoveNumber());
 
                     if (e.getColor() == BLACK) {
-                        destinationBC.setBlack();
+                        destinationPBC.setBlack();
                     } else if(e.getColor() == WHITE) {
-                        destinationBC.setWhite();
+                        destinationPBC.setWhite();
                     }
 
                     break;
@@ -191,11 +193,39 @@ public class BoardPane extends GridPane {
                     break;
 
                 case HANDICAP_SET:
-                    PlayableBoardCell destBC = getPlayableCell(e.getX(), e.getY());
+                    destinationPBC = getPlayableCell(e.getX(), e.getY());
 
-                    destBC.showHandicapSlot();
-                    destBC.getLabel().setVisible(false);
+                    destinationPBC.showHandicapSlot();
+                    destinationPBC.getLabel().setVisible(false);
 
+                    break;
+
+                case UNMARK:
+                case MARK_CIRCLE:
+                case MARK_SQUARE:
+                case MARK_TRIANGLE:
+                    destinationPBC = getPlayableCell(e.getX(), e.getY());
+
+                    switch(e.getGameCommand()) {
+                        case UNMARK:
+                            destinationPBC.unMark();
+                            break;
+
+                        case MARK_CIRCLE:
+                            destinationPBC.markCircle();
+                            break;
+
+                        case MARK_SQUARE:
+                            destinationPBC.markSquare();
+                            break;
+
+                        case MARK_TRIANGLE:
+                            destinationPBC.markTriangle();
+                            break;
+
+                        default:
+                            throw new IllegalStateException("Unsupported Gamecommand " + e.getGameCommand());
+                    }
                     break;
 
                 case COLOR_HAS_CHANGED:
@@ -1096,7 +1126,6 @@ public class BoardPane extends GridPane {
         private void markCircle() {
             mark(CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
             isCircleMarked = true;
-            // Game.getFileTree().markACoordinate(getColumnIndex(this) - 1, getRowIndex(this) - 1)
         }
 
         /**
@@ -1154,10 +1183,13 @@ public class BoardPane extends GridPane {
         }
 
         public void toggleCircleMark() {
+            int x = getColumnIndex(this) - 1;
+            int y = getRowIndex(this) - 1;
+
             if(isCircleMarked) {
-                unMark();
+                game.unmark(x, y);
             } else {
-                markCircle();
+                game.markCircle(x, y);
             }
         }
 

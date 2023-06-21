@@ -1,5 +1,6 @@
 package pr_se.gogame.view_controller;
 
+import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
 
@@ -22,7 +23,7 @@ public class GameEvent {
             throw new NullPointerException();
         }
 
-        if(isStoneRelated()) {
+        if(hasPosition()) {
             throw new IllegalArgumentException("GameCommand " + gameCommand + " is incompatible with GameCommand-only constructor.");
         }
 
@@ -30,6 +31,27 @@ public class GameEvent {
         this.X = -1;
         this.Y = -1;
         this.moveNumber = -1;
+        this.COLOR = null;
+    }
+
+    public GameEvent(GameCommand gameCommand, int x, int y, int moveNumber) {
+        if(gameCommand == null) {
+            throw new NullPointerException();
+        }
+
+        this.gameCommand = gameCommand;
+
+        if(!hasPosition() || isStoneRelated()) {
+            throw new IllegalArgumentException("GameCommand " + gameCommand + " is incompatible with constructor for position-related events (use constructor with StoneColor instead).");
+        }
+
+        if(x < 0 || y < 0 || moveNumber < 0) {
+            throw new IllegalArgumentException();
+        }
+
+        this.X = x;
+        this.Y = y;
+        this.moveNumber = moveNumber;
         this.COLOR = null;
     }
 
@@ -59,22 +81,22 @@ public class GameEvent {
     }
 
     public int getX() {
-        if(!isStoneRelated()) {
-            throw new IllegalStateException("Cannot query x coordinate from non stone-related event.");
+        if(!hasPosition()) {
+            throw new IllegalStateException("Cannot query x coordinate from event without position.");
         }
         return X;
     }
 
     public int getY() {
-        if(!isStoneRelated()) {
-            throw new IllegalStateException("Cannot query y coordinate from non stone-related event.");
+        if(!hasPosition()) {
+            throw new IllegalStateException("Cannot query y coordinate from event without position.");
         }
         return Y;
     }
 
     public int getMoveNumber() {
-        if(!isStoneRelated()) {
-            throw new IllegalStateException("Cannot query move number from non stone-related event.");
+        if(!hasPosition()) {
+            throw new IllegalStateException("Cannot query move number from non move-related event.");
         }
         return moveNumber;
     }
@@ -86,8 +108,12 @@ public class GameEvent {
         return COLOR;
     }
 
+    private boolean hasPosition() {
+        return isStoneRelated() || gameCommand == MARK_CIRCLE || gameCommand == MARK_SQUARE || gameCommand == MARK_TRIANGLE|| gameCommand == UNMARK || gameCommand == DEBUG_INFO;
+    }
+
     private boolean isStoneRelated() {
-        return gameCommand == STONE_WAS_SET || gameCommand == STONE_WAS_REMOVED || gameCommand == HANDICAP_SET || gameCommand == DEBUG_INFO;
+        return gameCommand == STONE_WAS_SET || gameCommand == STONE_WAS_REMOVED || gameCommand == HANDICAP_SET;
     }
 
     @Override
