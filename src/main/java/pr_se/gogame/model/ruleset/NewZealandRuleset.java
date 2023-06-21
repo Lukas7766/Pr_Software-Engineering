@@ -1,4 +1,6 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.ruleset;
+
+import pr_se.gogame.model.*;
 
 public class NewZealandRuleset implements Ruleset {
 

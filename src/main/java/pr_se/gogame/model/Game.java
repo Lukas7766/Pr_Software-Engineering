@@ -1,6 +1,8 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;
 

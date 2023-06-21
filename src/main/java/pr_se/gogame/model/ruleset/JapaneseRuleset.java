@@ -1,4 +1,6 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.ruleset;
+
+import pr_se.gogame.model.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -26,7 +28,7 @@ public class JapaneseRuleset implements Ruleset {
 
     @Override
     public UndoableCommand isKo(Game game) {
-        StoneColor [][] boardColor = new StoneColor[game.getSize()][game.getSize()];
+        StoneColor[][] boardColor = new StoneColor[game.getSize()][game.getSize()];
 
         for(int i = 0; i < game.getSize(); i++) {
             for(int j = 0; j < game.getSize(); j++) {

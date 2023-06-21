@@ -2,6 +2,8 @@ package pr_se.gogame.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.DebugEvent;
 import pr_se.gogame.view_controller.GameEvent;
 import pr_se.gogame.view_controller.GameListener;

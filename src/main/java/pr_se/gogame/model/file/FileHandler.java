@@ -1,6 +1,7 @@
 package pr_se.gogame.model.file;
 
 import pr_se.gogame.model.*;
+import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.io.File;
 import java.io.FileReader;

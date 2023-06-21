@@ -1,4 +1,6 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.ruleset;
+
+import pr_se.gogame.model.*;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
