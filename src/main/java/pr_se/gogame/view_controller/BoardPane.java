@@ -200,7 +200,7 @@ public class BoardPane extends GridPane {
 
                 case COLOR_HAS_CHANGED:
                     setMouseTransparent(false);
-                    requestFocus();
+                    requestFocus(); // This is necessary so that focus is taken away from the comment text area upon doing anything.
                     break;
 
                 case NEW_GAME:
@@ -380,7 +380,7 @@ public class BoardPane extends GridPane {
 
         // Layout of this BoardPane
         setAlignment(Pos.CENTER);
-        // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); No, don't to that, it breaks the cells' aspect ratio (even equal insets on all four sides will)
+        // this.setPadding(new Insets(7.5,7.5,7.5,5.5)); Sadly, this breaks the cells' aspect ratio (even equal insets on all four sides will)
         requestFocus();
     }
 
