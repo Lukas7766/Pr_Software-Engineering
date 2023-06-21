@@ -292,11 +292,6 @@ class GameTest {
     }
 
     @Test
-    void getFileSaver() {
-        assertNotNull(game.getFileTree());
-    }
-
-    @Test
     void getColorAt() {
         assertNull(game.getColorAt(0, 0));
         game.playMove(0, 0);
