@@ -173,30 +173,21 @@ public class SidePane extends StackPane {
         textScrollPane.prefHeightProperty().bind(infoPane.heightProperty());
         textScrollPane.setPrefWidth(infoPane.getWidth());
 
-        // TextFlow textFlow = new TextFlow();
-        TextArea textFlow = new TextArea();
-        textFlow.setPadding(new Insets(3));
-        textFlow.setFocusTraversable(false);
-        textFlow.setWrapText(true);
-        textFlow.prefHeightProperty().bind(explanationBoard.heightProperty());
-        textFlow.setPrefWidth(explanationBoard.getWidth());
-        // textFlow.setTextAlignment(TextAlignment.JUSTIFY);
+        TextArea textArea = new TextArea();
+        textArea.setPadding(new Insets(3));
+        textArea.setFocusTraversable(false);
+        textArea.setWrapText(true);
+        textArea.prefHeightProperty().bind(explanationBoard.heightProperty());
+        textArea.setPrefWidth(explanationBoard.getWidth());
 
-        /*Text explanation = new Text();
-        explanation.setFocusTraversable(false);
-        explanation.setText("");
-        textFlow.getChildren().add(explanation);*/
-
-        /*textScrollPane.setContent(textFlow);
-        explanationBoard.getChildren().add(textScrollPane);*/
-        explanationBoard.getChildren().add(textFlow);
+        explanationBoard.getChildren().add(textArea);
 
         Button saveCommentButton = new Button("Save Explanation");
         saveCommentButton.setFocusTraversable(false);
         saveCommentButton.prefWidthProperty().bind(explanationBoard.widthProperty());
         saveCommentButton.setAlignment(Pos.CENTER);
         saveCommentButton.setOnAction(e -> {
-            game.commentCurrentMove(textFlow.getText());
+            game.commentCurrentMove(textArea.getText());
         });
 
         explanationBoard.getChildren().add(saveCommentButton);
@@ -214,7 +205,7 @@ public class SidePane extends StackPane {
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
                     actualPlayer.setText(game.getCurColor().toString());
-                    textFlow.setText(game.getComment());
+                    textArea.setText(game.getComment());
                 }
             }
         });
