@@ -67,7 +67,8 @@ public class JapaneseRuleset implements Ruleset {
     /**
      * Calculates the score of the game based on the Japanese ruleset. This is done by calculating the territory of each player.
      * The player with the most territory wins. Territory is calculated by using the floodfill algorithm.
-     * ++komi ++handicap//ToDo adapt description
+     * Handicap is added to Black's score count.
+     * Komi is added to White's score count.
      *
      * @param game to calculate the score and define the winner
      * @return an array of size 2, containing the score of black and white

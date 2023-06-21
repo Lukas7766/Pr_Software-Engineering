@@ -46,17 +46,14 @@ public class Board implements BoardInterface {
 
     @Override
     public UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode) {
-        // Are the coordinates invalid?
         if (areInvalidXYCoordinates(x, y)) {
             throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
         }
 
-        // is the StoneColor invalid?
         if(color == null) {
             throw new NullPointerException();
         }
 
-        // Is the space already occupied?
         if (board[x][y] != null) {
             return null;
         }
@@ -70,7 +67,7 @@ public class Board implements BoardInterface {
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
-        // Get neighbors at these x and y coordinates
+        // Get neighboring stone(group)s at these x and y coordinates
         Set<StoneGroup> surroundingSGs = getSurroundings(
             x,
             y,
