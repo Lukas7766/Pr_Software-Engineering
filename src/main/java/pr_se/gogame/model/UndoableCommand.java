@@ -20,11 +20,6 @@ public abstract class UndoableCommand {
      */
     public abstract void execute(boolean saveEffects);
 
-    /*
-     * TODO: The saveEffects parameter MIGHT be necessary here as well, although not as strictly, as one would never
-     *  save when undoing to begin with (discarding the old "future" when going back would be handled by the
-     *  File tree, right?).
-     */
     /**
      * Undoes this UndoableCommand
      */
