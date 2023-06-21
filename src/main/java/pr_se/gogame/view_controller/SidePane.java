@@ -5,19 +5,13 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Text;
-import javafx.scene.text.TextFlow;
-import javafx.scene.text.TextAlignment;
-import javafx.scene.text.Font;
-import javafx.scene.text.FontWeight;
+import javafx.scene.text.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.JapaneseRuleset;
-import pr_se.gogame.model.NewZealandRuleset;
 import pr_se.gogame.model.StoneColor;
 
-import java.io.File;
 import java.util.HashSet;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -27,26 +21,6 @@ import java.util.stream.Stream;
  * It is recommended to place the panel on the left or right side of the application.
  */
 public class SidePane extends StackPane {
-
-    /**
-     * max size of custom board
-     */
-    private static final int MAX_CUSTOM_BOARD_SIZE = 25;
-
-    /**
-     * min size of custom board
-     */
-    private static final int MIN_CUSTOM_BOARD_SIZE = 5;
-
-    /**
-     * max handicap amount
-     */
-    private static final int MAX_HANDICAP_AMOUNT = 9;
-
-    /**
-     * min handicap amount
-     */
-    private static final int MIN_HANDICAP_AMOUNT = 0;
 
     /**
      * instance of actual game
@@ -287,7 +261,7 @@ public class SidePane extends StackPane {
         gridPane.add(normal, 0, 4);
         gridPane.add(custom, 0, 5);
 
-        Spinner<Integer> customSize = new Spinner<>(MIN_CUSTOM_BOARD_SIZE, MAX_CUSTOM_BOARD_SIZE, MIN_CUSTOM_BOARD_SIZE, 2);
+        Spinner<Integer> customSize = new Spinner<>(Game.MIN_CUSTOM_BOARD_SIZE, Game.MAX_CUSTOM_BOARD_SIZE, Game.MIN_CUSTOM_BOARD_SIZE, 2);
         customSize.setDisable(true);
         customSize.setMaxSize(55, 15);
         SpinnerValueFactory.IntegerSpinnerValueFactory customSizeIntFactory =
@@ -307,7 +281,7 @@ public class SidePane extends StackPane {
         handicapLbl.setPadding(new Insets(5));
         gridPane.add(handicapLbl, 0, 6);
 
-        Spinner<Integer> handicapCnt = new Spinner<>(MIN_HANDICAP_AMOUNT, MAX_HANDICAP_AMOUNT, MIN_HANDICAP_AMOUNT, 1);
+        Spinner<Integer> handicapCnt = new Spinner<>(Game.MIN_HANDICAP_AMOUNT, Game.MAX_HANDICAP_AMOUNT, Game.MIN_HANDICAP_AMOUNT, 1);
         handicapCnt.setMaxSize(55, 15);
         SpinnerValueFactory.IntegerSpinnerValueFactory handicapIntFactory =
                 (SpinnerValueFactory.IntegerSpinnerValueFactory) handicapCnt.getValueFactory();

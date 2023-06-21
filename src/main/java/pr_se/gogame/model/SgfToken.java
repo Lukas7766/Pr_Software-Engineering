@@ -23,12 +23,12 @@ public enum SgfToken {
     /**
      * Add white stone for handicap
      */
-    AW(";AW[%s]"),
+    AW("AW[%s]"),
 
     /**
      * Add black stone for handicap
      */
-    AB(";AB[%s]"),
+    AB("AB[%s]"),
 
     /**
      * Name for Player black

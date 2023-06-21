@@ -11,6 +11,26 @@ import static pr_se.gogame.model.StoneColor.BLACK;
 
 public class Game implements GameInterface {
 
+    /**
+     * max size of custom board
+     */
+    public static final int MAX_CUSTOM_BOARD_SIZE = 25;
+
+    /**
+     * min size of custom board
+     */
+    public static final int MIN_CUSTOM_BOARD_SIZE = 5;
+
+    /**
+     * max handicap amount
+     */
+    public static final int MAX_HANDICAP_AMOUNT = 9;
+
+    /**
+     * min handicap amount
+     */
+    public static final int MIN_HANDICAP_AMOUNT = 0;
+
     //Settings
     private Ruleset ruleset = new JapaneseRuleset();
     private int size = 19; // TODO: Just a thought, but technically, this is really just a property of the board, so maybe the Game shouldn't save this at all and instead just provide a method to obtain the board size via its interface (said method would then return board.getSize()).
@@ -54,7 +74,7 @@ public class Game implements GameInterface {
 
     @Override
     public void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset, boolean letRulesetPlaceHandicapStones) {
-        if(size < 0 || handicap < 0 || handicap > 9) {
+        if(size < MIN_CUSTOM_BOARD_SIZE || handicap < MIN_HANDICAP_AMOUNT || handicap > MAX_HANDICAP_AMOUNT) {
             throw new IllegalArgumentException();
         }
 

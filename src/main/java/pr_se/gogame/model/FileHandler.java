@@ -22,41 +22,51 @@ public class FileHandler {
 
         try (FileWriter output = new FileWriter(file)) {
 
+            GeraldsNode node = null;
+            SgfToken t;
+
             try {
                 output.write(String.format(START.getValue() + "\n\n", game.getSize()));
-                output.write(String.format(HA.getValue() + "\n\n", game.getHandicap())); // Used to include an opening '(' at the end.
+                output.write(String.format(HA.getValue() + "", game.getHandicap())); // Used to include an opening '(' at the end.
+                if(game.getHandicap() > 0) {
+                    boolean handicapMode = false;
+
+                    history.stepForward();
+                    node = history.getCurrentNode();
+                    while(!history.isAtEnd() && node.getSaveToken() == GeraldsNode.AbstractSaveToken.HANDICAP) {
+                        if (node.getColor() == BLACK) {
+                            t = SgfToken.AB;
+                        } else if (node.getColor() == WHITE) {
+                            t = SgfToken.AW;
+                        } else {
+                            throw new IllegalStateException("AE token not supported!");
+                        }
+
+                        String outputFormatString;
+
+                        if(handicapMode) {
+                            outputFormatString = SgfToken.LONE_ATTRIBUTE.getValue();
+                        } else {
+                            handicapMode = true;
+                            outputFormatString = t.getValue();
+                        }
+
+                        output.write(String.format(outputFormatString, calculateCoordinates(node.getX(), node.getY())));
+
+                        history.stepForward();
+                        node = history.getCurrentNode();
+                    }
+                }
             } catch(IOException e) {
                 System.out.println("Couldn't write file header!");
             }
 
+            output.write("\n\n");
+
             try {
-                boolean handicapMode = false;
-
-                while (!history.isAtEnd()) {
-                    history.stepForward();
-                    GeraldsNode node = history.getCurrentNode();
-                    SgfToken t;
-
+                for (;;) {
                     switch (node.getSaveToken()) {
                         case HANDICAP:
-                            if (node.getColor() == BLACK) {
-                                t = SgfToken.AB;
-                            } else if (node.getColor() == WHITE) {
-                                t = SgfToken.AW;
-                            } else {
-                                throw new IllegalStateException("AE token not supported!");
-                            }
-
-                            String outputFormatString;
-
-                            if(handicapMode) {
-                                outputFormatString = SgfToken.LONE_ATTRIBUTE.getValue();
-                            } else {
-                                handicapMode = true;
-                                outputFormatString = t.getValue();
-                            }
-
-                            output.write(String.format(outputFormatString, calculateCoordinates(node.getX(), node.getY())));
                             break;
 
                         case MOVE:
@@ -85,6 +95,13 @@ public class FileHandler {
                         default:
                             break;
                     }
+
+                    if(history.isAtEnd()) {
+                        break;
+                    }
+
+                    history.stepForward();
+                    node = history.getCurrentNode();
                 }
 
                 output.write("\n\n)"); // Used to have a closing ')' a the beginning.
@@ -141,15 +158,15 @@ public class FileHandler {
 
                     case SZ:
                         size = Integer.parseInt(t.getAttributeValue());
-                        break;
-
-                    case HA:
-                        handicap = Integer.parseInt(t.getAttributeValue());
+                        if(size < Game.MIN_CUSTOM_BOARD_SIZE || size > Game.MAX_CUSTOM_BOARD_SIZE) {
+                            throw new IOException("Invalid Size '" + size + "' in SGF file!");
+                        }
                         break;
 
                     case LPAR:
                         throw new IOException("This program does not support multiple GameTrees!");
 
+                    case HA:
                     case SEMICOLON:
                     case RPAR:
                         break loop;
@@ -159,52 +176,83 @@ public class FileHandler {
                         break loop;
                 }
             }
+            int[] decodedCoords = null;
 
-            if(size < 0) {
-                throw new IOException("Invalid Size in SGF file!");
-            }
+            if(t.getToken() == HA) {
+                handicap = Integer.parseInt(t.getAttributeValue());
+                if(handicap < Game.MIN_HANDICAP_AMOUNT || handicap > Game.MAX_HANDICAP_AMOUNT) {
+                    throw new IOException("Invalid handicap amount of " + handicap + "!");
+                }
+                game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
+                if(handicap > 0) {
+                    game.setHandicapStoneCounter(handicap);
 
-            if(handicap < 0) {
-                handicap = 0;
+                    StoneColor handicapColor = null;
+
+                    t = scanner.next();
+                    /*
+                     * TODO: At the moment, black always starts (which could lead to wrong results in the unimplemented
+                     *  situation that white starts. Maybe we should remove relics of this idea, as it seems unlikely,
+                     *  and even if a player wanted to start and play white, black could just manually pass for the
+                     *  first move.
+                     */
+                    if(t.getToken() == AB) {
+                        handicapColor = BLACK;
+                        decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                        game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+
+                    } else if(t.getToken() == AW) {
+                        handicapColor = WHITE;
+                        decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                        game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                    } else {
+                        unexpected(AB.getValue() + " or " + AW.getValue(), t);
+                    }
+
+                    t = scanner.next();
+                    while(t.getToken() == LONE_ATTRIBUTE) {
+                        decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                        if(handicapColor == BLACK) {
+                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                        } else {
+                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                        }
+                        t = scanner.next();
+                    }
+                }
+            } else {
+                game.newGame(BLACK, size, 0, new JapaneseRuleset(), false);
             }
-            game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
-            game.setHandicapStoneCounter(handicap);
 
             if(t.getToken() != RPAR) {
-                StoneColor handicapMode = null;
+                StoneColor addStoneColor = null;
 
                 loop2:
                 for (;;) {
                     t = scanner.next();
 
-                    int[] decodedCoords = null;
-
                     switch (t.getToken()) {
                         case SEMICOLON:
                             break;
 
-                        /*
-                         * // TODO: Maybe check this earlier to determine who starts. At the moment, black always starts
-                         *     (which can lead to wrong results if there were handicap stones).
-                         */
                         case AW:
-                            handicapMode = WHITE;
+                            addStoneColor = WHITE;
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                             game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
                             break;
 
                         case AB:
-                            handicapMode = BLACK;
+                            addStoneColor = BLACK;
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                             game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
                             break;
 
                         case LONE_ATTRIBUTE:
-                            if (handicapMode == null) {
+                            if (addStoneColor == null) {
                                 throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
                             }
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                            if(handicapMode == BLACK) {
+                            if(addStoneColor == BLACK) {
                                 game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
                             } else {
                                 game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
