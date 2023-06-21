@@ -159,7 +159,7 @@ public class FileHandler {
                     case SZ:
                         size = Integer.parseInt(t.getAttributeValue());
                         if(size < Game.MIN_CUSTOM_BOARD_SIZE || size > Game.MAX_CUSTOM_BOARD_SIZE) {
-                            throw new IOException("Invalid Size '" + size + "' in SGF file!");
+                            throw new IOException("Invalid size '" + size + "' in SGF file!");
                         }
                         break;
 
