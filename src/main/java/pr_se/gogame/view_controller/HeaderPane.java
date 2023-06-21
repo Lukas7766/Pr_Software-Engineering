@@ -342,19 +342,19 @@ public class HeaderPane extends VBox {
         backward.setFocusTraversable(false);
         backward.setOnAction(e -> System.out.println("backward"));
         playbackControlList.add(backward);
-        backward.setOnAction(e -> game.stepBack());
+        backward.setOnAction(e -> game.undo());
 
         Button forward = new Button(">");
         forward.setFocusTraversable(false);
         forward.setOnAction(e -> System.out.println("forward"));
         playbackControlList.add(forward);
-        forward.setOnAction(e -> game.stepForward());
+        forward.setOnAction(e -> game.redo());
 
         Button fastForward = new Button(">>");
         fastForward.setOnAction(e -> System.out.println("fastForward"));
         fastForward.setFocusTraversable(false);
         playbackControlList.add(fastForward);
-        fastForward.setOnAction(e -> game.skipToEnd());
+        fastForward.setOnAction(e -> game.goToEnd());
 
         playbackControl.getChildren().addAll(playbackControlList);
         /*playbackControlList.forEach(e -> e.setDisable(true));*/

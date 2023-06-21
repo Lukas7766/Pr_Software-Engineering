@@ -102,6 +102,10 @@ public class FileHandler {
                             break;
                     }
 
+                    if(!node.getComment().equals("")) {
+                        output.write(String.format(C.getValue(), node.getComment()));
+                    }
+
                     if(history.isAtEnd()) {
                         break;
                     }
@@ -189,6 +193,7 @@ public class FileHandler {
                 }
             }
             int[] decodedCoords = null;
+            String currentComment = null;
 
             if(t.getToken() == HA) {
                 handicap = Integer.parseInt(t.getAttributeValue());
@@ -236,6 +241,8 @@ public class FileHandler {
                 game.newGame(BLACK, size, 0, new JapaneseRuleset(), false);
             }
 
+            boolean moveWasMade = false;
+
             if(t.getToken() != RPAR) {
                 StoneColor addStoneColor = null;
 
@@ -245,18 +252,25 @@ public class FileHandler {
 
                     switch (t.getToken()) {
                         case SEMICOLON:
+                            if(currentComment != null) {
+                                game.commentCurrentMove(currentComment);
+                            }
+                            currentComment = null;
+                            moveWasMade = false;
                             break;
 
                         case AW:
                             addStoneColor = WHITE;
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                             game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            moveWasMade = true;
                             break;
 
                         case AB:
                             addStoneColor = BLACK;
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                             game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            moveWasMade = true;
                             break;
 
                         case LONE_ATTRIBUTE:
@@ -278,6 +292,7 @@ public class FileHandler {
                                 decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                                 game.playMove(decodedCoords[0], decodedCoords[1], BLACK);
                             }
+                            moveWasMade = true;
                             break;
 
                         case W:
@@ -286,6 +301,15 @@ public class FileHandler {
                             } else {
                                 decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                                 game.playMove(decodedCoords[0], decodedCoords[1], WHITE);
+                            }
+                            moveWasMade = true;
+                            break;
+
+                        case C:
+                            if(moveWasMade) {
+                                game.commentCurrentMove(t.getAttributeValue());
+                            } else {
+                                currentComment = t.getAttributeValue();
                             }
                             break;
 
@@ -315,7 +339,10 @@ public class FileHandler {
         } catch(IOException e) {
             System.out.println("Couldn't properly read SGF file!");
             e.printStackTrace();
+            return false;
         }
+
+        return true;
     }
 
     private static void unexpected(String expected, ScannedToken actual) throws IOException {

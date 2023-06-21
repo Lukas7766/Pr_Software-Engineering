@@ -23,7 +23,7 @@ public class GeraldsNode {
 
     private final UndoableCommand command;
 
-    private final String comment;
+    private String comment;
 
     private final AbstractSaveToken saveToken;
 
@@ -34,6 +34,10 @@ public class GeraldsNode {
     private final StoneColor color;
 
     public GeraldsNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, String comment) {
+        if(comment == null) {
+            throw new NullPointerException("Comment must at least be an empty string!");
+        }
+
         this.command = command;
         this.comment = comment;
         this.saveToken = saveToken;
@@ -43,6 +47,9 @@ public class GeraldsNode {
     }
 
     public GeraldsNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, int x, int y, String comment) {
+        if(comment == null) {
+            throw new NullPointerException("Comment must at least be an empty string!");
+        }
         this.command = command;
         this.comment = comment;
         this.saveToken = saveToken;
@@ -92,5 +99,12 @@ public class GeraldsNode {
 
     public StoneColor getColor() {
         return color;
+    }
+
+    public void setComment(String comment) {
+        if(comment == null) {
+            throw new NullPointerException("Comment must at least be an empty string!");
+        }
+        this.comment = comment;
     }
 }

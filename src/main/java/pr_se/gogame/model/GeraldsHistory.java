@@ -12,7 +12,7 @@ public class GeraldsHistory {
 
     public GeraldsHistory(Game game) {
         this.game = game;
-        current = new GeraldsNode(null, null, null, null); // This solely exists so that the first move can be undone without an edge case.
+        current = new GeraldsNode(null, null, null, ""); // This solely exists so that the first move can be undone without an edge case.
     }
 
     public void rewind() {

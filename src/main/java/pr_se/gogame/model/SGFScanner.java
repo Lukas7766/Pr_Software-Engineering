@@ -73,6 +73,7 @@ public class SGFScanner {
                 t = C;
                 getNextChar();
                 attribute = getAttribute();
+                break;
 
             case 'F':
                 getNextChar();

@@ -483,26 +483,6 @@ public class Game implements GameInterface {
         System.out.println();
     }
 
-    public void stepBack() {
-        geraldsHistory.stepBack();
-    }
-
-    public void stepForward() {
-        geraldsHistory.stepForward();
-    }
-
-    public void rewind() {
-        geraldsHistory.rewind();
-    }
-
-    public void skipToEnd() {
-        geraldsHistory.skipToEnd();
-    }
-
-    public String getComment() {
-        return geraldsHistory.currentComment();
-    }
-
     @Override
     public UndoableCommand addCapturedStones(StoneColor color, int amount) {
         if (color == null) {
@@ -602,6 +582,35 @@ public class Game implements GameInterface {
 
     public void printDebugInfo(int x, int y) {
         board.printDebugInfo(x, y);
+    }
+
+    // Methods controlling the history
+    public void undo() {
+        geraldsHistory.stepBack();
+    }
+
+    public void redo() {
+        geraldsHistory.stepForward();
+    }
+
+    public void rewind() {
+        geraldsHistory.rewind();
+    }
+
+    public void goToEnd() {
+        geraldsHistory.skipToEnd();
+    }
+
+    public String getComment() {
+        return geraldsHistory.currentComment();
+    }
+
+    public void commentCurrentMove(String comment) {
+        if(comment == null) {
+            throw new NullPointerException();
+        }
+        geraldsHistory.getCurrentNode().setComment(comment);
+        fireGameEvent(new GameEvent(GameCommand.COLOR_HAS_CHANGED));
     }
 
 }

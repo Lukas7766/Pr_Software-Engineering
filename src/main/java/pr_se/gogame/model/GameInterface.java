@@ -14,6 +14,9 @@ public interface GameInterface {
      */
     void initGame();
 
+
+    void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset);
+
     /**
      * Starts a new game.
      *
@@ -21,9 +24,8 @@ public interface GameInterface {
      * @param size          the size of the board
      * @param handicap      how many handicap stones are placed in favor of the beginner
      * @param ruleset       the Ruleset that this Game uses
+     * @param letRulesetPlaceHandicapStones whether the Game should let the Ruleset place handicap stones (set to false when loading a game from a file)
      */
-    void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset);
-
     void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset, boolean letRulesetPlaceHandicapStones);
 
     boolean loadGame(File file);
