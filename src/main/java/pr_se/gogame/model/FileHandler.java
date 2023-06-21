@@ -28,11 +28,13 @@ public class FileHandler {
             try {
                 output.write(String.format(START.getValue() + "\n\n", game.getSize()));
                 output.write(String.format(HA.getValue() + "", game.getHandicap())); // Used to include an opening '(' at the end.
+
+                history.stepForward();
+                node = history.getCurrentNode();
+
                 if(game.getHandicap() > 0) {
                     boolean handicapMode = false;
 
-                    history.stepForward();
-                    node = history.getCurrentNode();
                     while(!history.isAtEnd() && node.getSaveToken() == GeraldsNode.AbstractSaveToken.HANDICAP) {
                         if (node.getColor() == BLACK) {
                             t = SgfToken.AB;
@@ -66,9 +68,6 @@ public class FileHandler {
             try {
                 for (;;) {
                     switch (node.getSaveToken()) {
-                        case HANDICAP:
-                            break;
-
                         case MOVE:
                             if(node.getColor() == BLACK) {
                                 t = SgfToken.B;
