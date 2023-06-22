@@ -101,7 +101,6 @@ public interface Ruleset {
      * Call this method when starting a new game. This causes the ruleset to reset any private bookkeeping.
      */
     default void reset() {
-        return;
     }
 
     /**

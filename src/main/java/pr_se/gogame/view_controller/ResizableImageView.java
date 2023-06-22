@@ -6,7 +6,7 @@ import javafx.scene.image.ImageView;
 /**
  * This subclass of ImageView - unlike said superclass - can be automatically resized by its parents like other nodes
  * can.
- *
+ * <p>
  * Inspired by <a href="https://www.reddit.com/r/JavaFX/comments/l2yzwg/resize_imageview_to_fit_parent_pane/">...</a>
  */
 public class ResizableImageView extends ImageView {

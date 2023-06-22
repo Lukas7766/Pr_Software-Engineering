@@ -19,12 +19,10 @@ public class NewZealandRuleset implements Ruleset {
         return new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                return;
             }
 
             @Override
             public void undo() {
-                return;
             }
         };
     }
