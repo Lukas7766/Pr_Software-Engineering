@@ -477,6 +477,8 @@ public class Game implements GameInterface {
                 System.out.println(e);
                 fireGameEvent(e);
             }
+
+            c.getExecuteEvents().add(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
         }
 
         fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
@@ -505,14 +507,13 @@ public class Game implements GameInterface {
          * StoneColor.getOpposite() because we previously switched colors
          */
         removeAllMarks();
+        UC01_SET_STONE.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
         history.addNode(new HistoryNode(UC01_SET_STONE, HistoryNode.AbstractSaveToken.SETUP, color, x, y, "placeSetupStone(" + x + ", " + y + ")"));
 
         for(GameEvent e : UC01_SET_STONE.getExecuteEvents()) {
             System.out.println(e);
             fireGameEvent(e);
         }
-
-        fireGameEvent(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
     }
 
     @Override
