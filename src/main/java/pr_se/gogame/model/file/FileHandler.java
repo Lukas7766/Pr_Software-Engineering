@@ -3,13 +3,12 @@ package pr_se.gogame.model.file;
 import pr_se.gogame.model.*;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static pr_se.gogame.model.HistoryNode.AbstractSaveToken.HANDICAP;
+import static pr_se.gogame.model.HistoryNode.AbstractSaveToken.SETUP;
 import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
@@ -39,31 +38,17 @@ public class FileHandler {
                 node = history.getCurrentNode();
 
                 if(game.getHandicap() > 0) {
-                    boolean handicapMode = false;
-
-                    while(!history.isAtEnd() && node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
-                        if (node.getColor() == BLACK) {
-                            t = SGFToken.AB;
-                        } else if (node.getColor() == WHITE) {
-                            t = SGFToken.AW;
-                        } else {
-                            throw new IllegalStateException("AE token not supported!");
-                        }
-
-                        String outputFormatString;
-
-                        if(handicapMode) {
-                            outputFormatString = SGFToken.LONE_ATTRIBUTE.getValue();
-                        } else {
-                            handicapMode = true;
-                            outputFormatString = t.getValue();
-                        }
-
-                        output.write(String.format(outputFormatString, formStringFromCoords(node.getX(), node.getY())));
-
-                        history.stepForward();
-                        node = history.getCurrentNode();
+                    if (node.getColor() == BLACK) {
+                        t = SGFToken.AB;
+                    } else if (node.getColor() == WHITE) {
+                        t = SGFToken.AW;
+                    } else {
+                        throw new IllegalStateException("AE token not supported!");
                     }
+
+                    output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+
+                    writeAttributeSequence(output, history, HANDICAP, node.getColor());
                 }
             } catch(IOException e) {
                 System.out.println("Couldn't write file header!");
@@ -82,7 +67,10 @@ public class FileHandler {
                                 t = AW;
                             }
 
-                            output.write(String.format("\n" + t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+                            output.write(String.format("\n;" + t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+
+                            writeAttributeSequence(output, history, SETUP, node.getColor());
+
                             break;
 
                         case MOVE:
@@ -140,6 +128,15 @@ public class FileHandler {
         }
 
         return true;
+    }
+
+    private static void writeAttributeSequence(FileWriter output, History history, HistoryNode.AbstractSaveToken parentToken, StoneColor parentColor) throws IOException {
+        history.stepForward();
+        while(!history.isAtEnd() && history.getCurrentNode().getSaveToken() == parentToken && history.getCurrentNode().getColor() == parentColor) {
+            output.write(String.format(LONE_ATTRIBUTE.getValue(), formStringFromCoords(history.getCurrentNode().getX(), history.getCurrentNode().getY())));
+            history.stepForward();
+        }
+        history.stepBack();
     }
 
     public static boolean loadFile(Game game, File file) {
@@ -297,11 +294,7 @@ public class FileHandler {
                                 throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
                             }
                             decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            if(addStoneColor == BLACK) {
-                                game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
-                            } else {
-                                game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
-                            }
+                            game.placeSetupStone(decodedCoords.X, decodedCoords.Y, addStoneColor);
                             break;
 
                         case B:
@@ -333,7 +326,7 @@ public class FileHandler {
                             break;
 
                         case LPAR:
-                            throw new IOException("This SGF file has multiple branches, a feature currently unsupported by this program.");
+                            throw new IOException("Line " + t.getLine() + ", col " + t.getCol() + ": This SGF file has multiple branches, a feature currently unsupported by this program.");
 
                         default:
                             throw new IOException("Unsupported token \"" + t.getToken() + "\" read at line " + t.getLine() + ", col " + t.getCol());
