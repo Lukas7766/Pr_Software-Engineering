@@ -81,7 +81,7 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
-        this.gameState = GameState.RUNNING;
+        this.gameState = GameState.SETTING_UP;
 
         this.history = new History(this);
 
@@ -108,6 +108,12 @@ public class Game implements GameInterface {
         this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
 
         this.curMoveNumber = 1;
+
+        if(handicapStoneCounter <= 0) {
+            gameState = GameState.RUNNING;
+        } else {
+            gameState = GameState.SETTING_UP;
+        }
     }
 
     @Override
@@ -225,7 +231,8 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        this.handicapStoneCounter = noStones;
+        handicapStoneCounter = noStones;
+        gameState = GameState.SETTING_UP;
     }
 
     @Override
@@ -381,7 +388,7 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapPosition(int x, int y, boolean placeStone) {
-        if(gameState != GameState.RUNNING) {
+        if(gameState != GameState.SETTING_UP) {
             throw new IllegalStateException("Can't place handicap stone when game isn't running! Game state was " + gameState);
         }
 
@@ -421,6 +428,8 @@ public class Game implements GameInterface {
                             getExecuteEvents().addAll(uC02_switchColor.getExecuteEvents());
                             getUndoEvents().addAll(uC02_switchColor.getUndoEvents());
                         }
+
+                        gameState = GameState.RUNNING;
                     }
                 }
 
@@ -430,6 +439,8 @@ public class Game implements GameInterface {
                         uC02_switchColor.undo();
                     }
                     handicapStoneCounter = OLD_HANDICAP_CTR;
+
+                    gameState = GameState.SETTING_UP;
                 }
             };
             UC02_UPDATE_COUNTER.execute(true);

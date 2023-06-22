@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.StoneColor;
+import pr_se.gogame.model.ruleset.NewZealandRuleset;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
