@@ -70,7 +70,7 @@ public interface GameInterface {
 
     //##################################################################################################################
     //game settings
-    GameCommand getGameState();
+    GameState getGameState();
 
     int getSize();
 

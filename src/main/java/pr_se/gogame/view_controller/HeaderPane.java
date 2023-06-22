@@ -10,6 +10,7 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
+import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.Game;
 
@@ -115,7 +116,7 @@ public class HeaderPane extends VBox {
         newGameItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
         files.getItems().add(newGameItem);
         newGameItem.setOnAction(e -> {
-            if (game.getGameState() == GameCommand.INIT) {
+            if (game.getGameState() == GameState.NOT_STARTED_YET) {
                 return;
             }
             CustomNewGameAction.onSaveAction(stage, game, filterList);

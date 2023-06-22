@@ -26,7 +26,6 @@ public class History {
 
     public boolean stepBack() {
         if(current.getPrev() != null) {
-            System.out.println("Undoing " + current.getComment());
             current.getCommand().undo();
             ListIterator<GameEvent> i = current.getCommand().getUndoEvents().listIterator(current.getCommand().getUndoEvents().size());
             current = current.getPrev();
@@ -43,7 +42,6 @@ public class History {
     public boolean stepForward() {
         if(current.getNext() != null) {
             current = current.getNext();
-            System.out.println("Re-Doing " + current.getComment());
             current.getCommand().execute(false);
             current.getCommand().getExecuteEvents().stream().forEach(e -> game.fireGameEvent(e));
 

@@ -38,8 +38,7 @@ public class Game implements GameInterface {
     private Ruleset ruleset = new JapaneseRuleset();
     private int handicap = 0;
 
-    //global (helper) variables
-    private GameCommand gameCommand;
+    private GameState gameState;
     private final List<GameListener> listeners;
     private Board board;
     private int curMoveNumber;
@@ -56,15 +55,15 @@ public class Game implements GameInterface {
 
     public Game() {
         this.listeners = new ArrayList<>();
-        this.gameCommand = GameCommand.INIT;
+        this.gameState = GameState.NOT_STARTED_YET;
         this.board = new Board(this, 19);
     }
 
     @Override
     public void initGame() {
-        gameCommand = GameCommand.INIT;
+        gameState = GameState.NOT_STARTED_YET;
 
-        fireGameEvent(new GameEvent(gameCommand));
+        fireGameEvent(new GameEvent(GameCommand.INIT));
     }
 
     @Override
@@ -82,6 +81,8 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
+        this.gameState = GameState.RUNNING;
+
         this.history = new History(this);
 
         this.curColor = startingColor;
@@ -98,7 +99,7 @@ public class Game implements GameInterface {
         this.board = new Board(this, size);
         this.ruleset.reset();
         fireGameEvent(new GameEvent(GameCommand.NEW_GAME));
-        this.gameCommand = GameCommand.UPDATE;
+        // this.gameCommand = GameCommand.UPDATE;
 
         int tempHandicap = 0;
         if(letRulesetPlaceHandicapStones) {
@@ -107,7 +108,6 @@ public class Game implements GameInterface {
         this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
 
         this.curMoveNumber = 1;
-        this.gameCommand = GameCommand.UPDATE;
     }
 
     @Override
@@ -115,7 +115,6 @@ public class Game implements GameInterface {
         if (file == null) {
             return false;
         }
-        System.out.println("saved a file");
         return FileHandler.saveFile(this, file, history);
     }
 
@@ -126,7 +125,6 @@ public class Game implements GameInterface {
 
     @Override
     public void pass() {
-        System.out.println("pass");
         UndoableCommand c = switchColor();
 
         history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "pass")); // StoneColor.getOpposite() because we switched colors before
@@ -139,14 +137,11 @@ public class Game implements GameInterface {
     @Override
     public void resign() {
         // TODO: Replace with simple boolean isRunning (or even its own enum, but GameCommand doesn't quite work).
-        if(this.gameCommand == GameCommand.GAME_WON) {
+        if(gameState == GameState.GAME_OVER) {
             throw new IllegalStateException("Game has already ended!");
         }
 
-        System.out.println("resign");
-
         final GameResult OLD_GAME_RESULT = this.gameResult;
-        final GameCommand OLD_GAME_COMMAND = this.gameCommand;
         final StoneColor FINAL_CUR_COLOR = this.curColor;
 
         UndoableCommand c = new UndoableCommand() {
@@ -157,17 +152,17 @@ public class Game implements GameInterface {
                         "\n" +
                         StoneColor.getOpposite(FINAL_CUR_COLOR) + " won!";
                 gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(FINAL_CUR_COLOR), msg);
-                gameCommand = GameCommand.GAME_WON;
                 if(saveEffects) {
                     getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
-                    getUndoEvents().add(new GameEvent(OLD_GAME_COMMAND));
+                    getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
                 }
+                gameState = GameState.GAME_OVER;
             }
 
             @Override
             public void undo() {
                 gameResult = OLD_GAME_RESULT;
-                gameCommand = OLD_GAME_COMMAND;
+                gameState = GameState.RUNNING;
             }
         };
         c.execute(true);
@@ -181,11 +176,10 @@ public class Game implements GameInterface {
 
     @Override
     public void scoreGame() { // TODO: Is this only of cosmetic relevance or does it need to be undoable?
-        System.out.println("scoreGame");
-        this.gameResult = ruleset.scoreGame(this);
-        this.playerBlackScore = gameResult.getScoreBlack();
-        this.playerWhiteScore = gameResult.getScoreWhite();
-        this.gameCommand = GameCommand.GAME_WON;
+        gameResult = ruleset.scoreGame(this);
+        playerBlackScore = gameResult.getScoreBlack();
+        playerWhiteScore = gameResult.getScoreWhite();
+        gameState = GameState.GAME_OVER;
 
         fireGameEvent(new GameEvent(GameCommand.GAME_WON));
     }
@@ -235,8 +229,8 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public GameCommand getGameState() {
-        return gameCommand;
+    public GameState getGameState() {
+        return gameState;
     }
 
     @Override
@@ -270,19 +264,16 @@ public class Game implements GameInterface {
         }
 
         final StoneColor OLD_COLOR = this.curColor;
-        final GameCommand OLD_COMMAND = this.gameCommand;
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
                 Game.this.curColor = c;
-                Game.this.gameCommand = GameCommand.UPDATE;
             }
 
             @Override
             public void undo() {
                 Game.this.curColor = OLD_COLOR;
-                Game.this.gameCommand = OLD_COMMAND;
             }
         };
         ret.execute(true);
@@ -297,9 +288,9 @@ public class Game implements GameInterface {
 
     @Override
     public void playMove(int x, int y, StoneColor color) {
-        /*if(this.gameCommand != GameCommand.NEW_GAME && this.gameCommand != GameCommand.COLOR_HAS_CHANGED) {
-            throw new IllegalStateException("Can't place stone when game isn't being played! Game State was " + this.gameCommand);
-        }*/
+        if(gameState != GameState.RUNNING) {
+            throw new IllegalStateException("Can't place stone when game isn't running! Game State was " + gameState);
+        }
 
         if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
             throw new IllegalArgumentException();
@@ -390,9 +381,9 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapPosition(int x, int y, boolean placeStone) {
-        /*if(this.gameCommand != GameCommand.COLOR_HAS_CHANGED) {
-            throw new IllegalStateException("Can't place handicap stone after game start!");
-        }*/
+        if(gameState != GameState.RUNNING) {
+            throw new IllegalStateException("Can't place handicap stone when game isn't running! Game state was " + gameState);
+        }
 
         if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
             throw new IllegalArgumentException();
@@ -425,7 +416,6 @@ public class Game implements GameInterface {
 
                     if (NEW_HANDICAP_CTR <= 0) {
                         System.out.println("handicapStoneCounter is now less than 0.");
-                        // fileTree.insertBufferedStonesBeforeGame();
                         uC02_switchColor = switchColor();
                         if(saveEffects) {
                             getExecuteEvents().addAll(uC02_switchColor.getExecuteEvents());
@@ -480,7 +470,6 @@ public class Game implements GameInterface {
         }
 
         fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
-        System.out.println("Handicap Ctr now: " + handicapStoneCounter);
         System.out.println();
     }
 
@@ -554,7 +543,7 @@ public class Game implements GameInterface {
                 thisCommand = setCurColor(StoneColor.getOpposite(curColor));
                 if(saveEffects) {
                     getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
-                    getUndoEvents().add(new GameEvent(gameCommand));
+                    getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
                 }
             }
 

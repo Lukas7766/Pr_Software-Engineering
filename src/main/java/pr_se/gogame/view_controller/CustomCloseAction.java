@@ -7,6 +7,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
@@ -29,7 +30,7 @@ public class CustomCloseAction {
      * @param filterList pass list of Extension Filters
      */
     public static void onCloseAction(Stage stage, Game game, Event e, HashSet<FileChooser.ExtensionFilter> filterList) {
-        if (game.getGameState() == GameCommand.INIT) {
+        if (game.getGameState() == GameState.NOT_STARTED_YET) {
             Platform.exit();
             System.exit(0);
         }
