@@ -260,7 +260,6 @@ public class Game implements GameInterface {
         return board.getColorAt(x, y);
     }
 
-    @Override
     public int getHandicapStoneCounter() {
         return handicapStoneCounter;
     }
@@ -389,7 +388,7 @@ public class Game implements GameInterface {
     @Override
     public void placeHandicapPosition(int x, int y, boolean placeStone) {
         if(gameState != GameState.SETTING_UP) {
-            throw new IllegalStateException("Can't place handicap stone when game isn't running! Game state was " + gameState);
+            throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
         }
 
         if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {

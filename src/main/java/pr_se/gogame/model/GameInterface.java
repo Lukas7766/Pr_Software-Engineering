@@ -92,15 +92,6 @@ public interface GameInterface {
 
     Ruleset getRuleset();
 
-    /*
-     *  Note by Gerald: I simply added this to GameInterface so that BoardPane could exclusively talk to Game, reducing
-     * coupling. If anyone has a better, more generic idea for such a method, I'm entirely open to suggestions.
-     */
-
-    int getHandicapStoneCounter();
-
-    //void fireGameEvent(GameEvent e); //delete for getting fireGameEvent package private
-
     double getScore(StoneColor color);
 
     GameResult getGameResult();
