@@ -75,11 +75,21 @@ public class FileHandler {
             try {
                 for (;;) {
                     switch (node.getSaveToken()) {
+                        case SETUP:
+                            if(node.getColor() == BLACK) {
+                                t = AB;
+                            } else {
+                                t = AW;
+                            }
+
+                            output.write(String.format("\n" + t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+                            break;
+
                         case MOVE:
                             if(node.getColor() == BLACK) {
-                                t = SGFToken.B;
+                                t = B;
                             } else {
-                                t = SGFToken.W;
+                                t = W;
                             }
 
                             output.write(String.format("\n" + t.getValue(), formStringFromCoords(node.getX(), node.getY())));
@@ -87,9 +97,9 @@ public class FileHandler {
 
                         case PASS:
                             if(node.getColor() == BLACK) {
-                                t = SGFToken.B;
+                                t = B;
                             } else {
-                                t = SGFToken.W;
+                                t = W;
                             }
 
                             output.write("\n" + String.format(t.getValue(), "")); // Passing is done by having an empty move.
@@ -273,13 +283,13 @@ public class FileHandler {
                         case AW:
                             addStoneColor = WHITE;
                             decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
+                            game.placeSetupStone(decodedCoords.X, decodedCoords.Y, addStoneColor);
                             break;
 
                         case AB:
                             addStoneColor = BLACK;
                             decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
+                            game.placeSetupStone(decodedCoords.X, decodedCoords.Y, addStoneColor);
                             break;
 
                         case LONE_ATTRIBUTE:
@@ -346,6 +356,8 @@ public class FileHandler {
             e.printStackTrace();
             return false;
         }
+
+        game.goToFirstMove();
 
         return true;
     }

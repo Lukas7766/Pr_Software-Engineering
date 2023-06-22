@@ -84,6 +84,8 @@ public interface GameInterface {
 
     int getStonesCapturedBy(StoneColor color);
 
+    void placeSetupStone(int x, int y, StoneColor color);
+
     UndoableCommand addCapturedStones(StoneColor color, int amount);
 
     StoneColor getColorAt(int x, int y);
@@ -121,5 +123,7 @@ public interface GameInterface {
     void rewind();
 
     void goToEnd();
+
+    void goToFirstMove();
 }
 

@@ -199,6 +199,13 @@ public class BoardPane extends GridPane {
 
                     break;
 
+                case SETUP_STONE_SET:
+                    destinationPBC = getPlayableCell(e.getX(), e.getY());
+
+                    destinationPBC.getLabel().setVisible(false);
+
+                    break;
+
                 case UNMARK:
                 case MARK_CIRCLE:
                 case MARK_SQUARE:

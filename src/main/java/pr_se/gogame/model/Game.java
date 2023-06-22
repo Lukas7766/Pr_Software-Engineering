@@ -484,6 +484,38 @@ public class Game implements GameInterface {
     }
 
     @Override
+    public void placeSetupStone(int x, int y, StoneColor color) {
+        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
+            throw new IllegalArgumentException();
+        }
+
+        final int OLD_CUR_MOVE_NUMBER = curMoveNumber;
+        curMoveNumber = 0;
+        final UndoableCommand UC01_SET_STONE = board.setStone(x, y, color, true); // UC01_SET_STONE is already executed within board.setStone().
+        curMoveNumber = OLD_CUR_MOVE_NUMBER;
+
+        if(UC01_SET_STONE == null) {
+            System.out.println("Move aborted.");
+            return;
+        }
+
+        // Assertion: UC01_SET_STONE != null and was hence a valid move.
+
+        /*
+         * StoneColor.getOpposite() because we previously switched colors
+         */
+        removeAllMarks();
+        history.addNode(new HistoryNode(UC01_SET_STONE, HistoryNode.AbstractSaveToken.SETUP, color, x, y, "placeSetupStone(" + x + ", " + y + ")"));
+
+        for(GameEvent e : UC01_SET_STONE.getExecuteEvents()) {
+            System.out.println(e);
+            fireGameEvent(e);
+        }
+
+        fireGameEvent(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
+    }
+
+    @Override
     public UndoableCommand addCapturedStones(StoneColor color, int amount) {
         if (color == null) {
             throw new NullPointerException();
@@ -610,6 +642,19 @@ public class Game implements GameInterface {
     public void goToEnd() {
         removeAllMarks();
         history.skipToEnd();
+        reDisplayMarks();
+    }
+
+    @Override
+    public void goToFirstMove() {
+        removeAllMarks();
+        while(!history.isAtBeginning() && history.getCurrentNode().getSaveToken() != HistoryNode.AbstractSaveToken.HANDICAP && history.getCurrentNode().getSaveToken() != HistoryNode.AbstractSaveToken.SETUP) {
+            history.stepBack();
+        }
+
+        if(history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP) {
+            history.stepForward();
+        }
         reDisplayMarks();
     }
 

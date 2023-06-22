@@ -8,6 +8,8 @@ public class HistoryNode {
 
         HANDICAP,
 
+        SETUP,
+
         MOVE,
 
         PASS,           // SGF saves this as a black or white move with an empty coordinate.
