@@ -200,7 +200,7 @@ public class SidePane extends StackPane {
         game.addListener(e -> {
 
             switch (e.getGameCommand()) {
-                case STONE_WAS_SET, STONE_WAS_REMOVED, COLOR_HAS_CHANGED, NEW_GAME, GAME_WON -> {
+                case STONE_WAS_SET, STONE_WAS_REMOVED, UPDATE, NEW_GAME, GAME_WON -> {
                     System.out.println("Received " + e.getGameCommand());
                     scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
                     scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");

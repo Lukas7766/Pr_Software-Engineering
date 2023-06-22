@@ -115,8 +115,9 @@ public class HeaderPane extends VBox {
         newGameItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
         files.getItems().add(newGameItem);
         newGameItem.setOnAction(e -> {
-
-            if (game.getGameState() == GameCommand.INIT) return;
+            if (game.getGameState() == GameCommand.INIT) {
+                return;
+            }
             CustomNewGameAction.onSaveAction(stage, game, filterList);
         });
 
@@ -226,7 +227,7 @@ public class HeaderPane extends VBox {
                 case INIT, GAME_WON ->
                     gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
 
-                case NEW_GAME, COLOR_HAS_CHANGED ->
+                case NEW_GAME, UPDATE ->
                     gameSectionItems.stream().filter(MenuItem::isDisable).forEach(e -> e.setDisable(false));
             }
 
@@ -417,7 +418,7 @@ public class HeaderPane extends VBox {
         game.addListener(l -> {
             switch (l.getGameCommand()){
                 case INIT, GAME_WON -> gameShortCardList.forEach(e -> e.setDisable(true));
-                case NEW_GAME, COLOR_HAS_CHANGED -> gameShortCardList.forEach(e -> e.setDisable(false));
+                case NEW_GAME, UPDATE -> gameShortCardList.forEach(e -> e.setDisable(false));
             }
         });
 

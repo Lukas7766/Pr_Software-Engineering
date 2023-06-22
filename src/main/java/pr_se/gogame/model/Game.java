@@ -62,7 +62,7 @@ public class Game implements GameInterface {
 
     @Override
     public void initGame() {
-        this.gameCommand = GameCommand.INIT;
+        gameCommand = GameCommand.INIT;
 
         fireGameEvent(new GameEvent(gameCommand));
     }
@@ -98,7 +98,7 @@ public class Game implements GameInterface {
         this.board = new Board(this, size);
         this.ruleset.reset();
         fireGameEvent(new GameEvent(GameCommand.NEW_GAME));
-        this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
+        this.gameCommand = GameCommand.UPDATE;
 
         int tempHandicap = 0;
         if(letRulesetPlaceHandicapStones) {
@@ -107,7 +107,7 @@ public class Game implements GameInterface {
         this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
 
         this.curMoveNumber = 1;
-        this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
+        this.gameCommand = GameCommand.UPDATE;
     }
 
     @Override
@@ -138,6 +138,7 @@ public class Game implements GameInterface {
 
     @Override
     public void resign() {
+        // TODO: Replace with simple boolean isRunning (or even its own enum, but GameCommand doesn't quite work).
         if(this.gameCommand == GameCommand.GAME_WON) {
             throw new IllegalStateException("Game has already ended!");
         }
@@ -158,7 +159,7 @@ public class Game implements GameInterface {
                 gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(FINAL_CUR_COLOR), msg);
                 gameCommand = GameCommand.GAME_WON;
                 if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(gameCommand));
+                    getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
                     getUndoEvents().add(new GameEvent(OLD_GAME_COMMAND));
                 }
             }
@@ -186,7 +187,7 @@ public class Game implements GameInterface {
         this.playerWhiteScore = gameResult.getScoreWhite();
         this.gameCommand = GameCommand.GAME_WON;
 
-        fireGameEvent(new GameEvent(gameCommand));
+        fireGameEvent(new GameEvent(GameCommand.GAME_WON));
     }
 
     @Override
@@ -275,7 +276,7 @@ public class Game implements GameInterface {
             @Override
             public void execute(boolean saveEffects) {
                 Game.this.curColor = c;
-                Game.this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
+                Game.this.gameCommand = GameCommand.UPDATE;
             }
 
             @Override
@@ -552,7 +553,7 @@ public class Game implements GameInterface {
             public void execute(boolean saveEffects) {
                 thisCommand = setCurColor(StoneColor.getOpposite(curColor));
                 if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(gameCommand));
+                    getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
                     getUndoEvents().add(new GameEvent(gameCommand));
                 }
             }
@@ -650,7 +651,7 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
         history.getCurrentNode().setComment(comment);
-        fireGameEvent(new GameEvent(GameCommand.COLOR_HAS_CHANGED));
+        fireGameEvent(new GameEvent(GameCommand.UPDATE));
     }
 
     // TODO: Have this affect the history and, consequently, the file saver.

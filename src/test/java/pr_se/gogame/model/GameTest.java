@@ -127,7 +127,7 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(BLACK, prevColor);
         GameCommand prevState = game.getGameState();
-        assertEquals(COLOR_HAS_CHANGED, prevState);
+        assertEquals(UPDATE, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
@@ -160,7 +160,7 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
         GameCommand prevState = game.getGameState();
-        assertEquals(COLOR_HAS_CHANGED, prevState);
+        assertEquals(UPDATE, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
@@ -267,9 +267,9 @@ class GameTest {
 
     @Test
     void getGameState() {
-        assertEquals(COLOR_HAS_CHANGED, game.getGameState());
+        assertEquals(UPDATE, game.getGameState());
         game.playMove(0, 0);
-        assertEquals(COLOR_HAS_CHANGED, game.getGameState());
+        assertEquals(UPDATE, game.getGameState());
     }
 
     @Test

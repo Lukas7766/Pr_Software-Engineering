@@ -226,7 +226,7 @@ public class BoardPane extends GridPane {
                     }
                     break;
 
-                case COLOR_HAS_CHANGED:
+                case UPDATE:
                     setMouseTransparent(false);
                     requestFocus(); // This is necessary so that focus is taken away from the comment text area upon doing anything.
                     break;
