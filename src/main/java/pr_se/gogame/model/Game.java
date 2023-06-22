@@ -137,8 +137,8 @@ public class Game implements GameInterface {
     @Override
     public void resign() {
         // TODO: Replace with simple boolean isRunning (or even its own enum, but GameCommand doesn't quite work).
-        if(gameState == GameState.GAME_OVER) {
-            throw new IllegalStateException("Game has already ended!");
+        if(gameState != GameState.RUNNING) {
+            throw new IllegalStateException("Can't score game if it isn't running! gameState was + " + gameState);
         }
 
         final GameResult OLD_GAME_RESULT = this.gameResult;
