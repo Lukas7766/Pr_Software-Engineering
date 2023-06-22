@@ -3,16 +3,17 @@ package pr_se.gogame.model;
 import pr_se.gogame.view_controller.GameEvent;
 
 import java.util.ListIterator;
+import java.util.Map;
 
-public class GeraldsHistory {
+public class History {
 
     private final Game game;
 
-    private GeraldsNode current;
+    private HistoryNode current;
 
-    public GeraldsHistory(Game game) {
+    public History(Game game) {
         this.game = game;
-        current = new GeraldsNode(null, null, null, ""); // This solely exists so that the first move can be undone without an edge case.
+        current = new HistoryNode(null, null, null, ""); // This solely exists so that the first move can be undone without an edge case.
     }
 
     public void rewind() {
@@ -44,9 +45,7 @@ public class GeraldsHistory {
             current = current.getNext();
             System.out.println("Re-Doing " + current.getComment());
             current.getCommand().execute(false);
-            for(GameEvent e : current.getCommand().getExecuteEvents()) {
-                game.fireGameEvent(e);
-            }
+            current.getCommand().getExecuteEvents().stream().forEach(e -> game.fireGameEvent(e));
 
             return true;
         }
@@ -54,7 +53,7 @@ public class GeraldsHistory {
         return false;
     }
 
-    public void addNode(GeraldsNode addedNode) {
+    public void addNode(HistoryNode addedNode) {
         current.setNext(addedNode);
         current = current.getNext();
     }
@@ -63,7 +62,7 @@ public class GeraldsHistory {
         return current.getComment();
     }
 
-    public GeraldsNode getCurrentNode() {
+    public HistoryNode getCurrentNode() {
         return current;
     }
 

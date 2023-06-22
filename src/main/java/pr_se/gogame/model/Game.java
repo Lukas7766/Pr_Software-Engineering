@@ -52,7 +52,7 @@ public class Game implements GameInterface {
     private int whiteCapturedStones;
     private GameResult gameResult;
 
-    private GeraldsHistory geraldsHistory;
+    private History history;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -83,7 +83,7 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
-        this.geraldsHistory = new GeraldsHistory(this);
+        this.history = new History(this);
 
         this.curColor = startingColor;
         this.handicap = handicap;
@@ -119,7 +119,7 @@ public class Game implements GameInterface {
             return false;
         }
         System.out.println("saved a file");
-        return FileHandler.saveFile(this, file, geraldsHistory);
+        return FileHandler.saveFile(this, file, history);
     }
 
     @Override
@@ -132,7 +132,7 @@ public class Game implements GameInterface {
         System.out.println("pass");
         UndoableCommand c = switchColor();
 
-        geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "pass")); // StoneColor.getOpposite() because we switched colors before
+        history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "pass")); // StoneColor.getOpposite() because we switched colors before
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -174,7 +174,7 @@ public class Game implements GameInterface {
         };
         c.execute(true);
 
-        geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.RESIGN, FINAL_CUR_COLOR, "resign"));
+        history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.RESIGN, FINAL_CUR_COLOR, "resign"));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -382,7 +382,8 @@ public class Game implements GameInterface {
         /*
          * StoneColor.getOpposite() because we previously switched colors
          */
-        geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), x, y, "playMove(" + x + ", " + y + ")"));
+        removeAllMarks();
+        history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), x, y, "playMove(" + x + ", " + y + ")"));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -471,7 +472,8 @@ public class Game implements GameInterface {
             if(NEW_HANDICAP_CTR <= 0) {
                 col = StoneColor.getOpposite(curColor);
             }
-            geraldsHistory.addNode(new GeraldsNode(c, GeraldsNode.AbstractSaveToken.HANDICAP, col, x, y, "placeHandicapPosition(" + x + ", " + y + ")"));
+            removeAllMarks();
+            history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.HANDICAP, col, x, y, "placeHandicapPosition(" + x + ", " + y + ")"));
 
             for(GameEvent e : c.getExecuteEvents()) {
                 System.out.println(e);
@@ -588,27 +590,61 @@ public class Game implements GameInterface {
     // Methods controlling the history
     @Override
     public void undo() {
-        geraldsHistory.stepBack();
+        removeAllMarks();
+        history.stepBack();
+        reDisplayMarks();
     }
 
     @Override
     public void redo() {
-        geraldsHistory.stepForward();
+        removeAllMarks();
+        history.stepForward();
+        reDisplayMarks();
     }
 
     @Override
     public void rewind() {
-        geraldsHistory.rewind();
+        removeAllMarks();
+        history.rewind();
+        reDisplayMarks();
     }
 
     @Override
     public void goToEnd() {
-        geraldsHistory.skipToEnd();
+        removeAllMarks();
+        history.skipToEnd();
+        reDisplayMarks();
+    }
+
+    public void removeAllMarks() {
+        history.getCurrentNode().getMarks().entrySet().stream()
+            .forEach(e -> fireGameEvent(new GameEvent(GameCommand.UNMARK, e.getKey().X, e.getKey().Y, curMoveNumber)));
+    }
+
+    public void reDisplayMarks() {
+        history.getCurrentNode().getMarks().entrySet().stream().forEach(e -> {
+            switch(e.getValue()) {
+                case CIRCLE:
+                    fireGameEvent(new GameEvent(GameCommand.MARK_CIRCLE, e.getKey().X, e.getKey().Y, curMoveNumber));
+                    break;
+
+                case SQUARE:
+                    fireGameEvent(new GameEvent(GameCommand.MARK_SQUARE, e.getKey().X, e.getKey().Y, curMoveNumber));
+                    break;
+
+                case TRIANGLE:
+                    fireGameEvent(new GameEvent(GameCommand.MARK_TRIANGLE, e.getKey().X, e.getKey().Y, curMoveNumber));
+                    break;
+
+                default:
+                    break;
+            }
+        });
     }
 
     @Override
     public String getComment() {
-        return geraldsHistory.currentComment();
+        return history.currentComment();
     }
 
     @Override
@@ -616,13 +652,14 @@ public class Game implements GameInterface {
         if(comment == null) {
             throw new NullPointerException();
         }
-        geraldsHistory.getCurrentNode().setComment(comment);
+        history.getCurrentNode().setComment(comment);
         fireGameEvent(new GameEvent(GameCommand.COLOR_HAS_CHANGED));
     }
 
     // TODO: Have this affect the history and, consequently, the file saver.
     @Override
     public void markCircle(int x, int y) {
+        history.getCurrentNode().addMark(x, y, MarkShape.CIRCLE);
         fireGameEvent(new GameEvent(GameCommand.MARK_CIRCLE, x, y, curMoveNumber));
     }
 
@@ -638,6 +675,7 @@ public class Game implements GameInterface {
 
     @Override
     public void unmark(int x, int y) {
+        history.getCurrentNode().removeMark(x, y);
         fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
     }
 

@@ -1,6 +1,9 @@
 package pr_se.gogame.model;
 
-public class GeraldsNode {
+import java.util.LinkedHashMap;
+import java.util.Map;
+
+public class HistoryNode {
     public enum AbstractSaveToken {
 
         HANDICAP,
@@ -17,9 +20,9 @@ public class GeraldsNode {
         RESIGN
     }
 
-    private GeraldsNode prev;
+    private HistoryNode prev;
 
-    private GeraldsNode next;
+    private HistoryNode next;
 
     private final UndoableCommand command;
 
@@ -33,7 +36,9 @@ public class GeraldsNode {
 
     private final StoneColor color;
 
-    public GeraldsNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, String comment) {
+    private final Map<Position, MarkShape> marks = new LinkedHashMap<>();
+
+    public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, String comment) {
         if(comment == null) {
             throw new NullPointerException("Comment must at least be an empty string!");
         }
@@ -46,7 +51,7 @@ public class GeraldsNode {
         this.Y = -1;
     }
 
-    public GeraldsNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, int x, int y, String comment) {
+    public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, int x, int y, String comment) {
         if(comment == null) {
             throw new NullPointerException("Comment must at least be an empty string!");
         }
@@ -62,20 +67,20 @@ public class GeraldsNode {
         return command;
     }
 
-    public GeraldsNode getPrev() {
+    public HistoryNode getPrev() {
         return prev;
     }
 
-    public void setPrev(GeraldsNode prev) {
+    public void setPrev(HistoryNode prev) {
         this.prev = prev;
         prev.next = this;
     }
 
-    public GeraldsNode getNext() {
+    public HistoryNode getNext() {
         return next;
     }
 
-    public void setNext(GeraldsNode next) {
+    public void setNext(HistoryNode next) {
         this.next = next;
         next.prev = this;
     }
@@ -106,5 +111,17 @@ public class GeraldsNode {
             throw new NullPointerException("Comment must at least be an empty string!");
         }
         this.comment = comment;
+    }
+
+    public Map<Position, MarkShape> getMarks() {
+        return marks;
+    }
+
+    public void removeMark(int x, int y) {
+        marks.remove(new Position(x, y));
+    }
+
+    public void addMark(int x, int y, MarkShape shape) {
+        marks.put(new Position(x, y), shape);
     }
 }

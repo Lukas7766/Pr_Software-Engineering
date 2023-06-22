@@ -15,7 +15,7 @@ import static pr_se.gogame.model.StoneColor.WHITE;
 public class FileHandler {
     private static File currentFile;
 
-    public static boolean saveFile(Game game, File file, GeraldsHistory history) {
+    public static boolean saveFile(Game game, File file, History history) {
         if(file == null) {
             throw new NullPointerException();
         }
@@ -26,7 +26,7 @@ public class FileHandler {
 
         try (FileWriter output = new FileWriter(file)) {
 
-            GeraldsNode node;
+            HistoryNode node;
             SGFToken t;
 
             try {
@@ -39,7 +39,7 @@ public class FileHandler {
                 if(game.getHandicap() > 0) {
                     boolean handicapMode = false;
 
-                    while(!history.isAtEnd() && node.getSaveToken() == GeraldsNode.AbstractSaveToken.HANDICAP) {
+                    while(!history.isAtEnd() && node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
                         if (node.getColor() == BLACK) {
                             t = SGFToken.AB;
                         } else if (node.getColor() == WHITE) {
