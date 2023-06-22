@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.Map;
 
 import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.StoneColor.BLACK;
@@ -102,6 +103,10 @@ public class FileHandler {
 
                     if(!node.getComment().equals("")) {
                         output.write(String.format(C.getValue(), node.getComment())); // TODO: Reformat the string according to the SGF "text" value specification
+                    }
+
+                    for(Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
+                        output.write(String.format(e.getValue().getSgfToken().getValue(), calculateCoordinates(e.getKey().X, e.getKey().Y)));
                     }
 
                     if(history.isAtEnd()) {

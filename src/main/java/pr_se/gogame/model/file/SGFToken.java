@@ -59,6 +59,21 @@ public enum SGFToken {
     MA("MA[%s]"),
 
     /**
+     * Circle mark
+     */
+    CR("CR[%s]"),
+
+    /**
+     * Square mark
+     */
+    SQ("SQ[%s]"),
+
+    /**
+     * Triangle mark
+     */
+    TR("TR[%s]"),
+
+    /**
      * label for a coordinate
      */
     LB("LB[%s:%s]"),

@@ -127,8 +127,7 @@ public class HeaderPane extends VBox {
             File f = CustomFileDialog.getFile(stage, false, filterList);//fileDialog(false, filterList);
             if (f == null) {
                 System.out.println("Import Dialog cancelled");
-            }
-            if(!game.loadGame(f)) {
+            } else if(!game.loadGame(f)) {
                 System.out.println("Failed to load game!");
             }
         });
