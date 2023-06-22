@@ -36,7 +36,6 @@ public class Game implements GameInterface {
 
     //Settings
     private Ruleset ruleset = new JapaneseRuleset();
-    private int size = 19; // TODO: Just a thought, but technically, this is really just a property of the board, so maybe the Game shouldn't save this at all and instead just provide a method to obtain the board size via its interface (said method would then return board.getSize()).
     private int handicap = 0;
 
     //global (helper) variables
@@ -58,7 +57,7 @@ public class Game implements GameInterface {
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameCommand = GameCommand.INIT;
-        this.board = new Board(this);
+        this.board = new Board(this, 19);
     }
 
     @Override
@@ -87,7 +86,6 @@ public class Game implements GameInterface {
         this.geraldsHistory = new GeraldsHistory(this);
 
         this.curColor = startingColor;
-        this.size = size;
         this.handicap = handicap;
         this.ruleset = ruleset;
 
@@ -98,7 +96,7 @@ public class Game implements GameInterface {
         this.curMoveNumber = 0; // Note: Indicates to the BoardPane that handicap stones are being set.
         this.gameResult = null;
 
-        this.board = new Board(this);
+        this.board = new Board(this, size);
         this.ruleset.reset();
         fireGameEvent(new GameEvent(GameCommand.NEW_GAME));
         this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
@@ -196,7 +194,7 @@ public class Game implements GameInterface {
 
     @Override
     public int getSize() {
-        return this.size;
+        return board.getSize();
     }
 
     @Override
@@ -305,7 +303,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place stone when game isn't being played! Game State was " + this.gameCommand);
         }*/
 
-        if(x < 0 || y < 0 || x >= size || y >= size) {
+        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
             throw new IllegalArgumentException();
         }
 
@@ -397,7 +395,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place handicap stone after game start!");
         }*/
 
-        if(x < 0 || y < 0 || x >= size || y >= size) {
+        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
             throw new IllegalArgumentException();
         }
 

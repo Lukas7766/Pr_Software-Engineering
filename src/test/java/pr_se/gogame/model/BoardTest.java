@@ -17,7 +17,7 @@ class BoardTest {
     void setUp() {
         game = new Game();
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
-        board = new Board(game);
+        board = new Board(game, 19);
     }
 
     @AfterEach

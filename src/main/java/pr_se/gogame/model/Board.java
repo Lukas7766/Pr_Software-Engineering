@@ -37,10 +37,11 @@ public class Board implements BoardInterface {
      * (only if the Game has a handicap set)
      *
      * @param game the Game that this Board belongs to
+     * @param size
      */
-    public Board(Game game) {
+    public Board(Game game, int size) {
         this.GAME = game;
-        this.SIZE = game.getSize();
+        this.SIZE = size;
         this.board = new StoneGroupPointer[SIZE][SIZE];
     }
 
