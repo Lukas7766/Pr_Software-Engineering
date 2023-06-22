@@ -64,7 +64,6 @@ public class Game implements GameInterface {
     public void initGame() {
         this.gameCommand = GameCommand.INIT;
 
-        System.out.println("initGame: " + gameCommand);
         fireGameEvent(new GameEvent(gameCommand));
     }
 
@@ -109,8 +108,6 @@ public class Game implements GameInterface {
 
         this.curMoveNumber = 1;
         this.gameCommand = GameCommand.COLOR_HAS_CHANGED;
-
-        System.out.println("\nnewGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n------");
     }
 
     @Override
