@@ -36,7 +36,7 @@ public class GameEvent {
 
     public GameEvent(GameCommand gameCommand, int x, int y, int moveNumber) {
         if(gameCommand == null) {
-            throw new NullPointerException();
+            throw new NullPointerException("gameCommand was null in GameEvent constructor.");
         }
 
         this.gameCommand = gameCommand;

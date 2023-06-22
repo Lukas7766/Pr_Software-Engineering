@@ -111,11 +111,7 @@ public interface GameInterface {
 
     void commentCurrentMove(String comment);
 
-    void markCircle(int x, int y);
-
-    void markSquare(int x, int y);
-
-    void markTriangle(int x, int y);
+    void mark(int x, int y, MarkShape shape);
 
     void unmark(int x, int y);
     //##################################################################################################################

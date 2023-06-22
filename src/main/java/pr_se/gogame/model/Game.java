@@ -658,19 +658,23 @@ public class Game implements GameInterface {
 
     // TODO: Have this affect the history and, consequently, the file saver.
     @Override
-    public void markCircle(int x, int y) {
-        history.getCurrentNode().addMark(x, y, MarkShape.CIRCLE);
-        fireGameEvent(new GameEvent(GameCommand.MARK_CIRCLE, x, y, curMoveNumber));
-    }
+    public void mark(int x, int y, MarkShape shape) {
+        history.getCurrentNode().addMark(x, y, shape);
+        GameCommand gc = null;
+        switch(shape) {
+            case CIRCLE:
+                gc = GameCommand.MARK_CIRCLE;
+                break;
 
-    @Override
-    public void markSquare(int x, int y) {
-        fireGameEvent(new GameEvent(GameCommand.MARK_SQUARE, x, y, curMoveNumber));
-    }
+            case SQUARE:
+                gc = GameCommand.MARK_SQUARE;
+                break;
 
-    @Override
-    public void markTriangle(int x, int y) {
-        fireGameEvent(new GameEvent(GameCommand.MARK_TRIANGLE, x, y, curMoveNumber));
+            case TRIANGLE:
+                gc = GameCommand.MARK_TRIANGLE;
+                break;
+        }
+        fireGameEvent(new GameEvent(gc, x, y, curMoveNumber));
     }
 
     @Override

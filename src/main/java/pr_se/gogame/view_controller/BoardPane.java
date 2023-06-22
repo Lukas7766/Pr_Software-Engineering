@@ -13,6 +13,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.model.MarkShape;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -1186,7 +1187,7 @@ public class BoardPane extends GridPane {
             if(isCircleMarked) {
                 game.unmark(x, y);
             } else {
-                game.markCircle(x, y);
+                game.mark(x, y, MarkShape.CIRCLE);
             }
         }
 

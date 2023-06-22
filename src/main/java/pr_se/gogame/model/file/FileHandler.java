@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import static pr_se.gogame.model.file.SGFToken.*;
@@ -101,12 +102,12 @@ public class FileHandler {
                             break;
                     }
 
-                    if(!node.getComment().equals("")) {
-                        output.write(String.format(C.getValue(), node.getComment())); // TODO: Reformat the string according to the SGF "text" value specification
-                    }
-
                     for(Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
                         output.write(String.format(e.getValue().getSgfToken().getValue(), calculateCoordinates(e.getKey().X, e.getKey().Y)));
+                    }
+
+                    if(!node.getComment().equals("")) {
+                        output.write(String.format(C.getValue(), node.getComment())); // TODO: Reformat the string according to the SGF "text" value specification
                     }
 
                     if(history.isAtEnd()) {
@@ -243,7 +244,7 @@ public class FileHandler {
                 game.newGame(BLACK, size, 0, new JapaneseRuleset(), false);
             }
 
-            boolean moveWasMade = false;
+            Map<Position, MarkShape> marks = new LinkedHashMap<>();
 
             if(t.getToken() != RPAR) {
                 StoneColor addStoneColor = null;
@@ -254,25 +255,31 @@ public class FileHandler {
 
                     switch (t.getToken()) {
                         case SEMICOLON:
+                        case RPAR:
                             if(currentComment != null) {
                                 game.commentCurrentMove(currentComment);
                             }
                             currentComment = null;
-                            moveWasMade = false;
-                            break;
+                            for(Map.Entry<Position, MarkShape> e : marks.entrySet()) {
+                                game.mark(e.getKey().X, e.getKey().Y, e.getValue());
+                            }
+                            marks = new LinkedHashMap<>();
+                            if(t.getToken() == SEMICOLON) {
+                                break;
+                            } else {
+                                break loop2;
+                            }
 
                         case AW:
                             addStoneColor = WHITE;
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                             game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
-                            moveWasMade = true;
                             break;
 
                         case AB:
                             addStoneColor = BLACK;
                             decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                             game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
-                            moveWasMade = true;
                             break;
 
                         case LONE_ATTRIBUTE:
@@ -294,7 +301,6 @@ public class FileHandler {
                                 decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                                 game.playMove(decodedCoords[0], decodedCoords[1], BLACK);
                             }
-                            moveWasMade = true;
                             break;
 
                         case W:
@@ -304,21 +310,17 @@ public class FileHandler {
                                 decodedCoords = calculateGridCoordinates(t.getAttributeValue());
                                 game.playMove(decodedCoords[0], decodedCoords[1], WHITE);
                             }
-                            moveWasMade = true;
                             break;
 
                         case C:
                             // TODO: Reformat the string according to the SGF "text" value specification
-                            if(moveWasMade) {
-                                game.commentCurrentMove(t.getAttributeValue());
-                            } else {
-                                currentComment = t.getAttributeValue();
-                            }
+                            currentComment = t.getAttributeValue();
                             break;
 
-                        case RPAR:
-                            // t = scanner.next();
-                            break loop2;
+                        case CR:
+                            decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                            marks.put(new Position(decodedCoords[0], decodedCoords[1]), MarkShape.CIRCLE);
+                            break;
 
                         case LPAR:
                             throw new IOException("This SGF file has multiple branches, a feature currently unsupported by this program.");
