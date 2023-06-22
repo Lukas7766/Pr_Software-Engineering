@@ -59,7 +59,7 @@ public class FileHandler {
                             outputFormatString = t.getValue();
                         }
 
-                        output.write(String.format(outputFormatString, calculateCoordinates(node.getX(), node.getY())));
+                        output.write(String.format(outputFormatString, formStringFromCoords(node.getX(), node.getY())));
 
                         history.stepForward();
                         node = history.getCurrentNode();
@@ -82,7 +82,7 @@ public class FileHandler {
                                 t = SGFToken.W;
                             }
 
-                            output.write(String.format("\n" + t.getValue(), calculateCoordinates(node.getX(), node.getY())));
+                            output.write(String.format("\n" + t.getValue(), formStringFromCoords(node.getX(), node.getY())));
                             break;
 
                         case PASS:
@@ -103,7 +103,7 @@ public class FileHandler {
                     }
 
                     for(Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
-                        output.write(String.format(e.getValue().getSgfToken().getValue(), calculateCoordinates(e.getKey().X, e.getKey().Y)));
+                        output.write(String.format(e.getValue().getSgfToken().getValue(), formStringFromCoords(e.getKey().X, e.getKey().Y)));
                     }
 
                     if(!node.getComment().equals("")) {
@@ -195,7 +195,7 @@ public class FileHandler {
                         break loop;
                 }
             }
-            int[] decodedCoords;
+            Position decodedCoords;
             String currentComment = null;
 
             if(t.getToken() == HA) {
@@ -218,24 +218,24 @@ public class FileHandler {
                      */
                     if(t.getToken() == AB) {
                         handicapColor = BLACK;
-                        decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                        decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                        game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
 
                     } else if(t.getToken() == AW) {
                         handicapColor = WHITE;
-                        decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                        decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                        game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
                     } else {
                         unexpected(AB.getValue() + " or " + AW.getValue(), t);
                     }
 
                     t = scanner.next();
                     while(t.getToken() == LONE_ATTRIBUTE) {
-                        decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                        decodedCoords = calculateCoordsFromString(t.getAttributeValue());
                         if(handicapColor == BLACK) {
-                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
                         } else {
-                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
                         }
                         t = scanner.next();
                     }
@@ -272,25 +272,25 @@ public class FileHandler {
 
                         case AW:
                             addStoneColor = WHITE;
-                            decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                            game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
                             break;
 
                         case AB:
                             addStoneColor = BLACK;
-                            decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                            game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                            game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
                             break;
 
                         case LONE_ATTRIBUTE:
                             if (addStoneColor == null) {
                                 throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
                             }
-                            decodedCoords = calculateGridCoordinates(t.getAttributeValue());
+                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
                             if(addStoneColor == BLACK) {
-                                game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                                game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
                             } else {
-                                game.placeHandicapPosition(decodedCoords[0], decodedCoords[1], true);
+                                game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
                             }
                             break;
 
@@ -298,8 +298,8 @@ public class FileHandler {
                             if (t.getAttributeValue().equals("")) {
                                 game.pass();
                             } else {
-                                decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                                game.playMove(decodedCoords[0], decodedCoords[1], BLACK);
+                                decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                                game.playMove(decodedCoords.X, decodedCoords.Y, BLACK);
                             }
                             break;
 
@@ -307,8 +307,8 @@ public class FileHandler {
                             if (t.getAttributeValue().equals("")) {
                                 game.pass();
                             } else {
-                                decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                                game.playMove(decodedCoords[0], decodedCoords[1], WHITE);
+                                decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                                game.playMove(decodedCoords.X, decodedCoords.Y, WHITE);
                             }
                             break;
 
@@ -318,8 +318,8 @@ public class FileHandler {
                             break;
 
                         case CR:
-                            decodedCoords = calculateGridCoordinates(t.getAttributeValue());
-                            marks.put(new Position(decodedCoords[0], decodedCoords[1]), MarkShape.CIRCLE);
+                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                            marks.put(new Position(decodedCoords.X, decodedCoords.Y), MarkShape.CIRCLE);
                             break;
 
                         case LPAR:
@@ -361,12 +361,12 @@ public class FileHandler {
      * @param y row of Stone
      * @return The x and y-axis in letter format
      */
-    private static String calculateCoordinates(int x, int y) {
+    private static String formStringFromCoords(int x, int y) {
         return "" + (char) (x + 97) + (char) (97 + y);
     }
 
-    private static int[] calculateGridCoordinates(String s) {
-        return new int[]{s.charAt(0) - 97, s.charAt(1) - 97};
+    private static Position calculateCoordsFromString(String s) {
+        return new Position(s.charAt(0) - 97, s.charAt(1) - 97);
     }
 
     // Getters and setters
