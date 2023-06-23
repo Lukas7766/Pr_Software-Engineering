@@ -32,9 +32,9 @@ public class HistoryNode {
 
     private final AbstractSaveToken saveToken;
 
-    private final int X;
+    private final int x;
 
-    private final int Y;
+    private final int y;
 
     private final StoneColor color;
 
@@ -45,8 +45,8 @@ public class HistoryNode {
         setComment(comment);
         this.saveToken = saveToken;
         this.color = color;
-        this.X = -1;
-        this.Y = -1;
+        this.x = -1;
+        this.y = -1;
     }
 
     public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, int x, int y, String comment) {
@@ -54,8 +54,8 @@ public class HistoryNode {
         setComment(comment);
         this.saveToken = saveToken;
         this.color = color;
-        this.X = x;
-        this.Y = y;
+        this.x = x;
+        this.y = y;
     }
 
     public UndoableCommand getCommand() {
@@ -90,11 +90,11 @@ public class HistoryNode {
     }
 
     public int getX() {
-        return X;
+        return x;
     }
 
     public int getY() {
-        return Y;
+        return y;
     }
 
     public StoneColor getColor() {

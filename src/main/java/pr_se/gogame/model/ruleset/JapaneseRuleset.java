@@ -40,7 +40,6 @@ public class JapaneseRuleset implements Ruleset {
         final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
 
         if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
-            System.out.println("Ko Detected. Move aborted.");
             return null;
         }
 
@@ -151,10 +150,10 @@ public class JapaneseRuleset implements Ruleset {
                     floodFill(game, i, j);
 
                     for (Position p : territory) {
-                        if(     (p.X > 0 && game.getColorAt(p.X - 1, p.Y) == StoneColor.getOpposite(color)) ||
-                                (p.X < game.getSize() - 1 && game.getColorAt(p.X + 1, p.Y) == StoneColor.getOpposite(color)) ||
-                                (p.Y > 0 && game.getColorAt(p.X, p.Y - 1) == StoneColor.getOpposite(color)) ||
-                                (p.Y < game.getSize() - 1 && game.getColorAt(p.X, p.Y + 1) == StoneColor.getOpposite(color))) {
+                        if(     (p.x > 0 && game.getColorAt(p.x - 1, p.y) == StoneColor.getOpposite(color)) ||
+                                (p.x < game.getSize() - 1 && game.getColorAt(p.x + 1, p.y) == StoneColor.getOpposite(color)) ||
+                                (p.y > 0 && game.getColorAt(p.x, p.y - 1) == StoneColor.getOpposite(color)) ||
+                                (p.y < game.getSize() - 1 && game.getColorAt(p.x, p.y + 1) == StoneColor.getOpposite(color))) {
                             occupiedTerritory = false;
                             break;
                         }

@@ -669,22 +669,22 @@ public class Game implements GameInterface {
     }
 
     public void removeAllMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.X, key.Y, curMoveNumber)));
+        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.x, key.y, curMoveNumber)));
     }
 
     public void reDisplayMarks() {
         history.getCurrentNode().getMarks().forEach((key, value) -> {
             switch (value) {
                 case CIRCLE:
-                    fireGameEvent(new GameEvent(GameCommand.MARK_CIRCLE, key.X, key.Y, curMoveNumber));
+                    fireGameEvent(new GameEvent(GameCommand.MARK_CIRCLE, key.x, key.y, curMoveNumber));
                     break;
 
                 case SQUARE:
-                    fireGameEvent(new GameEvent(GameCommand.MARK_SQUARE, key.X, key.Y, curMoveNumber));
+                    fireGameEvent(new GameEvent(GameCommand.MARK_SQUARE, key.x, key.y, curMoveNumber));
                     break;
 
                 case TRIANGLE:
-                    fireGameEvent(new GameEvent(GameCommand.MARK_TRIANGLE, key.X, key.Y, curMoveNumber));
+                    fireGameEvent(new GameEvent(GameCommand.MARK_TRIANGLE, key.x, key.y, curMoveNumber));
                     break;
 
                 default:

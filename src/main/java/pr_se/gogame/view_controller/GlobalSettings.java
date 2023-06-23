@@ -3,7 +3,7 @@ package pr_se.gogame.view_controller;
 import java.util.LinkedList;
 import java.util.List;
 
-public class GlobalSettings {
+public final class GlobalSettings {
     public static final boolean DEBUG = false; // TODO: Remove in final product (or maybe not)
 
     private static boolean confirmationNeeded = false;
@@ -17,6 +17,10 @@ public class GlobalSettings {
     private static String graphicsPack = "/default.zip";
 
     private static final List<ViewListener> listeners = new LinkedList<>();
+
+    private GlobalSettings() {
+        // This private constructor solely exists to prevent instantiation.
+    }
 
     public static void addListener(ViewListener l) {
         if(l == null) {

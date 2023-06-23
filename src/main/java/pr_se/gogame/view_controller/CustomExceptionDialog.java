@@ -10,12 +10,16 @@ import javafx.stage.Stage;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-public class CustomExceptionDialog {
+public final class CustomExceptionDialog {
 
     /**
      * The stage to which the dialog is attached.
      */
     private static Stage stage;
+
+    private CustomExceptionDialog() {
+        // This private constructor solely exists to prevent instantiation.
+    }
 
     /**
      * Creates a customised Exception Dialog

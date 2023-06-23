@@ -3,12 +3,12 @@ package pr_se.gogame.model;
 import java.util.Objects;
 
 public class Position {
-    public final int X;
-    public final int Y;
+    public final int x;
+    public final int y;
 
     public Position(int x, int y) {
-        this.X = x;
-        this.Y = y;
+        this.x = x;
+        this.y = y;
     }
 
     @Override
@@ -16,16 +16,16 @@ public class Position {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Position position = (Position) o;
-        return X == position.X && Y == position.Y;
+        return x == position.x && y == position.y;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(X, Y);
+        return Objects.hash(x, y);
     }
 
     @Override
     public String toString() {
-        return "(" + X + ", " + Y + ")";
+        return "(" + x + ", " + y + ")";
     }
 }

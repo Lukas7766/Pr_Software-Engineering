@@ -102,7 +102,7 @@ public class FileHandler {
                     }
 
                     for(Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
-                        output.write(String.format(e.getValue().getSgfToken().getValue(), formStringFromCoords(e.getKey().X, e.getKey().Y)));
+                        output.write(String.format(e.getValue().getSgfToken().getValue(), formStringFromCoords(e.getKey().x, e.getKey().y)));
                     }
 
                     if(!node.getComment().equals("")) {
@@ -228,12 +228,12 @@ public class FileHandler {
                     if(t.getToken() == AB) {
                         handicapColor = BLACK;
                         decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
+                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true);
 
                     } else if(t.getToken() == AW) {
                         handicapColor = WHITE;
                         decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
+                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true);
                     } else {
                         unexpected(AB.getValue() + " or " + AW.getValue(), t);
                     }
@@ -242,9 +242,9 @@ public class FileHandler {
                     while(t.getToken() == LONE_ATTRIBUTE) {
                         decodedCoords = calculateCoordsFromString(t.getAttributeValue());
                         if(handicapColor == BLACK) {
-                            game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
+                            game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true);
                         } else {
-                            game.placeHandicapPosition(decodedCoords.X, decodedCoords.Y, true);
+                            game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true);
                         }
                         t = scanner.next();
                     }
@@ -269,7 +269,7 @@ public class FileHandler {
                                 game.commentCurrentMove(currentComment);
                             }
                             currentComment = null;
-                            marks.entrySet().forEach((e) -> game.mark(e.getKey().X, e.getKey().Y, e.getValue()));
+                            marks.entrySet().forEach((e) -> game.mark(e.getKey().x, e.getKey().y, e.getValue()));
                             marks = new LinkedHashMap<>();
                             if(t.getToken() == SEMICOLON) {
                                 break;
@@ -280,13 +280,13 @@ public class FileHandler {
                         case AW:
                             addStoneColor = WHITE;
                             decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            game.placeSetupStone(decodedCoords.X, decodedCoords.Y, addStoneColor);
+                            game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
                             break;
 
                         case AB:
                             addStoneColor = BLACK;
                             decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            game.placeSetupStone(decodedCoords.X, decodedCoords.Y, addStoneColor);
+                            game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
                             break;
 
                         case LONE_ATTRIBUTE:
@@ -294,7 +294,7 @@ public class FileHandler {
                                 throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
                             }
                             decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            game.placeSetupStone(decodedCoords.X, decodedCoords.Y, addStoneColor);
+                            game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
                             break;
 
                         case B:
@@ -302,7 +302,7 @@ public class FileHandler {
                                 game.pass();
                             } else {
                                 decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                                game.playMove(decodedCoords.X, decodedCoords.Y, BLACK);
+                                game.playMove(decodedCoords.x, decodedCoords.y, BLACK);
                             }
                             break;
 
@@ -311,7 +311,7 @@ public class FileHandler {
                                 game.pass();
                             } else {
                                 decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                                game.playMove(decodedCoords.X, decodedCoords.Y, WHITE);
+                                game.playMove(decodedCoords.x, decodedCoords.y, WHITE);
                             }
                             break;
 
@@ -321,7 +321,7 @@ public class FileHandler {
 
                         case CR:
                             decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            marks.put(new Position(decodedCoords.X, decodedCoords.Y), MarkShape.CIRCLE);
+                            marks.put(new Position(decodedCoords.x, decodedCoords.y), MarkShape.CIRCLE);
                             break;
 
                         case LPAR:

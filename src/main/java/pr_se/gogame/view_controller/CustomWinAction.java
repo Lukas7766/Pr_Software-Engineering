@@ -8,7 +8,11 @@ import javafx.util.Pair;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameState;
 
-public class CustomWinAction {
+public final class CustomWinAction {
+
+    private CustomWinAction() {
+        // This private constructor solely exists to prevent instantiation.
+    }
 
     /**
      * Handles the win action<br>

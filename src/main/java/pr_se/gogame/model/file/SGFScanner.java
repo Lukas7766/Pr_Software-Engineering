@@ -52,7 +52,7 @@ public class SGFScanner {
                 } else if (ch == 'W') {
                     t = AW;
                 } else {
-                    unexpected("B or W");
+                    unexpected('B', 'W');
                 }
                 getNextChar();
                 attribute = getAttribute();
@@ -83,7 +83,7 @@ public class SGFScanner {
             case 'F':
                 getNextChar();
                 if(ch != 'F') {
-                    unexpected("F");
+                    unexpected('F');
                 }
                 t = FF;
                 getNextChar();
@@ -93,7 +93,7 @@ public class SGFScanner {
             case 'G':
                 getNextChar();
                 if(ch != 'M') {
-                    unexpected("M");
+                    unexpected('M');
                 }
                 t = GM;
                 getNextChar();
@@ -103,7 +103,7 @@ public class SGFScanner {
             case 'H':
                 getNextChar();
                 if(ch != 'A') {
-                    unexpected("A");
+                    unexpected('A');
                 }
                 t = HA;
                 getNextChar();
@@ -113,7 +113,7 @@ public class SGFScanner {
             case 'S':
                 getNextChar();
                 if(ch != 'Z') {
-                    unexpected("Z");
+                    unexpected('Z');
                 }
                 t = SZ;
                 getNextChar();
@@ -131,19 +131,23 @@ public class SGFScanner {
         return new ScannedToken(t, attribute, line, col);
     }
 
-    private void unexpected(String expected) throws IOException {
-        throw new IOException("Expected '" + expected + "' but scanned '" + ch + "' on line " + line + ", col " + col);
+    private void unexpected(char ... expected) throws IOException {
+        StringBuilder sb = new StringBuilder("'" + expected[0] + "'");
+        for(int i = 1; i < expected.length; i++) {
+            sb.append("or '").append(expected[i]).append("'");
+        }
+        throw new IOException("Expected " + sb + " but scanned '" + ch + "' on line " + line + ", col " + col);
     }
 
     /**
      * Scans the attribute string while doing some pre-conversions as per the most permissive value type "Text".
      * See <a href="https://www.red-bean.com/sgf/sgf4.html#text">...</a> for more information.
-     * @return An pre-formatted attribute string
+     * @return A pre-formatted attribute string
      * @throws IOException if reading from the file fails or an unexpected character is read
      */
     private String getAttribute() throws IOException {
         if(ch != '[') {
-            unexpected("[");
+            unexpected('[');
         }
         getNextChar();
         StringBuilder attributeSB = new StringBuilder();
@@ -161,7 +165,7 @@ public class SGFScanner {
             getNextChar();
         }
         if(ch != ']') {
-            unexpected("]");
+            unexpected(']');
         }
         return attributeSB.toString();
     }

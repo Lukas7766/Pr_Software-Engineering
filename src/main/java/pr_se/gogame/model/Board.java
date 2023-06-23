@@ -162,7 +162,7 @@ public class Board implements BoardInterface {
                         if ((sg.getStoneColor() != COLOR || !FINAL_KILL_ANOTHER) && sg.getLiberties().size() == 0) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
-                                UndoableCommand tmpCmd = removeStone(p.X, p.Y);
+                                UndoableCommand tmpCmd = removeStone(p.x, p.y);
                                 UC06_01_REMOVE_STONE_COMMANDS.add(tmpCmd);
                                 if(saveEffects) {
                                     getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
