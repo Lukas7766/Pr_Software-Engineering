@@ -316,7 +316,6 @@ public class FileHandler {
                             break;
 
                         case C:
-                            // TODO: Reformat the string according to the SGF "text" value specification
                             currentComment = t.getAttributeValue();
                             break;
 

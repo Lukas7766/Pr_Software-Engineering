@@ -169,7 +169,6 @@ public class Board implements BoardInterface {
                                     getUndoEvents().addAll(tmpCmd.getUndoEvents());
                                 }
                                 captured++;
-                                System.out.println("remove: " + p.X + " / " + p.Y);
                             }
                             uC06_02_addCapturedStonesCommand = GAME.addCapturedStones(COLOR, captured);
                         }
