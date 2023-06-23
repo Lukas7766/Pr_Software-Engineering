@@ -26,6 +26,7 @@ public class GoApplication extends Application {
         //    CustomExceptionDialog.show(e);
         //});
         CustomExceptionDialog.stage = stage;
+
         // Generate the necessary folder and extract the default the graphics pack if it is not present.
         String graphicsDir = GlobalSettings.graphicsPackFolder;
         String graphicsPack = GlobalSettings.getGraphicsPack();

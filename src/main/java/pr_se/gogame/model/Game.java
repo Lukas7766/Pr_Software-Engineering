@@ -635,27 +635,39 @@ public class Game implements GameInterface {
     @Override
     public void rewind() {
         removeAllMarks();
-        history.rewind();
+        if(!history.isAtBeginning()) {
+            history.stepBack();
+            if((history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP)) {
+                history.rewind();
+            } else {
+                goToFirstMove();
+            }
+        }
         reDisplayMarks();
     }
 
     @Override
-    public void goToEnd() {
+    public void fastForward() {
         removeAllMarks();
-        history.skipToEnd();
+        if(history.isAtBeginning()) {
+            history.stepForward();
+        }
+        if((history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP)) {
+            goToFirstMove();
+        } else {
+            history.skipToEnd();
+        }
         reDisplayMarks();
     }
 
     @Override
     public void goToFirstMove() {
         removeAllMarks();
-        while(!history.isAtBeginning() && history.getCurrentNode().getSaveToken() != HistoryNode.AbstractSaveToken.HANDICAP && history.getCurrentNode().getSaveToken() != HistoryNode.AbstractSaveToken.SETUP) {
-            history.stepBack();
-        }
+        history.rewind();
 
-        if(history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP) {
+        do {
             history.stepForward();
-        }
+        } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP));
         reDisplayMarks();
     }
 

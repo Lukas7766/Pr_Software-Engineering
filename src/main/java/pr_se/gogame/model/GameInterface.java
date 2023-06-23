@@ -122,7 +122,7 @@ public interface GameInterface {
 
     void rewind();
 
-    void goToEnd();
+    void fastForward();
 
     void goToFirstMove();
 }
