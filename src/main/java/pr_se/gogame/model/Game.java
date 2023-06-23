@@ -420,68 +420,49 @@ public class Game implements GameInterface {
                 @Override
                 public void execute(boolean saveEffects) {
                     handicapStoneCounter = NEW_HANDICAP_CTR;
+
+                    if (NEW_HANDICAP_CTR <= 0) {
+                        System.out.println("handicapStoneCounter is now less than 0.");
+                        uC02_switchColor = switchColor();
+                        if(saveEffects) {
+                            getExecuteEvents().addAll(uC02_switchColor.getExecuteEvents());
+                            getUndoEvents().addAll(uC02_switchColor.getUndoEvents());
+                        }
+
+                        gameState = GameState.RUNNING;
+                    }
                 }
 
                 @Override
                 public void undo() {
+                    if(uC02_switchColor != null) {
+                        uC02_switchColor.undo();
+                    }
                     handicapStoneCounter = OLD_HANDICAP_CTR;
+
+                    gameState = GameState.SETTING_UP;
                 }
             };
             uc02UpdateCounter.execute(true);
-
-            final UndoableCommand uC03SwitchColor;
-            final UndoableCommand uc04GameStateRunning;
-            if(handicapStoneCounter <= 0) {
-                uC03SwitchColor = switchColor();
-                uc04GameStateRunning = new UndoableCommand() {
-                    @Override
-                    public void execute(boolean saveEffects) {
-                        gameState = GameState.RUNNING;
-                    }
-
-                    @Override
-                    public void undo() {
-                        gameState = GameState.SETTING_UP;
-                    }
-                };
-                uc04GameStateRunning.execute(true);
-            } else {
-                uC03SwitchColor = null;
-                uc04GameStateRunning = null;
-            }
 
             UndoableCommand c = new UndoableCommand() {
                 @Override
                 public void execute(boolean saveEffects) {
                     uc01SetStone.execute(saveEffects);
                     uc02UpdateCounter.execute(saveEffects);
-                    if(uC03SwitchColor != null) {
-                        uC03SwitchColor.execute(saveEffects);
-                    }
-                    if(uc04GameStateRunning != null) {
-                        uc04GameStateRunning.execute(saveEffects);
-                    }
                 }
 
                 @Override
                 public void undo() {
-                    if(uc04GameStateRunning != null) {
-                        uc04GameStateRunning.undo();
-                    }
-                    if(uC03SwitchColor != null) {
-                        uC03SwitchColor.undo();
-                    }
                     uc02UpdateCounter.undo();
                     uc01SetStone.undo();
                 }
             };
             // c was already executed piecemeal
             c.getExecuteEvents().addAll(uc01SetStone.getExecuteEvents());
+            c.getExecuteEvents().addAll(uc02UpdateCounter.getExecuteEvents());
             c.getUndoEvents().addAll(uc01SetStone.getUndoEvents());
-            if(uC03SwitchColor != null) {
-                c.getExecuteEvents().addAll(uC03SwitchColor.getExecuteEvents());
-                c.getUndoEvents().addAll(uC03SwitchColor.getUndoEvents());
-            }
+            c.getUndoEvents().addAll(uc02UpdateCounter.getUndoEvents());
 
             /*
              * StoneColor.getOpposite() because we previously switched colors
