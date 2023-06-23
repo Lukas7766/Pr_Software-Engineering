@@ -230,7 +230,7 @@ public class BoardPane extends GridPane {
                             break;
 
                         default:
-                            throw new IllegalStateException("Unsupported Gamecommand " + e.getGameCommand());
+                            throw new IllegalStateException("Unsupported GameCommand " + e.getGameCommand());
                     }
                     break;
 
@@ -434,7 +434,7 @@ public class BoardPane extends GridPane {
                 } else if(game.getGameState() == GameState.SETTING_UP) {
                     game.placeHandicapPosition(col, row, true);
                 } else {
-                    throw new IllegalStateException("Can't place stone when game is neither being set up nor runnign!");
+                    throw new IllegalStateException("Can't place stone when game is neither being set up nor running!");
                 }
             }
 
@@ -843,7 +843,7 @@ public class BoardPane extends GridPane {
         private final ResizableImageView SQUARE_MARK_ON_WHITE;
 
         /**
-         * Instanc eof the global image for use on handicap stone slots
+         * Instance of the global image for use on handicap stone slots
          */
         private final ResizableImageView HANDICAP_SLOT;
 
@@ -1129,7 +1129,7 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Marks this PLayableBoardCell with a circle mark
+         * Marks this PlayableBoardCell with a circle mark
          */
         private void markCircle() {
             mark(CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
@@ -1137,7 +1137,7 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Marks this PLayableBoardCell with a triangle mark
+         * Marks this PlayableBoardCell with a triangle mark
          */
         private void markTriangle() {
             mark(TRIANGLE_MARK_ON_EMPTY, TRIANGLE_MARK_ON_BLACK, TRIANGLE_MARK_ON_WHITE);
@@ -1145,7 +1145,7 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Marks this PLayableBoardCell with a square mark
+         * Marks this PlayableBoardCell with a square mark
          */
         private void markSquare() {
             mark(SQUARE_MARK_ON_EMPTY, SQUARE_MARK_ON_BLACK, SQUARE_MARK_ON_WHITE);
@@ -1179,7 +1179,7 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Unmarks this PLayableBoardCell altogether.
+         * Unmarks this PlayableBoardCell altogether.
          */
         private void unMark() {
             unMark(CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);
@@ -1226,7 +1226,7 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Updates all marks on this PLayableBoardCell.
+         * Updates all marks on this PlayableBoardCell.
          */
         private void updateMarks() {
             updateMarks(isCircleMarked, CIRCLE_MARK_ON_EMPTY, CIRCLE_MARK_ON_BLACK, CIRCLE_MARK_ON_WHITE);

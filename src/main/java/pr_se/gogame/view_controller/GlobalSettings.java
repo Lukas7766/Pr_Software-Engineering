@@ -12,7 +12,9 @@ public class GlobalSettings {
 
     private static boolean showCoordinates = true;
 
-    private static String graphicsPath = "./Grafiksets/default.zip";
+    public static final String graphicsPackFolder = "./Grafiksets";
+
+    private static String graphicsPack = "/default.zip";
 
     private static final List<ViewListener> listeners = new LinkedList<>();
 
@@ -69,14 +71,18 @@ public class GlobalSettings {
     }
 
     public static String getGraphicsPath() {
-        return graphicsPath;
+        return graphicsPackFolder + graphicsPack;
     }
 
-    public static void setGraphicsPath(String graphicsPath) {
-        if(graphicsPath == null) {
+    public static String getGraphicsPack() {
+        return graphicsPack;
+    }
+
+    public static void setGraphicsPack(String graphicsPack) {
+        if(graphicsPack == null) {
             throw new NullPointerException();
         }
-        GlobalSettings.graphicsPath = graphicsPath;
+        GlobalSettings.graphicsPack = graphicsPack;
         update();
     }
 }

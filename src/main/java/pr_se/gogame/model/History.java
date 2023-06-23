@@ -3,7 +3,6 @@ package pr_se.gogame.model;
 import pr_se.gogame.view_controller.GameEvent;
 
 import java.util.ListIterator;
-import java.util.Map;
 
 public class History {
 

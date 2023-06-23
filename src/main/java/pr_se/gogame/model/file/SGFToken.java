@@ -1,8 +1,5 @@
 package pr_se.gogame.model.file;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 public enum SGFToken {
 
     /**

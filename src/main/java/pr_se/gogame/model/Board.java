@@ -259,7 +259,7 @@ public class Board implements BoardInterface {
 
                 // Update UI
                 if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, GAME.getCurMoveNumber())); // TOOD: Should all parameters be saved into and read from final vars outside of this anonymous class?
+                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, GAME.getCurMoveNumber()));
                     getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, BOARD_AT_XY_PREVIOUSLY.getStoneGroup().getStoneColor(), GAME.getCurMoveNumber()));
                 }
             }

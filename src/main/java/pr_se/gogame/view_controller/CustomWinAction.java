@@ -1,10 +1,11 @@
 package pr_se.gogame.view_controller;
 
-import javafx.scene.control.*;
+import javafx.scene.control.ButtonBar;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.GameState;
 
 public class CustomWinAction {

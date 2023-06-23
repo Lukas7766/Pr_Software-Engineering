@@ -27,9 +27,9 @@ public class GoApplication extends Application {
         //});
         CustomExceptionDialog.stage = stage;
         // Generate the necessary folder and extract the default the graphics pack if it is not present.
-        String graphicsDir = "./Grafiksets";
-        String graphicsPack = "/default.zip";
-        Path path = Paths.get(graphicsDir + graphicsPack);
+        String graphicsDir = GlobalSettings.graphicsPackFolder;
+        String graphicsPack = GlobalSettings.getGraphicsPack();
+        Path path = Paths.get(GlobalSettings.getGraphicsPath());
         if(Files.notExists(path, LinkOption.NOFOLLOW_LINKS)) {
             System.out.println("The default graphics pack doesn't exist.");
 

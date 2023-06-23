@@ -5,13 +5,13 @@ import javafx.geometry.Pos;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.scene.text.*;
+import javafx.scene.text.Font;
+import javafx.scene.text.FontWeight;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.StoneColor;
-import pr_se.gogame.model.ruleset.NewZealandRuleset;
+import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.util.HashSet;
 import java.util.stream.Collectors;
@@ -76,13 +76,6 @@ public class SidePane extends StackPane {
                     }
                     break;
 
-                //case CONFIG_DEMO_MODE:
-                //    if (game.isDemoMode()) {
-                //        this.getChildren().remove(gameSetting);
-                //        this.getChildren().add(gameInfo);
-                //    }
-                //    break;
-
                 case GAME_WON:
                     CustomWinAction.winAction(stage, game);
                     break;
@@ -91,7 +84,7 @@ public class SidePane extends StackPane {
     }
 
     /**
-     * GameInfomations contains a mechanism to show relevant information based on current GameCommand <br>
+     * GameInfomation contains a mechanism to show relevant information based on current GameCommand <br>
      * contains at least: <br>
      * -> Game Board <br>
      * -> Turn Explanation <br>

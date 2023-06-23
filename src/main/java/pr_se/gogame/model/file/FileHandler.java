@@ -3,15 +3,16 @@ package pr_se.gogame.model.file;
 import pr_se.gogame.model.*;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static pr_se.gogame.model.HistoryNode.AbstractSaveToken.HANDICAP;
-import static pr_se.gogame.model.HistoryNode.AbstractSaveToken.SETUP;
-import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
+import static pr_se.gogame.model.file.SGFToken.*;
 
 public class FileHandler {
     private static File currentFile;
@@ -48,7 +49,7 @@ public class FileHandler {
 
                     output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
 
-                    writeAttributeSequence(output, history, HANDICAP, node.getColor());
+                    writeAttributeSequence(output, history, node);
                 }
             } catch(IOException e) {
                 System.out.println("Couldn't write file header!");
@@ -69,7 +70,7 @@ public class FileHandler {
 
                             output.write(String.format("\n;" + t.getValue(), formStringFromCoords(node.getX(), node.getY())));
 
-                            writeAttributeSequence(output, history, SETUP, node.getColor());
+                            writeAttributeSequence(output, history, node);
 
                             break;
 
@@ -130,9 +131,9 @@ public class FileHandler {
         return true;
     }
 
-    private static void writeAttributeSequence(FileWriter output, History history, HistoryNode.AbstractSaveToken parentToken, StoneColor parentColor) throws IOException {
+    private static void writeAttributeSequence(FileWriter output, History history, HistoryNode parentNode) throws IOException {
         history.stepForward();
-        while(!history.isAtEnd() && history.getCurrentNode().getSaveToken() == parentToken && history.getCurrentNode().getColor() == parentColor) {
+        while(!history.isAtEnd() && history.getCurrentNode().getSaveToken() == parentNode.getSaveToken() && history.getCurrentNode().getColor() == parentNode.getColor()) {
             output.write(String.format(LONE_ATTRIBUTE.getValue(), formStringFromCoords(history.getCurrentNode().getX(), history.getCurrentNode().getY())));
             history.stepForward();
         }

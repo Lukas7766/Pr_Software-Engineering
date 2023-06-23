@@ -7,10 +7,9 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
+import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.file.FileHandler;
-import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameCommand;
 
 import java.io.File;
 import java.util.HashSet;

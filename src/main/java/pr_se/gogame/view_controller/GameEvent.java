@@ -1,6 +1,5 @@
 package pr_se.gogame.view_controller;
 
-import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;
 

@@ -1,5 +1,6 @@
 package pr_se.gogame.view_controller;
 
+import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
@@ -10,16 +11,13 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
-import pr_se.gogame.model.GameState;
-import pr_se.gogame.model.file.FileHandler;
-import pr_se.gogame.model.Game;
-
-import javafx.application.Application;
 import javafx.scene.paint.Color;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import pr_se.gogame.model.GameCommand;
+import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameState;
+import pr_se.gogame.model.file.FileHandler;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -428,8 +426,7 @@ public class HeaderPane extends VBox {
 
         // Create combo box for selecting graphics packs
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList();
-        final String GRAPHICS_FOLDER = "./Grafiksets";
-        File graphicsFolder = new File(GRAPHICS_FOLDER);
+        File graphicsFolder = new File(GlobalSettings.graphicsPackFolder);
         FileFilter zipFilter = new FileFilter() {
             @Override
             public boolean accept(File pathname) {
@@ -450,7 +447,7 @@ public class HeaderPane extends VBox {
         graphicsPackSelectorComboBox.setFocusTraversable(false);
         graphicsPackSelectorComboBox.setOnAction((e) -> {
             System.out.println(graphicsPackSelectorComboBox.getValue());
-            GlobalSettings.setGraphicsPath(GRAPHICS_FOLDER + "/" + graphicsPackSelectorComboBox.getValue());
+            GlobalSettings.setGraphicsPack("/" + graphicsPackSelectorComboBox.getValue());
         });
 
         gameShortCuts.getChildren().add(graphicsPackSelectorComboBox);

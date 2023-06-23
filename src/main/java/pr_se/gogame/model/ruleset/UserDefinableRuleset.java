@@ -19,7 +19,7 @@ public class UserDefinableRuleset implements Ruleset {
      * -> set to true if you want to allow it <br>
      * -> set to false if you want to forbid it <br>
      * @param allow (true or false)
-     * @param check predicate to evaluate whether the stonegroup in question is allowed to commit suicide.
+     * @param check predicate to evaluate whether the stone group in question is allowed to commit suicide.
      */
     void setSuicide(boolean allow, Predicate<StoneGroup> check) {
         suicideAllowed = allow;

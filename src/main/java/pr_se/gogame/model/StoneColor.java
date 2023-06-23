@@ -3,7 +3,7 @@ package pr_se.gogame.model;
 public enum StoneColor {
     BLACK("Black"), WHITE("White");
 
-    private String name;
+    private final String name;
 
     StoneColor(String name) {
         this.name = name;
