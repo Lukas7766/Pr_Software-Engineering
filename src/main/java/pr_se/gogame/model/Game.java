@@ -179,7 +179,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void scoreGame() { // TODO: Is this only of cosmetic relevance or does it need to be undoable?
+    public void scoreGame() {
         gameResult = ruleset.scoreGame(this);
         playerBlackScore = gameResult.getScoreBlack();
         playerWhiteScore = gameResult.getScoreWhite();

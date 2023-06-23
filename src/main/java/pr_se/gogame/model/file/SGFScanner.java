@@ -134,6 +134,12 @@ public class SGFScanner {
         throw new IOException("Expected '" + expected + "' but scanned '" + ch + "' on line " + line + ", col " + col);
     }
 
+    /**
+     * Scans the attribute string while doing some pre-conversions as per the most permissive value type "Text".
+     * See https://www.red-bean.com/sgf/sgf4.html#text for more information.
+     * @return An pre-formatted attribute string
+     * @throws IOException
+     */
     private String getAttribute() throws IOException {
         if(ch != '[') {
             unexpected("[");
@@ -141,6 +147,15 @@ public class SGFScanner {
         getNextChar();
         StringBuilder attributeSB = new StringBuilder();
         while(ch != ']' && ch != eof) {
+            if(ch == '\\') {
+                getNextChar();
+                if(ch == '\n') {
+                    getNextChar();
+                }
+            }
+            if(Character.isWhitespace(ch) && ch != '\n') {
+                ch = ' ';
+            }
             attributeSB.append(ch);
             getNextChar();
         }

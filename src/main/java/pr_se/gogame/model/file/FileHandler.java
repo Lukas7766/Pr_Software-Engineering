@@ -33,7 +33,7 @@ public class FileHandler {
 
             try {
                 output.write(String.format(START.getValue() + "\n\n", game.getSize()));
-                output.write(String.format(HA.getValue() + "", game.getHandicap())); // Used to include an opening '(' at the end.
+                output.write(String.format(HA.getValue() + "", game.getHandicap()));
 
                 history.stepForward();
                 node = history.getCurrentNode();
@@ -106,7 +106,8 @@ public class FileHandler {
                     }
 
                     if(!node.getComment().equals("")) {
-                        output.write(String.format(C.getValue(), node.getComment())); // TODO: Reformat the string according to the SGF "text" value specification
+                        String reformattedComment = node.getComment().replace("\\", "\\\\").replace("]", "\\]").replace(":", "\\:");
+                        output.write(String.format(C.getValue(), reformattedComment));
                     }
 
                     if(history.isAtEnd()) {
@@ -117,7 +118,7 @@ public class FileHandler {
                     node = history.getCurrentNode();
                 }
 
-                output.write("\n\n)"); // Used to have a closing ')' at the beginning.
+                output.write("\n\n)");
             } catch (IOException e) {
                 System.out.println("File write Error");
                 return false;
