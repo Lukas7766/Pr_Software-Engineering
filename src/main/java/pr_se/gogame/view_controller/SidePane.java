@@ -183,6 +183,8 @@ public class SidePane extends StackPane {
                     actualPlayer.setText(game.getCurColor().toString());
                     textArea.setText(game.getComment());
                 }
+
+                default -> {}
             }
         });
 

@@ -13,11 +13,18 @@ class BoardTest {
     Game game;
     Board board;
 
+    /*
+     * This variable is used for AssertThrows()-calls, as SonarQube (rightly) points out that nested method calls
+     * might create ambiguity as to which method has thrown an expected (or unexpected) exception.
+     */
+    int maxCoord;
+
     @BeforeEach
     void setUp() {
         game = new Game();
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
         board = new Board(game, 19);
+        maxCoord = board.getSize() - 1;
     }
 
     @AfterEach
@@ -28,9 +35,9 @@ class BoardTest {
     @Test
     void setStoneArguments() {
         assertThrows(IllegalArgumentException.class, () -> board.setStone(-1, 0, BLACK, false));
-        assertThrows(IllegalArgumentException.class, () -> board.setStone(board.getSize(), 0, BLACK, false));
+        assertThrows(IllegalArgumentException.class, () -> board.setStone(maxCoord + 1, 0, BLACK, false));
         assertThrows(IllegalArgumentException.class, () -> board.setStone(0, -1, BLACK, false));
-        assertThrows(IllegalArgumentException.class, () -> board.setStone(0, board.getSize(), BLACK, false));
+        assertThrows(IllegalArgumentException.class, () -> board.setStone(0, maxCoord + 1, BLACK, false));
         assertThrows(NullPointerException.class, () -> board.setStone(0, 0, null, false));
     }
 
@@ -38,24 +45,24 @@ class BoardTest {
     void removeStoneArguments() {
         assertThrows(IllegalArgumentException.class, () -> board.removeStone(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> board.removeStone(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> board.removeStone(board.getSize(), 0));
-        assertThrows(IllegalArgumentException.class, () -> board.removeStone(0, board.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> board.removeStone(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> board.removeStone(0, maxCoord + 1));
     }
 
     @Test
     void getColorAtArguments() {
         assertThrows(IllegalArgumentException.class, () -> board.getColorAt(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> board.getColorAt(board.getSize(), 0));
-        assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, board.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> board.getColorAt(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, maxCoord + 1));
     }
 
     @Test
     void printDebugInfoArguments() {
         assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(board.getSize(), 0));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, board.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, maxCoord + 1));
     }
 
     // other tests

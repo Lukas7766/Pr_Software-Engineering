@@ -15,7 +15,11 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class CustomCloseAction {
+public final class CustomCloseAction {
+
+    private CustomCloseAction() {
+        // This private constructor solely exists to prevent instantiation.
+    }
 
     /**
      * Handles the on close action<br>

@@ -12,7 +12,11 @@ import java.io.File;
 import java.util.HashSet;
 import java.util.Optional;
 
-public class CustomNewGameAction {
+public final class CustomNewGameAction {
+
+    private CustomNewGameAction() {
+        // This private constructor solely exists to prevent instantiation.
+    }
 
     /**
      * Handles the on new game action<br>

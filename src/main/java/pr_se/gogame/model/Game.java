@@ -310,7 +310,6 @@ public class Game implements GameInterface {
         final UndoableCommand UC02_SET_STONE = board.setStone(x, y, curColor, false); // UC02_SET_STONE is already executed within board.setStone().
 
         if(UC02_SET_STONE == null) {
-            System.out.println("Move aborted.");
             return;
         }
 
@@ -407,64 +406,82 @@ public class Game implements GameInterface {
         }
 
         if(placeStone) {
-            final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, true); // UC01_SET_STONE is already executed within board.setStone().
+            final UndoableCommand uc01SetStone = board.setStone(x, y, curColor, true); // uc01SetStone is already executed within board.setStone().
 
-            if(UC01_SET_STONE == null) {
-                System.out.println("Move aborted.");
+            if(uc01SetStone == null) {
                 return;
             }
 
-            // Assertion: UC01_SET_STONE != null and was hence a valid move.
+            // Assertion: uc01SetStone != null and was hence a valid move.
 
-            final UndoableCommand UC02_UPDATE_COUNTER = new UndoableCommand() {
+            final UndoableCommand uc02UpdateCounter = new UndoableCommand() {
                 UndoableCommand uC02_switchColor = null;
 
                 @Override
                 public void execute(boolean saveEffects) {
                     handicapStoneCounter = NEW_HANDICAP_CTR;
-
-                    if (NEW_HANDICAP_CTR <= 0) {
-                        System.out.println("handicapStoneCounter is now less than 0.");
-                        uC02_switchColor = switchColor();
-                        if(saveEffects) {
-                            getExecuteEvents().addAll(uC02_switchColor.getExecuteEvents());
-                            getUndoEvents().addAll(uC02_switchColor.getUndoEvents());
-                        }
-
-                        gameState = GameState.RUNNING;
-                    }
                 }
 
                 @Override
                 public void undo() {
-                    if(uC02_switchColor != null) {
-                        uC02_switchColor.undo();
-                    }
                     handicapStoneCounter = OLD_HANDICAP_CTR;
-
-                    gameState = GameState.SETTING_UP;
                 }
             };
-            UC02_UPDATE_COUNTER.execute(true);
+            uc02UpdateCounter.execute(true);
+
+            final UndoableCommand uC03SwitchColor;
+            final UndoableCommand uc04GameStateRunning;
+            if(handicapStoneCounter <= 0) {
+                uC03SwitchColor = switchColor();
+                uc04GameStateRunning = new UndoableCommand() {
+                    @Override
+                    public void execute(boolean saveEffects) {
+                        gameState = GameState.RUNNING;
+                    }
+
+                    @Override
+                    public void undo() {
+                        gameState = GameState.SETTING_UP;
+                    }
+                };
+                uc04GameStateRunning.execute(true);
+            } else {
+                uC03SwitchColor = null;
+                uc04GameStateRunning = null;
+            }
 
             UndoableCommand c = new UndoableCommand() {
                 @Override
                 public void execute(boolean saveEffects) {
-                    UC01_SET_STONE.execute(saveEffects);
-                    UC02_UPDATE_COUNTER.execute(saveEffects);
+                    uc01SetStone.execute(saveEffects);
+                    uc02UpdateCounter.execute(saveEffects);
+                    if(uC03SwitchColor != null) {
+                        uC03SwitchColor.execute(saveEffects);
+                    }
+                    if(uc04GameStateRunning != null) {
+                        uc04GameStateRunning.execute(saveEffects);
+                    }
                 }
 
                 @Override
                 public void undo() {
-                    UC02_UPDATE_COUNTER.undo();
-                    UC01_SET_STONE.undo();
+                    if(uc04GameStateRunning != null) {
+                        uc04GameStateRunning.undo();
+                    }
+                    if(uC03SwitchColor != null) {
+                        uC03SwitchColor.undo();
+                    }
+                    uc02UpdateCounter.undo();
+                    uc01SetStone.undo();
                 }
             };
             // c was already executed piecemeal
-            c.getExecuteEvents().addAll(UC01_SET_STONE.getExecuteEvents());
-            c.getExecuteEvents().addAll(UC02_UPDATE_COUNTER.getExecuteEvents());
-            c.getUndoEvents().addAll(UC01_SET_STONE.getUndoEvents());
-            c.getUndoEvents().addAll(UC02_UPDATE_COUNTER.getUndoEvents());
+            c.getExecuteEvents().addAll(uc01SetStone.getExecuteEvents());
+            c.getUndoEvents().addAll(uc01SetStone.getUndoEvents());
+            if(uC03SwitchColor != null) {
+                c.getExecuteEvents().addAll(uC03SwitchColor.getExecuteEvents());
+                c.getUndoEvents().addAll(uC03SwitchColor.getUndoEvents());
+            }
 
             /*
              * StoneColor.getOpposite() because we previously switched colors
@@ -484,7 +501,6 @@ public class Game implements GameInterface {
         }
 
         fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
-        System.out.println();
     }
 
     @Override
@@ -499,7 +515,6 @@ public class Game implements GameInterface {
         curMoveNumber = OLD_CUR_MOVE_NUMBER;
 
         if(UC01_SET_STONE == null) {
-            System.out.println("Move aborted.");
             return;
         }
 

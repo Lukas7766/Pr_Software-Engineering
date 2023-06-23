@@ -14,8 +14,12 @@ import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
 import static pr_se.gogame.model.file.SGFToken.*;
 
-public class FileHandler {
+public final class FileHandler {
     private static File currentFile;
+
+    private FileHandler() {
+        // This private constructor solely exists to prevent instantiation.
+    }
 
     public static boolean saveFile(Game game, File file, History history) {
         if(file == null) {
@@ -32,8 +36,9 @@ public class FileHandler {
             SGFToken t;
 
             try {
-                output.write(String.format(START.getValue() + "\n\n", game.getSize()));
-                output.write(String.format(HA.getValue() + "", game.getHandicap()));
+                output.write(String.format(START.getValue(), game.getSize()));
+                output.write( "\n\n");
+                output.write(String.format(HA.getValue(), game.getHandicap()));
 
                 history.stepForward();
                 node = history.getCurrentNode();
@@ -52,7 +57,6 @@ public class FileHandler {
                     writeAttributeSequence(output, history, node);
                 }
             } catch(IOException e) {
-                System.out.println("Couldn't write file header!");
                 return false;
             }
 
@@ -60,6 +64,8 @@ public class FileHandler {
 
             try {
                 for (;;) {
+                    output.write("\n");
+
                     switch (node.getSaveToken()) {
                         case SETUP:
                             if(node.getColor() == BLACK) {
@@ -68,7 +74,8 @@ public class FileHandler {
                                 t = AW;
                             }
 
-                            output.write(String.format("\n;" + t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+                            output.write(";");
+                            output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
 
                             writeAttributeSequence(output, history, node);
 
@@ -81,7 +88,7 @@ public class FileHandler {
                                 t = W;
                             }
 
-                            output.write(String.format("\n" + t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+                            output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
                             break;
 
                         case PASS:
@@ -91,7 +98,7 @@ public class FileHandler {
                                 t = W;
                             }
 
-                            output.write("\n" + String.format(t.getValue(), "")); // Passing is done by having an empty move.
+                            output.write(String.format(t.getValue(), "")); // Passing is done by having an empty move.
                             break;
 
                         case RESIGN:
@@ -120,12 +127,10 @@ public class FileHandler {
 
                 output.write("\n\n)");
             } catch (IOException e) {
-                System.out.println("File write Error");
                 return false;
             }
         } catch(IOException e) {
-            System.out.println("Couldn't open file output stream!");
-            e.printStackTrace();
+            ;
             return false;
         }
 
@@ -328,7 +333,7 @@ public class FileHandler {
                             throw new IOException("Line " + t.getLine() + ", col " + t.getCol() + ": This SGF file has multiple branches, a feature currently unsupported by this program.");
 
                         default:
-                            throw new IOException("Unsupported token \"" + t.getToken() + "\" read at line " + t.getLine() + ", col " + t.getCol());
+                            throw new IOException("Unsupported " + t);
                     }
                 }
             }
@@ -345,7 +350,7 @@ public class FileHandler {
 
         } catch(IOException e) {
             System.out.println("Couldn't properly read SGF file!");
-            e.printStackTrace();
+            ;
             return false;
         }
 
@@ -354,8 +359,8 @@ public class FileHandler {
         return true;
     }
 
-    private static void unexpected(String expected, ScannedToken actual) throws IOException {
-        throw new IOException("Expected " + expected + " but parsed " + actual.getToken().getValue() + " on line " + actual.getLine() + ", col " + actual.getCol());
+    private static void unexpected(String expectedToken, ScannedToken actualToken) throws IOException {
+        throw new IOException("Expected " + expectedToken + " but parsed " + actualToken);
     }
 
     /**

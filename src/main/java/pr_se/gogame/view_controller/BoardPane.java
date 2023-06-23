@@ -559,7 +559,7 @@ public class BoardPane extends GridPane {
             String errMsg = "Couldn't open graphics pack " + graphicsPath + "!";
             CustomExceptionDialog.show(e, errMsg);
             System.err.println(errMsg);
-            e.printStackTrace();
+            ;
         }
     }
 
@@ -581,7 +581,7 @@ public class BoardPane extends GridPane {
             String errMsg = "File " + fileName + " is not present in graphics pack " + graphicsPath + "!";
             CustomExceptionDialog.show(e, errMsg);
             System.err.println(errMsg);
-            e.printStackTrace();
+            ;
             return null;
         }
 
@@ -601,7 +601,7 @@ public class BoardPane extends GridPane {
             String errMsg = "File " + fileName + " appears to be present but unreadable in graphics pack " + graphicsPath + "!";
             CustomExceptionDialog.show(e, errMsg);
             System.err.println(errMsg);
-            e.printStackTrace();
+            ;
         }
 
         return ret;

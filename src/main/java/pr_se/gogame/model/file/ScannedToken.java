@@ -31,4 +31,9 @@ public class ScannedToken {
     public int getCol() {
         return col;
     }
+
+    @Override
+    public String toString() {
+        return "token \"" + String.format(token.getValue(), attributeValue) + "\" at line " + line + ", col " + col;
+    }
 }

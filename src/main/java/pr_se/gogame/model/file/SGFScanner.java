@@ -182,7 +182,7 @@ public class SGFScanner {
                 line++;
             }
         } catch(IOException e) {
-            e.printStackTrace();
+            ;
         }
     }
 }

@@ -61,8 +61,8 @@ public class Board implements BoardInterface {
         Set<Position> newStoneLiberties = getSurroundings(
             x,
             y,
-            sgp -> sgp == null,
-            (neighborX, neighborY) -> new Position(neighborX, neighborY)
+                Objects::isNull,
+                Position::new
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
@@ -70,7 +70,7 @@ public class Board implements BoardInterface {
         Set<StoneGroup> surroundingSGs = getSurroundings(
             x,
             y,
-            sgp -> sgp != null,
+                Objects::nonNull,
             (neighborX, neighborY) -> boardContents[neighborX][neighborY].getStoneGroup()
         );
 
@@ -89,7 +89,7 @@ public class Board implements BoardInterface {
         boolean killAnother = false;
         Set<StoneGroup> otherColorGroups = surroundingSGs.stream().filter(sg -> sg.getStoneColor() != color).collect(Collectors.toSet());
 
-        if (!prepareMode && newGroup.getLiberties().size() == 0 && (newGroup == firstSameColorGroup || firstSameColorGroup.getLiberties().size() == 1)) { // if adding this stone would take away all liberties from the group it's being added to
+        if (!prepareMode && newGroup.getLiberties().isEmpty() && (newGroup == firstSameColorGroup || firstSameColorGroup.getLiberties().size() == 1)) { // if adding this stone would take away all liberties from the group it's being added to
             if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)) { // if there are any groups of the opposite color with only one liberty, the attacker wins and the existing group is removed instead.
                 System.out.println("SUICIDE DETECTED!!!");
                 if (!game.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
@@ -110,22 +110,22 @@ public class Board implements BoardInterface {
         sameColorGroups.removeAll(otherColorGroups);
         sameColorGroups.remove(firstSameColorGroup);
 
-        final UndoableCommand UC01_ADD_NEW_TO_FIRST = (firstSameColorGroup != newGroup) ? (firstSameColorGroup.mergeWithStoneGroup(newGroup)) : (null);
-        subcommands.add(UC01_ADD_NEW_TO_FIRST);
+        final UndoableCommand uc01AddNewToFirst = (firstSameColorGroup != newGroup) ? (firstSameColorGroup.mergeWithStoneGroup(newGroup)) : (null);
+        subcommands.add(uc01AddNewToFirst);
 
         for(StoneGroup sg : sameColorGroups) {
             subcommands.add(firstSameColorGroup.mergeWithStoneGroup(sg));
         }
 
-        final UndoableCommand UC03_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES = firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
-        subcommands.add(UC03_REMOVE_NEW_POS_FROM_FIRST_LIBERTIES);
+        final UndoableCommand uc02RemoveNewPosFromFirstLiberties = firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
+        subcommands.add(uc02RemoveNewPosFromFirstLiberties);
 
         for(StoneGroup sg : otherColorGroups) {
             subcommands.add(sg.removeLiberty(new Position(x, y)));
         }
 
         final boolean FINAL_PERMITTED_SUICIDE = permittedSuicide;
-        final UndoableCommand UC05_PLACE_POINTER = new UndoableCommand() {
+        final UndoableCommand uc03PlacePointer = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
                 if (!FINAL_PERMITTED_SUICIDE) {
@@ -141,14 +141,14 @@ public class Board implements BoardInterface {
                 boardContents[x][y] = null;
             }
         };
-        UC05_PLACE_POINTER.execute(true);
-        subcommands.add(UC05_PLACE_POINTER);
+        uc03PlacePointer.execute(true);
+        subcommands.add(uc03PlacePointer);
 
         final boolean FINAL_KILL_ANOTHER = killAnother;
         final boolean PREPARE_MODE = prepareMode;
         final StoneColor COLOR = color;
 
-        final UndoableCommand UC06_REMOVE_CAPTURED_STONES = new UndoableCommand() {
+        final UndoableCommand uc04RemoveCapturedStones = new UndoableCommand() {
             final LinkedList<UndoableCommand> UC06_01_REMOVE_STONE_COMMANDS = new LinkedList<>();
             UndoableCommand uC06_02_addCapturedStonesCommand = null;
 
@@ -191,8 +191,8 @@ public class Board implements BoardInterface {
                 }
             }
         };
-        UC06_REMOVE_CAPTURED_STONES.execute(true);
-        subcommands.add(UC06_REMOVE_CAPTURED_STONES);
+        uc04RemoveCapturedStones.execute(true);
+        subcommands.add(uc04RemoveCapturedStones);
 
         final List<UndoableCommand> SUBCOMMANDS = Collections.unmodifiableList(subcommands);
 
@@ -219,8 +219,8 @@ public class Board implements BoardInterface {
             }
         };
         // No execute() this time, as we've already executed the subcommands piecemeal.
-        ret.getExecuteEvents().addAll(UC06_REMOVE_CAPTURED_STONES.getExecuteEvents());
-        ret.getUndoEvents().addAll(UC06_REMOVE_CAPTURED_STONES.getUndoEvents());
+        ret.getExecuteEvents().addAll(uc04RemoveCapturedStones.getExecuteEvents());
+        ret.getUndoEvents().addAll(uc04RemoveCapturedStones.getUndoEvents());
 
         return ret;
     }
@@ -242,7 +242,7 @@ public class Board implements BoardInterface {
                 Set<StoneGroup> surroundingSGs = getSurroundings(
                     x,
                     y,
-                    sgp -> sgp != null,
+                        Objects::nonNull,
                     (neighborX, neighborY) -> boardContents[neighborX][neighborY].getStoneGroup()
                 );
                 for (StoneGroup sg : surroundingSGs) {
@@ -346,7 +346,6 @@ public class Board implements BoardInterface {
      * Tests whether these x and y coordinates are outside the bounds of the playing field
      * @param x x coordinate starting at the left
      * @param y y coordinate starting at the top
-     * @return whether these x and y coordinates are outside the playing field.
      */
     private void checkXYCoordinates(int x, int y) throws IllegalArgumentException {
         if(x < 0 || y < 0 || x >= size || y >= size) {

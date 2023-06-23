@@ -61,7 +61,7 @@ public class HeaderPane extends VBox {
 
     private final List<Button> playbackControlList = new ArrayList<>();
 
-    private final List<Button> gameShortCardList = new ArrayList<>();
+    private final List<Button> gameShortCutList = new ArrayList<>();
 
     private final List<MenuItem> gameSectionItems = new ArrayList<>();
 
@@ -124,7 +124,7 @@ public class HeaderPane extends VBox {
         importFileItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
-            File f = CustomFileDialog.getFile(stage, false, filterList);//fileDialog(false, filterList);
+            File f = CustomFileDialog.getFile(stage, false, filterList);
             if (f == null) {
                 System.out.println("Import Dialog cancelled");
             } else if(!game.loadGame(f)) {
@@ -157,6 +157,7 @@ public class HeaderPane extends VBox {
                     exportFileItem.setDisable(true);
                     exportFileItemAs.setDisable(true);
                 }
+                default -> {}
             }
         });
 
@@ -192,7 +193,7 @@ public class HeaderPane extends VBox {
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
         moveConfirmationRequired.setOnAction(e -> {
-            var k = this.gameShortCardList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
+            var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
             if (moveConfirmationRequired.isSelected()) {
                 k.ifPresent(button -> button.setVisible(true));
                 GlobalSettings.setConfirmationNeeded(true);
@@ -221,13 +222,14 @@ public class HeaderPane extends VBox {
         menu.getItems().addAll(gameSectionItems);
         gameSectionItems.forEach(e -> e.setDisable(true));
 
-        game.addListener(l -> {
-            switch (l.getGameCommand()) {
+        game.addListener(e -> {
+            switch (e.getGameCommand()) {
                 case INIT, GAME_WON ->
-                    gameSectionItems.stream().filter(e -> !e.isDisable()).forEach(e -> e.setDisable(true));
+                    gameSectionItems.stream().filter(menuItem -> !menuItem.isDisable()).forEach(menuItem -> menuItem.setDisable(true));
 
                 case NEW_GAME, UPDATE ->
-                    gameSectionItems.stream().filter(MenuItem::isDisable).forEach(e -> e.setDisable(false));
+                    gameSectionItems.stream().filter(MenuItem::isDisable).forEach(menuItem -> menuItem.setDisable(false));
+                default -> {}
             }
 
         });
@@ -356,7 +358,6 @@ public class HeaderPane extends VBox {
         fastForward.setOnAction(e -> game.fastForward());
 
         playbackControl.getChildren().addAll(playbackControlList);
-        /*playbackControlList.forEach(e -> e.setDisable(true));*/
 
         //Key Bindings for the playback control
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F), () -> {
@@ -393,31 +394,32 @@ public class HeaderPane extends VBox {
         Button pass = new Button("Pass");
         pass.setFocusTraversable(false);
         pass.setOnAction(e -> game.pass());
-        gameShortCardList.add(pass);
+        gameShortCutList.add(pass);
 
         Button resign = new Button("Resign");
         resign.setFocusTraversable(false);
         resign.setOnAction(e -> game.resign());
-        gameShortCardList.add(resign);
+        gameShortCutList.add(resign);
 
         Button scoreGame = new Button("Score Game");
         scoreGame.setFocusTraversable(false);
         scoreGame.setOnAction(e -> game.scoreGame());
-        gameShortCardList.add(scoreGame);
+        gameShortCutList.add(scoreGame);
 
         Button confirm = new Button("Confirm");
         confirm.setFocusTraversable(false);
         confirm.setVisible(GlobalSettings.isConfirmationNeeded());
         confirm.setOnAction(e -> GlobalSettings.confirmMove());
-        gameShortCardList.add(confirm);
+        gameShortCutList.add(confirm);
 
-        gameShortCuts.getChildren().addAll(gameShortCardList);
-        gameShortCardList.forEach(e -> e.setDisable(true));
+        gameShortCuts.getChildren().addAll(gameShortCutList);
+        gameShortCutList.forEach(e -> e.setDisable(true));
 
-        game.addListener(l -> {
-            switch (l.getGameCommand()){
-                case INIT, GAME_WON -> gameShortCardList.forEach(e -> e.setDisable(true));
-                case NEW_GAME, UPDATE -> gameShortCardList.forEach(e -> e.setDisable(false));
+        game.addListener(e -> {
+            switch (e.getGameCommand()){
+                case INIT, GAME_WON -> gameShortCutList.forEach(button -> button.setDisable(true));
+                case NEW_GAME, UPDATE -> gameShortCutList.forEach(button -> button.setDisable(false));
+                default -> {}
             }
         });
 
@@ -427,12 +429,7 @@ public class HeaderPane extends VBox {
         // Create combo box for selecting graphics packs
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList();
         File graphicsFolder = new File(GlobalSettings.GRAPHICS_PACK_FOLDER);
-        FileFilter zipFilter = new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                return pathname.getName().toLowerCase().endsWith(".zip");
-            }
-        };
+        FileFilter zipFilter = pathname -> pathname.getName().toLowerCase().endsWith(".zip");
         for(File f : graphicsFolder.listFiles(zipFilter)) {
             if(f.isFile()) { // We still need to check this because you could have a folder whose name ends with ".zip".
                 comboBoxItems.add(f.getName());
