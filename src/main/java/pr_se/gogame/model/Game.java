@@ -226,8 +226,12 @@ public class Game implements GameInterface {
      */
     @Override
     public void setHandicapStoneCounter(int noStones) {
-        if((noStones < 0 && noStones != -1)) {
-            throw new IllegalArgumentException();
+        /*
+         * A value greater than the actual handicap is allowed, as this counter is not only used for setting stones,
+         * but also positions (i.e., slots).
+         */
+        if(noStones < 0 || noStones > MAX_HANDICAP_AMOUNT) {
+            throw new IllegalArgumentException("Invalid handicap of " + noStones);
         }
 
         handicapStoneCounter = noStones;
@@ -398,11 +402,11 @@ public class Game implements GameInterface {
         handicapStoneCounter--;
         final int NEW_HANDICAP_CTR = handicapStoneCounter;
 
-        if(placeStone) {
-            if (OLD_HANDICAP_CTR <= 0) {
-                throw new IllegalStateException("Can't place any more handicap stones!");
-            }
+        if (OLD_HANDICAP_CTR <= 0) {
+            throw new IllegalStateException("Can't place any more handicap stones or positions!");
+        }
 
+        if(placeStone) {
             final UndoableCommand UC01_SET_STONE = board.setStone(x, y, curColor, true); // UC01_SET_STONE is already executed within board.setStone().
 
             if(UC01_SET_STONE == null) {

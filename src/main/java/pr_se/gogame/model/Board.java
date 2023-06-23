@@ -17,17 +17,17 @@ public class Board implements BoardInterface {
     /**
      * the Game that this Board belongs to
      */
-    private final Game GAME;
+    private final Game game;
 
     /**
      * the number of rows and columns of this board
      */
-    private final int SIZE;
+    private final int size;
 
     /**
      * the actual board
      */
-    private final StoneGroupPointer[][] board;
+    private final StoneGroupPointer[][] boardContents;
 
     private int lastDebugX = -1;
     private int lastDebugY = -1;
@@ -40,22 +40,20 @@ public class Board implements BoardInterface {
      * @param size
      */
     public Board(Game game, int size) {
-        this.GAME = game;
-        this.SIZE = size;
-        this.board = new StoneGroupPointer[SIZE][SIZE];
+        this.game = game;
+        this.size = size;
+        this.boardContents = new StoneGroupPointer[this.size][this.size];
     }
 
     @Override
     public UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode) {
-        if (areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
-        }
+        checkXYCoordinates(x, y);
 
         if(color == null) {
             throw new NullPointerException();
         }
 
-        if (board[x][y] != null) {
+        if (boardContents[x][y] != null) {
             return null;
         }
 
@@ -63,7 +61,7 @@ public class Board implements BoardInterface {
         Set<Position> newStoneLiberties = getSurroundings(
             x,
             y,
-            (sgp) -> sgp == null,
+            sgp -> sgp == null,
             (neighborX, neighborY) -> new Position(neighborX, neighborY)
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
@@ -72,8 +70,8 @@ public class Board implements BoardInterface {
         Set<StoneGroup> surroundingSGs = getSurroundings(
             x,
             y,
-            (sgp) -> sgp != null,
-            (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+            sgp -> sgp != null,
+            (neighborX, neighborY) -> boardContents[neighborX][neighborY].getStoneGroup()
         );
 
         /*
@@ -94,7 +92,7 @@ public class Board implements BoardInterface {
         if (!prepareMode && newGroup.getLiberties().size() == 0 && (newGroup == firstSameColorGroup || firstSameColorGroup.getLiberties().size() == 1)) { // if adding this stone would take away all liberties from the group it's being added to
             if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)) { // if there are any groups of the opposite color with only one liberty, the attacker wins and the existing group is removed instead.
                 System.out.println("SUICIDE DETECTED!!!");
-                if (!GAME.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
+                if (!game.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
                     return null;
                 }
                 System.out.println("Suicide permitted.");
@@ -131,7 +129,7 @@ public class Board implements BoardInterface {
             @Override
             public void execute(boolean saveEffects) {
                 if (!FINAL_PERMITTED_SUICIDE) {
-                    board[x][y] =
+                    boardContents[x][y] =
                         firstSameColorGroup.getPointers().stream()
                             .findFirst()
                             .orElseGet(() -> new StoneGroupPointer(newGroup));
@@ -140,7 +138,7 @@ public class Board implements BoardInterface {
 
             @Override
             public void undo() {
-                board[x][y] = null;
+                boardContents[x][y] = null;
             }
         };
         UC05_PLACE_POINTER.execute(true);
@@ -170,15 +168,15 @@ public class Board implements BoardInterface {
                                 }
                                 captured++;
                             }
-                            uC06_02_addCapturedStonesCommand = GAME.addCapturedStones(COLOR, captured);
+                            uC06_02_addCapturedStonesCommand = game.addCapturedStones(COLOR, captured);
                         }
                     }
                 }
 
                 // Update UI if possible
                 if (!FINAL_PERMITTED_SUICIDE && saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, COLOR, GAME.getCurMoveNumber()));
-                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, GAME.getCurMoveNumber()));
+                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, COLOR, game.getCurMoveNumber()));
+                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
                 }
             }
 
@@ -229,11 +227,9 @@ public class Board implements BoardInterface {
 
     @Override
     public UndoableCommand removeStone(int x, int y) {
-        if(areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
-        }
+        checkXYCoordinates(x, y);
 
-        final StoneGroupPointer BOARD_AT_XY_PREVIOUSLY = board[x][y];
+        final StoneGroupPointer BOARD_AT_XY_PREVIOUSLY = boardContents[x][y];
 
         UndoableCommand ret = new UndoableCommand() {
 
@@ -241,13 +237,13 @@ public class Board implements BoardInterface {
 
             @Override
             public void execute(boolean saveEffects) {
-                board[x][y] = null;
+                boardContents[x][y] = null;
 
                 Set<StoneGroup> surroundingSGs = getSurroundings(
                     x,
                     y,
-                    (sgp) -> sgp != null,
-                    (neighborX, neighborY) -> board[neighborX][neighborY].getStoneGroup()
+                    sgp -> sgp != null,
+                    (neighborX, neighborY) -> boardContents[neighborX][neighborY].getStoneGroup()
                 );
                 for (StoneGroup sg : surroundingSGs) {
                     ADD_LIBERTY_COMMANDS.add(sg.addLiberty(new Position(x, y)));
@@ -255,14 +251,14 @@ public class Board implements BoardInterface {
 
                 // Update UI
                 if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, GAME.getCurMoveNumber()));
-                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, BOARD_AT_XY_PREVIOUSLY.getStoneGroup().getStoneColor(), GAME.getCurMoveNumber()));
+                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
+                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, BOARD_AT_XY_PREVIOUSLY.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
                 }
             }
 
             @Override
             public void undo() {
-                board[x][y] = BOARD_AT_XY_PREVIOUSLY;
+                boardContents[x][y] = BOARD_AT_XY_PREVIOUSLY;
 
                 for(UndoableCommand c : ADD_LIBERTY_COMMANDS) {
                     c.undo();
@@ -287,22 +283,20 @@ public class Board implements BoardInterface {
      * @return a Set of at most four unique elements converted by conversion that are above, below, to the left and right of the provided x and y coordinate and fulfill check
      */
     private Set getSurroundings(int x, int y, Predicate<StoneGroupPointer> check, BiFunction<Integer, Integer, ?> conversion) {
-        if (areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
-        }
+        checkXYCoordinates(x, y);
 
         Set surroundings = new HashSet<>();
 
-        if (y > 0 && check.test(board[x][y - 1])) {
+        if (y > 0 && check.test(boardContents[x][y - 1])) {
             surroundings.add(conversion.apply(x, y - 1));
         }
-        if (y < SIZE - 1 && check.test(board[x][y + 1])) {
+        if (y < size - 1 && check.test(boardContents[x][y + 1])) {
             surroundings.add(conversion.apply(x, y + 1));
         }
-        if (x > 0 && check.test(board[x - 1][y])) {
+        if (x > 0 && check.test(boardContents[x - 1][y])) {
             surroundings.add(conversion.apply(x - 1, y));
         }
-        if (x < SIZE - 1 && check.test(board[x + 1][y])) {
+        if (x < size - 1 && check.test(boardContents[x + 1][y])) {
             surroundings.add(conversion.apply(x + 1, y));
         }
 
@@ -312,17 +306,15 @@ public class Board implements BoardInterface {
     // Getters and Setters
     @Override
     public int getSize() {
-        return SIZE;
+        return size;
     }
 
     @Override
     public StoneColor getColorAt(int x, int y) {
-        if(areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
-        }
+        checkXYCoordinates(x, y);
 
-        if (board[x][y] != null) {
-            return board[x][y].getStoneGroup().getStoneColor();
+        if (boardContents[x][y] != null) {
+            return boardContents[x][y].getStoneGroup().getStoneColor();
         } else {
             return null;
         }
@@ -330,20 +322,18 @@ public class Board implements BoardInterface {
 
     // TODO: Remove these debug methods
     public void printDebugInfo(int x, int y) {
-        if(areInvalidXYCoordinates(x, y)) {
-            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board");
-        }
+        checkXYCoordinates(x, y);
 
-        if (board[x][y] != null && !(x == lastDebugX && y == lastDebugY)) {
+        if (boardContents[x][y] != null && !(x == lastDebugX && y == lastDebugY)) {
             System.out.println("Group at " + x + ", " + y + ":");
-            System.out.println("Liberties: " + board[x][y].getStoneGroup().getLiberties().size());
+            System.out.println("Liberties: " + boardContents[x][y].getStoneGroup().getLiberties().size());
         }
 
-        for (int i = 0; i < SIZE; i++) {
-            for (int j = 0; j < SIZE; j++) {
-                if (board[i][j] != null) {
-                    DebugEvent e = new DebugEvent(i, j, board[i][j].serialNo, board[i][j].getStoneGroup().serialNo);
-                    GAME.fireGameEvent(e);
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                if (boardContents[i][j] != null) {
+                    DebugEvent e = new DebugEvent(i, j, boardContents[i][j].serialNo, boardContents[i][j].getStoneGroup().serialNo);
+                    game.fireGameEvent(e);
                 }
             }
         }
@@ -358,7 +348,9 @@ public class Board implements BoardInterface {
      * @param y y coordinate starting at the top
      * @return whether these x and y coordinates are outside the playing field.
      */
-    private boolean areInvalidXYCoordinates(int x, int y) {
-        return x < 0 || y < 0 || x >= SIZE || y >= SIZE;
+    private void checkXYCoordinates(int x, int y) throws IllegalArgumentException {
+        if(x < 0 || y < 0 || x >= size || y >= size) {
+            throw new IllegalArgumentException("Coordinates X=" + x + ", Y=" + y + " are out of bounds for board.");
+        }
     }
 }

@@ -65,8 +65,8 @@ public class GoApplication extends Application {
 
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
-        stage.setMinHeight(HEIGHT + 40);
-        stage.setMinWidth(WIDTH + 20);
+        stage.setMinHeight(HEIGHT + 40.0);
+        stage.setMinWidth(WIDTH + 20.0);
 
         stage.setScene(scene);
         BoardPane bp = new BoardPane(game);

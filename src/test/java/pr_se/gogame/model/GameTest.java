@@ -88,7 +88,8 @@ class GameTest {
 
     @Test
     void setHandicapStoneCounterArguments() {
-        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(game.getHandicap() + 1));
+        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(Game.MAX_HANDICAP_AMOUNT + 1));
+        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(Game.MIN_HANDICAP_AMOUNT - 1));
     }
 
     @Test
@@ -160,7 +161,7 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
         GameState prevState = game.getGameState();
-        assertEquals(UPDATE, prevState);
+        assertEquals(GameState.RUNNING, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
@@ -267,9 +268,9 @@ class GameTest {
 
     @Test
     void getGameState() {
-        assertEquals(UPDATE, game.getGameState());
+        assertEquals(GameState.RUNNING, game.getGameState());
         game.playMove(0, 0);
-        assertEquals(UPDATE, game.getGameState());
+        assertEquals(GameState.RUNNING, game.getGameState());
     }
 
     @Test
@@ -302,14 +303,9 @@ class GameTest {
 
     @Test
     void setHandicapStoneCounter() {
-        game.newGame(BLACK, 19, 8, new JapaneseRuleset());
-        game.setHandicapStoneCounter(8);
-        assertEquals(8, game.getHandicapStoneCounter());
-    }
-
-    @Test
-    void getHandicapStoneCounter() {
-        assertEquals(-1, game.getHandicapStoneCounter());
+        game.setHandicapStoneCounter(1);
+        assertDoesNotThrow(() -> game.placeHandicapPosition(0, 0, false));
+        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(0, 0, false));
     }
 
     @Test
@@ -340,6 +336,7 @@ class GameTest {
     @Test
     void newGameWithHandicap() {
         game.newGame(BLACK, 19, 3, new JapaneseRuleset());
+        assertEquals(WHITE, game.getCurColor());
     }
 
     @Test
@@ -420,9 +417,9 @@ class GameTest {
         assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(1, 1, true));
     }
 
-    /*@Test
+    @Test
     void dontPlayAfterGameIsOver() {
         game.resign();
         assertThrows(IllegalStateException.class, () -> game.playMove(0, 0));
-    }*/
+    }
 }

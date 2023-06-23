@@ -288,7 +288,6 @@ public class SidePane extends StackPane {
         startGameBtn.setText("Start game");
         startGameBtn.setAlignment(Pos.BOTTOM_RIGHT);
         startGameBtn.setOnAction(event -> {
-            //this.getChildren().remove(gridPane);
             RadioButton selected = (RadioButton) boardSize.getSelectedToggle();
             int handicap = handicapIntFactory.getValue();
             int actualBoardSize;

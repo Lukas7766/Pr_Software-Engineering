@@ -614,7 +614,7 @@ public class BoardPane extends GridPane {
         for(int i = 0; i < 4; i++) {
             BoardCell bc = (BoardCell)getChildren().get(i);
             bc.updateImages(outerCorner);
-            bc.getTile().setRotate(90 * i);
+            bc.getTile().setRotate(90.0 * i);
         }
 
         for(int i = 0; i < size; i++) {
@@ -622,7 +622,7 @@ public class BoardPane extends GridPane {
             for(int j = 0; j < 4; j++) {
                 BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
                 bc.updateImages(outerEdge);
-                bc.getTile().setRotate(90 * (j % 2));
+                bc.getTile().setRotate(90.0 * (j % 2));
             }
             // center
             for(int j = 0; j < size; j++) {
@@ -731,7 +731,7 @@ public class BoardPane extends GridPane {
         /**
          * Sets the text color of this BoardCell's label to the inverse of its background tile's center color
          */
-        private void updateLabelColor() {
+        protected void updateLabelColor() {
             Image bgImg = TILE.getImage();
 
             PixelReader p = bgImg.getPixelReader();
@@ -1243,7 +1243,8 @@ public class BoardPane extends GridPane {
          * Sets the text color of this PlayableBoardCell's label to the inverse of the center color of the stone that
          * is currently set.
          */
-        private void updateLabelColor() {
+        @Override
+        protected void updateLabelColor() {
             if(currentlySetStone != null) {
                 PixelReader p = currentlySetStone.getImage().getPixelReader();
                 if(p == null) {
