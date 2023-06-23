@@ -99,7 +99,6 @@ public class Game implements GameInterface {
         this.board = new Board(this, size);
         this.ruleset.reset();
         fireGameEvent(new GameEvent(GameCommand.NEW_GAME));
-        // this.gameCommand = GameCommand.UPDATE;
 
         int tempHandicap = 0;
         if(letRulesetPlaceHandicapStones) {
@@ -142,7 +141,6 @@ public class Game implements GameInterface {
 
     @Override
     public void resign() {
-        // TODO: Replace with simple boolean isRunning (or even its own enum, but GameCommand doesn't quite work).
         if(gameState != GameState.RUNNING) {
             throw new IllegalStateException("Can't score game if it isn't running! gameState was + " + gameState);
         }
@@ -710,7 +708,6 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(GameCommand.UPDATE));
     }
 
-    // TODO: Have this affect the history and, consequently, the file saver.
     @Override
     public void mark(int x, int y, MarkShape shape) {
         history.getCurrentNode().addMark(x, y, shape);

@@ -42,7 +42,7 @@ public class History {
         if(current.getNext() != null) {
             current = current.getNext();
             current.getCommand().execute(false);
-            current.getCommand().getExecuteEvents().forEach(e -> game.fireGameEvent(e));
+            current.getCommand().getExecuteEvents().forEach(game::fireGameEvent);
 
             return true;
         }

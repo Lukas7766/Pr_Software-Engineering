@@ -22,7 +22,7 @@ public class AncientChineseRuleset implements Ruleset {
         }
 
         final int LAST_BOARD_HASH = lastBoardHash;
-        final int NEW_BOARD_HASH = Arrays.hashCode(boardColor);
+        final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
 
         if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
             return null;

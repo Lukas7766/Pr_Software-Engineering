@@ -7,15 +7,10 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
-
-import java.util.HashSet;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class contains the controller and view function of the game information panel.<br>
@@ -27,15 +22,6 @@ public class SidePane extends StackPane {
      * instance of actual game
      */
     private final Game game;
-    /**
-     * list of file extension filters for file chooser/saver
-     */
-    private final HashSet<FileChooser.ExtensionFilter> filterList;
-
-    /**
-     * stage of application
-     */
-    private final Stage stage;
 
     /**
      * Constructor to create a SidePane
@@ -44,9 +30,6 @@ public class SidePane extends StackPane {
      */
     public SidePane(Color backColor, Stage stage, Game game) {
         this.game = game;
-        this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
-                .collect(Collectors.toCollection(HashSet::new));
-        this.stage = stage;
         this.setBackground(new Background(new BackgroundFill(backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
         this.setMinWidth(250);
         setPadding(new Insets(5, 5, 5, 5)); //top, right, bottom, left
@@ -84,7 +67,7 @@ public class SidePane extends StackPane {
     }
 
     /**
-     * GameInfomation contains a mechanism to show relevant information based on current GameCommand <br>
+     * GameInformation contains a mechanism to show relevant information based on current GameCommand <br>
      * contains at least: <br>
      * -> Game Board <br>
      * -> Turn Explanation <br>

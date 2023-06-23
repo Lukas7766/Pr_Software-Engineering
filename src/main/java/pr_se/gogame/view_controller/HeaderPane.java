@@ -439,7 +439,7 @@ public class HeaderPane extends VBox {
             }
         }
 
-        ComboBox graphicsPackSelectorComboBox = new ComboBox(comboBoxItems);
+        ComboBox<String> graphicsPackSelectorComboBox = new ComboBox<>(comboBoxItems);
         graphicsPackSelectorComboBox.setValue("default.zip");
         graphicsPackSelectorComboBox.setTooltip(new Tooltip("Select the graphics pack zip file."));
         graphicsPackSelectorComboBox.setMinWidth(125);

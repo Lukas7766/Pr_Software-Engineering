@@ -53,7 +53,7 @@ public interface GameInterface {
      * @param x the x coordinate of the stone, starting at the left
      * @param y the y coordinate of the stone, starting at the top
      */
-    void playMove(int x, int y); // TODO: Maybe return boolean for move successful/unsuccessful?
+    void playMove(int x, int y);
 
     void playMove(int x, int y, StoneColor color);
 

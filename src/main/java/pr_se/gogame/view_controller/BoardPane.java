@@ -578,6 +578,7 @@ public class BoardPane extends GridPane {
             CustomExceptionDialog.show(e, errMsg);
             System.err.println(errMsg);
             e.printStackTrace();
+            return null;
         }
 
         Image ret = null;

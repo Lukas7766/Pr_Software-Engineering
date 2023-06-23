@@ -9,7 +9,7 @@ import java.util.List;
 public class JapaneseRuleset implements Ruleset {
 
     /**
-     * This helps to determine if a position is already visited by the floodfill algorithm.
+     * This helps to determine if a position is already visited by the flood fill algorithm.
      */
     private boolean[][] visited;
 
@@ -68,7 +68,7 @@ public class JapaneseRuleset implements Ruleset {
 
     /**
      * Calculates the score of the game based on the Japanese ruleset. This is done by calculating the territory of each player.
-     * The player with the most territory wins. Territory is calculated by using the floodfill algorithm.
+     * The player with the most territory wins. Territory is calculated by using the flood fill algorithm.
      * Handicap is added to Black's score count.
      * Komi is added to White's score count.
      *
@@ -94,10 +94,10 @@ public class JapaneseRuleset implements Ruleset {
         double scoreWhite = capturedStonesWhite + territoryScoreWhite + komi;
 
         StringBuilder sb = new StringBuilder();
-        StoneColor winner = null;
-        int captStone = 0;
-        int trScore = 0;
-        double sc = 0;
+        StoneColor winner;
+        int captStone;
+        int trScore;
+        double sc;
 
         if (scoreBlack > scoreWhite) {
             winner = StoneColor.BLACK;
