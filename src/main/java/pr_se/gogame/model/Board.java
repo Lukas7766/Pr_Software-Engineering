@@ -131,7 +131,6 @@ public class Board implements BoardInterface {
             @Override
             public void execute(boolean saveEffects) {
                 if (!FINAL_PERMITTED_SUICIDE) {
-                    System.out.println("Placing " + color + " stone down at " + x + ", " + y);
                     board[x][y] =
                         firstSameColorGroup.getPointers().stream()
                             .findFirst()
@@ -193,8 +192,6 @@ public class Board implements BoardInterface {
                 if(uC06_02_addCapturedStonesCommand != null) {
                     uC06_02_addCapturedStonesCommand.undo();
                 }
-
-                System.out.println("Removing the stone");
             }
         };
         UC06_REMOVE_CAPTURED_STONES.execute(true);

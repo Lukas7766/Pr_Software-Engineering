@@ -474,6 +474,10 @@ public class BoardPane extends GridPane {
     }
 
     public void setMoveConfirmation(boolean needsMoveConfirmation) {
+        if(!needsMoveConfirmation && selectionPBC != null) {
+            selectionPBC.deselect();
+            selectionPBC = null;
+        }
         this.needsMoveConfirmation = needsMoveConfirmation;
     }
 

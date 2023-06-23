@@ -269,9 +269,7 @@ public class FileHandler {
                                 game.commentCurrentMove(currentComment);
                             }
                             currentComment = null;
-                            for(Map.Entry<Position, MarkShape> e : marks.entrySet()) {
-                                game.mark(e.getKey().X, e.getKey().Y, e.getValue());
-                            }
+                            marks.entrySet().forEach((e) -> game.mark(e.getKey().X, e.getKey().Y, e.getValue()));
                             marks = new LinkedHashMap<>();
                             if(t.getToken() == SEMICOLON) {
                                 break;

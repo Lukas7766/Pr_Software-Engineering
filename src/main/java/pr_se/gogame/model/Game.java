@@ -472,7 +472,6 @@ public class Game implements GameInterface {
             history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.HANDICAP, col, x, y, "placeHandicapPosition(" + x + ", " + y + ")"));
 
             for(GameEvent e : c.getExecuteEvents()) {
-                System.out.println(e);
                 fireGameEvent(e);
             }
 
@@ -509,7 +508,6 @@ public class Game implements GameInterface {
         history.addNode(new HistoryNode(UC01_SET_STONE, HistoryNode.AbstractSaveToken.SETUP, color, x, y, "placeSetupStone(" + x + ", " + y + ")"));
 
         for(GameEvent e : UC01_SET_STONE.getExecuteEvents()) {
-            System.out.println(e);
             fireGameEvent(e);
         }
     }
