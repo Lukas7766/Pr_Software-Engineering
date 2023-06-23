@@ -15,7 +15,7 @@ public class CustomExceptionDialog {
     /**
      * The stage to which the dialog is attached.
      */
-    public static Stage stage;
+    private static Stage stage;
 
     /**
      * Creates a customised Exception Dialog
@@ -64,5 +64,13 @@ public class CustomExceptionDialog {
         alert.getDialogPane().setExpandableContent(expContent);
 
         alert.showAndWait();
+    }
+
+    public static Stage getStage() {
+        return stage;
+    }
+
+    public static void setStage(Stage stage) {
+        CustomExceptionDialog.stage = stage;
     }
 }

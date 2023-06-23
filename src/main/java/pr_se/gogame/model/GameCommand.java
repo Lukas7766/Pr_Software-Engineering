@@ -14,5 +14,10 @@ public enum GameCommand {
     MARK_SQUARE,
     MARK_TRIANGLE,
     UNMARK,
-    DEBUG_INFO          // Used to trigger debug output; TODO: might be removed
+    DEBUG_INFO;          // Used to trigger debug output; TODO: might be removed
+
+    @Override
+    public String toString() {
+        return "GameCommand " + this;
+    }
 }

@@ -6,13 +6,14 @@ import java.io.IOException;
 import static pr_se.gogame.model.file.SGFToken.*;
 
 public class SGFScanner {
-    private static final char eof = (char)-1;
+    private static final char EOF = (char)-1;
 
     private final FileReader input;
 
     private char ch;
 
-    private int col = 0, line = 1;
+    private int col = 0;
+    private int line = 1;
 
     public SGFScanner(FileReader input) {
         this.input = input;
@@ -120,7 +121,7 @@ public class SGFScanner {
                 break;
 
             case (char)-1:
-                t = EOF;
+                t = SGFToken.EOF;
                 break;
 
             default:
@@ -136,9 +137,9 @@ public class SGFScanner {
 
     /**
      * Scans the attribute string while doing some pre-conversions as per the most permissive value type "Text".
-     * See https://www.red-bean.com/sgf/sgf4.html#text for more information.
+     * See <a href="https://www.red-bean.com/sgf/sgf4.html#text">...</a> for more information.
      * @return An pre-formatted attribute string
-     * @throws IOException
+     * @throws IOException if reading from the file fails or an unexpected character is read
      */
     private String getAttribute() throws IOException {
         if(ch != '[') {
@@ -146,7 +147,7 @@ public class SGFScanner {
         }
         getNextChar();
         StringBuilder attributeSB = new StringBuilder();
-        while(ch != ']' && ch != eof) {
+        while(ch != ']' && ch != EOF) {
             if(ch == '\\') {
                 getNextChar();
                 if(ch == '\n') {

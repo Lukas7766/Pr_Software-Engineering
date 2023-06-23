@@ -25,10 +25,10 @@ public class GoApplication extends Application {
         //Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
         //    CustomExceptionDialog.show(e);
         //});
-        CustomExceptionDialog.stage = stage;
+        CustomExceptionDialog.setStage(stage);
 
         // Generate the necessary folder and extract the default the graphics pack if it is not present.
-        String graphicsDir = GlobalSettings.graphicsPackFolder;
+        String graphicsDir = GlobalSettings.GRAPHICS_PACK_FOLDER;
         String graphicsPack = GlobalSettings.getGraphicsPack();
         Path path = Paths.get(GlobalSettings.getGraphicsPath());
         if(Files.notExists(path, LinkOption.NOFOLLOW_LINKS)) {

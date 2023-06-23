@@ -41,12 +41,8 @@ public class HistoryNode {
     private final Map<Position, MarkShape> marks = new LinkedHashMap<>();
 
     public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, String comment) {
-        if(comment == null) {
-            throw new NullPointerException("Comment must at least be an empty string!");
-        }
-
         this.command = command;
-        this.comment = comment;
+        setComment(comment);
         this.saveToken = saveToken;
         this.color = color;
         this.X = -1;
@@ -54,15 +50,12 @@ public class HistoryNode {
     }
 
     public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, int x, int y, String comment) {
-        if(comment == null) {
-            throw new NullPointerException("Comment must at least be an empty string!");
-        }
         this.command = command;
-        this.comment = comment;
+        setComment(comment);
         this.saveToken = saveToken;
         this.color = color;
-        X = x;
-        Y = y;
+        this.X = x;
+        this.Y = y;
     }
 
     public UndoableCommand getCommand() {

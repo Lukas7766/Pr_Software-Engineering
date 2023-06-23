@@ -1,5 +1,6 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.GameListener;
 

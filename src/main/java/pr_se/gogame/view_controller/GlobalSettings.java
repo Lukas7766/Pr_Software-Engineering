@@ -12,7 +12,7 @@ public class GlobalSettings {
 
     private static boolean showCoordinates = true;
 
-    public static final String graphicsPackFolder = "./Grafiksets";
+    public static final String GRAPHICS_PACK_FOLDER = "./Grafiksets";
 
     private static String graphicsPack = "/default.zip";
 
@@ -71,7 +71,7 @@ public class GlobalSettings {
     }
 
     public static String getGraphicsPath() {
-        return graphicsPackFolder + graphicsPack;
+        return GRAPHICS_PACK_FOLDER + graphicsPack;
     }
 
     public static String getGraphicsPack() {

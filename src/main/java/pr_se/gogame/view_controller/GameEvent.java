@@ -23,7 +23,7 @@ public class GameEvent {
         }
 
         if(hasPosition()) {
-            throw new IllegalArgumentException("GameCommand " + gameCommand + " is incompatible with GameCommand-only constructor.");
+            throw new IllegalArgumentException(gameCommand + " is incompatible with GameCommand-only constructor.");
         }
 
         this.gameCommand = gameCommand;
@@ -41,7 +41,7 @@ public class GameEvent {
         this.gameCommand = gameCommand;
 
         if(!hasPosition() || isStoneRelated()) {
-            throw new IllegalArgumentException("GameCommand " + gameCommand + " is incompatible with constructor for position-related events (use constructor with StoneColor instead).");
+            throw new IllegalArgumentException(gameCommand + " is incompatible with constructor for position-related events (use constructor with StoneColor instead).");
         }
 
         if(x < 0 || y < 0 || moveNumber < 0) {
@@ -62,7 +62,7 @@ public class GameEvent {
         this.gameCommand = gameCommand;
 
         if(!isStoneRelated()) {
-            throw new IllegalArgumentException("GameCommand " + gameCommand + " is incompatible with constructor for stone-related events.");
+            throw new IllegalArgumentException(gameCommand + " is incompatible with constructor for stone-related events.");
         }
 
         if(x < 0 || y < 0 || moveNumber < 0) {

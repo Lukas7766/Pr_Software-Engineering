@@ -19,10 +19,12 @@ public class NewZealandRuleset implements Ruleset {
         return new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
+                // Returning this equates to telling the caller that ko has not occurred.
             }
 
             @Override
             public void undo() {
+                // Returning this equates to telling the caller that ko has not occurred.
             }
         };
     }

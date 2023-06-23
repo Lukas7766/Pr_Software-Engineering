@@ -426,7 +426,7 @@ public class HeaderPane extends VBox {
 
         // Create combo box for selecting graphics packs
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList();
-        File graphicsFolder = new File(GlobalSettings.graphicsPackFolder);
+        File graphicsFolder = new File(GlobalSettings.GRAPHICS_PACK_FOLDER);
         FileFilter zipFilter = new FileFilter() {
             @Override
             public boolean accept(File pathname) {

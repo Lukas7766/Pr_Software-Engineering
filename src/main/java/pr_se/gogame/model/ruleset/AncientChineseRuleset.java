@@ -2,7 +2,6 @@ package pr_se.gogame.model.ruleset;
 
 
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameResult;
 import pr_se.gogame.model.StoneColor;
 import pr_se.gogame.model.UndoableCommand;
 
@@ -63,9 +62,7 @@ public class AncientChineseRuleset implements Ruleset {
             }
         }
 
-        System.out.println("Score Black: " + scoreBlack);
-        System.out.println("Score White: " + scoreWhite);
-        return new GameResult(1,1,null,"");
+        return new GameResult(scoreBlack,scoreWhite,null,"");
 
     }
 

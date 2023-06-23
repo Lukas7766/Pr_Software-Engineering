@@ -98,7 +98,7 @@ class JapaneseRulesetTest {
                         "+ Territory points: 9\n" +
                         "+ Captured stones: 1\n" +
                         "\n" +
-                        "= 10.0 points", japaneseRuleset.scoreGame(game).getGameResult());
+                        "= 10.0 points", japaneseRuleset.scoreGame(game).getDescription());
     }
 
     @Test
@@ -143,7 +143,7 @@ class JapaneseRulesetTest {
                         "+ Territory points: 0\n" +
                         "+ Captured stones: 0\n" +
                         "\n" +
-                        "= 6.5 points", japaneseRuleset.scoreGame(game).getGameResult());
+                        "= 6.5 points", japaneseRuleset.scoreGame(game).getDescription());
 
     }
 

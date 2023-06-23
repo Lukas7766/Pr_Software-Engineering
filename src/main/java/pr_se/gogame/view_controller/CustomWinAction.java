@@ -26,7 +26,7 @@ public class CustomWinAction {
         Dialog<Pair<String,String>> dialog = new Dialog<>();
 
         dialog.setTitle("Game Result");
-        dialog.setHeaderText(game.getGameResult().getGameResult());
+        dialog.setHeaderText(game.getGameResult().getDescription());
         dialog.initOwner(stage);
 
         ButtonType loginButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);

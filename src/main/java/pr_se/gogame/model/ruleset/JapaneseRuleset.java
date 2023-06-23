@@ -166,7 +166,6 @@ public class JapaneseRuleset implements Ruleset {
                 }
             }
         }
-        System.out.println("Territory Score " + color + " " + territoryPoints);
         return territoryPoints;
     }
 
