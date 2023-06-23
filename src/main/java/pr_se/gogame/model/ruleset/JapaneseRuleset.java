@@ -82,7 +82,7 @@ public class JapaneseRuleset implements Ruleset {
         }
 
         double komi = game.getKomi();
-        int handicap = game.getHandicap();
+        double handicap = game.getHandicap();
 
         int capturedStonesBlack = game.getStonesCapturedBy(StoneColor.BLACK);
         int territoryScoreBlack = calculateTerritoryPoints(StoneColor.BLACK, game);
