@@ -128,6 +128,8 @@ public interface GameInterface {
 
     void fastForward();
 
+    void goBeforeFirstMove();
+
     void goToFirstMove();
 }
 

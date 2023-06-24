@@ -219,23 +219,18 @@ public final class FileHandler {
 
                     if(t.getToken() == AB) {
                         handicapColor = BLACK;
-                        decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
                     } else if(t.getToken() == AW) {
                         handicapColor = WHITE;
-                        decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
                     } else {
                         unexpected(AB.getValue() + " or " + AW.getValue(), t);
                     }
 
-                    t = scanner.next();
-                    while(t.getToken() == LONE_ATTRIBUTE) {
+                    do {
                         decodedCoords = calculateCoordsFromString(t.getAttributeValue());
                         game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
 
                         t = scanner.next();
-                    }
+                    } while(t.getToken() == LONE_ATTRIBUTE);
                 }
             } else {
                 game.newGame(BLACK, size, 0, new JapaneseRuleset(), false);
@@ -362,5 +357,9 @@ public final class FileHandler {
 
     public static File getCurrentFile() {
         return currentFile;
+    }
+
+    public static void clearCurrentFile() {
+        currentFile = null;
     }
 }

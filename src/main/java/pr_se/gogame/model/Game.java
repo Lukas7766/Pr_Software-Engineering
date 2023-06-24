@@ -63,6 +63,7 @@ public class Game implements GameInterface {
     @Override
     public void initGame() {
         gameState = GameState.NOT_STARTED_YET;
+        FileHandler.clearCurrentFile();
 
         fireGameEvent(new GameEvent(GameCommand.INIT));
     }
@@ -647,7 +648,7 @@ public class Game implements GameInterface {
             if((history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP)) {
                 history.rewind();
             } else if(!history.isAtBeginning()) {
-                goToFirstMove();
+                goBeforeFirstMove();
             }
         }
         reDisplayMarks();
@@ -656,11 +657,23 @@ public class Game implements GameInterface {
     @Override
     public void fastForward() {
         removeAllMarks();
-        if(history.getCurrentNode().getSaveToken() == null || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP) {
-            goToFirstMove();
+        HistoryNode n = history.getCurrentNode();
+        if(n.getSaveToken() == null || n.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || n.getSaveToken() == HistoryNode.AbstractSaveToken.SETUP) {
+            goBeforeFirstMove();
+            if(history.getCurrentNode() == n) {
+                history.skipToEnd();
+            }
         } else {
             history.skipToEnd();
         }
+        reDisplayMarks();
+    }
+
+    @Override
+    public void goBeforeFirstMove() {
+        goToFirstMove();
+        removeAllMarks();
+        history.stepBack();
         reDisplayMarks();
     }
 
@@ -675,11 +688,11 @@ public class Game implements GameInterface {
         reDisplayMarks();
     }
 
-    public void removeAllMarks() {
+    private void removeAllMarks() {
         history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.x, key.y, curMoveNumber)));
     }
 
-    public void reDisplayMarks() {
+    private void reDisplayMarks() {
         history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.x, key.y, value));
     }
 
