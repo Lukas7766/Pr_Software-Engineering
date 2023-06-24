@@ -42,10 +42,10 @@ public final class FileHandler {
             output.write( "\n\n");
             output.write(String.format(HA.getValue(), game.getHandicap()));
 
-            history.stepForward();
-            node = history.getCurrentNode();
-
             if(game.getHandicap() > 0) {
+                history.stepForward();
+                node = history.getCurrentNode();
+
                 if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
                     if (node.getColor() == BLACK) {
                         t = SGFToken.AB;
@@ -56,8 +56,6 @@ public final class FileHandler {
                     output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
 
                     writeAttributeSequence(output, history, node);
-
-                    history.stepForward();
                     node = history.getCurrentNode();
                 } else if(game.getHandicap() > 1) {
                     throw new IllegalStateException("Handicap move expected but not found!");
@@ -67,15 +65,17 @@ public final class FileHandler {
             output.write("\n\n");
 
             // Write game contents
-
             for (;;) {
                 output.write("\n");
 
+                history.stepForward();
+                node = history.getCurrentNode();
+
                 switch (node.getSaveToken()) {
                     case SETUP:
-                        if(node.getColor() == BLACK) {
+                        if (node.getColor() == BLACK) {
                             t = AB;
-                        } else if(node.getColor() == WHITE) {
+                        } else if (node.getColor() == WHITE) {
                             t = AW;
                         } else {
                             throw new IllegalStateException("AE token not supported!");
@@ -89,7 +89,7 @@ public final class FileHandler {
                         break;
 
                     case MOVE, PASS:
-                        if(node.getColor() == BLACK) {
+                        if (node.getColor() == BLACK) {
                             t = B;
                         } else {
                             t = W;
@@ -101,7 +101,7 @@ public final class FileHandler {
                         break;
 
                     case HANDICAP:
-                        if(!history.isAtEnd()) {
+                        if (!history.isAtEnd()) {
                             throw new IOException("Can't save handicap after game has commenced!");
                         }
                         break;
@@ -110,22 +110,20 @@ public final class FileHandler {
                         break;
                 }
 
-                for(Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
+                for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
                     output.write(String.format(e.getValue().getSgfToken().getValue(), formStringFromCoords(e.getKey().x, e.getKey().y)));
                 }
 
-                if(!node.getComment().equals("")) {
+                if (!node.getComment().equals("")) {
                     String reformattedComment = node.getComment().replace("\\", "\\\\").replace("]", "\\]").replace(":", "\\:");
                     output.write(String.format(C.getValue(), reformattedComment));
                 }
 
-                if(history.isAtEnd()) {
+                if (history.isAtEnd()) {
                     break;
                 }
-
-                history.stepForward();
-                node = history.getCurrentNode();
             }
+
 
             output.write("\n\n)");
 
@@ -141,15 +139,11 @@ public final class FileHandler {
         while(history.getCurrentNode().getSaveToken() == parentNode.getSaveToken() && history.getCurrentNode().getColor() == parentNode.getColor()) {
             output.write(String.format(LONE_ATTRIBUTE.getValue(), formStringFromCoords(history.getCurrentNode().getX(), history.getCurrentNode().getY())));
             if(history.isAtEnd()) {
-                break;
+                return;
             }
             history.stepForward();
         }
-        if(!history.isAtEnd()) {
-            history.stepBack();
-        } else if(history.getCurrentNode().getSaveToken() != parentNode.getSaveToken() || history.getCurrentNode().getColor() == parentNode.getColor()) {
-            history.stepBack();
-        }
+        history.stepBack();
     }
 
     public static boolean loadFile(Game game, File file) {

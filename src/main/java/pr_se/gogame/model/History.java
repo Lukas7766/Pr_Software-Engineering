@@ -70,4 +70,6 @@ public class History {
     public boolean isAtBeginning() {
         return current.getPrev() == null;
     }
+
+
 }

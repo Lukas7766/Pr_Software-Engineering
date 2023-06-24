@@ -2,6 +2,7 @@ package pr_se.gogame.model;
 
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class HistoryNode {
     public enum AbstractSaveToken {
@@ -118,5 +119,18 @@ public class HistoryNode {
 
     public void addMark(int x, int y, MarkShape shape) {
         marks.put(new Position(x, y), shape);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        HistoryNode that = (HistoryNode) o;
+        return x == that.x && y == that.y && Objects.equals(prev, that.prev) && Objects.equals(next, that.next) && command.equals(that.command) && comment.equals(that.comment) && saveToken == that.saveToken && color == that.color && marks.equals(that.marks);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(prev, next, command, comment, saveToken, x, y, color, marks);
     }
 }
