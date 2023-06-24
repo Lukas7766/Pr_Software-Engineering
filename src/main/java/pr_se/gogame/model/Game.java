@@ -619,10 +619,6 @@ public class Game implements GameInterface {
             return;
         }
 
-        /*if(setupMode && curMoveNumber > 1) {
-            return false;
-        }*/
-
         this.setupMode = setupMode;
 
         this.gameState = this.setupMode ? GameState.SETTING_UP : GameState.RUNNING;
