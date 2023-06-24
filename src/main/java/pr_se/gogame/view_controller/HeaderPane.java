@@ -184,9 +184,12 @@ public class HeaderPane extends VBox {
     private Menu gameSection() {
         Menu menu = new Menu("_Game");
 
-        MenuItem passItem = new MenuItem("_Pass");
-
         CheckMenuItem setupMode = new CheckMenuItem("Set_up mode");
+        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
+        MenuItem passItem = new MenuItem("_Pass");
+        MenuItem resignItem = new MenuItem("_Resign");
+        MenuItem scoreGameItem = new MenuItem("_Score Game");
+
         // This item probably doesn't need a separate accelerator.
         gameSectionItems.add(setupMode);
         setupMode.setSelected(game.isSetupMode());
@@ -205,7 +208,7 @@ public class HeaderPane extends VBox {
             }
         });
 
-        CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
+
         moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
@@ -215,17 +218,14 @@ public class HeaderPane extends VBox {
             k.ifPresent(button -> button.setVisible(GlobalSettings.isConfirmationNeeded()));
         });
 
-
         passItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN));
         gameSectionItems.add(passItem);
         passItem.setOnAction(e -> game.pass());
 
-        MenuItem resignItem = new MenuItem("_Resign");
         resignItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.ALT_DOWN));
         gameSectionItems.add(resignItem);
         resignItem.setOnAction(e -> game.resign());
 
-        MenuItem scoreGameItem = new MenuItem("_Score Game");
         scoreGameItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN));
         gameSectionItems.add(scoreGameItem);
         scoreGameItem.setOnAction(e -> game.scoreGame());
