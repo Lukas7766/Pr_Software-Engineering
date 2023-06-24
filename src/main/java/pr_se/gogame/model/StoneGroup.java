@@ -62,14 +62,16 @@ public class StoneGroup {
             throw new IllegalArgumentException("Stone group must be of the same color!");
         }
 
-        final List<Position> oldLocations = Collections.unmodifiableList(locations);
-        final Set<Position> oldLiberties = Collections.unmodifiableSet(liberties);
+        final List<Position> oldLocations = List.copyOf(locations);
+        final List<Position> newLocations = List.copyOf(other.getLocations());
+        final Set<Position> oldLiberties = Set.copyOf(liberties);
+        final Set<Position> newLiberties = Set.copyOf(other.getLiberties());
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                locations.addAll(other.getLocations());
-                liberties.addAll(other.getLiberties());
+                locations.addAll(newLocations);
+                liberties.addAll(newLiberties);
                 other.getPointers().forEach(p -> {
                     p.setStoneGroup(StoneGroup.this);
                     pointers.add(p);

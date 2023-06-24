@@ -40,6 +40,7 @@ public class Board implements BoardInterface {
         this.game = game;
         this.size = size;
         this.boardContents = new StoneGroupPointer[this.size][this.size];
+        StoneGroup.resetDebug();
     }
 
     @Override
@@ -82,9 +83,11 @@ public class Board implements BoardInterface {
         // Check for suicide
         boolean permittedSuicide = false;
         boolean killAnother = false;
-        Set<StoneGroup> otherColorGroups = surroundingSGs.stream().filter(sg -> sg.getStoneColor() != color).collect(Collectors.toSet());
+        Set<StoneGroup> otherColorGroups = surroundingSGs.stream()
+            .filter(sg -> sg.getStoneColor() != color)
+            .collect(Collectors.toSet());
 
-        if (!prepareMode && newGroup.getLiberties().isEmpty() && (newGroup == firstSameColorGroup || firstSameColorGroup.getLiberties().size() == 1)) { // if adding this stone would take away all liberties from the group it's being added to
+        if (!prepareMode && newGroup.getLiberties().isEmpty() && firstSameColorGroup.getLiberties().size() <= 1) { // if adding this stone would take away all liberties from the group it's being added to
             if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)) { // if there are any groups of the opposite color with only one liberty, the attacker wins and the existing group is removed instead.
                 if (!game.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
                     return null;
@@ -96,7 +99,7 @@ public class Board implements BoardInterface {
         }
 
         /*
-         * Merge newly-connected StoneGroups of the same color and remove the new stone's position from the liberties
+         * Merge newly connected StoneGroups of the same color and remove the new stone's position from the liberties
          * of all adjacent groups
          */
         Set<StoneGroup> sameColorGroups = new HashSet<>(surroundingSGs);
@@ -320,6 +323,7 @@ public class Board implements BoardInterface {
         } else {
             StoneGroup s = boardContents[x][y].getStoneGroup();
             System.out.println("Location " + x + "/" + y + ":");
+            System.out.println("Pointer: " + boardContents[x][y].serialNo);
             System.out.println("StoneGroup " + s.serialNo + " locations: ");
             s.getLocations().forEach(p -> System.out.println(p));
             System.out.println();
