@@ -35,100 +35,97 @@ public final class FileHandler {
             HistoryNode node;
             SGFToken t;
 
-            try {
-                output.write(String.format(START.getValue(), game.getSize()));
-                output.write( "\n\n");
-                output.write(String.format(HA.getValue(), game.getHandicap()));
+            // Write file header
 
-                history.stepForward();
-                node = history.getCurrentNode();
+            output.write(String.format(START.getValue(), game.getSize()));
+            output.write( "\n\n");
+            output.write(String.format(HA.getValue(), game.getHandicap()));
 
-                if(game.getHandicap() > 0) {
-                    if (node.getColor() == BLACK) {
-                        t = SGFToken.AB;
-                    } else if (node.getColor() == WHITE) {
-                        t = SGFToken.AW;
-                    } else {
-                        throw new IllegalStateException("AE token not supported!");
-                    }
+            history.stepForward();
+            node = history.getCurrentNode();
 
-                    output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
-
-                    writeAttributeSequence(output, history, node);
+            if(game.getHandicap() > 0) {
+                if (node.getColor() == BLACK) {
+                    t = SGFToken.AB;
+                } else if (node.getColor() == WHITE) {
+                    t = SGFToken.AW;
+                } else {
+                    throw new IllegalStateException("AE token not supported!");
                 }
-            } catch(IOException e) {
-                return false;
+
+                output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+
+                writeAttributeSequence(output, history, node);
             }
 
             output.write("\n\n");
 
-            try {
-                for (;;) {
-                    output.write("\n");
+            // Write game contents
 
-                    switch (node.getSaveToken()) {
-                        case SETUP:
-                            if(node.getColor() == BLACK) {
-                                t = AB;
-                            } else {
-                                t = AW;
-                            }
+            for (;;) {
+                output.write("\n");
 
-                            output.write(";");
-                            output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+                switch (node.getSaveToken()) {
+                    case SETUP:
+                        if(node.getColor() == BLACK) {
+                            t = AB;
+                        } else {
+                            t = AW;
+                        }
 
-                            writeAttributeSequence(output, history, node);
+                        output.write(";");
+                        output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
 
-                            break;
+                        writeAttributeSequence(output, history, node);
 
-                        case MOVE:
-                            if(node.getColor() == BLACK) {
-                                t = B;
-                            } else {
-                                t = W;
-                            }
-
-                            output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
-                            break;
-
-                        case PASS:
-                            if(node.getColor() == BLACK) {
-                                t = B;
-                            } else {
-                                t = W;
-                            }
-
-                            output.write(String.format(t.getValue(), "")); // Passing is done by having an empty move.
-                            break;
-
-                        case RESIGN:
-                            break;
-
-                        default:
-                            break;
-                    }
-
-                    for(Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
-                        output.write(String.format(e.getValue().getSgfToken().getValue(), formStringFromCoords(e.getKey().x, e.getKey().y)));
-                    }
-
-                    if(!node.getComment().equals("")) {
-                        String reformattedComment = node.getComment().replace("\\", "\\\\").replace("]", "\\]").replace(":", "\\:");
-                        output.write(String.format(C.getValue(), reformattedComment));
-                    }
-
-                    if(history.isAtEnd()) {
                         break;
-                    }
 
-                    history.stepForward();
-                    node = history.getCurrentNode();
+                    case MOVE:
+                        if(node.getColor() == BLACK) {
+                            t = B;
+                        } else {
+                            t = W;
+                        }
+
+                        output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+                        break;
+
+                    case PASS:
+                        if(node.getColor() == BLACK) {
+                            t = B;
+                        } else {
+                            t = W;
+                        }
+
+                        output.write(String.format(t.getValue(), "")); // Passing is done by having an empty move.
+                        break;
+
+                    case RESIGN:
+                        break;
+
+                    default:
+                        break;
                 }
 
-                output.write("\n\n)");
-            } catch (IOException e) {
-                return false;
+                for(Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
+                    output.write(String.format(e.getValue().getSgfToken().getValue(), formStringFromCoords(e.getKey().x, e.getKey().y)));
+                }
+
+                if(!node.getComment().equals("")) {
+                    String reformattedComment = node.getComment().replace("\\", "\\\\").replace("]", "\\]").replace(":", "\\:");
+                    output.write(String.format(C.getValue(), reformattedComment));
+                }
+
+                if(history.isAtEnd()) {
+                    break;
+                }
+
+                history.stepForward();
+                node = history.getCurrentNode();
             }
+
+            output.write("\n\n)");
+
         } catch(IOException e) {
             return false;
         }
@@ -196,9 +193,7 @@ public final class FileHandler {
                     case LPAR:
                         throw new IOException("This program does not support multiple GameTrees!");
 
-                    case HA:
-                    case SEMICOLON:
-                    case RPAR:
+                    case HA, SEMICOLON, RPAR:
                         break loop;
 
                     default:
@@ -243,11 +238,8 @@ public final class FileHandler {
                     t = scanner.next();
                     while(t.getToken() == LONE_ATTRIBUTE) {
                         decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                        if(handicapColor == BLACK) {
-                            game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true);
-                        } else {
-                            game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true);
-                        }
+                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
+
                         t = scanner.next();
                     }
                 }
@@ -265,8 +257,7 @@ public final class FileHandler {
                     t = scanner.next();
 
                     switch (t.getToken()) {
-                        case SEMICOLON:
-                        case RPAR:
+                        case SEMICOLON, RPAR:
                             if(currentComment != null) {
                                 game.commentCurrentMove(currentComment);
                             }

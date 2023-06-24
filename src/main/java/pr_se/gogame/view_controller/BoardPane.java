@@ -207,10 +207,7 @@ public class BoardPane extends GridPane {
 
                     break;
 
-                case UNMARK:
-                case MARK_CIRCLE:
-                case MARK_SQUARE:
-                case MARK_TRIANGLE:
+                case UNMARK, MARK_CIRCLE, MARK_SQUARE, MARK_TRIANGLE:
                     destinationPBC = getPlayableCell(e.getX(), e.getY());
 
                     switch(e.getGameCommand()) {
@@ -245,8 +242,7 @@ public class BoardPane extends GridPane {
                     init();
                     break;
 
-                case INIT:
-                case GAME_WON:
+                case INIT, GAME_WON:
                     setMouseTransparent(true);
                     break;
 
@@ -352,36 +348,28 @@ public class BoardPane extends GridPane {
             boolean hasMoved = false;
 
             switch(e.getCode()) {
-                case W:
-                case I:
-                case UP:
+                case UP, W, I:
                     if(keyboardCellY > 0) {
                         keyboardCellY--;
                     }
                     hasMoved = true;
                     break;
 
-                case S:
-                case K:
-                case DOWN:
+                case DOWN, S, K:
                     if(keyboardCellY < size - 1) {
                         keyboardCellY++;
                     }
                     hasMoved = true;
                     break;
 
-                case A:
-                case J:
-                case LEFT:
+                case LEFT, A, J:
                     if(keyboardCellX > 0) {
                         keyboardCellX--;
                     }
                     hasMoved = true;
                     break;
 
-                case D:
-                case L:
-                case RIGHT:
+                case RIGHT, D, L:
                     if(keyboardCellX < size - 1) {
                         keyboardCellX++;
                     }

@@ -94,7 +94,7 @@ public class Game implements GameInterface {
         this.playerWhiteScore = this.ruleset.getKomi();
         this.blackCapturedStones = 0;
         this.whiteCapturedStones = 0;
-        this.curMoveNumber = 0; // Note: Indicates to the BoardPane that handicap stones are being set.
+        this.curMoveNumber = 0;
         this.gameResult = null;
 
         this.board = new Board(this, size);
@@ -263,10 +263,6 @@ public class Game implements GameInterface {
         return board.getColorAt(x, y);
     }
 
-    public int getHandicapStoneCounter() {
-        return handicapStoneCounter;
-    }
-
     private UndoableCommand setCurColor(final StoneColor c) {
         if (c == null) {
             throw new NullPointerException();
@@ -319,7 +315,7 @@ public class Game implements GameInterface {
 
         if(uc03IsKo == null) {
             uc02SetStone.undo();
-            System.out.println("Ko detected. Move aborted.");
+            uc01SetColor.undo();
             return;
         }
 
@@ -389,12 +385,21 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapPosition(int x, int y, boolean placeStone) {
+        placeHandicapPosition(x, y, curColor, placeStone);
+    }
+
+    @Override
+    public void placeHandicapPosition(int x, int y, StoneColor color, boolean placeStone) {
         if(gameState != GameState.SETTING_UP) {
             throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
         }
 
         if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
             throw new IllegalArgumentException();
+        }
+
+        if(color == null) {
+            throw new NullPointerException();
         }
 
         final int OLD_HANDICAP_CTR = handicapStoneCounter;
@@ -406,7 +411,7 @@ public class Game implements GameInterface {
         }
 
         if(placeStone) {
-            final UndoableCommand uc01SetStone = board.setStone(x, y, curColor, true); // uc01SetStone is already executed within board.setStone().
+            final UndoableCommand uc01SetStone = board.setStone(x, y, color, true); // uc01SetStone is already executed within board.setStone().
 
             if(uc01SetStone == null) {
                 return;
@@ -483,6 +488,7 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
     }
 
+
     @Override
     public void placeSetupStone(int x, int y, StoneColor color) {
         if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
@@ -513,7 +519,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public UndoableCommand addCapturedStones(StoneColor color, int amount) {
+    public UndoableCommand addCapturedStones(final StoneColor color, final int amount) {
         if (color == null) {
             throw new NullPointerException();
         }
@@ -521,16 +527,16 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        final int OLD_BLACK_CAPTURED_STONES = blackCapturedStones;
-        final int OLD_WHITE_CAPTURED_STONES = whiteCapturedStones;
-        final double OLD_BLACK_PLAYER_SCORE = playerBlackScore;
-        final double OLD_WHITE_PLAYER_SCORE = playerWhiteScore;
+        final int oldBlackCapturedStones = blackCapturedStones;
+        final int oldWhiteCapturedStones = whiteCapturedStones;
+        final double oldBlackPlayerScore = playerBlackScore;
+        final double oldWhitePlayerScore = playerWhiteScore;
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
                 if (color == BLACK) {
-                    Game.this.blackCapturedStones += amount; // TODO: If this causes issues, maybe change to "OLD_BLACK_CAPTURED_STONES + amount" and so on?
+                    Game.this.blackCapturedStones += amount;
                     Game.this.playerBlackScore += amount;
                 } else {
                     Game.this.whiteCapturedStones += amount;
@@ -540,10 +546,10 @@ public class Game implements GameInterface {
 
             @Override
             public void undo() {
-                Game.this.blackCapturedStones = OLD_BLACK_CAPTURED_STONES;
-                Game.this.whiteCapturedStones = OLD_WHITE_CAPTURED_STONES;
-                Game.this.playerBlackScore = OLD_BLACK_PLAYER_SCORE;
-                Game.this.playerWhiteScore = OLD_WHITE_PLAYER_SCORE;
+                Game.this.blackCapturedStones = oldBlackCapturedStones;
+                Game.this.whiteCapturedStones = oldWhiteCapturedStones;
+                Game.this.playerBlackScore = oldBlackPlayerScore;
+                Game.this.playerWhiteScore = oldWhitePlayerScore;
             }
         };
         ret.execute(true);
@@ -555,8 +561,11 @@ public class Game implements GameInterface {
     public int getStonesCapturedBy(StoneColor color) {
         if (color == null) throw new NullPointerException();
 
-        if (color == BLACK) return this.blackCapturedStones;
-        else return this.whiteCapturedStones;
+        if (color == BLACK) {
+            return this.blackCapturedStones;
+        } else {
+            return this.whiteCapturedStones;
+        }
     }
 
     @Override

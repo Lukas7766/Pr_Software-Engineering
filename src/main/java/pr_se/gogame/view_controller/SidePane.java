@@ -63,6 +63,9 @@ public class SidePane extends StackPane {
                 case GAME_WON:
                     CustomWinAction.winAction(stage, game);
                     break;
+
+                default:
+                    break;
             }
         });
     }

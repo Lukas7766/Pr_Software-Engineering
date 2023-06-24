@@ -29,9 +29,6 @@ public class Board implements BoardInterface {
      */
     private final StoneGroupPointer[][] boardContents;
 
-    private int lastDebugX = -1;
-    private int lastDebugY = -1;
-
     /**
      * Creates a new Board belonging to the specified Game, containing handicap stones of the specified beginner color
      * (only if the Game has a handicap set)
@@ -91,11 +88,9 @@ public class Board implements BoardInterface {
 
         if (!prepareMode && newGroup.getLiberties().isEmpty() && (newGroup == firstSameColorGroup || firstSameColorGroup.getLiberties().size() == 1)) { // if adding this stone would take away all liberties from the group it's being added to
             if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)) { // if there are any groups of the opposite color with only one liberty, the attacker wins and the existing group is removed instead.
-                System.out.println("SUICIDE DETECTED!!!");
                 if (!game.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
                     return null;
                 }
-                System.out.println("Suicide permitted.");
                 permittedSuicide = true;
             } else {
                 killAnother = true;
@@ -124,11 +119,11 @@ public class Board implements BoardInterface {
             subcommands.add(sg.removeLiberty(new Position(x, y)));
         }
 
-        final boolean FINAL_PERMITTED_SUICIDE = permittedSuicide;
+        final boolean finalPermittedSuicide = permittedSuicide;
         final UndoableCommand uc03PlacePointer = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                if (!FINAL_PERMITTED_SUICIDE) {
+                if (!finalPermittedSuicide) {
                     boardContents[x][y] =
                         firstSameColorGroup.getPointers().stream()
                             .findFirst()
@@ -144,7 +139,7 @@ public class Board implements BoardInterface {
         uc03PlacePointer.execute(true);
         subcommands.add(uc03PlacePointer);
 
-        final boolean FINAL_KILL_ANOTHER = killAnother;
+        final boolean finalKillAnother = killAnother;
 
         final UndoableCommand uc04RemoveCapturedStones = new UndoableCommand() {
             final LinkedList<UndoableCommand> uc0601RemoveStoneCommands = new LinkedList<>();
@@ -155,7 +150,7 @@ public class Board implements BoardInterface {
                 if (!prepareMode) {
 
                     for (StoneGroup sg : surroundingSGs) {
-                        if ((sg.getStoneColor() != color || !FINAL_KILL_ANOTHER) && sg.getLiberties().isEmpty()) {
+                        if ((sg.getStoneColor() != color || !finalKillAnother) && sg.getLiberties().isEmpty()) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
                                 UndoableCommand tmpCmd = removeStone(p.x, p.y);
@@ -172,7 +167,7 @@ public class Board implements BoardInterface {
                 }
 
                 // Update UI if possible
-                if (!FINAL_PERMITTED_SUICIDE && saveEffects) {
+                if (!finalPermittedSuicide && saveEffects) {
                     getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, color, game.getCurMoveNumber()));
                     getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
                 }
@@ -322,11 +317,6 @@ public class Board implements BoardInterface {
     public void printDebugInfo(int x, int y) {
         checkXYCoordinates(x, y);
 
-        if (boardContents[x][y] != null && !(x == lastDebugX && y == lastDebugY)) {
-            System.out.println("Group at " + x + ", " + y + ":");
-            System.out.println("Liberties: " + boardContents[x][y].getStoneGroup().getLiberties().size());
-        }
-
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (boardContents[i][j] != null) {
@@ -336,8 +326,6 @@ public class Board implements BoardInterface {
             }
         }
 
-        lastDebugX = x;
-        lastDebugY = y;
     }
 
     /**

@@ -58,15 +58,18 @@ public interface GameInterface {
 
     void playMove(int x, int y, StoneColor color);
 
+    void placeHandicapPosition(int x, int y, boolean placeStone);
+
     /**
      * This method places a handicap stone down for the beginner player at the specified coordinates. This only works
      * at the beginning of the game.
      *
      * @param x          the x coordinate of the stone, starting at the left
      * @param y          the y coordinate of the stone, starting at the top
+     * @param color the color of the stone to be placed - if any
      * @param placeStone whether a stone is to be placed. If false, the handicap slot is still placed.
      */
-    void placeHandicapPosition(int x, int y, boolean placeStone);
+    void placeHandicapPosition(int x, int y, StoneColor color, boolean placeStone);
 
 
     //##################################################################################################################
