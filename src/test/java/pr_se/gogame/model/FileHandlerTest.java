@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static pr_se.gogame.model.StoneColor.*;
 
-public class FileHandlerTest {
+class FileHandlerTest {
     Game game;
 
     @BeforeEach
