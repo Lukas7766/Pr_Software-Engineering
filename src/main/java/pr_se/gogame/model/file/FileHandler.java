@@ -94,12 +94,11 @@ public final class FileHandler {
                     if(t == SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor()) && t.hasMultiAttribs()) {
                         node = writeAttributeSequence(output, iter, node);
                     }
-                    if(iter.hasNext() || t != SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor())) {
-                        writeNodeMetaData(output, node.getPrev());
-                    } else {
-                        writeNodeMetaData(output, node);
-                        break;
-                    }
+
+                }
+
+                if(iter.hasNext() || t != SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor())) {
+                    writeNodeMetaData(output, node.getPrev());
                 } else {
                     writeNodeMetaData(output, node);
                     break;

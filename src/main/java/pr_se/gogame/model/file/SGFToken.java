@@ -160,8 +160,7 @@ public enum SGFToken {
 
     public static SGFToken ofAbstractSaveToken(HistoryNode.AbstractSaveToken t, StoneColor c) {
         switch(t) {
-            case SETUP:
-            case HANDICAP:
+            case SETUP, HANDICAP:
                 if(c == BLACK) {
                     return AB;
                 } else if(c == WHITE) {
@@ -170,8 +169,7 @@ public enum SGFToken {
                     return AE;
                 }
 
-            case MOVE:
-            case PASS:
+            case MOVE, PASS:
                 if(c == BLACK) {
                     return B;
                 } else {
