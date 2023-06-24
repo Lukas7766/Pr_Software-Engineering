@@ -27,7 +27,9 @@ class FileHandlerTest {
         game.saveGame(new File("onlyHandicap.sgf"));
 
         game.loadGame(new File("onlyHandicap.sgf"));
-
+        assertEquals(19, game.getSize());
+        assertEquals(9, game.getHandicap());
+        assertEquals();
     }
 
 }
