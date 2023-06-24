@@ -464,7 +464,7 @@ public class HeaderPane extends VBox {
             }
         }
         if (!game.saveGame(saveGameFile)) {
-            CustomExceptionDialog.show(new IOException(), "Could not save game!");
+            CustomExceptionDialog.show(new IOException(), "Could not save the game!");
         }
     }
 

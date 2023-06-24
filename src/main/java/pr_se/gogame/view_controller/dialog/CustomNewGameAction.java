@@ -55,7 +55,7 @@ public final class CustomNewGameAction {
                     }
 
                     if (!game.saveGame(f)) {
-                        CustomExceptionDialog.show(new IOException(), "Could not save game!");
+                        CustomExceptionDialog.show(new IOException(), "Could not save the game!");
                     }
                 }
                 default -> {

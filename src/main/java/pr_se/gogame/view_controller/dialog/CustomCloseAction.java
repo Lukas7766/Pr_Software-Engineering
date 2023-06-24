@@ -67,7 +67,7 @@ public final class CustomCloseAction {
                         System.exit(0);
                     }
 
-                    CustomExceptionDialog.show(new IOException(), "Could not save game!");
+                    CustomExceptionDialog.show(new IOException(), "Could not save the game!");
                     if (e != null) e.consume();
                 }
                 case "cancel" ->  {if (e != null) e.consume();}
