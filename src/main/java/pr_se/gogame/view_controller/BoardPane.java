@@ -867,11 +867,6 @@ public class BoardPane extends GridPane {
                 keyboardCellX = getColumnIndex(this) - 1;
                 keyboardCellY = getRowIndex(this) - 1;
 
-                if(GlobalSettings.DEBUG) {
-                    System.out.println("Info at this position: " + game.getColorAt(keyboardCellX, keyboardCellY));
-                    game.printDebugInfo(keyboardCellX, keyboardCellY);
-                }
-
                 hover();
             });
 

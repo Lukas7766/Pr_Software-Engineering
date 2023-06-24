@@ -318,17 +318,6 @@ public class Board implements BoardInterface {
     public void printDebugInfo(int x, int y) {
         checkXYCoordinates(x, y);
 
-        if(boardContents[x][y] == null) {
-            System.out.println("null");
-        } else {
-            StoneGroup s = boardContents[x][y].getStoneGroup();
-            System.out.println("Location " + x + "/" + y + ":");
-            System.out.println("Pointer: " + boardContents[x][y].serialNo);
-            System.out.println("StoneGroup " + s.serialNo + " locations: ");
-            s.getLocations().forEach(p -> System.out.println(p));
-            System.out.println();
-        }
-
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (boardContents[i][j] != null) {
