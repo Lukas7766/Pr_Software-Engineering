@@ -106,7 +106,9 @@ public class Board implements BoardInterface {
         final List<UndoableCommand> subcommands = new LinkedList<>();
 
         final UndoableCommand uc01AddNewToFirst = (firstSameColorGroup != newGroup) ? (firstSameColorGroup.mergeWithStoneGroup(newGroup)) : (null);
-        subcommands.add(uc01AddNewToFirst);
+        if(uc01AddNewToFirst != null) {
+            subcommands.add(uc01AddNewToFirst);
+        }
 
         for(StoneGroup sg : sameColorGroups) {
             subcommands.add(firstSameColorGroup.mergeWithStoneGroup(sg));
