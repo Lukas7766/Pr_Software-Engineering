@@ -299,27 +299,30 @@ public class BoardPane extends GridPane {
 
         // populate the coordinate axes
         for (int i = 0; i < this.size; i++) {
+            String horizText = "" + (char)('A' + i);
+            String vertText = "" + (size - i);
+
             // top
             BoardCell t = new BoardCell(this.outerEdge);
-            t.getLabel().setText("" + (char)('A' + i));
+            t.getLabel().setText(horizText);
             t.getLabel().setAlignment(Pos.CENTER);
             add(t, i + 1, 0);
 
             // right
             BoardCell r = new BoardCell(this.outerEdge);
-            r.getLabel().setText("" + (size - i));
+            r.getLabel().setText(vertText);
             r.getLabel().setAlignment(Pos.CENTER);
             add(r, size + 1, i + 1);
 
             // bottom
             BoardCell b = new BoardCell(this.outerEdge);
-            b.getLabel().setText("" + (char)('A' + i));
+            b.getLabel().setText(horizText);
             b.getLabel().setAlignment(Pos.CENTER);
             add(b, i + 1, size + 1);
 
             // left
             BoardCell l = new BoardCell(this.outerEdge);
-            l.getLabel().setText("" + (size - i));
+            l.getLabel().setText(vertText);
             l.getLabel().setAlignment(Pos.CENTER);
             add(l, 0, i + 1);
         }
