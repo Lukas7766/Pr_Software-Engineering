@@ -264,11 +264,10 @@ public final class FileHandler {
                             currentComment = null;
                             marks.entrySet().forEach(e -> game.mark(e.getKey().x, e.getKey().y, e.getValue()));
                             marks = new LinkedHashMap<>();
-                            if(t.getToken() == SEMICOLON) {
-                                break;
-                            } else {
+                            if(t.getToken() == RPAR) {
                                 break loop2;
                             }
+                            break;
 
                         case AW:
                             addStoneColor = WHITE;
