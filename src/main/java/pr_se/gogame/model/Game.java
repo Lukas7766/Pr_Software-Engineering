@@ -405,11 +405,11 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
-        final int OLD_HANDICAP_CTR = handicapStoneCounter;
+        final int oldHandicapCtr = handicapStoneCounter;
         handicapStoneCounter--;
-        final int NEW_HANDICAP_CTR = handicapStoneCounter;
+        final int newHandicapCtr = handicapStoneCounter;
 
-        if (OLD_HANDICAP_CTR <= 0) {
+        if (oldHandicapCtr <= 0) {
             throw new IllegalStateException("Can't place any more handicap stones or positions!");
         }
 
@@ -427,9 +427,9 @@ public class Game implements GameInterface {
 
                 @Override
                 public void execute(boolean saveEffects) {
-                    handicapStoneCounter = NEW_HANDICAP_CTR;
+                    handicapStoneCounter = newHandicapCtr;
 
-                    if (NEW_HANDICAP_CTR <= 0) {
+                    if (newHandicapCtr <= 0) {
                         uC02SwitchColor = switchColor();
                         if(saveEffects) {
                             getExecuteEvents().addAll(uC02SwitchColor.getExecuteEvents());
@@ -445,7 +445,7 @@ public class Game implements GameInterface {
                     if(uC02SwitchColor != null) {
                         uC02SwitchColor.undo();
                     }
-                    handicapStoneCounter = OLD_HANDICAP_CTR;
+                    handicapStoneCounter = oldHandicapCtr;
 
                     gameState = GameState.SETTING_UP;
                 }
@@ -475,7 +475,7 @@ public class Game implements GameInterface {
              * StoneColor.getOpposite() because we previously switched colors
              */
             StoneColor col = curColor;
-            if(NEW_HANDICAP_CTR <= 0) {
+            if(newHandicapCtr <= 0) {
                 col = StoneColor.getOpposite(curColor);
             }
             removeAllMarks();
