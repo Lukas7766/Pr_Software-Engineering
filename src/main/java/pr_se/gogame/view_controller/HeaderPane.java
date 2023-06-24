@@ -233,14 +233,10 @@ public class HeaderPane extends VBox {
         });
 
         SeparatorMenuItem sep1 = new SeparatorMenuItem();
-        menu.getItems().
-
-                add(1, sep1);
+        menu.getItems().add(1, sep1);
 
         SeparatorMenuItem sep2 = new SeparatorMenuItem();
-        menu.getItems().
-
-                add(4, sep2);
+        menu.getItems().add(4, sep2);
 
         return menu;
     }
