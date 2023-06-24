@@ -184,20 +184,20 @@ public class HeaderPane extends VBox {
     private Menu gameSection() {
         Menu menu = new Menu("_Game");
 
+        CheckMenuItem setupMode = new CheckMenuItem("Set_up mode");
+        // This item probably doesn't need a separate accelerator.
+        gameSectionItems.add(setupMode);
+        setupMode.setSelected(game.isSetupMode());
+        setupMode.setOnAction(e -> game.setSetupMode(setupMode.isSelected()));
+
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
         moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
         moveConfirmationRequired.setOnAction(e -> {
+            GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected());
             var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
-            if (moveConfirmationRequired.isSelected()) {
-                k.ifPresent(button -> button.setVisible(true));
-                GlobalSettings.setConfirmationNeeded(true);
-
-            } else {
-                k.ifPresent(button -> button.setVisible(false));
-                GlobalSettings.setConfirmationNeeded(false);
-            }
+            k.ifPresent(button -> button.setVisible(GlobalSettings.isConfirmationNeeded()));
         });
 
         MenuItem passItem = new MenuItem("_Pass");
@@ -233,10 +233,10 @@ public class HeaderPane extends VBox {
         });
 
         SeparatorMenuItem sep1 = new SeparatorMenuItem();
-        menu.getItems().add(1, sep1);
+        menu.getItems().add(2, sep1);
 
         SeparatorMenuItem sep2 = new SeparatorMenuItem();
-        menu.getItems().add(4, sep2);
+        menu.getItems().add(5, sep2);
 
         return menu;
     }

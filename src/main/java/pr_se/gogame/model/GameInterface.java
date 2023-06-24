@@ -72,7 +72,7 @@ public interface GameInterface {
     void placeHandicapPosition(int x, int y, StoneColor color, boolean placeStone);
 
 
-    void placeStone(int x, int y);
+    void usePosition(int x, int y);
 
 
     //##################################################################################################################
@@ -105,8 +105,6 @@ public interface GameInterface {
 
     GameResult getGameResult();
 
-    void toggleSetupMode();
-
     //##################################################################################################################
     // Methods regarding "move metadata"
     String getComment();
@@ -123,6 +121,10 @@ public interface GameInterface {
     void removeListener(GameListener l);
 
     void setHandicapStoneCounter(int noStones);
+
+    void setSetupMode(boolean setupMode);
+
+    boolean isSetupMode();
 
     // Methods controlling the history
     void undo();

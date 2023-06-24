@@ -54,7 +54,7 @@ public class Game implements GameInterface {
 
     private History history;
 
-    private GameState oldGameState;
+    private boolean setupMode;
 
     public Game() {
         this.listeners = new ArrayList<>();
@@ -85,8 +85,8 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
+        this.setupMode = false;
         this.gameState = GameState.SETTING_UP;
-        this.oldGameState = null;
 
         this.history = new History(this);
 
@@ -135,11 +135,17 @@ public class Game implements GameInterface {
 
     @Override
     public void pass() {
+        if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
+            throw new IllegalStateException("Can't pass on GameState " + gameState);
+        }
+
         UndoableCommand c = switchColor();
 
-        history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "pass")); // StoneColor.getOpposite() because we switched colors before
+        if(gameState != GameState.SETTING_UP) {
+            history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "pass")); // StoneColor.getOpposite() because we switched colors before
+        }
 
-        for(GameEvent e : c.getExecuteEvents()) {
+        for (GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
         }
     }
@@ -495,7 +501,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void placeStone(int x, int y) {
+    public void usePosition(int x, int y) {
         if(gameState == GameState.RUNNING) {
             playMove(x, y);
         } else if(gameState == GameState.SETTING_UP) {
@@ -604,21 +610,27 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void toggleSetupMode() {
+    public void setSetupMode(boolean setupMode) {
         if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
-            throw new IllegalStateException("Can't switch Game into setup mode in current state " + gameState);
+            return;
         }
 
-        if(gameState == GameState.SETTING_UP) {
-            if(handicapStoneCounter > 0) {
-                throw new IllegalStateException("Can't abort placement of handicap stones!");
-            } else {
-                // Assertion: handicapStoneCounter <= 0
-                gameState = GameState.RUNNING;
-            }
-        } else {
-            gameState = GameState.SETTING_UP;
+        if(handicapStoneCounter > 0) {
+            return;
         }
+
+        /*if(setupMode && curMoveNumber > 1) {
+            return false;
+        }*/
+
+        this.setupMode = setupMode;
+
+        this.gameState = this.setupMode ? GameState.SETTING_UP : GameState.RUNNING;
+    }
+
+    @Override
+    public boolean isSetupMode() {
+        return setupMode;
     }
 
     private UndoableCommand switchColor() {

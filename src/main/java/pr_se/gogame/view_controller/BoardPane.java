@@ -418,13 +418,7 @@ public class BoardPane extends GridPane {
             int col = getColumnIndex(selectionPBC) - 1;
             int row = getRowIndex(selectionPBC) - 1;
             if(col >= 0 && row >= 0) {
-                if(game.getGameState() == Game.GameState.RUNNING) {
-                    game.playMove(col, row);
-                } else if(game.getGameState() == Game.GameState.SETTING_UP) {
-                    game.placeHandicapPosition(col, row, true);
-                } else {
-                    throw new IllegalStateException("Can't place stone when game is neither being set up nor running!");
-                }
+                game.usePosition(col, row);
             }
 
             if(GlobalSettings.DEBUG) {
