@@ -313,7 +313,6 @@ public class Board implements BoardInterface {
         }
     }
 
-    // TODO: Remove these debug methods
     public void printDebugInfo(int x, int y) {
         checkXYCoordinates(x, y);
 

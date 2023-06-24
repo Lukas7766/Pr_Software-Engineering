@@ -1,9 +1,7 @@
 package pr_se.gogame.view_controller.observer;
 
 import pr_se.gogame.model.GameCommand;
-import pr_se.gogame.view_controller.observer.GameEvent;
 
-// Todo: Remove this in the final product
 public class DebugEvent extends GameEvent {
     private final int groupNo;
     private final int ptrNo;

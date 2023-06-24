@@ -27,7 +27,6 @@ public class StoneGroup {
      */
     private final Set<StoneGroupPointer> pointers;
 
-    // TODO: Remove these debug variables
     private static int nextSerialNo = 0;
     public final int serialNo;
 
@@ -45,7 +44,7 @@ public class StoneGroup {
         this.pointers = new HashSet<>();
 
         locations.add(new Position(x, y));
-        // TODO: Remove this debug code
+
         serialNo = nextSerialNo;
         nextSerialNo++;
     }
