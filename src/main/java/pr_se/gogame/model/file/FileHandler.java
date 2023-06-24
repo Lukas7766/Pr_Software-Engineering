@@ -81,7 +81,7 @@ public final class FileHandler {
                 } else {
                     t = SGFToken.ofHistoryNode(node);
                     if (t == AE || t == null) {
-                        throw new IllegalStateException(t.getValue() + " token not supported!");
+                        throw new IllegalStateException(node.getSaveToken() + " with color " + node.getColor() + " not supported!");
                     }
                     coords = node.getSaveToken() == HistoryNode.AbstractSaveToken.PASS ? "" : getStringFromCoords(node.getX(), node.getY());
                 }
