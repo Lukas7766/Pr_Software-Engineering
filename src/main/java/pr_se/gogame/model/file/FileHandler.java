@@ -216,21 +216,15 @@ public final class FileHandler {
                     StoneColor handicapColor = null;
 
                     t = scanner.next();
-                    /*
-                     * TODO: At the moment, black always starts (which could lead to wrong results in the unimplemented
-                     *  situation that white starts. Maybe we should remove relics of this idea, as it seems unlikely,
-                     *  and even if a player wanted to start and play white, black could just manually pass for the
-                     *  first move.
-                     */
+
                     if(t.getToken() == AB) {
                         handicapColor = BLACK;
                         decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true);
-
+                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
                     } else if(t.getToken() == AW) {
                         handicapColor = WHITE;
                         decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true);
+                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
                     } else {
                         unexpected(AB.getValue() + " or " + AW.getValue(), t);
                     }
