@@ -1,5 +1,7 @@
 package pr_se.gogame.view_controller;
 
+import pr_se.gogame.view_controller.observer.ViewListener;
+
 import java.util.LinkedList;
 import java.util.List;
 

@@ -1,4 +1,4 @@
-package pr_se.gogame.view_controller;
+package pr_se.gogame.view_controller.observer;
 
 public interface ViewListener {
     public void onSettingsUpdated();

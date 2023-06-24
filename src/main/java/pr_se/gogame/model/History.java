@@ -1,6 +1,6 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.view_controller.GameEvent;
+import pr_se.gogame.view_controller.observer.GameEvent;
 
 import java.util.ListIterator;
 

@@ -4,9 +4,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.Ruleset;
-import pr_se.gogame.view_controller.DebugEvent;
-import pr_se.gogame.view_controller.GameEvent;
-import pr_se.gogame.view_controller.GameListener;
+import pr_se.gogame.view_controller.observer.DebugEvent;
+import pr_se.gogame.view_controller.observer.GameEvent;
+import pr_se.gogame.view_controller.observer.GameListener;
+
+import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -23,6 +25,8 @@ class GameTest {
     Ruleset ruleset;
 
     int maxCoord;
+
+    static final String TESTFILE_FOLDER = "./testFiles/";
 
     @BeforeEach
     void setUp() {
@@ -432,5 +436,16 @@ class GameTest {
     void dontPlayAfterGameIsOver() {
         game.resign();
         assertThrows(IllegalStateException.class, () -> game.playMove(0, 0));
+    }
+
+    @Test
+    void playMoveKoPrevention() {
+        game.newGame(BLACK, 19, 0, new JapaneseRuleset());
+
+        game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf"));
+        game.fastForward();
+
+        assertTrue(game.playMove(2, 1));
+        assertFalse(game.playMove(1, 1));
     }
 }

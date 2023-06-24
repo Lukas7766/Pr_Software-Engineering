@@ -111,26 +111,6 @@ class BoardTest {
         assertNull(board.getColorAt(10, 11));
     }
 
-    // TODO: Move to GameTest
-    @Test
-    void setStoneKoPrevention() {
-        game.newGame(BLACK, 19, 0, new JapaneseRuleset());
-
-        assertNotNull(board.setStone(9, 1, BLACK, false));
-        assertNotNull(board.setStone(10, 1, WHITE, false));
-        assertNotNull(board.setStone(9, 3, BLACK, false));
-        assertNotNull(board.setStone(10, 3, WHITE, false));
-        assertNotNull(board.setStone(8, 2, BLACK, false));
-        assertNotNull(board.setStone(11, 2, WHITE, false));
-
-        assertNotNull(board.setStone(9, 2, WHITE, false));
-        assertNotNull(board.setStone(10, 2, BLACK, false));
-
-        assertNull(board.setStone(9, 2, WHITE, false));
-        assertNull(board.setStone(9, 2, WHITE, false)); // for maximum code coverage
-        assertNotNull(board.setStone(12, 2, WHITE, false)); // for maximum code coverage
-    }
-
     @Test
     void setStone() {
         assertNotNull(board.setStone(0, 1, BLACK, false)); // save = false for max. code coverage

@@ -4,8 +4,8 @@ import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.Ruleset;
-import pr_se.gogame.view_controller.GameEvent;
-import pr_se.gogame.view_controller.GameListener;
+import pr_se.gogame.view_controller.observer.GameEvent;
+import pr_se.gogame.view_controller.observer.GameListener;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -287,12 +287,12 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void playMove(int x, int y) {
-        playMove(x, y, this.curColor);
+    public boolean playMove(int x, int y) {
+        return playMove(x, y, this.curColor);
     }
 
     @Override
-    public void playMove(int x, int y, StoneColor color) {
+    public boolean playMove(int x, int y, StoneColor color) {
         if(gameState != GameState.RUNNING) {
             throw new IllegalStateException("Can't place stone when game isn't running! Game State was " + gameState);
         }
@@ -306,7 +306,7 @@ public class Game implements GameInterface {
         final UndoableCommand uc02SetStone = board.setStone(x, y, curColor, false); // uc02SetStone is already executed within board.setStone().
 
         if(uc02SetStone == null) {
-            return;
+            return false;
         }
 
         // Assertion: uc02SetStone != null and was hence a valid move.
@@ -316,7 +316,7 @@ public class Game implements GameInterface {
         if(uc03IsKo == null) {
             uc02SetStone.undo();
             uc01SetColor.undo();
-            return;
+            return false;
         }
 
         final int OLD_MOVE_NO = curMoveNumber;
@@ -381,6 +381,8 @@ public class Game implements GameInterface {
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
         }
+
+        return true;
     }
 
     @Override

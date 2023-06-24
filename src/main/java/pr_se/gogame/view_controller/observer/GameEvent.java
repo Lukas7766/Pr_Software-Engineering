@@ -1,4 +1,4 @@
-package pr_se.gogame.view_controller;
+package pr_se.gogame.view_controller.observer;
 
 import pr_se.gogame.model.GameCommand;
 import pr_se.gogame.model.StoneColor;

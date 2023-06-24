@@ -2,7 +2,7 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.Ruleset;
-import pr_se.gogame.view_controller.GameListener;
+import pr_se.gogame.view_controller.observer.GameListener;
 
 import java.io.File;
 
@@ -54,9 +54,9 @@ public interface GameInterface {
      * @param x the x coordinate of the stone, starting at the left
      * @param y the y coordinate of the stone, starting at the top
      */
-    void playMove(int x, int y);
+    boolean playMove(int x, int y);
 
-    void playMove(int x, int y, StoneColor color);
+    boolean playMove(int x, int y, StoneColor color);
 
     void placeHandicapPosition(int x, int y, boolean placeStone);
 

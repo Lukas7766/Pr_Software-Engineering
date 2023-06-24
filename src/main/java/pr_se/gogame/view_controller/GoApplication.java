@@ -23,9 +23,6 @@ public class GoApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        //Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-        //    CustomExceptionDialog.show(e);
-        //});
         CustomExceptionDialog.setStage(stage);
 
         // Generate the necessary folder and extract the default the graphics pack if it is not present.

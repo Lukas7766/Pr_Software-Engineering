@@ -16,6 +16,8 @@ import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.MarkShape;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
+import pr_se.gogame.view_controller.observer.DebugEvent;
+import pr_se.gogame.view_controller.observer.ViewListener;
 
 import java.io.IOException;
 import java.io.InputStream;
