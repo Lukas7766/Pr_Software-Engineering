@@ -673,7 +673,9 @@ public class Game implements GameInterface {
     public void goBeforeFirstMove() {
         goToFirstMove();
         removeAllMarks();
-        history.stepBack();
+        if(history.getCurrentNode().getSaveToken() != HistoryNode.AbstractSaveToken.SETUP && history.getCurrentNode().getSaveToken() != HistoryNode.AbstractSaveToken.HANDICAP) {
+            history.stepBack();
+        }
         reDisplayMarks();
     }
 

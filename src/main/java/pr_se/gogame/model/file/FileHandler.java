@@ -102,7 +102,10 @@ public final class FileHandler {
                         break;
 
                     case HANDICAP:
-                        throw new IOException("Can't save handicap after game has commenced!");
+                        if(!history.isAtEnd()) {
+                            throw new IOException("Can't save handicap after game has commenced!");
+                        }
+                        break;
 
                     default:
                         break;
@@ -136,11 +139,16 @@ public final class FileHandler {
 
     private static void writeAttributeSequence(FileWriter output, History history, HistoryNode parentNode) throws IOException {
         history.stepForward();
-        while(!history.isAtEnd() && history.getCurrentNode().getSaveToken() == parentNode.getSaveToken() && history.getCurrentNode().getColor() == parentNode.getColor()) {
+        while(history.getCurrentNode().getSaveToken() == parentNode.getSaveToken() && history.getCurrentNode().getColor() == parentNode.getColor()) {
             output.write(String.format(LONE_ATTRIBUTE.getValue(), formStringFromCoords(history.getCurrentNode().getX(), history.getCurrentNode().getY())));
+            if(history.isAtEnd()) {
+                break;
+            }
             history.stepForward();
         }
-        history.stepBack();
+        if(!history.isAtEnd()) {
+            history.stepBack();
+        }
     }
 
     public static boolean loadFile(Game game, File file) {
@@ -204,38 +212,39 @@ public final class FileHandler {
             }
             Position decodedCoords;
             String currentComment = null;
+            int handicap = 0;
 
             if(t.getToken() == HA) {
-                int handicap = Integer.parseInt(t.getAttributeValue());
-                if(handicap < Game.MIN_HANDICAP_AMOUNT || handicap > Game.MAX_HANDICAP_AMOUNT) {
+                handicap = Integer.parseInt(t.getAttributeValue());
+                if (handicap < Game.MIN_HANDICAP_AMOUNT || handicap > Game.MAX_HANDICAP_AMOUNT) {
                     throw new IOException("Invalid handicap amount of " + handicap + "!");
                 }
-                game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
-                if(handicap > 0) {
-                    StoneColor handicapColor = null;
+            }
 
-                    t = scanner.next();
+            game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
 
-                    if(t.getToken() == AB) {
-                        handicapColor = BLACK;
-                    } else if(t.getToken() == AW) {
-                        handicapColor = WHITE;
-                    } else if(handicap > 1){
-                        unexpected(AB.getValue() + " or " + AW.getValue(), t);
-                    }
+            if(handicap > 0) {
+                StoneColor handicapColor = null;
 
-                    if(handicapColor != null) {
-                        game.setHandicapStoneCounter(handicap);
-                        do {
-                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
+                t = scanner.next();
 
-                            t = scanner.next();
-                        } while (t.getToken() == LONE_ATTRIBUTE);
-                    }
+                if(t.getToken() == AB) {
+                    handicapColor = BLACK;
+                } else if(t.getToken() == AW) {
+                    handicapColor = WHITE;
+                } else if(handicap > 1){
+                    unexpected(AB.getValue() + " or " + AW.getValue(), t);
                 }
-            } else {
-                game.newGame(BLACK, size, 0, new JapaneseRuleset(), false);
+
+                if(handicapColor != null) {
+                    game.setHandicapStoneCounter(handicap);
+                    do {
+                        decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
+
+                        t = scanner.next();
+                    } while (t.getToken() == LONE_ATTRIBUTE);
+                }
             }
 
             Map<Position, MarkShape> marks = new LinkedHashMap<>();
