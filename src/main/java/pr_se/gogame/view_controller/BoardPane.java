@@ -439,11 +439,7 @@ public class BoardPane extends GridPane {
             selectionPBC = null;
 
             if(hoverPBC != null) {
-                if (game.getCurColor() == BLACK) {
-                    hoverPBC.hoverBlack();
-                } else {
-                    hoverPBC.hoverWhite();
-                }
+                hoverPBC.hover();
             }
 
             /*
@@ -950,22 +946,6 @@ public class BoardPane extends GridPane {
         }
 
         /**
-         * Makes this PlayableBoardCell display a translucent version of the white stone to indicate that it is being
-         * hovered over and can be selected with a left click
-         */
-        public void hoverWhite() {
-            hover(whiteHover);
-        }
-
-        /**
-         * Makes this PlayableBoardCell display a translucent version of the black stone to indicate that it is being
-         * hovered over and can be selected with a left click
-         */
-        public void hoverBlack() {
-            hover(blackHover);
-        }
-
-        /**
          * Removes all hover indicators on this PlayableBoardCell, unless it is selected (to remove a selection
          * indicator, call deselect() instead).
          */
@@ -1001,11 +981,11 @@ public class BoardPane extends GridPane {
          * Makes this PlayableBoardCell display a translucent version of the current player color to indicate that it is
          * being hovered over and can be selected with a left click
          */
-        private void hover() {
+        public void hover() {
             if (game.getCurColor() == BLACK) {
-                hoverBlack();
+                hover(blackHover);
             } else {
-                hoverWhite();
+                hover(whiteHover);
             }
         }
 
