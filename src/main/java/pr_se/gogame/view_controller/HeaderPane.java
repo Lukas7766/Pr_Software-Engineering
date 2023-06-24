@@ -184,11 +184,26 @@ public class HeaderPane extends VBox {
     private Menu gameSection() {
         Menu menu = new Menu("_Game");
 
+        MenuItem passItem = new MenuItem("_Pass");
+
         CheckMenuItem setupMode = new CheckMenuItem("Set_up mode");
         // This item probably doesn't need a separate accelerator.
         gameSectionItems.add(setupMode);
         setupMode.setSelected(game.isSetupMode());
-        setupMode.setOnAction(e -> game.setSetupMode(setupMode.isSelected()));
+        setupMode.setOnAction(e -> {
+            game.setSetupMode(setupMode.isSelected());
+
+            if(game.isSetupMode()) {
+                passItem.setText("Switch co_lor");
+                var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Pass")).findFirst();
+                k.ifPresent(button -> button.setText("Switch color"));
+
+            } else {
+                passItem.setText("_Pass");
+                var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Switch color")).findFirst();
+                k.ifPresent(button -> button.setText("Pass"));
+            }
+        });
 
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
         moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
@@ -200,7 +215,7 @@ public class HeaderPane extends VBox {
             k.ifPresent(button -> button.setVisible(GlobalSettings.isConfirmationNeeded()));
         });
 
-        MenuItem passItem = new MenuItem("_Pass");
+
         passItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN));
         gameSectionItems.add(passItem);
         passItem.setOnAction(e -> game.pass());
