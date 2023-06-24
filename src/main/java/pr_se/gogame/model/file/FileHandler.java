@@ -58,10 +58,8 @@ public final class FileHandler {
 
                     history.stepForward();
                     node = history.getCurrentNode();
-                } else {
-                    if(game.getHandicap() > 1) {
-                        throw new IllegalStateException("Handicap move expected but not found!");
-                    }
+                } else if(game.getHandicap() > 1) {
+                    throw new IllegalStateException("Handicap move expected but not found!");
                 }
             }
 
