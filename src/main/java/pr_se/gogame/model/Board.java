@@ -37,7 +37,7 @@ public class Board implements BoardInterface {
      * (only if the Game has a handicap set)
      *
      * @param game the Game that this Board belongs to
-     * @param size
+     * @param size the size of the board
      */
     public Board(Game game, int size) {
         this.game = game;
@@ -46,7 +46,7 @@ public class Board implements BoardInterface {
     }
 
     @Override
-    public UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode) {
+    public UndoableCommand setStone(int x, int y, final StoneColor color, final boolean prepareMode) {
         checkXYCoordinates(x, y);
 
         if(color == null) {
@@ -145,61 +145,59 @@ public class Board implements BoardInterface {
         subcommands.add(uc03PlacePointer);
 
         final boolean FINAL_KILL_ANOTHER = killAnother;
-        final boolean PREPARE_MODE = prepareMode;
-        final StoneColor COLOR = color;
 
         final UndoableCommand uc04RemoveCapturedStones = new UndoableCommand() {
-            final LinkedList<UndoableCommand> UC06_01_REMOVE_STONE_COMMANDS = new LinkedList<>();
-            UndoableCommand uC06_02_addCapturedStonesCommand = null;
+            final LinkedList<UndoableCommand> uc0601RemoveStoneCommands = new LinkedList<>();
+            UndoableCommand uC0602AddCapturedStonesCommand = null;
 
             @Override
             public void execute(boolean saveEffects) {
-                if (!PREPARE_MODE) {
+                if (!prepareMode) {
 
                     for (StoneGroup sg : surroundingSGs) {
-                        if ((sg.getStoneColor() != COLOR || !FINAL_KILL_ANOTHER) && sg.getLiberties().size() == 0) {
+                        if ((sg.getStoneColor() != color || !FINAL_KILL_ANOTHER) && sg.getLiberties().isEmpty()) {
                             int captured = 0;
                             for (Position p : sg.getLocations()) {
                                 UndoableCommand tmpCmd = removeStone(p.x, p.y);
-                                UC06_01_REMOVE_STONE_COMMANDS.add(tmpCmd);
+                                uc0601RemoveStoneCommands.add(tmpCmd);
                                 if(saveEffects) {
                                     getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
                                     getUndoEvents().addAll(tmpCmd.getUndoEvents());
                                 }
                                 captured++;
                             }
-                            uC06_02_addCapturedStonesCommand = game.addCapturedStones(COLOR, captured);
+                            uC0602AddCapturedStonesCommand = game.addCapturedStones(color, captured);
                         }
                     }
                 }
 
                 // Update UI if possible
                 if (!FINAL_PERMITTED_SUICIDE && saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, COLOR, game.getCurMoveNumber()));
+                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, color, game.getCurMoveNumber()));
                     getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
                 }
             }
 
             @Override
             public void undo() {
-                for(UndoableCommand c : UC06_01_REMOVE_STONE_COMMANDS) {
+                for(UndoableCommand c : uc0601RemoveStoneCommands) {
                     c.undo();
                 }
 
-                if(uC06_02_addCapturedStonesCommand != null) {
-                    uC06_02_addCapturedStonesCommand.undo();
+                if(uC0602AddCapturedStonesCommand != null) {
+                    uC0602AddCapturedStonesCommand.undo();
                 }
             }
         };
         uc04RemoveCapturedStones.execute(true);
         subcommands.add(uc04RemoveCapturedStones);
 
-        final List<UndoableCommand> SUBCOMMANDS = Collections.unmodifiableList(subcommands);
+        final List<UndoableCommand> finalSubCommands = Collections.unmodifiableList(subcommands);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                for(UndoableCommand c : SUBCOMMANDS) {
+                for(UndoableCommand c : finalSubCommands) {
                     if(c != null) {
                         c.execute(saveEffects);
                     }
@@ -209,7 +207,7 @@ public class Board implements BoardInterface {
             @Override
             public void undo() {
                 // Undoing it the other way round just in case.
-                ListIterator<UndoableCommand> i = SUBCOMMANDS.listIterator(SUBCOMMANDS.size());
+                ListIterator<UndoableCommand> i = finalSubCommands.listIterator(finalSubCommands.size());
                 while(i.hasPrevious()) {
                     UndoableCommand c = i.previous();
                     if(c != null) {
@@ -229,11 +227,11 @@ public class Board implements BoardInterface {
     public UndoableCommand removeStone(int x, int y) {
         checkXYCoordinates(x, y);
 
-        final StoneGroupPointer BOARD_AT_XY_PREVIOUSLY = boardContents[x][y];
+        final StoneGroupPointer boardAtXyPreviously = boardContents[x][y];
 
         UndoableCommand ret = new UndoableCommand() {
 
-            final List<UndoableCommand> ADD_LIBERTY_COMMANDS = new LinkedList<>();
+            final List<UndoableCommand> addLibertyCommands = new LinkedList<>();
 
             @Override
             public void execute(boolean saveEffects) {
@@ -246,21 +244,21 @@ public class Board implements BoardInterface {
                     (neighborX, neighborY) -> boardContents[neighborX][neighborY].getStoneGroup()
                 );
                 for (StoneGroup sg : surroundingSGs) {
-                    ADD_LIBERTY_COMMANDS.add(sg.addLiberty(new Position(x, y)));
+                    addLibertyCommands.add(sg.addLiberty(new Position(x, y)));
                 }
 
                 // Update UI
                 if(saveEffects) {
                     getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
-                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, BOARD_AT_XY_PREVIOUSLY.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
+                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, boardAtXyPreviously.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
                 }
             }
 
             @Override
             public void undo() {
-                boardContents[x][y] = BOARD_AT_XY_PREVIOUSLY;
+                boardContents[x][y] = boardAtXyPreviously;
 
-                for(UndoableCommand c : ADD_LIBERTY_COMMANDS) {
+                for(UndoableCommand c : addLibertyCommands) {
                     c.undo();
                 }
             }

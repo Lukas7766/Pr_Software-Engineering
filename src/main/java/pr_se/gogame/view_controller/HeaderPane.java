@@ -21,6 +21,7 @@ import pr_se.gogame.model.file.FileHandler;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -125,10 +126,8 @@ public class HeaderPane extends VBox {
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
             File f = CustomFileDialog.getFile(stage, false, filterList);
-            if (f == null) {
-                System.out.println("Import Dialog cancelled");
-            } else if(!game.loadGame(f)) {
-                System.out.println("Failed to load game!");
+            if (f != null && !game.loadGame(f)) {
+                CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably because the file contains unsupported SGF features.");
             }
         });
 
@@ -335,24 +334,20 @@ public class HeaderPane extends VBox {
 
         Button fastBackward = new Button("<<");
         fastBackward.setFocusTraversable(false);
-        fastBackward.setOnAction(e -> System.out.println("fastBackward"));
         playbackControlList.add(fastBackward);
         fastBackward.setOnAction(e -> game.rewind());
 
         Button backward = new Button("<");
         backward.setFocusTraversable(false);
-        backward.setOnAction(e -> System.out.println("backward"));
         playbackControlList.add(backward);
         backward.setOnAction(e -> game.undo());
 
         Button forward = new Button(">");
         forward.setFocusTraversable(false);
-        forward.setOnAction(e -> System.out.println("forward"));
         playbackControlList.add(forward);
         forward.setOnAction(e -> game.redo());
 
         Button fastForward = new Button(">>");
-        fastForward.setOnAction(e -> System.out.println("fastForward"));
         fastForward.setFocusTraversable(false);
         playbackControlList.add(fastForward);
         fastForward.setOnAction(e -> game.fastForward());
@@ -362,20 +357,16 @@ public class HeaderPane extends VBox {
         //Key Bindings for the playback control
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F), () -> {
             if (backward.isDisabled()) return;
-            System.out.println("backward");
         });
 
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.H), () -> {
             if (forward.isDisabled()) return;
-            System.out.println("forward");
         });
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T), () -> {
             if (fastForward.isDisabled()) return;
-            System.out.println("fastForward");
         });
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.G), () -> {
             if (fastBackward.isDisabled()) return;
-            System.out.println("fastBackward");
         });
 
 
@@ -443,7 +434,6 @@ public class HeaderPane extends VBox {
         graphicsPackSelectorComboBox.setTranslateX(-15);
         graphicsPackSelectorComboBox.setFocusTraversable(false);
         graphicsPackSelectorComboBox.setOnAction((e) -> {
-            System.out.println(graphicsPackSelectorComboBox.getValue());
             GlobalSettings.setGraphicsPack("/" + graphicsPackSelectorComboBox.getValue());
         });
 
@@ -465,7 +455,9 @@ public class HeaderPane extends VBox {
                 return;
             }
         }
-        if (!game.saveGame(saveGameFile)) System.out.println("Export did not work!");
+        if (!game.saveGame(saveGameFile)) {
+            CustomExceptionDialog.show(new IOException(), "Could not save game!");
+        }
     }
 
 }

@@ -146,17 +146,17 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't score game if it isn't running! gameState was + " + gameState);
         }
 
-        final GameResult OLD_GAME_RESULT = this.gameResult;
-        final StoneColor FINAL_CUR_COLOR = this.curColor;
+        final GameResult oldGameResult = this.gameResult;
+        final StoneColor finalCurColor = this.curColor;
 
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
                 String msg =
-                        "Game was resigned by " + FINAL_CUR_COLOR + "!\n" +
+                        "Game was resigned by " + finalCurColor + "!\n" +
                         "\n" +
-                        StoneColor.getOpposite(FINAL_CUR_COLOR) + " won!";
-                gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(FINAL_CUR_COLOR), msg);
+                        StoneColor.getOpposite(finalCurColor) + " won!";
+                gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(finalCurColor), msg);
                 if(saveEffects) {
                     getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
                     getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
@@ -166,13 +166,13 @@ public class Game implements GameInterface {
 
             @Override
             public void undo() {
-                gameResult = OLD_GAME_RESULT;
+                gameResult = oldGameResult;
                 gameState = GameState.RUNNING;
             }
         };
         c.execute(true);
 
-        history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.RESIGN, FINAL_CUR_COLOR, "resign"));
+        history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.RESIGN, finalCurColor, "resign"));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -267,12 +267,12 @@ public class Game implements GameInterface {
         return handicapStoneCounter;
     }
 
-    private UndoableCommand setCurColor(StoneColor c) {
+    private UndoableCommand setCurColor(final StoneColor c) {
         if (c == null) {
             throw new NullPointerException();
         }
 
-        final StoneColor OLD_COLOR = this.curColor;
+        final StoneColor oldColor = this.curColor;
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
@@ -282,7 +282,7 @@ public class Game implements GameInterface {
 
             @Override
             public void undo() {
-                Game.this.curColor = OLD_COLOR;
+                Game.this.curColor = oldColor;
             }
         };
         ret.execute(true);
@@ -305,27 +305,27 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        final UndoableCommand UC01_SET_COLOR = setCurColor(color);
+        final UndoableCommand uc01SetColor = setCurColor(color);
 
-        final UndoableCommand UC02_SET_STONE = board.setStone(x, y, curColor, false); // UC02_SET_STONE is already executed within board.setStone().
+        final UndoableCommand uc02SetStone = board.setStone(x, y, curColor, false); // uc02SetStone is already executed within board.setStone().
 
-        if(UC02_SET_STONE == null) {
+        if(uc02SetStone == null) {
             return;
         }
 
-        // Assertion: UC02_SET_STONE != null and was hence a valid move.
+        // Assertion: uc02SetStone != null and was hence a valid move.
 
-        final UndoableCommand UC03_IS_KO = ruleset.isKo(this);
+        final UndoableCommand uc03IsKo = ruleset.isKo(this);
 
-        if(UC03_IS_KO == null) {
-            UC02_SET_STONE.undo();
+        if(uc03IsKo == null) {
+            uc02SetStone.undo();
             System.out.println("Ko detected. Move aborted.");
             return;
         }
 
         final int OLD_MOVE_NO = curMoveNumber;
 
-        final UndoableCommand UC04_SWITCH_COLOR = new UndoableCommand() {
+        final UndoableCommand uc04SwitchColor = new UndoableCommand() {
             UndoableCommand thisCommand = null;
 
             @Override
@@ -347,23 +347,23 @@ public class Game implements GameInterface {
                 curMoveNumber = OLD_MOVE_NO;
             }
         };
-        UC04_SWITCH_COLOR.execute(true);
+        uc04SwitchColor.execute(true);
 
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                UC01_SET_COLOR.execute(saveEffects);
-                UC02_SET_STONE.execute(saveEffects);
-                UC03_IS_KO.execute(saveEffects);
-                UC04_SWITCH_COLOR.execute(saveEffects);
+                uc01SetColor.execute(saveEffects);
+                uc02SetStone.execute(saveEffects);
+                uc03IsKo.execute(saveEffects);
+                uc04SwitchColor.execute(saveEffects);
             }
 
             @Override
             public void undo() {
-                UC04_SWITCH_COLOR.undo();
-                UC03_IS_KO.undo();
-                UC02_SET_STONE.undo();
-                UC01_SET_COLOR.undo();
+                uc04SwitchColor.undo();
+                uc03IsKo.undo();
+                uc02SetStone.undo();
+                uc01SetColor.undo();
             }
         };
         // c was already executed piecemeal
@@ -371,10 +371,10 @@ public class Game implements GameInterface {
         /*
          * UC02 and UC04 fire events, so those have to be added to the command containing them.
          */
-        c.getExecuteEvents().addAll(UC02_SET_STONE.getExecuteEvents());
-        c.getExecuteEvents().addAll(UC04_SWITCH_COLOR.getExecuteEvents());
-        c.getUndoEvents().addAll(UC02_SET_STONE.getUndoEvents());
-        c.getUndoEvents().addAll(UC04_SWITCH_COLOR.getUndoEvents());
+        c.getExecuteEvents().addAll(uc02SetStone.getExecuteEvents());
+        c.getExecuteEvents().addAll(uc04SwitchColor.getExecuteEvents());
+        c.getUndoEvents().addAll(uc02SetStone.getUndoEvents());
+        c.getUndoEvents().addAll(uc04SwitchColor.getUndoEvents());
 
         /*
          * StoneColor.getOpposite() because we previously switched colors
@@ -415,18 +415,17 @@ public class Game implements GameInterface {
             // Assertion: uc01SetStone != null and was hence a valid move.
 
             final UndoableCommand uc02UpdateCounter = new UndoableCommand() {
-                UndoableCommand uC02_switchColor = null;
+                UndoableCommand uC02SwitchColor = null;
 
                 @Override
                 public void execute(boolean saveEffects) {
                     handicapStoneCounter = NEW_HANDICAP_CTR;
 
                     if (NEW_HANDICAP_CTR <= 0) {
-                        System.out.println("handicapStoneCounter is now less than 0.");
-                        uC02_switchColor = switchColor();
+                        uC02SwitchColor = switchColor();
                         if(saveEffects) {
-                            getExecuteEvents().addAll(uC02_switchColor.getExecuteEvents());
-                            getUndoEvents().addAll(uC02_switchColor.getUndoEvents());
+                            getExecuteEvents().addAll(uC02SwitchColor.getExecuteEvents());
+                            getUndoEvents().addAll(uC02SwitchColor.getUndoEvents());
                         }
 
                         gameState = GameState.RUNNING;
@@ -435,8 +434,8 @@ public class Game implements GameInterface {
 
                 @Override
                 public void undo() {
-                    if(uC02_switchColor != null) {
-                        uC02_switchColor.undo();
+                    if(uC02SwitchColor != null) {
+                        uC02SwitchColor.undo();
                     }
                     handicapStoneCounter = OLD_HANDICAP_CTR;
 
@@ -492,23 +491,23 @@ public class Game implements GameInterface {
 
         final int OLD_CUR_MOVE_NUMBER = curMoveNumber;
         curMoveNumber = 0;
-        final UndoableCommand UC01_SET_STONE = board.setStone(x, y, color, true); // UC01_SET_STONE is already executed within board.setStone().
+        final UndoableCommand uc01SetStone = board.setStone(x, y, color, true); // uc01SetStone is already executed within board.setStone().
         curMoveNumber = OLD_CUR_MOVE_NUMBER;
 
-        if(UC01_SET_STONE == null) {
+        if(uc01SetStone == null) {
             return;
         }
 
-        // Assertion: UC01_SET_STONE != null and was hence a valid move.
+        // Assertion: uc01SetStone != null and was hence a valid move.
 
         /*
          * StoneColor.getOpposite() because we previously switched colors
          */
         removeAllMarks();
-        UC01_SET_STONE.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
-        history.addNode(new HistoryNode(UC01_SET_STONE, HistoryNode.AbstractSaveToken.SETUP, color, x, y, "placeSetupStone(" + x + ", " + y + ")"));
+        uc01SetStone.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
+        history.addNode(new HistoryNode(uc01SetStone, HistoryNode.AbstractSaveToken.SETUP, color, x, y, "placeSetupStone(" + x + ", " + y + ")"));
 
-        for(GameEvent e : UC01_SET_STONE.getExecuteEvents()) {
+        for(GameEvent e : uc01SetStone.getExecuteEvents()) {
             fireGameEvent(e);
         }
     }
@@ -673,24 +672,7 @@ public class Game implements GameInterface {
     }
 
     public void reDisplayMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> {
-            switch (value) {
-                case CIRCLE:
-                    fireGameEvent(new GameEvent(GameCommand.MARK_CIRCLE, key.x, key.y, curMoveNumber));
-                    break;
-
-                case SQUARE:
-                    fireGameEvent(new GameEvent(GameCommand.MARK_SQUARE, key.x, key.y, curMoveNumber));
-                    break;
-
-                case TRIANGLE:
-                    fireGameEvent(new GameEvent(GameCommand.MARK_TRIANGLE, key.x, key.y, curMoveNumber));
-                    break;
-
-                default:
-                    break;
-            }
-        });
+        history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.x, key.y, value));
     }
 
     @Override

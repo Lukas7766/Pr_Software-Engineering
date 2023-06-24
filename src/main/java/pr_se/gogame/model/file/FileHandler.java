@@ -158,8 +158,6 @@ public final class FileHandler {
 
             ScannedToken t = scanner.next();
 
-            System.out.println("Reading preparatory Token ...");
-
             if(t.getToken() != LPAR) {
                 unexpected(LPAR.getValue(), t);
             }
@@ -349,8 +347,6 @@ public final class FileHandler {
             }
 
         } catch(IOException e) {
-            System.out.println("Couldn't properly read SGF file!");
-            ;
             return false;
         }
 

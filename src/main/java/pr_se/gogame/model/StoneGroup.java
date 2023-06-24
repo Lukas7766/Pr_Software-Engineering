@@ -1,9 +1,6 @@
 package pr_se.gogame.model;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Model
@@ -66,8 +63,8 @@ public class StoneGroup {
             throw new IllegalArgumentException("Stone group must be of the same color!");
         }
 
-        final List<Position> OLD_LOCATIONS = new LinkedList<>(locations);
-        final Set<Position> OLD_LIBERTIES = new HashSet<>(liberties);
+        final List<Position> oldLocations = Collections.unmodifiableList(locations);
+        final Set<Position> oldLiberties = Collections.unmodifiableSet(liberties);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
@@ -83,9 +80,9 @@ public class StoneGroup {
             @Override
             public void undo() {
                 locations.clear();
-                locations.addAll(OLD_LOCATIONS);
+                locations.addAll(oldLocations);
                 liberties.clear();
-                liberties.addAll(OLD_LIBERTIES);
+                liberties.addAll(oldLiberties);
                 other.getPointers().forEach(p -> {
                     p.setStoneGroup(other);
                     pointers.remove(p);
@@ -99,26 +96,26 @@ public class StoneGroup {
     }
 
     /**
-     * Adds the supplied LIBERTY to this StoneGroup
-     * @param LIBERTY unoccupied Position to be added to this StoneGroup
+     * Adds the supplied liberty to this StoneGroup
+     * @param liberty unoccupied Position to be added to this StoneGroup
      */
-    public UndoableCommand addLiberty(final Position LIBERTY) {
-        if(LIBERTY == null) {
+    public UndoableCommand addLiberty(final Position liberty) {
+        if(liberty == null) {
             throw new NullPointerException();
         }
 
-        final boolean WAS_CONTAINED = liberties.contains(LIBERTY);
+        final boolean wasContained = liberties.contains(liberty);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                liberties.add(LIBERTY);
+                liberties.add(liberty);
             }
 
             @Override
             public void undo() {
-                if(!WAS_CONTAINED) {
-                    liberties.remove(LIBERTY);
+                if(!wasContained) {
+                    liberties.remove(liberty);
                 }
             }
         };
@@ -137,7 +134,7 @@ public class StoneGroup {
             throw new NullPointerException();
         }
 
-        final boolean WAS_CONTAINED = liberties.contains(liberty);
+        final boolean wasContained = liberties.contains(liberty);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
@@ -147,7 +144,7 @@ public class StoneGroup {
 
             @Override
             public void undo() {
-                if(WAS_CONTAINED) {
+                if(wasContained) {
                     liberties.add(liberty);
                 }
             }

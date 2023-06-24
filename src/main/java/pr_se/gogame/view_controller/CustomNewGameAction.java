@@ -9,6 +9,7 @@ import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.Game;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 
@@ -57,12 +58,7 @@ public final class CustomNewGameAction {
                     }
 
                     if (!game.saveGame(f)) {
-                        System.out.println("Export did not work!");
-                        Alert info = new Alert(Alert.AlertType.INFORMATION);
-                        info.setTitle("Go Game - Save Game Info");
-                        info.setHeaderText("Game was not saved! Try it again.");
-                        info.initOwner(stage);
-                        info.showAndWait();
+                        CustomExceptionDialog.show(new IOException(), "Could not save game!");
                     }
                 }
             }

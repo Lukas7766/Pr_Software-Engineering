@@ -123,7 +123,7 @@ public class BoardPane extends GridPane {
     /**
      * NumberBinding for the width and height of all BoardCells
      */
-    private NumberBinding MAX_CELL_DIM_INT;
+    private NumberBinding maxCellDimInt;
 
     /**
      * X index for keyboard controls
@@ -275,11 +275,11 @@ public class BoardPane extends GridPane {
         this.size = this.game.getSize();
 
         // determine cell size
-        final NumberBinding MAX_CELL_DIM = Bindings.min(
+        final NumberBinding maxCellDim = Bindings.min(
             widthProperty().divide(size + 2),
             heightProperty().divide(size + 2)
         );
-        MAX_CELL_DIM_INT = Bindings.createIntegerBinding(MAX_CELL_DIM::intValue, MAX_CELL_DIM); // round down
+        maxCellDimInt = Bindings.createIntegerBinding(maxCellDim::intValue, maxCellDim); // round down
 
         // put the axes' corners in first to mess up the indexing as little as possible;
         BoardCell corner1 = new BoardCell(this.outerCorner);
@@ -487,12 +487,11 @@ public class BoardPane extends GridPane {
 
     public void setShowsMoveNumbers(boolean showsMoveNumbers) {
         this.showsMoveNumbers = showsMoveNumbers;
-        System.out.println(showsMoveNumbers);
-        for(int i = 0; i < size; i++) {
-            for(int j = 0; j < size; j++) {
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
                 PlayableBoardCell pbc = getPlayableCell(j, i);
-                if(!pbc.getLabel().getText().startsWith("0")) {
-                    pbc.showMoveNumber();
+                if (!pbc.getLabel().getText().startsWith("0")) {
+                    pbc.showOrHideMoveNumber();
                 }
             }
         }
@@ -699,8 +698,8 @@ public class BoardPane extends GridPane {
             getChildren().add(this.LABEL);
 
             this.setMinSize(0, 0);
-            prefWidthProperty().bind(MAX_CELL_DIM_INT);
-            prefHeightProperty().bind(MAX_CELL_DIM_INT);
+            prefWidthProperty().bind(maxCellDimInt);
+            prefHeightProperty().bind(maxCellDimInt);
             setMouseTransparent(true);
         }
 
@@ -972,7 +971,7 @@ public class BoardPane extends GridPane {
          * Updates the showing of the move number (i.e., the label) according to its own set status and the global
          * BoardPane's showsMoveNumbers attributes
          */
-        public void showMoveNumber() {
+        public void showOrHideMoveNumber() {
             LABEL.setVisible(currentlySetStone != null && showsMoveNumbers);
             updateLabelColor();
         }

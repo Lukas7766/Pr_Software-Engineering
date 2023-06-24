@@ -255,7 +255,6 @@ public class SidePane extends StackPane {
         //change Event
         boardSize.selectedToggleProperty().addListener((observableValue, toggle, t1) -> {
             customSize.setDisable(t1.hashCode() != custom.hashCode());
-            System.out.println(((RadioButton) t1).getText());
         });
 
         //Handicap

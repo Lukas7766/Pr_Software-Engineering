@@ -32,8 +32,6 @@ public class GoApplication extends Application {
         String graphicsPack = GlobalSettings.getGraphicsPack();
         Path path = Paths.get(GlobalSettings.getGraphicsPath());
         if(Files.notExists(path, LinkOption.NOFOLLOW_LINKS)) {
-            System.out.println("The default graphics pack doesn't exist.");
-
             InputStream link = this.getClass().getResourceAsStream(graphicsPack);
             if(link == null) {
                 throw new NullPointerException("Default graphics pack is not in JAR file!");
