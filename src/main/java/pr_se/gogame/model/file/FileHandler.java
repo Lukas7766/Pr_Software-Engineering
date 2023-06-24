@@ -79,7 +79,7 @@ public final class FileHandler {
                 if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
                     throw new IOException("Can't save handicap after game has commenced!");
                 } else {
-                    t = SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor());
+                    t = SGFToken.ofHistoryNode(node);
                     if (t == AE || t == null) {
                         throw new IllegalStateException(t.getValue() + " token not supported!");
                     }
@@ -91,13 +91,13 @@ public final class FileHandler {
 
                 if(iter.hasNext()) {
                     node = iter.next();
-                    if(t == SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor()) && t.hasMultiAttribs()) {
+                    if(t == SGFToken.ofHistoryNode(node) && t.hasMultiAttribs()) {
                         node = writeAttributeSequence(output, iter, node);
                     }
 
                 }
 
-                if(iter.hasNext() || t != SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor())) {
+                if(iter.hasNext() || t != SGFToken.ofHistoryNode(node)) {
                     writeNodeMetaData(output, node.getPrev());
                 } else {
                     writeNodeMetaData(output, node);

@@ -1,7 +1,6 @@
 package pr_se.gogame.model.file;
 
 import pr_se.gogame.model.HistoryNode;
-import pr_se.gogame.model.StoneColor;
 
 import static pr_se.gogame.model.StoneColor.BLACK;
 import static pr_se.gogame.model.StoneColor.WHITE;
@@ -137,7 +136,7 @@ public enum SGFToken {
      * Creates a token
      *
      * @param token                String for the token
-     * @param supportsMultiAttribs
+     * @param supportsMultiAttribs whether the token may have multiple attributes in the file
      */
     SGFToken(String token, boolean supportsMultiAttribs) {
         this.value = token;
@@ -158,19 +157,19 @@ public enum SGFToken {
         return supportsMultiAttribs;
     }
 
-    public static SGFToken ofAbstractSaveToken(HistoryNode.AbstractSaveToken t, StoneColor c) {
-        switch(t) {
+    public static SGFToken ofHistoryNode(HistoryNode node) {
+        switch(node.getSaveToken()) {
             case SETUP, HANDICAP:
-                if(c == BLACK) {
+                if(node.getColor() == BLACK) {
                     return AB;
-                } else if(c == WHITE) {
+                } else if(node.getColor() == WHITE) {
                     return AW;
                 } else {
                     return AE;
                 }
 
             case MOVE, PASS:
-                if(c == BLACK) {
+                if(node.getColor() == BLACK) {
                     return B;
                 } else {
                     return W;
