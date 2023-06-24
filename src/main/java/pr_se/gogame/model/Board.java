@@ -119,16 +119,13 @@ public class Board implements BoardInterface {
             subcommands.add(sg.removeLiberty(new Position(x, y)));
         }
 
-        final boolean finalPermittedSuicide = permittedSuicide;
-        final UndoableCommand uc03PlacePointer = new UndoableCommand() {
+        final UndoableCommand uc03PlacePointer = (permittedSuicide) ? (null) : new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                if (!finalPermittedSuicide) {
-                    boardContents[x][y] =
-                        firstSameColorGroup.getPointers().stream()
-                            .findFirst()
-                            .orElseGet(() -> new StoneGroupPointer(newGroup));
-                }
+                boardContents[x][y] =
+                    firstSameColorGroup.getPointers().stream()
+                        .findFirst()
+                        .orElseGet(() -> new StoneGroupPointer(newGroup));
             }
 
             @Override
@@ -136,53 +133,49 @@ public class Board implements BoardInterface {
                 boardContents[x][y] = null;
             }
         };
-        uc03PlacePointer.execute(true);
-        subcommands.add(uc03PlacePointer);
+        if(uc03PlacePointer != null) {
+            uc03PlacePointer.execute(true);
+            subcommands.add(uc03PlacePointer);
+        }
 
         final boolean finalKillAnother = killAnother;
 
-        final UndoableCommand uc04RemoveCapturedStones = new UndoableCommand() {
-            final LinkedList<UndoableCommand> uc0601RemoveStoneCommands = new LinkedList<>();
-            UndoableCommand uC0602AddCapturedStonesCommand = null;
+        UndoableCommand uc04RemoveCapturedStones = (prepareMode) ? (null) : new UndoableCommand() {
+            final LinkedList<UndoableCommand> uc0401RemoveStoneCommands = new LinkedList<>();
+            UndoableCommand uC0402AddCapturedStonesCommand = null;
 
             @Override
             public void execute(boolean saveEffects) {
-                if (!prepareMode) {
-                    for (StoneGroup sg : surroundingSGs) {
-                        if ((sg.getStoneColor() != color || !finalKillAnother) && sg.getLiberties().isEmpty()) {
-                            for (Position p : sg.getLocations()) {
-                                UndoableCommand tmpCmd = removeStone(p.x, p.y);
-                                uc0601RemoveStoneCommands.add(tmpCmd);
-                                if(saveEffects) {
-                                    getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
-                                    getUndoEvents().addAll(tmpCmd.getUndoEvents());
-                                }
+                for (StoneGroup sg : surroundingSGs) {
+                    if ((sg.getStoneColor() != color || !finalKillAnother) && sg.getLiberties().isEmpty()) {
+                        for (Position p : sg.getLocations()) {
+                            UndoableCommand tmpCmd = removeStone(p.x, p.y);
+                            uc0401RemoveStoneCommands.add(tmpCmd);
+                            if(saveEffects) {
+                                getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
+                                getUndoEvents().addAll(tmpCmd.getUndoEvents());
                             }
-                            uC0602AddCapturedStonesCommand = game.addCapturedStones(color, sg.getLocations().size());
                         }
+                        uC0402AddCapturedStonesCommand = game.addCapturedStones(color, sg.getLocations().size());
                     }
-                }
-
-                // Update UI if possible
-                if (!finalPermittedSuicide && saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, color, game.getCurMoveNumber()));
-                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
                 }
             }
 
             @Override
             public void undo() {
-                for(UndoableCommand c : uc0601RemoveStoneCommands) {
-                    c.undo();
+                if(uC0402AddCapturedStonesCommand != null) {
+                    uC0402AddCapturedStonesCommand.undo();
                 }
 
-                if(uC0602AddCapturedStonesCommand != null) {
-                    uC0602AddCapturedStonesCommand.undo();
+                for(UndoableCommand c : uc0401RemoveStoneCommands) {
+                    c.undo();
                 }
             }
         };
-        uc04RemoveCapturedStones.execute(true);
-        subcommands.add(uc04RemoveCapturedStones);
+        if(uc04RemoveCapturedStones != null) {
+            uc04RemoveCapturedStones.execute(true);
+            subcommands.add(uc04RemoveCapturedStones);
+        }
 
         final List<UndoableCommand> finalSubCommands = Collections.unmodifiableList(subcommands);
 
@@ -209,8 +202,15 @@ public class Board implements BoardInterface {
             }
         };
         // No execute() this time, as we've already executed the subcommands piecemeal.
-        ret.getExecuteEvents().addAll(uc04RemoveCapturedStones.getExecuteEvents());
-        ret.getUndoEvents().addAll(uc04RemoveCapturedStones.getUndoEvents());
+        if(uc04RemoveCapturedStones != null) {
+            ret.getExecuteEvents().addAll(uc04RemoveCapturedStones.getExecuteEvents());
+            ret.getUndoEvents().addAll(uc04RemoveCapturedStones.getUndoEvents());
+        }
+        if(!permittedSuicide) {
+            ret.getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, color, game.getCurMoveNumber()));
+            ret.getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
+        }
+
 
         return ret;
     }
