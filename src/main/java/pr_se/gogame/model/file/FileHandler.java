@@ -45,17 +45,26 @@ public final class FileHandler {
             node = history.getCurrentNode();
 
             if(game.getHandicap() > 0) {
-                if (node.getColor() == BLACK) {
-                    t = SGFToken.AB;
-                } else if (node.getColor() == WHITE) {
-                    t = SGFToken.AW;
+                if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
+                    if (node.getColor() == BLACK) {
+                        t = SGFToken.AB;
+                    } else if (node.getColor() == WHITE) {
+                        t = SGFToken.AW;
+                    } else {
+                        throw new IllegalStateException("AE token not supported!");
+                    }
+
+                    output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+
+                    writeAttributeSequence(output, history, node);
+
+                    history.stepForward();
+                    node = history.getCurrentNode();
                 } else {
-                    throw new IllegalStateException("AE token not supported!");
+                    if(game.getHandicap() > 1) {
+                        throw new IllegalStateException("Handicap move expected but not found!");
+                    }
                 }
-
-                output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
-
-                writeAttributeSequence(output, history, node);
             }
 
             output.write("\n\n");
@@ -100,8 +109,8 @@ public final class FileHandler {
                         output.write(String.format(t.getValue(), "")); // Passing is done by having an empty move.
                         break;
 
-                    case RESIGN:
-                        break;
+                    case HANDICAP:
+                        throw new IOException("Can't save handicap after game has commenced!");
 
                     default:
                         break;
@@ -211,8 +220,6 @@ public final class FileHandler {
                 }
                 game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
                 if(handicap > 0) {
-                    game.setHandicapStoneCounter(handicap);
-
                     StoneColor handicapColor = null;
 
                     t = scanner.next();
@@ -221,16 +228,19 @@ public final class FileHandler {
                         handicapColor = BLACK;
                     } else if(t.getToken() == AW) {
                         handicapColor = WHITE;
-                    } else {
+                    } else if(handicap > 1){
                         unexpected(AB.getValue() + " or " + AW.getValue(), t);
                     }
 
-                    do {
-                        decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
+                    if(handicapColor != null) {
+                        game.setHandicapStoneCounter(handicap);
+                        do {
+                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                            game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
 
-                        t = scanner.next();
-                    } while(t.getToken() == LONE_ATTRIBUTE);
+                            t = scanner.next();
+                        } while (t.getToken() == LONE_ATTRIBUTE);
+                    }
                 }
             } else {
                 game.newGame(BLACK, size, 0, new JapaneseRuleset(), false);
