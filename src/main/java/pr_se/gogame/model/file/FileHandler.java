@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -208,6 +209,13 @@ public final class FileHandler {
                         break loop;
                 }
             }
+
+            final Map<SGFToken, StoneColor> correspondingColors = new HashMap<>();
+            correspondingColors.put(AW, WHITE);
+            correspondingColors.put(W, WHITE);
+            correspondingColors.put(AB, BLACK);
+            correspondingColors.put(B, BLACK);
+
             Position decodedCoords;
             String currentComment = null;
             int handicap = 0;
@@ -226,11 +234,9 @@ public final class FileHandler {
 
                 t = scanner.next();
 
-                if(t.getToken() == AB) {
-                    handicapColor = BLACK;
-                } else if(t.getToken() == AW) {
-                    handicapColor = WHITE;
-                } else if(handicap > 1){
+                if(t.getToken() == AB || t.getToken() == AW) {
+                    handicapColor = correspondingColors.get(t.getToken());
+                } else if(handicap > 1) {
                     unexpected(AB.getValue() + " or " + AW.getValue(), t);
                 }
 
@@ -267,14 +273,8 @@ public final class FileHandler {
                             }
                             break;
 
-                        case AW:
-                            addStoneColor = WHITE;
-                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                            game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
-                            break;
-
-                        case AB:
-                            addStoneColor = BLACK;
+                        case AB, AW:
+                            addStoneColor = correspondingColors.get(t.getToken());
                             decodedCoords = calculateCoordsFromString(t.getAttributeValue());
                             game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
                             break;
@@ -288,7 +288,7 @@ public final class FileHandler {
                             break;
 
                         case B, W:
-                            StoneColor c = t.getToken() == B ? BLACK : WHITE;
+                            StoneColor c = correspondingColors.get(t.getToken());
                             if (t.getAttributeValue().equals("")) {
                                 game.pass();
                             } else {
