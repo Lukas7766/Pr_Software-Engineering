@@ -6,7 +6,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public final class GlobalSettings {
-    public static final boolean DEBUG = false;
+    public static final boolean DEBUG = true;
 
     private static boolean confirmationNeeded = false;
 

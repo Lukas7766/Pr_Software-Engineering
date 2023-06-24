@@ -147,6 +147,8 @@ public final class FileHandler {
         }
         if(!history.isAtEnd()) {
             history.stepBack();
+        } else if(history.getCurrentNode().getSaveToken() != parentNode.getSaveToken() || history.getCurrentNode().getColor() == parentNode.getColor()) {
+            history.stepBack();
         }
     }
 

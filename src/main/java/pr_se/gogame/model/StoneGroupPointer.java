@@ -40,4 +40,8 @@ public class StoneGroupPointer {
         }
         this.stoneGroup = stoneGroup;
     }
+
+    public static void resetDebug() {
+        nextSerialNo = 0;
+    }
 }

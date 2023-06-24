@@ -469,7 +469,7 @@ public class BoardPane extends GridPane {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 PlayableBoardCell pbc = getPlayableCell(j, i);
-                if (!pbc.getLabel().getText().startsWith("0")) {
+                if (GlobalSettings.DEBUG || !pbc.getLabel().getText().startsWith("0")) {
                     pbc.showOrHideMoveNumber();
                 }
             }
@@ -866,6 +866,11 @@ public class BoardPane extends GridPane {
             setOnMouseEntered(e -> {
                 keyboardCellX = getColumnIndex(this) - 1;
                 keyboardCellY = getRowIndex(this) - 1;
+
+                if(GlobalSettings.DEBUG) {
+                    System.out.println("Info at this position: " + game.getColorAt(keyboardCellX, keyboardCellY));
+                    game.printDebugInfo(keyboardCellX, keyboardCellY);
+                }
 
                 hover();
             });

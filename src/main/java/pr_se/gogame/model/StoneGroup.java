@@ -53,7 +53,7 @@ public class StoneGroup {
      * Adds the locations and liberties of the supplied StoneGroup to this one
      * @param other StoneGroup that is to be merged with this one
      */
-    public UndoableCommand mergeWithStoneGroup(StoneGroup other) {
+    public UndoableCommand mergeWithStoneGroup(final StoneGroup other) {
         if(other == null) {
             throw new NullPointerException();
         }
@@ -177,5 +177,9 @@ public class StoneGroup {
 
     public Set<StoneGroupPointer> getPointers() {
         return pointers;
+    }
+
+    public static void resetDebug() {
+        nextSerialNo = 0;
     }
 }

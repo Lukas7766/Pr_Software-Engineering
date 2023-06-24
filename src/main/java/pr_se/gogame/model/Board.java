@@ -58,8 +58,8 @@ public class Board implements BoardInterface {
         Set<Position> newStoneLiberties = getSurroundings(
             x,
             y,
-                Objects::isNull,
-                Position::new
+            Objects::isNull,
+            Position::new
         );
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
@@ -67,7 +67,7 @@ public class Board implements BoardInterface {
         Set<StoneGroup> surroundingSGs = getSurroundings(
             x,
             y,
-                Objects::nonNull,
+            Objects::nonNull,
             (neighborX, neighborY) -> boardContents[neighborX][neighborY].getStoneGroup()
         );
 
@@ -78,8 +78,6 @@ public class Board implements BoardInterface {
             .filter(sg -> sg.getStoneColor() == color)
             .max(Comparator.comparingInt(sg -> sg.getLiberties().size()))
             .orElse(newGroup);
-
-        final List<UndoableCommand> subcommands = new LinkedList<>();
 
         // Check for suicide
         boolean permittedSuicide = false;
@@ -104,6 +102,8 @@ public class Board implements BoardInterface {
         Set<StoneGroup> sameColorGroups = new HashSet<>(surroundingSGs);
         sameColorGroups.removeAll(otherColorGroups);
         sameColorGroups.remove(firstSameColorGroup);
+
+        final List<UndoableCommand> subcommands = new LinkedList<>();
 
         final UndoableCommand uc01AddNewToFirst = (firstSameColorGroup != newGroup) ? (firstSameColorGroup.mergeWithStoneGroup(newGroup)) : (null);
         subcommands.add(uc01AddNewToFirst);
@@ -148,10 +148,8 @@ public class Board implements BoardInterface {
             @Override
             public void execute(boolean saveEffects) {
                 if (!prepareMode) {
-
                     for (StoneGroup sg : surroundingSGs) {
                         if ((sg.getStoneColor() != color || !finalKillAnother) && sg.getLiberties().isEmpty()) {
-                            int captured = 0;
                             for (Position p : sg.getLocations()) {
                                 UndoableCommand tmpCmd = removeStone(p.x, p.y);
                                 uc0601RemoveStoneCommands.add(tmpCmd);
@@ -159,9 +157,8 @@ public class Board implements BoardInterface {
                                     getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
                                     getUndoEvents().addAll(tmpCmd.getUndoEvents());
                                 }
-                                captured++;
                             }
-                            uC0602AddCapturedStonesCommand = game.addCapturedStones(color, captured);
+                            uC0602AddCapturedStonesCommand = game.addCapturedStones(color, sg.getLocations().size());
                         }
                     }
                 }
@@ -315,6 +312,16 @@ public class Board implements BoardInterface {
 
     public void printDebugInfo(int x, int y) {
         checkXYCoordinates(x, y);
+
+        if(boardContents[x][y] == null) {
+            System.out.println("null");
+        } else {
+            StoneGroup s = boardContents[x][y].getStoneGroup();
+            System.out.println("Location " + x + "/" + y + ":");
+            System.out.println("StoneGroup " + s.serialNo + " locations: ");
+            s.getLocations().forEach(p -> System.out.println(p));
+            System.out.println();
+        }
 
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
