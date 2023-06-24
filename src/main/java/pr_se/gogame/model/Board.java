@@ -182,7 +182,7 @@ public class Board implements BoardInterface {
             subcommands.add(uc04RemoveCapturedStones);
         }
 
-        final List<UndoableCommand> finalSubCommands = Collections.unmodifiableList(subcommands);
+        final List<UndoableCommand> finalSubCommands = List.copyOf(subcommands);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
