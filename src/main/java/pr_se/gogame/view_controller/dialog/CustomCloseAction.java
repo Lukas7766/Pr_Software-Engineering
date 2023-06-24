@@ -11,6 +11,7 @@ import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.file.FileHandler;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.Optional;
 
 public final class CustomCloseAction {
@@ -66,15 +67,13 @@ public final class CustomCloseAction {
                         System.exit(0);
                     }
 
-                    Alert info = new Alert(Alert.AlertType.INFORMATION);
-                    info.setTitle("Go Game - Close Info");
-                    info.setHeaderText("Saving your game didn't work.");
-                    info.setContentText("Try it again!");
-                    info.initOwner(stage);
-                    info.showAndWait();
+                    CustomExceptionDialog.show(new IOException(), "Could not save game!");
                     if (e != null) e.consume();
                 }
                 case "cancel" ->  {if (e != null) e.consume();}
+                default -> {
+                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
+                }
             }
         });
     }

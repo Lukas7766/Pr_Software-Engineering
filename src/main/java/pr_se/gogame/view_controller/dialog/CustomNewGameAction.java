@@ -35,7 +35,7 @@ public final class CustomNewGameAction {
         alert.initOwner(stage);
 
         ButtonType noBtn = new ButtonType("no");
-        ButtonType saveBtn = new ButtonType("save");
+        ButtonType saveBtn = new ButtonType("yes");
         ButtonType cancelBtn = new ButtonType("cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(saveBtn, noBtn, cancelBtn);
@@ -45,7 +45,7 @@ public final class CustomNewGameAction {
         btnResult.ifPresent(er -> {
             switch (er.getText()){
                 case "no" -> game.initGame();
-                case "save" -> {
+                case "yes" -> {
                     File f = FileHandler.getCurrentFile();
                     if(f == null){
                         f = CustomFileDialog.getFile(stage,true);
@@ -57,6 +57,9 @@ public final class CustomNewGameAction {
                     if (!game.saveGame(f)) {
                         CustomExceptionDialog.show(new IOException(), "Could not save game!");
                     }
+                }
+                default -> {
+                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
                 }
             }
         });

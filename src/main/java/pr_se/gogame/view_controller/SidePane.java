@@ -183,7 +183,9 @@ public class SidePane extends StackPane {
                     textArea.setText(game.getComment());
                 }
 
-                default -> {}
+                default -> {
+                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
+                }
             }
         });
 

@@ -152,7 +152,9 @@ public class HeaderPane extends VBox {
                     exportFileItem.setDisable(true);
                     exportFileItemAs.setDisable(true);
                 }
-                default -> {}
+                default -> {
+                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
+                }
             }
         });
 
@@ -224,7 +226,9 @@ public class HeaderPane extends VBox {
 
                 case NEW_GAME, UPDATE ->
                     gameSectionItems.stream().filter(MenuItem::isDisable).forEach(menuItem -> menuItem.setDisable(false));
-                default -> {}
+                default -> {
+                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
+                }
             }
 
         });
@@ -414,7 +418,9 @@ public class HeaderPane extends VBox {
             switch (e.getGameCommand()){
                 case INIT, GAME_WON -> gameShortCutList.forEach(button -> button.setDisable(true));
                 case NEW_GAME, UPDATE -> gameShortCutList.forEach(button -> button.setDisable(false));
-                default -> {}
+                default -> {
+                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
+                }
             }
         });
 

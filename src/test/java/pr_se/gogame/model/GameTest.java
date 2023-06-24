@@ -15,41 +15,52 @@ import static pr_se.gogame.model.StoneColor.*;
 
 class GameTest {
     Game game;
+
+    /*
+     * These variables are mostly meant for AssertThrows()-calls, as SonarQube (rightly) points out that nested method
+     * calls might create ambiguity as to which method has thrown an expected (or unexpected) exception.
+     */
+    Ruleset ruleset;
+
+    int maxCoord;
+
     @BeforeEach
     void setUp() {
         game = new Game();
-        game.newGame(BLACK, 19, 0, new JapaneseRuleset());
+        ruleset = new JapaneseRuleset();
+        game.newGame(BLACK, 19, 0, ruleset);
+        maxCoord = game.getSize() - 1;
     }
 
     // argument-checking
 
     @Test
     void newGameArguments() {
-        assertThrows(NullPointerException.class, () -> game.newGame(null, 19, 0, new JapaneseRuleset()));
-        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, -1, 0, new JapaneseRuleset()));
-        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, -1, new JapaneseRuleset()));
-        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, 10, new JapaneseRuleset()));
+        assertThrows(NullPointerException.class, () -> game.newGame(null, 19, 0, ruleset));
+        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, -1, 0, ruleset));
+        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, -1, ruleset));
+        assertThrows(IllegalArgumentException.class, () -> game.newGame(null, 19, 10, ruleset));
     }
 
     @Test
     void playMoveArguments() {
         assertThrows(IllegalArgumentException.class, () -> game.playMove(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> game.playMove(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> game.playMove(game.getSize(), 0));
-        assertThrows(IllegalArgumentException.class, () -> game.playMove(0, game.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> game.playMove(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> game.playMove(0, maxCoord + 1));
     }
 
     @Test
     void placeHandicapStoneArguments() {
-        game.newGame(BLACK, 19, 1, new JapaneseRuleset());
+        game.newGame(BLACK, 19, 1, ruleset);
         game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(-1, 0, true));
         game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, -1, true));
         game.setHandicapStoneCounter(1);
-        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(game.getSize(), 0, true));
+        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(maxCoord + 1, 0, true));
         game.setHandicapStoneCounter(1);
-        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, game.getSize(), true));
+        assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, maxCoord + 1, true));
     }
 
     @Test
@@ -77,8 +88,8 @@ class GameTest {
     void printDebugInfoArguments() {
         assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(game.getSize(), 0));
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, game.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, maxCoord + 1));
     }
 
     @Test
@@ -107,7 +118,7 @@ class GameTest {
 
     @Test
     void newGame() {
-        game.newGame(WHITE, 13, 1, new JapaneseRuleset());
+        game.newGame(WHITE, 13, 1, ruleset);
         assertEquals(WHITE, game.getCurColor());
         assertEquals(13, game.getSize());
         assertEquals(1, game.getHandicap());
@@ -156,7 +167,7 @@ class GameTest {
 
     @Test
     void passWhiteStarts() {
-        game.newGame(WHITE, 19, 0, new JapaneseRuleset());
+        game.newGame(WHITE, 19, 0, ruleset);
 
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
@@ -195,7 +206,7 @@ class GameTest {
         assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
-        game.newGame(WHITE, 19, 0, new JapaneseRuleset());
+        game.newGame(WHITE, 19, 0, ruleset);
         game.addListener(e -> assertEquals(GAME_WON, e.getGameCommand()));
         game.resign();
         assertEquals(BLACK, game.getGameResult().getWinner());
@@ -212,7 +223,7 @@ class GameTest {
         assertEquals(BLACK, game.getGameResult().getWinner());
 
         game.removeListener(l1);
-        game.newGame(WHITE, 19, 0, new JapaneseRuleset());
+        game.newGame(WHITE, 19, 0, ruleset);
         game.playMove(0, 0);
         game.addListener(e -> assertEquals(GAME_WON, e.getGameCommand()));
         game.resign();
@@ -229,7 +240,7 @@ class GameTest {
         assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
-        game.newGame(BLACK, 19, 9, new JapaneseRuleset());
+        game.newGame(BLACK, 19, 9, ruleset);
         game.addListener(e -> assertEquals(GAME_WON, e.getGameCommand()));
         game.scoreGame();
         assertEquals(BLACK, game.getGameResult().getWinner());
@@ -326,7 +337,7 @@ class GameTest {
 
     @Test
     void placeHandicapStone() {
-        game.newGame(BLACK, 19, 1, new JapaneseRuleset()); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
+        game.newGame(BLACK, 19, 1, ruleset); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
         game.setHandicapStoneCounter(1);
         assertNull(game.getColorAt(0, 0));
         game.placeHandicapPosition(0, 0, true);
@@ -335,7 +346,7 @@ class GameTest {
 
     @Test
     void newGameWithHandicap() {
-        game.newGame(BLACK, 19, 3, new JapaneseRuleset());
+        game.newGame(BLACK, 19, 3, ruleset);
         assertEquals(WHITE, game.getCurColor());
     }
 

@@ -337,10 +337,6 @@ public class BoardPane extends GridPane {
         updateGraphics();
 
         // Set up listeners
-        // If this is active, dragging from within this BoardPane but outside the actual playable board works (might be desirable)
-        /*setOnDragDetected(e -> {
-            startFullDrag();
-        });*/
 
         setOnKeyPressed(e -> {
             if(keyboardCellX < 0 || keyboardCellY < 0) {
@@ -884,10 +880,6 @@ public class BoardPane extends GridPane {
             setMouseTransparent(false);
 
             // Set up listeners
-            // If this is enabled, dragging from outside the actual playable board doesn't work (might be desirable)
-            /*setOnDragDetected(e -> {
-                startFullDrag();
-            });*/
 
             setOnMouseEntered(e -> {
                 keyboardCellX = getColumnIndex(this) - 1;

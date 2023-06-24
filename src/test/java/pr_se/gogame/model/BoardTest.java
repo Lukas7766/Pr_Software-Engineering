@@ -14,8 +14,8 @@ class BoardTest {
     Board board;
 
     /*
-     * This variable is used for AssertThrows()-calls, as SonarQube (rightly) points out that nested method calls
-     * might create ambiguity as to which method has thrown an expected (or unexpected) exception.
+     * This variable is mostly meant for AssertThrows()-calls, as SonarQube (rightly) points out that nested method
+     * calls might create ambiguity as to which method has thrown an expected (or unexpected) exception.
      */
     int maxCoord;
 

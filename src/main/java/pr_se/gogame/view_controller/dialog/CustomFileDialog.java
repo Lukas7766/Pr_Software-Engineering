@@ -6,8 +6,10 @@ import javafx.stage.Stage;
 import java.io.File;
 
 
-public class CustomFileDialog {
-
+public final class CustomFileDialog {
+    private CustomFileDialog() {
+        // This private constructor solely exists to prevent instantiation.
+    }
 
     /**
      * Creates a parameterizes File Dialog
