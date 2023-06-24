@@ -8,4 +8,6 @@ module pr_se.gogame {
     opens pr_se.gogame.model.file;
     exports pr_se.gogame.model.ruleset;
     opens pr_se.gogame.model.ruleset;
+    exports pr_se.gogame.view_controller.dialog;
+    opens pr_se.gogame.view_controller.dialog;
 }

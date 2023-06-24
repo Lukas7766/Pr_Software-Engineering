@@ -170,19 +170,15 @@ public class SGFScanner {
         return attributeSB.toString();
     }
 
-    private void getNextChar() {
-        try {
-            col++;
+    private void getNextChar() throws IOException {
+        col++;
+        ch = (char)input.read();
+        while(ch == '\r') {
             ch = (char)input.read();
-            while(ch == '\r') {
-                ch = (char)input.read();
-            }
-            if(ch == '\n') {
-                col = 0;
-                line++;
-            }
-        } catch(IOException e) {
-            ;
+        }
+        if(ch == '\n') {
+            col = 0;
+            line++;
         }
     }
 }

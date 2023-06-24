@@ -635,7 +635,7 @@ public class Game implements GameInterface {
             history.stepBack();
             if((history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP)) {
                 history.rewind();
-            } else {
+            } else if(!history.isAtBeginning()) {
                 goToFirstMove();
             }
         }
@@ -645,10 +645,7 @@ public class Game implements GameInterface {
     @Override
     public void fastForward() {
         removeAllMarks();
-        if(history.isAtBeginning()) {
-            history.stepForward();
-        }
-        if((history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP)) {
+        if(history.getCurrentNode().getSaveToken() == null || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP) {
             goToFirstMove();
         } else {
             history.skipToEnd();

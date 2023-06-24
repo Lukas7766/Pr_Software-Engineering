@@ -1,16 +1,14 @@
-package pr_se.gogame.view_controller;
+package pr_se.gogame.view_controller.dialog;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.Game;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashSet;
 import java.util.Optional;
 
 public final class CustomNewGameAction {
@@ -27,9 +25,8 @@ public final class CustomNewGameAction {
      *
      * @param stage pass stage
      * @param game pass game
-     * @param filterList pass list of Extension Filters
      */
-    public static void onSaveAction(Stage stage, Game game, HashSet<FileChooser.ExtensionFilter> filterList) {
+    public static void onSaveAction(Stage stage, Game game) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
 
         alert.setTitle("Go Game - Save Game");
@@ -51,7 +48,7 @@ public final class CustomNewGameAction {
                 case "save" -> {
                     File f = FileHandler.getCurrentFile();
                     if(f == null){
-                        f = CustomFileDialog.getFile(stage,true, filterList);
+                        f = CustomFileDialog.getFile(stage,true);
                         if(f == null) {
                             return;
                         }

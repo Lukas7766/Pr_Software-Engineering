@@ -1,4 +1,4 @@
-package pr_se.gogame.view_controller;
+package pr_se.gogame.view_controller.dialog;
 
 import javafx.scene.control.Alert;
 import javafx.scene.control.Label;

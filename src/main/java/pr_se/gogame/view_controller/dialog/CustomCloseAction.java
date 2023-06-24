@@ -1,18 +1,16 @@
-package pr_se.gogame.view_controller;
+package pr_se.gogame.view_controller.dialog;
 
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.file.FileHandler;
 
 import java.io.File;
-import java.util.HashSet;
 import java.util.Optional;
 
 public final class CustomCloseAction {
@@ -30,9 +28,8 @@ public final class CustomCloseAction {
      * @param stage pass stage
      * @param game pass game
      * @param e Event
-     * @param filterList pass list of Extension Filters
      */
-    public static void onCloseAction(Stage stage, Game game, Event e, HashSet<FileChooser.ExtensionFilter> filterList) {
+    public static void onCloseAction(Stage stage, Game game, Event e) {
         if (game.getGameState() == GameState.NOT_STARTED_YET) {
             Platform.exit();
             System.exit(0);
@@ -58,7 +55,7 @@ public final class CustomCloseAction {
                 case "yes" -> {
                     File f = FileHandler.getCurrentFile();
                     if(f == null){
-                        f = CustomFileDialog.getFile(stage,true, filterList);
+                        f = CustomFileDialog.getFile(stage,true);
                         if(f == null) {
                             return;
                         }

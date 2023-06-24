@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.view_controller.dialog.CustomWinAction;
 
 /**
  * This class contains the controller and view function of the game information panel.<br>
@@ -163,9 +164,7 @@ public class SidePane extends StackPane {
         saveCommentButton.setFocusTraversable(false);
         saveCommentButton.prefWidthProperty().bind(explanationBoard.widthProperty());
         saveCommentButton.setAlignment(Pos.CENTER);
-        saveCommentButton.setOnAction(e -> {
-            game.commentCurrentMove(textArea.getText());
-        });
+        saveCommentButton.setOnAction(e -> game.commentCurrentMove(textArea.getText()));
 
         explanationBoard.getChildren().add(saveCommentButton);
 
@@ -253,9 +252,7 @@ public class SidePane extends StackPane {
         gridPane.add(customSize, 1, 5);
 
         //change Event
-        boardSize.selectedToggleProperty().addListener((observableValue, toggle, t1) -> {
-            customSize.setDisable(t1.hashCode() != custom.hashCode());
-        });
+        boardSize.selectedToggleProperty().addListener((observableValue, toggle, t1) -> customSize.setDisable(t1.hashCode() != custom.hashCode()));
 
         //Handicap
         Label handicapLbl = new Label();

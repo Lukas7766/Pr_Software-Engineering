@@ -1,10 +1,9 @@
-package pr_se.gogame.view_controller;
+package pr_se.gogame.view_controller.dialog;
 
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
 import java.io.File;
-import java.util.HashSet;
 
 
 public class CustomFileDialog {
@@ -14,15 +13,15 @@ public class CustomFileDialog {
      * Creates a parameterizes File Dialog
      * @param stage pass stage
      * @param isSave true for saving a file, false for opening a file
-     * @param filter pass list of Extension Filters
      * @return where to save or open the FILE
      */
-    public static File getFile(Stage stage, boolean isSave, HashSet<FileChooser.ExtensionFilter> filter) {
+    public static File getFile(Stage stage, boolean isSave) {
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setInitialDirectory(new File(System.getProperty("user.home")));
 
-        if (filter != null && !filter.isEmpty()) filter.forEach(i -> fileChooser.getExtensionFilters().add(i));
+        FileChooser.ExtensionFilter filter = new FileChooser.ExtensionFilter("Go Game", "*.sgf");
+        fileChooser.getExtensionFilters().add(filter);
 
         return (isSave) ? fileChooser.showSaveDialog(stage) : fileChooser.showOpenDialog(stage);
     }

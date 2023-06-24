@@ -12,21 +12,21 @@ import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.view_controller.dialog.CustomCloseAction;
+import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
+import pr_se.gogame.view_controller.dialog.CustomFileDialog;
+import pr_se.gogame.view_controller.dialog.CustomNewGameAction;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 /**
  * This class contains the controller and view function of the game header panel.<br>
@@ -58,7 +58,6 @@ public class HeaderPane extends VBox {
      * Scene of application
      */
     private final Scene scene;
-    private final HashSet<FileChooser.ExtensionFilter> filterList;
 
     private final List<Button> playbackControlList = new ArrayList<>();
 
@@ -81,9 +80,6 @@ public class HeaderPane extends VBox {
         this.game = game;
         this.scene = scene;
 
-        this.filterList = Stream.of(new FileChooser.ExtensionFilter("Go Game", "*.sgf"))
-                .collect(Collectors.toCollection(HashSet::new));
-
         this.setSpacing(5);
 
         MenuBar menuBar = new MenuBar();
@@ -95,7 +91,7 @@ public class HeaderPane extends VBox {
         this.getChildren().add(menuBar);
         this.getChildren().add(shortMenu());
 
-        stage.setOnCloseRequest(e -> CustomCloseAction.onCloseAction(stage, game, e, filterList));
+        stage.setOnCloseRequest(e -> CustomCloseAction.onCloseAction(stage, game, e));
     }
 
     /**
@@ -118,14 +114,14 @@ public class HeaderPane extends VBox {
             if (game.getGameState() == GameState.NOT_STARTED_YET) {
                 return;
             }
-            CustomNewGameAction.onSaveAction(stage, game, filterList);
+            CustomNewGameAction.onSaveAction(stage, game);
         });
 
         MenuItem importFileItem = new MenuItem("L_oad Game");
         importFileItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
-            File f = CustomFileDialog.getFile(stage, false, filterList);
+            File f = CustomFileDialog.getFile(stage, false);
             if (f != null && !game.loadGame(f)) {
                 CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably because the file contains unsupported SGF features.");
             }
@@ -163,7 +159,7 @@ public class HeaderPane extends VBox {
         MenuItem exitGameItem = new MenuItem("_Quit Game");
         exitGameItem.setAccelerator(new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exitGameItem);
-        exitGameItem.setOnAction(e -> CustomCloseAction.onCloseAction(stage, game, null, filterList)); //onCloseAction(null)
+        exitGameItem.setOnAction(e -> CustomCloseAction.onCloseAction(stage, game, null)); //onCloseAction(null)
 
 
         SeparatorMenuItem sep1 = new SeparatorMenuItem();
@@ -356,17 +352,25 @@ public class HeaderPane extends VBox {
 
         //Key Bindings for the playback control
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F), () -> {
-            if (backward.isDisabled()) return;
+            if (!backward.isDisabled()) {
+                backward.fire();
+            }
         });
 
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.H), () -> {
-            if (forward.isDisabled()) return;
+            if (!forward.isDisabled()) {
+                forward.fire();
+            }
         });
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T), () -> {
-            if (fastForward.isDisabled()) return;
+            if (!fastForward.isDisabled()) {
+                fastForward.fire();
+            }
         });
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.G), () -> {
-            if (fastBackward.isDisabled()) return;
+            if (!fastBackward.isDisabled()) {
+                fastBackward.fire();
+            }
         });
 
 
@@ -433,9 +437,7 @@ public class HeaderPane extends VBox {
         graphicsPackSelectorComboBox.setMinWidth(125);
         graphicsPackSelectorComboBox.setTranslateX(-15);
         graphicsPackSelectorComboBox.setFocusTraversable(false);
-        graphicsPackSelectorComboBox.setOnAction((e) -> {
-            GlobalSettings.setGraphicsPack("/" + graphicsPackSelectorComboBox.getValue());
-        });
+        graphicsPackSelectorComboBox.setOnAction(e -> GlobalSettings.setGraphicsPack("/" + graphicsPackSelectorComboBox.getValue()));
 
         gameShortCuts.getChildren().add(graphicsPackSelectorComboBox);
 
@@ -450,7 +452,7 @@ public class HeaderPane extends VBox {
         File saveGameFile = FileHandler.getCurrentFile();
 
         if (as || saveGameFile == null) {
-            saveGameFile = CustomFileDialog.getFile(stage, true, filterList);
+            saveGameFile = CustomFileDialog.getFile(stage, true);
             if (saveGameFile == null) {
                 return;
             }

@@ -130,7 +130,6 @@ public final class FileHandler {
                 return false;
             }
         } catch(IOException e) {
-            ;
             return false;
         }
 
@@ -272,7 +271,7 @@ public final class FileHandler {
                                 game.commentCurrentMove(currentComment);
                             }
                             currentComment = null;
-                            marks.entrySet().forEach((e) -> game.mark(e.getKey().x, e.getKey().y, e.getValue()));
+                            marks.entrySet().forEach(e -> game.mark(e.getKey().x, e.getKey().y, e.getValue()));
                             marks = new LinkedHashMap<>();
                             if(t.getToken() == SEMICOLON) {
                                 break;

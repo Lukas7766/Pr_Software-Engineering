@@ -7,6 +7,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 
 import java.io.File;
 import java.io.InputStream;
@@ -78,7 +79,7 @@ public class GoApplication extends Application {
          * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,
          * except, for some reason, the menu bar. This might be desirable.
          */
-        scene.setOnDragDetected((e) -> scene.startFullDrag());
+        scene.setOnDragDetected(e -> scene.startFullDrag());
 
         /*
          * This is necessary for keeping the rows and columns of the board together if Windows's DPI Scaling is set
