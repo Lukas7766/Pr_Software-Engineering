@@ -289,21 +289,13 @@ public final class FileHandler {
                             game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
                             break;
 
-                        case B:
+                        case B, W:
+                            StoneColor c = t.getToken() == B ? BLACK : WHITE;
                             if (t.getAttributeValue().equals("")) {
                                 game.pass();
                             } else {
                                 decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                                game.playMove(decodedCoords.x, decodedCoords.y, BLACK);
-                            }
-                            break;
-
-                        case W:
-                            if (t.getAttributeValue().equals("")) {
-                                game.pass();
-                            } else {
-                                decodedCoords = calculateCoordsFromString(t.getAttributeValue());
-                                game.playMove(decodedCoords.x, decodedCoords.y, WHITE);
+                                game.playMove(decodedCoords.x, decodedCoords.y, c);
                             }
                             break;
 
