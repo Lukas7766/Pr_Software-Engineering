@@ -48,10 +48,8 @@ public final class FileHandler {
                 if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
                     if (node.getColor() == BLACK) {
                         t = SGFToken.AB;
-                    } else if (node.getColor() == WHITE) {
-                        t = SGFToken.AW;
                     } else {
-                        throw new IllegalStateException("AE token not supported!");
+                        t = SGFToken.AW;
                     }
 
                     output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
@@ -78,8 +76,10 @@ public final class FileHandler {
                     case SETUP:
                         if(node.getColor() == BLACK) {
                             t = AB;
-                        } else {
+                        } else if(node.getColor() == WHITE) {
                             t = AW;
+                        } else {
+                            throw new IllegalStateException("AE token not supported!");
                         }
 
                         output.write(";");
