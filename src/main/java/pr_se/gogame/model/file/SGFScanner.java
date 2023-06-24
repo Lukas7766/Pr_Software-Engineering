@@ -82,9 +82,7 @@ public class SGFScanner {
 
             case 'F':
                 getNextChar();
-                if(ch != 'F') {
-                    unexpected('F');
-                }
+                expect('F');
                 t = FF;
                 getNextChar();
                 attribute = getAttribute();
@@ -92,9 +90,7 @@ public class SGFScanner {
 
             case 'G':
                 getNextChar();
-                if(ch != 'M') {
-                    unexpected('M');
-                }
+                expect('M');
                 t = GM;
                 getNextChar();
                 attribute = getAttribute();
@@ -102,9 +98,7 @@ public class SGFScanner {
 
             case 'H':
                 getNextChar();
-                if(ch != 'A') {
-                    unexpected('A');
-                }
+                expect('A');
                 t = HA;
                 getNextChar();
                 attribute = getAttribute();
@@ -112,9 +106,7 @@ public class SGFScanner {
 
             case 'S':
                 getNextChar();
-                if(ch != 'Z') {
-                    unexpected('Z');
-                }
+                expect('Z');
                 t = SZ;
                 getNextChar();
                 attribute = getAttribute();
@@ -129,6 +121,12 @@ public class SGFScanner {
         }
 
         return new ScannedToken(t, attribute, line, col);
+    }
+
+    private void expect(char expected) throws IOException {
+        if(ch != expected) {
+            unexpected(expected);
+        }
     }
 
     private void unexpected(char ... expected) throws IOException {
@@ -146,9 +144,7 @@ public class SGFScanner {
      * @throws IOException if reading from the file fails or an unexpected character is read
      */
     private String getAttribute() throws IOException {
-        if(ch != '[') {
-            unexpected('[');
-        }
+        expect('[');
         getNextChar();
         StringBuilder attributeSB = new StringBuilder();
         while(ch != ']' && ch != EOF) {
@@ -164,9 +160,7 @@ public class SGFScanner {
             attributeSB.append(ch);
             getNextChar();
         }
-        if(ch != ']') {
-            unexpected(']');
-        }
+        expect(']');
         return attributeSB.toString();
     }
 
