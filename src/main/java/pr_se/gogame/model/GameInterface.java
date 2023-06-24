@@ -72,9 +72,12 @@ public interface GameInterface {
     void placeHandicapPosition(int x, int y, StoneColor color, boolean placeStone);
 
 
+    void placeStone(int x, int y);
+
+
     //##################################################################################################################
     //game settings
-    GameState getGameState();
+    Game.GameState getGameState();
 
     int getSize();
 
@@ -101,6 +104,8 @@ public interface GameInterface {
     double getScore(StoneColor color);
 
     GameResult getGameResult();
+
+    void toggleSetupMode();
 
     //##################################################################################################################
     // Methods regarding "move metadata"

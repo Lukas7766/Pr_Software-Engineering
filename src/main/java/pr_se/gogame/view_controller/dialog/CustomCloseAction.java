@@ -7,7 +7,6 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.file.FileHandler;
 
 import java.io.File;
@@ -31,7 +30,7 @@ public final class CustomCloseAction {
      * @param e Event
      */
     public static void onCloseAction(Stage stage, Game game, Event e) {
-        if (game.getGameState() == GameState.NOT_STARTED_YET) {
+        if (game.getGameState() == Game.GameState.NOT_STARTED_YET) {
             Platform.exit();
             System.exit(0);
         }

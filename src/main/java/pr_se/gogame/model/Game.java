@@ -54,6 +54,8 @@ public class Game implements GameInterface {
 
     private History history;
 
+    private GameState oldGameState;
+
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameState = GameState.NOT_STARTED_YET;
@@ -84,6 +86,7 @@ public class Game implements GameInterface {
         }
 
         this.gameState = GameState.SETTING_UP;
+        this.oldGameState = null;
 
         this.history = new History(this);
 
@@ -491,6 +494,21 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
     }
 
+    @Override
+    public void placeStone(int x, int y) {
+        if(gameState == GameState.RUNNING) {
+            playMove(x, y);
+        } else if(gameState == GameState.SETTING_UP) {
+            if(handicapStoneCounter > 0) {
+                placeHandicapPosition(x, y, true);
+            } else {
+                placeSetupStone(x, y, curColor);
+            }
+        } else {
+            throw new IllegalStateException("Can't place stone when game is neither running nor setting up!");
+        }
+    }
+
 
     @Override
     public void placeSetupStone(int x, int y, StoneColor color) {
@@ -583,6 +601,24 @@ public class Game implements GameInterface {
     @Override
     public GameResult getGameResult() {
         return gameResult;
+    }
+
+    @Override
+    public void toggleSetupMode() {
+        if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
+            throw new IllegalStateException("Can't switch Game into setup mode in current state " + gameState);
+        }
+
+        if(gameState == GameState.SETTING_UP) {
+            if(handicapStoneCounter > 0) {
+                throw new IllegalStateException("Can't abort placement of handicap stones!");
+            } else {
+                // Assertion: handicapStoneCounter <= 0
+                gameState = GameState.RUNNING;
+            }
+        } else {
+            gameState = GameState.SETTING_UP;
+        }
     }
 
     private UndoableCommand switchColor() {
@@ -738,5 +774,11 @@ public class Game implements GameInterface {
         fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
     }
 
+    public enum GameState {
+        NOT_STARTED_YET,
+        SETTING_UP,
+        RUNNING,
+        GAME_OVER
+    }
 }
 

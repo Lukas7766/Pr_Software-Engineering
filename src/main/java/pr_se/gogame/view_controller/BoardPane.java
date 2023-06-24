@@ -13,7 +13,6 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.MarkShape;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 import pr_se.gogame.view_controller.observer.DebugEvent;
@@ -419,9 +418,9 @@ public class BoardPane extends GridPane {
             int col = getColumnIndex(selectionPBC) - 1;
             int row = getRowIndex(selectionPBC) - 1;
             if(col >= 0 && row >= 0) {
-                if(game.getGameState() == GameState.RUNNING) {
+                if(game.getGameState() == Game.GameState.RUNNING) {
                     game.playMove(col, row);
-                } else if(game.getGameState() == GameState.SETTING_UP) {
+                } else if(game.getGameState() == Game.GameState.SETTING_UP) {
                     game.placeHandicapPosition(col, row, true);
                 } else {
                     throw new IllegalStateException("Can't place stone when game is neither being set up nor running!");

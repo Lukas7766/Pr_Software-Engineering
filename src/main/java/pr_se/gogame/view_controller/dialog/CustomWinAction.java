@@ -6,7 +6,6 @@ import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameState;
 
 public final class CustomWinAction {
 
@@ -23,7 +22,7 @@ public final class CustomWinAction {
      * @param game pass game
      */
     public static void winAction(Stage stage, Game game) {
-        if (game.getGameState() != GameState.GAME_OVER){
+        if (game.getGameState() != Game.GameState.GAME_OVER){
             throw new IllegalStateException("Game is not over yet!");
         }
 

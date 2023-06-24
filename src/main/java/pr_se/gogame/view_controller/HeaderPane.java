@@ -15,7 +15,6 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.GameState;
 import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.view_controller.dialog.CustomCloseAction;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
@@ -111,7 +110,7 @@ public class HeaderPane extends VBox {
         newGameItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
         files.getItems().add(newGameItem);
         newGameItem.setOnAction(e -> {
-            if (game.getGameState() == GameState.NOT_STARTED_YET) {
+            if (game.getGameState() == Game.GameState.NOT_STARTED_YET) {
                 return;
             }
             CustomNewGameAction.onSaveAction(stage, game);
