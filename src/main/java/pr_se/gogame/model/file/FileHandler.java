@@ -89,24 +89,16 @@ public final class FileHandler {
 
                         break;
 
-                    case MOVE:
+                    case MOVE, PASS:
                         if(node.getColor() == BLACK) {
                             t = B;
                         } else {
                             t = W;
                         }
 
-                        output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
-                        break;
+                        String coords = node.getSaveToken() == HistoryNode.AbstractSaveToken.MOVE ? formStringFromCoords(node.getX(), node.getY()) : "";
+                        output.write(String.format(t.getValue(), coords));
 
-                    case PASS:
-                        if(node.getColor() == BLACK) {
-                            t = B;
-                        } else {
-                            t = W;
-                        }
-
-                        output.write(String.format(t.getValue(), "")); // Passing is done by having an empty move.
                         break;
 
                     case HANDICAP:
