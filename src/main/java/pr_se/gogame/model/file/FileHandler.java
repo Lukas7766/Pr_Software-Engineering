@@ -22,7 +22,7 @@ public final class FileHandler {
     }
 
     public static boolean saveFile(Game game, File file, History history) {
-        if(file == null) {
+        if(game == null || file == null || history == null) {
             throw new NullPointerException();
         }
 
