@@ -7,7 +7,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.HashMap;
+import java.util.EnumMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -210,7 +210,7 @@ public final class FileHandler {
                 }
             }
 
-            final Map<SGFToken, StoneColor> correspondingColors = new HashMap<>();
+            final Map<SGFToken, StoneColor> correspondingColors = new EnumMap<>(SGFToken.class);
             correspondingColors.put(AW, WHITE);
             correspondingColors.put(W, WHITE);
             correspondingColors.put(AB, BLACK);
