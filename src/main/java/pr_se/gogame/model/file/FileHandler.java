@@ -8,6 +8,7 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.EnumMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
@@ -29,11 +30,11 @@ public final class FileHandler {
 
         currentFile = file;
 
-        history.rewind();
+        Iterator<HistoryNode> iter = history.iterator();
 
         try (FileWriter output = new FileWriter(file)) {
 
-            HistoryNode node;
+            HistoryNode node = iter.next();
             SGFToken t;
 
             // Write file header
@@ -43,9 +44,6 @@ public final class FileHandler {
             output.write(String.format(HA.getValue(), game.getHandicap()));
 
             if(game.getHandicap() > 0) {
-                history.stepForward();
-                node = history.getCurrentNode();
-
                 if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
                     if (node.getColor() == BLACK) {
                         t = SGFToken.AB;
@@ -53,73 +51,57 @@ public final class FileHandler {
                         t = SGFToken.AW;
                     }
 
-                    output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
+                    output.write(String.format(t.getValue(), getStringFromCoords(node.getX(), node.getY())));
+                    node = iter.next();
 
-                    writeAttributeSequence(output, history, node);
-                    node = history.getCurrentNode();
+                    node = writeAttributeSequence(output, iter, node);
+                    /*
+                     * Assertion: node is either the first node after the attributeSequence or the last node in the
+                     * History.
+                     */
                 } else if(game.getHandicap() > 1) {
                     throw new IllegalStateException("Handicap move expected but not found!");
                 }
             }
 
-            output.write("\n\n");
+            if(!iter.hasNext() && node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
+                writeNodeMetaData(output, node);
+                output.write("\n\n)");
+                return true;
+            }
+
+            output.write("\n");
+
+            String coords;
 
             // Write game contents
             for (;;) {
-                output.write("\n");
-
-                history.stepForward();
-                node = history.getCurrentNode();
-
-                switch (node.getSaveToken()) {
-                    case SETUP:
-                        if (node.getColor() == BLACK) {
-                            t = AB;
-                        } else if (node.getColor() == WHITE) {
-                            t = AW;
-                        } else {
-                            throw new IllegalStateException("AE token not supported!");
-                        }
-
-                        output.write(";");
-                        output.write(String.format(t.getValue(), formStringFromCoords(node.getX(), node.getY())));
-
-                        writeAttributeSequence(output, history, node);
-
-                        break;
-
-                    case MOVE, PASS:
-                        if (node.getColor() == BLACK) {
-                            t = B;
-                        } else {
-                            t = W;
-                        }
-
-                        String coords = node.getSaveToken() == HistoryNode.AbstractSaveToken.MOVE ? formStringFromCoords(node.getX(), node.getY()) : "";
-                        output.write(String.format(t.getValue(), coords));
-
-                        break;
-
-                    case HANDICAP:
-                        if (!history.isAtEnd()) {
-                            throw new IOException("Can't save handicap after game has commenced!");
-                        }
-                        break;
-
-                    default:
-                        break;
+                if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
+                    throw new IOException("Can't save handicap after game has commenced!");
+                } else {
+                    t = SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor());
+                    if (t == AE || t == null) {
+                        throw new IllegalStateException(t.getValue() + " token not supported!");
+                    }
+                    coords = node.getSaveToken() == HistoryNode.AbstractSaveToken.PASS ? "" : getStringFromCoords(node.getX(), node.getY());
                 }
 
-                for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
-                    output.write(String.format(e.getValue().getSgfToken().getValue(), formStringFromCoords(e.getKey().x, e.getKey().y)));
-                }
+                output.write("\n" + SEMICOLON.getValue());
+                output.write(String.format(t.getValue(), coords));
 
-                if (!node.getComment().equals("")) {
-                    String reformattedComment = node.getComment().replace("\\", "\\\\").replace("]", "\\]").replace(":", "\\:");
-                    output.write(String.format(C.getValue(), reformattedComment));
-                }
-
-                if (history.isAtEnd()) {
+                if(iter.hasNext()) {
+                    node = iter.next();
+                    if(t == SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor()) && t.hasMultiAttribs()) {
+                        node = writeAttributeSequence(output, iter, node);
+                    }
+                    if(iter.hasNext() || t != SGFToken.ofAbstractSaveToken(node.getSaveToken(), node.getColor())) {
+                        writeNodeMetaData(output, node.getPrev());
+                    } else {
+                        writeNodeMetaData(output, node);
+                        break;
+                    }
+                } else {
+                    writeNodeMetaData(output, node);
                     break;
                 }
             }
@@ -134,16 +116,41 @@ public final class FileHandler {
         return true;
     }
 
-    private static void writeAttributeSequence(FileWriter output, History history, HistoryNode parentNode) throws IOException {
-        history.stepForward();
-        while(history.getCurrentNode().getSaveToken() == parentNode.getSaveToken() && history.getCurrentNode().getColor() == parentNode.getColor()) {
-            output.write(String.format(LONE_ATTRIBUTE.getValue(), formStringFromCoords(history.getCurrentNode().getX(), history.getCurrentNode().getY())));
-            if(history.isAtEnd()) {
-                return;
-            }
-            history.stepForward();
+    private static void writeNodeMetaData(FileWriter output, HistoryNode node) throws IOException {
+        for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
+            output.write(String.format(e.getValue().getSgfToken().getValue(), getStringFromCoords(e.getKey().x, e.getKey().y)));
         }
-        history.stepBack();
+
+        if (!node.getComment().equals("")) {
+            String reformattedComment = node.getComment().replace("\\", "\\\\").replace("]", "\\]").replace(":", "\\:");
+            output.write(String.format(C.getValue(), reformattedComment));
+        }
+    }
+
+    /**
+     * @param output     the FileWriter that is to be written to
+     * @param iter       the Iterator over the History
+     * @param parentNode the parent Node of this attribute sequence
+     * @return the first node of a different AbstractSaveToken or color, or the last node in the History.
+     * @throws IOException if the FileWriter cannot be written to
+     */
+    private static HistoryNode writeAttributeSequence(FileWriter output, Iterator<HistoryNode> iter, HistoryNode parentNode) throws IOException {
+        if(output == null || parentNode == null || iter == null) {
+            throw new NullPointerException();
+        }
+
+        HistoryNode n = parentNode;
+
+        do {
+            output.write(String.format(LONE_ATTRIBUTE.getValue(), getStringFromCoords(n.getX(), n.getY())));
+            if(iter.hasNext()) {
+                n = iter.next();
+            } else {
+                break;
+            }
+        } while(n.getSaveToken() == parentNode.getSaveToken() && n.getColor() == parentNode.getColor());
+
+        return n;
     }
 
     public static boolean loadFile(Game game, File file) {
@@ -239,7 +246,7 @@ public final class FileHandler {
                 if(handicapColor != null) {
                     game.setHandicapStoneCounter(handicap);
                     do {
-                        decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                        decodedCoords = getCoordsFromString(t.getAttributeValue());
                         game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
 
                         t = scanner.next();
@@ -271,7 +278,7 @@ public final class FileHandler {
 
                         case AB, AW:
                             addStoneColor = correspondingColors.get(t.getToken());
-                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                            decodedCoords = getCoordsFromString(t.getAttributeValue());
                             game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
                             break;
 
@@ -279,7 +286,7 @@ public final class FileHandler {
                             if (addStoneColor == null) {
                                 throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
                             }
-                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                            decodedCoords = getCoordsFromString(t.getAttributeValue());
                             game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
                             break;
 
@@ -288,7 +295,7 @@ public final class FileHandler {
                             if (t.getAttributeValue().equals("")) {
                                 game.pass();
                             } else {
-                                decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                                decodedCoords = getCoordsFromString(t.getAttributeValue());
                                 game.playMove(decodedCoords.x, decodedCoords.y, c);
                             }
                             break;
@@ -298,7 +305,7 @@ public final class FileHandler {
                             break;
 
                         case CR:
-                            decodedCoords = calculateCoordsFromString(t.getAttributeValue());
+                            decodedCoords = getCoordsFromString(t.getAttributeValue());
                             marks.put(new Position(decodedCoords.x, decodedCoords.y), MarkShape.CIRCLE);
                             break;
 
@@ -341,11 +348,11 @@ public final class FileHandler {
      * @param y row of Stone
      * @return The x and y-axis in letter format
      */
-    private static String formStringFromCoords(int x, int y) {
+    private static String getStringFromCoords(int x, int y) {
         return "" + (char) (x + 97) + (char) (97 + y);
     }
 
-    private static Position calculateCoordsFromString(String s) {
+    private static Position getCoordsFromString(String s) {
         return new Position(s.charAt(0) - 97, s.charAt(1) - 97);
     }
 

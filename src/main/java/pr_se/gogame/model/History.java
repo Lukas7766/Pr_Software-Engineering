@@ -2,9 +2,13 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.observer.GameEvent;
 
+import java.util.Iterator;
 import java.util.ListIterator;
+import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 
-public class History {
+public class History implements Iterable<HistoryNode> {
 
     private final Game game;
 
@@ -71,5 +75,46 @@ public class History {
         return current.getPrev() == null;
     }
 
+    private HistoryNode getFirstMeaningfulNode() {
+        HistoryNode first = current;
+        while(first.getPrev() != null) {
+            first = first.getPrev();
+        }
+        first = first.getNext();
+        return first;
+    }
 
+    @Override
+    public Iterator<HistoryNode> iterator() {
+        return new Iterator<>() {
+
+            HistoryNode node = getFirstMeaningfulNode();
+
+            @Override
+            public boolean hasNext() {
+                return node != null;
+            }
+
+            @Override
+            public HistoryNode next() {
+                if(hasNext()) {
+                    HistoryNode ret = node;
+                    node = node.getNext();
+                    return ret;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+        };
+    }
+
+    @Override
+    public void forEach(Consumer<? super HistoryNode> action) {
+        Iterable.super.forEach(action);
+    }
+
+    @Override
+    public Spliterator<HistoryNode> spliterator() {
+        return Iterable.super.spliterator();
+    }
 }
