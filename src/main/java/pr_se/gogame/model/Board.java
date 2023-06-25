@@ -178,11 +178,7 @@ public class Board implements BoardInterface {
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                for(UndoableCommand c : finalSubCommands) {
-                    if(c != null) {
-                        c.execute(saveEffects);
-                    }
-                }
+                finalSubCommands.forEach(c -> c.execute(saveEffects));
             }
 
             @Override
@@ -191,9 +187,7 @@ public class Board implements BoardInterface {
                 ListIterator<UndoableCommand> i = finalSubCommands.listIterator(finalSubCommands.size());
                 while(i.hasPrevious()) {
                     UndoableCommand c = i.previous();
-                    if(c != null) {
-                        c.undo();
-                    }
+                    c.undo();
                 }
             }
         };
