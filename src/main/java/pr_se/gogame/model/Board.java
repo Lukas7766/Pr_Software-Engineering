@@ -82,7 +82,6 @@ public class Board implements BoardInterface {
 
         // Check for suicide
         boolean permittedSuicide = false;
-        boolean killAnother = false;
         Set<StoneGroup> otherColorGroups = surroundingSGs.stream()
             .filter(sg -> sg.getStoneColor() != color)
             .collect(Collectors.toSet());
@@ -94,7 +93,6 @@ public class Board implements BoardInterface {
                 }
                 permittedSuicide = true;
             } else {
-                killAnother = true;
             }
         }
 
