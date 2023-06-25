@@ -531,4 +531,11 @@ class GameTest {
 
         assertEquals(Game.GameState.SETTING_UP, game.getGameState());
     }
+
+    @Test
+    void isSetupMode() {
+        assertFalse(game.isSetupMode());
+        game.setSetupMode(true);
+        assertTrue(game.isSetupMode());
+    }
 }
