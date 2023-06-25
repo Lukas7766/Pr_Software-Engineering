@@ -112,6 +112,16 @@ class GameTest {
         assertThrows(NullPointerException.class, () -> game.fireGameEvent(null));
     }
 
+    @Test
+    void saveGameArgs() {
+        assertThrows(NullPointerException.class, () -> game.saveGame(null));
+    }
+
+    @Test
+    void loadGameArgs() {
+        assertThrows(NullPointerException.class, () -> game.loadGame(null));
+    }
+
     // other tests
 
     @Test
@@ -130,12 +140,20 @@ class GameTest {
 
     @Test
     void loadGame() {
-        fail();
+        saveGame();
+        assertTrue(game.loadGame(new File("tmp.sgf")));
+        game.goToEnd();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertEquals(WHITE, game.getColorAt(1, 0));
     }
 
     @Test
     void saveGame() {
-        fail();
+        game.playMove(0, 0);
+        game.playMove(1, 0);
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertEquals(WHITE, game.getColorAt(1, 0));
+        assertTrue(game.saveGame(new File("tmp.sgf")));
     }
 
     @Test

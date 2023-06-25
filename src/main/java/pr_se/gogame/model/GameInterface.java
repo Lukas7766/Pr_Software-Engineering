@@ -138,5 +138,7 @@ public interface GameInterface {
     void goBeforeFirstMove();
 
     void goToFirstMove();
+
+    void goToEnd();
 }
 

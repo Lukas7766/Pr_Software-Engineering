@@ -123,7 +123,7 @@ public class Game implements GameInterface {
     @Override
     public boolean saveGame(File file) {
         if (file == null) {
-            return false;
+            throw new NullPointerException();
         }
         return FileHandler.saveFile(this, file);
     }
@@ -690,6 +690,13 @@ public class Game implements GameInterface {
         do {
             history.stepForward();
         } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP));
+        reDisplayMarks();
+    }
+
+    @Override
+    public void goToEnd() {
+        removeAllMarks();
+        history.skipToEnd();
         reDisplayMarks();
     }
 
