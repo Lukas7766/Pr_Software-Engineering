@@ -32,8 +32,8 @@ public class NewZealandRuleset implements Ruleset {
     }
 
     /**
-     * The New Zealand Ruleset allows for free placement of handicap stones. See https://en.wikipedia.org/wiki/Handicapping_in_Go#Free_placement
-     * @return false
+     * The New Zealand Ruleset allows for free placement of handicap stones.
+     * See <a href="https://en.wikipedia.org/wiki/Handicapping_in_Go#Free_placement">...</a>
      */
     @Override
     public void setHandicapStones(Game game, StoneColor beginner, int noStones) {

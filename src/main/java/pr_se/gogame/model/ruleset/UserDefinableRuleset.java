@@ -28,8 +28,8 @@ public class UserDefinableRuleset implements Ruleset {
         suicideCheck = check;
     }
 
-    /** Depending on the rules, suicide is allowed or forbidden. This is the default option to forbid suicide. <br>
-     * @return false
+    /**
+     * Depending on the rules, suicide is allowed or forbidden. This is the default option to forbid suicide.
      */
     void setDefaultSuicide() {
         suicideAllowed = false;
@@ -59,9 +59,9 @@ public class UserDefinableRuleset implements Ruleset {
         return null;
     }
 
-    /** To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
+    /**
+     * To prevent endless repetitions or make them pointless, positional repetition is restricted. <br>
      * Two consecutive moves (except passing) may not restore the original position.
-     * @return 2
      */
     void setDefaultKoAmount() {
         koAmount = 2;

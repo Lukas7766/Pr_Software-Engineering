@@ -562,7 +562,7 @@ public class BoardPane extends GridPane {
             throw new IOException();
         }
 
-        Image ret = null;
+        Image ret;
 
         try (InputStream is = zip.getInputStream(zipEntry)) {
             final int DEFAULT_IMAGE_SIZE = 128;

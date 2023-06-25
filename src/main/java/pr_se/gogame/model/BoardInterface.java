@@ -10,7 +10,7 @@ public interface BoardInterface {
      *
      * @param x           Horizontal coordinate from 0 to size-1, starting on the left
      * @param y           Vertical coordinate from 0 to size-1, starting on the top
-     * @param color       Whether the stone to be placed is StoneColor.BLACK or WHITE
+     * @param color       Color of the stone to be placed
      * @param prepareMode Whether this stone is set before the beginning of the game (e.g., as a handicap) or by a (human or AI) player
      */
     UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode);

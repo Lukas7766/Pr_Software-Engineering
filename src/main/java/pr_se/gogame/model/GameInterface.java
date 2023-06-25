@@ -15,7 +15,7 @@ public interface GameInterface {
     //game operations
 
     /**
-     * Makes the game fire an initialisation event that notifies listening components so they may initialise themselves.
+     * Makes the game fire an initialisation event cueing listening components to initialise themselves.
      */
     void initGame();
 
