@@ -8,7 +8,6 @@ import pr_se.gogame.view_controller.observer.DebugEvent;
 import pr_se.gogame.view_controller.observer.GameEvent;
 
 import java.util.*;
-import java.util.function.BiFunction;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -60,21 +59,12 @@ public class Board implements BoardInterface {
         }
 
         // Get liberties at these x and y coordinates
-        Set<Position> newStoneLiberties = getSurroundings(
-            x,
-            y,
-            Objects::isNull,
-            Position::new
-        );
+        Set<Position> newStoneLiberties = getSurroundings(x, y, Objects::isNull);
         StoneGroup newGroup = new StoneGroup(color, x, y, newStoneLiberties);
 
         // Get neighboring stone(group)s at these x and y coordinates
-        Set<StoneGroup> surroundingSGs = getSurroundings(
-            x,
-            y,
-            Objects::nonNull,
-            (neighborX, neighborY) -> boardContents[neighborX][neighborY].getStoneGroup()
-        );
+        Set<StoneGroup> surroundingSGs = getSurroundings(x, y, Objects::nonNull).stream()
+            .map(p -> boardContents[p.getX()][p.getY()].getStoneGroup()).collect(Collectors.toSet());
 
         /*
          * Existing group of the same colour with maximum no. of liberties (which is relevant for the suicide-check)
@@ -235,12 +225,8 @@ public class Board implements BoardInterface {
             public void execute(boolean saveEffects) {
                 boardContents[x][y] = null;
 
-                Set<StoneGroup> surroundingSGs = getSurroundings(
-                    x,
-                    y,
-                        Objects::nonNull,
-                    (neighborX, neighborY) -> boardContents[neighborX][neighborY].getStoneGroup()
-                );
+                Set<StoneGroup> surroundingSGs = getSurroundings(x, y, Objects::nonNull).stream()
+                    .map(p -> boardContents[p.getX()][p.getY()].getStoneGroup()).collect(Collectors.toSet());
                 for (StoneGroup sg : surroundingSGs) {
                     addLibertyCommands.add(sg.addLiberty(new Position(x, y)));
                 }
@@ -272,30 +258,29 @@ public class Board implements BoardInterface {
 
     /**
      * Checks the space above, below, to the right and left of the one marked by x and y for StoneGroupPointers
-     * fulfilling the predicate check, returning a Set of at most four elements that have been converted by conversion.
+     * fulfilling the predicate check, returning a Set of at most four positions.
      *
      * @param x          Horizontal coordinate from 0 to size-1, starting on the left
      * @param y          Vertical coordinate from 0 to size-1, starting on the top
      * @param check      the condition that a surrounding tile has to fulfill to be added ot the returned Set
-     * @param conversion a BiFunction taking an x and y coordinate from this method and returning something caller-defined based on those coordinates
      * @return a Set of at most four unique elements converted by conversion that are above, below, to the left and right of the provided x and y coordinate and fulfill check
      */
-    private Set getSurroundings(int x, int y, Predicate<StoneGroupPointer> check, BiFunction<Integer, Integer, ?> conversion) {
+    private Set<Position> getSurroundings(int x, int y, Predicate<StoneGroupPointer> check) {
         checkXYCoordinates(x, y);
 
-        Set surroundings = new HashSet<>();
+        Set<Position> surroundings = new HashSet<>();
 
         if (y > 0 && check.test(boardContents[x][y - 1])) {
-            surroundings.add(conversion.apply(x, y - 1));
+            surroundings.add(new Position(x, y - 1));
         }
         if (y < size - 1 && check.test(boardContents[x][y + 1])) {
-            surroundings.add(conversion.apply(x, y + 1));
+            surroundings.add(new Position(x, y + 1));
         }
         if (x > 0 && check.test(boardContents[x - 1][y])) {
-            surroundings.add(conversion.apply(x - 1, y));
+            surroundings.add(new Position(x - 1, y));
         }
         if (x < size - 1 && check.test(boardContents[x + 1][y])) {
-            surroundings.add(conversion.apply(x + 1, y));
+            surroundings.add(new Position(x + 1, y));
         }
 
         return surroundings;
