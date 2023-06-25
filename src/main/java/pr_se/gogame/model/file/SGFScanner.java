@@ -35,124 +35,102 @@ public class SGFScanner {
         boolean hasAttribute = true;
 
         switch (ch) {
-            case '[':
+            case '[' -> {
                 t = LONE_ATTRIBUTE;
                 attribute = getAttribute();
                 hasAttribute = false;
-                break;
-
-            case ';':
+            }
+            case ';' -> {
                 t = SEMICOLON;
                 hasAttribute = false;
-                break;
-
-            case '(':
+            }
+            case '(' -> {
                 t = LPAR;
                 hasAttribute = false;
-                break;
-
-            case ')':
+            }
+            case ')' -> {
                 t = RPAR;
                 hasAttribute = false;
-                break;
-
-            case 'A':
+            }
+            case 'A' -> {
                 getNextChar();
-                if(ch == 'B') {
+                if (ch == 'B') {
                     t = AB;
                 } else if (ch == 'W') {
                     t = AW;
-                } else if(ch == 'E') {
+                } else if (ch == 'E') {
                     t = AE;
                 } else {
                     unexpected('B', 'W', 'E');
                 }
-                break;
-
-            case 'B':
-                t = B;
-                break;
-
-            case 'W':
-                t = W;
-                break;
-
-            case 'C':
+            }
+            case 'B' -> t = B;
+            case 'W' -> t = W;
+            case 'C' -> {
                 t = C;
                 getNextChar();
-                if(ch == 'R') {
+                if (ch == 'R') {
                     t = CR;
                     getNextChar();
                 }
                 attribute = getAttribute();
                 hasAttribute = false;
-                break;
-
-            case 'F':
+            }
+            case 'F' -> {
                 getNextChar();
                 expect('F');
                 t = FF;
-                break;
-
-            case 'G':
+            }
+            case 'G' -> {
                 getNextChar();
                 expect('M');
                 t = GM;
-                break;
-
-            case 'H':
+            }
+            case 'H' -> {
                 getNextChar();
                 expect('A');
                 t = HA;
-                break;
-
-            case 'K':
+            }
+            case 'K' -> {
                 getNextChar();
                 expect('M');
                 t = KM;
-                break;
-
-            case 'M':
+            }
+            case 'M' -> {
                 getNextChar();
                 expect('A');
                 t = MA;
-                break;
-
-            case 'P':
+            }
+            case 'P' -> {
                 getNextChar();
-                if(ch == 'B') {
+                if (ch == 'B') {
                     t = PB;
-                } else if(ch == 'W') {
+                } else if (ch == 'W') {
                     t = PW;
                 } else {
                     unexpected('B', 'W');
                 }
-                break;
-
-            case 'S':
+            }
+            case 'S' -> {
                 getNextChar();
-                if(ch == 'Z') {
+                if (ch == 'Z') {
                     t = SZ;
-                } else if(ch == 'Q') {
+                } else if (ch == 'Q') {
                     t = SQ;
                 } else {
                     unexpected('Q', 'Z');
                 }
-                break;
-
-            case 'T':
+            }
+            case 'T' -> {
                 getNextChar();
                 expect('R');
                 t = TR;
-                break;
-
-            case (char)-1:
+            }
+            case (char) -1 -> {
                 t = SGFToken.EOF;
                 hasAttribute = false;
-                break;
-
-            default:
-                throw new IOException("Invalid token '" + ch + "'!");
+            }
+            default -> throw new IOException("Invalid token '" + ch + "'!");
         }
 
         if(hasAttribute) {
