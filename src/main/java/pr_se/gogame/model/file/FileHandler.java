@@ -1,6 +1,9 @@
 package pr_se.gogame.model.file;
 
 import pr_se.gogame.model.*;
+import pr_se.gogame.model.helper.MarkShape;
+import pr_se.gogame.model.helper.Position;
+import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.io.File;
@@ -12,8 +15,8 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
-import static pr_se.gogame.model.StoneColor.BLACK;
-import static pr_se.gogame.model.StoneColor.WHITE;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 import static pr_se.gogame.model.file.SGFToken.*;
 
 public final class FileHandler {

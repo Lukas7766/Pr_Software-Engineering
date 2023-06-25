@@ -2,8 +2,8 @@ package pr_se.gogame.model.file;
 
 import pr_se.gogame.model.HistoryNode;
 
-import static pr_se.gogame.model.StoneColor.BLACK;
-import static pr_se.gogame.model.StoneColor.WHITE;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 public enum SGFToken {
 

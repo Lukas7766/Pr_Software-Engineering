@@ -1,5 +1,9 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.model.helper.MarkShape;
+import pr_se.gogame.model.helper.Position;
+import pr_se.gogame.model.helper.StoneColor;
+
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Objects;

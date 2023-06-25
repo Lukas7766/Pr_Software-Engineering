@@ -13,7 +13,7 @@ import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.MarkShape;
+import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 import pr_se.gogame.view_controller.observer.DebugEvent;
 import pr_se.gogame.view_controller.observer.ViewListener;
@@ -23,8 +23,8 @@ import java.io.InputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
-import static pr_se.gogame.model.StoneColor.BLACK;
-import static pr_se.gogame.model.StoneColor.WHITE;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 /**
  * View/Controller

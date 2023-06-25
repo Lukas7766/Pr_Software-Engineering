@@ -9,7 +9,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.StoneColor;
+import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.view_controller.dialog.CustomWinAction;
 

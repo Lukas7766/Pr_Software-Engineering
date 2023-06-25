@@ -8,7 +8,7 @@ import pr_se.gogame.model.ruleset.NewZealandRuleset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import static pr_se.gogame.model.StoneColor.*;
+import static pr_se.gogame.model.helper.StoneColor.*;
 
 class BoardTest {
     Game game;

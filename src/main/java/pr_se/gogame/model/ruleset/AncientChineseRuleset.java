@@ -2,7 +2,7 @@ package pr_se.gogame.model.ruleset;
 
 
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.StoneColor;
+import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.UndoableCommand;
 
 import java.util.Arrays;

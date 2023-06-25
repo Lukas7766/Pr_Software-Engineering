@@ -1,6 +1,8 @@
 package pr_se.gogame.model.ruleset;
 
 import pr_se.gogame.model.*;
+import pr_se.gogame.model.helper.Position;
+import pr_se.gogame.model.helper.StoneColor;
 
 import java.util.ArrayList;
 import java.util.Arrays;

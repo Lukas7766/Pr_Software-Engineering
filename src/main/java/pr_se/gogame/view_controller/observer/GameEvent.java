@@ -1,9 +1,9 @@
 package pr_se.gogame.view_controller.observer;
 
-import pr_se.gogame.model.GameCommand;
-import pr_se.gogame.model.StoneColor;
+import pr_se.gogame.model.helper.GameCommand;
+import pr_se.gogame.model.helper.StoneColor;
 
-import static pr_se.gogame.model.GameCommand.*;
+import static pr_se.gogame.model.helper.GameCommand.*;
 
 public class GameEvent {
 

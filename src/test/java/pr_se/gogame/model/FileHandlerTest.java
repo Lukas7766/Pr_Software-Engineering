@@ -1,17 +1,17 @@
 package pr_se.gogame.model;
 
-import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static pr_se.gogame.model.StoneColor.BLACK;
-import static pr_se.gogame.model.StoneColor.WHITE;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 class FileHandlerTest {
     Game game;

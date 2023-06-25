@@ -1,6 +1,6 @@
 package pr_se.gogame.model.ruleset;
 
-import pr_se.gogame.model.StoneColor;
+import pr_se.gogame.model.helper.StoneColor;
 
 public class GameResult {
     private final double scoreBlack;

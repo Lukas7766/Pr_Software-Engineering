@@ -1,4 +1,4 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.helper;
 
 import pr_se.gogame.model.file.SGFToken;
 

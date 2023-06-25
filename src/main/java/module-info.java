@@ -12,4 +12,6 @@ module pr_se.gogame {
     opens pr_se.gogame.view_controller.dialog;
     exports pr_se.gogame.view_controller.observer;
     opens pr_se.gogame.view_controller.observer;
+    exports pr_se.gogame.model.helper;
+    opens pr_se.gogame.model.helper;
 }

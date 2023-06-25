@@ -1,6 +1,9 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.helper.GameCommand;
+import pr_se.gogame.model.helper.MarkShape;
+import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.Ruleset;
@@ -11,7 +14,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static pr_se.gogame.model.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
 
 public class Game implements GameInterface {
 

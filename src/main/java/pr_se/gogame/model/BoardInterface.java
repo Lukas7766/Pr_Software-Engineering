@@ -1,5 +1,7 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.model.helper.StoneColor;
+
 public interface BoardInterface {
     /**
      * Places a stone on the board, calculating its liberties and adding it to an existing group where applicable, as
