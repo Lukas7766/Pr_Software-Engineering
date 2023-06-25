@@ -29,8 +29,8 @@ public class SGFScannerTest {
         game.newGame(BLACK, size, handicap, new JapaneseRuleset());
         oldHistory = game.getHistory();
         file = new File("tmp.sgf");
-        new FileReader(file);
-        scanner = new SGFScanner();
+        // new FileReader(file);
+        // scanner = new SGFScanner();
     }
 
     // Argument-Checking

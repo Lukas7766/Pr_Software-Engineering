@@ -48,7 +48,7 @@ public class Game implements GameInterface {
     private Board board;
     private int curMoveNumber;
     private StoneColor curColor;
-    private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
+    private int handicapStoneCounter = 0;
     private double playerBlackScore;
     private int blackCapturedStones;
 
@@ -276,29 +276,6 @@ public class Game implements GameInterface {
     @Override
     public StoneColor getColorAt(int x, int y) {
         return board.getColorAt(x, y);
-    }
-
-    private UndoableCommand setCurColor(final StoneColor c) {
-        if (c == null) {
-            throw new NullPointerException();
-        }
-
-        final StoneColor oldColor = this.curColor;
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                Game.this.curColor = c;
-            }
-
-            @Override
-            public void undo() {
-                Game.this.curColor = oldColor;
-            }
-        };
-        ret.execute(true);
-
-        return ret;
     }
 
     @Override
@@ -589,32 +566,6 @@ public class Game implements GameInterface {
         return ret;
     }
 
-    private UndoableCommand switchColor() {
-        UndoableCommand ret = new UndoableCommand() {
-            UndoableCommand thisCommand;
-
-            @Override
-            public void execute(boolean saveEffects) {
-                thisCommand = setCurColor(StoneColor.getOpposite(curColor));
-                if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
-                    getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
-                }
-            }
-
-            @Override
-            public void undo() {
-                if(thisCommand != null) {
-                    thisCommand.undo();
-                }
-            }
-        };
-        ret.execute(true);
-
-        return ret;
-
-    }
-
     void fireGameEvent(GameEvent e) { // package-private by design
         if(e == null) {
             throw new NullPointerException();
@@ -701,14 +652,6 @@ public class Game implements GameInterface {
         reDisplayMarks();
     }
 
-    private void removeAllMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), curMoveNumber)));
-    }
-
-    private void reDisplayMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.getX(), key.getY(), value));
-    }
-
     @Override
     public void mark(int x, int y, MarkShape shape) {
         history.getCurrentNode().addMark(x, y, shape);
@@ -735,12 +678,6 @@ public class Game implements GameInterface {
 
         history.getCurrentNode().removeMark(x, y);
         fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
-    }
-
-    private void checkCoords(int x, int y) {
-        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
-            throw new IllegalArgumentException("Invalid coordinates x = " + x + ", y = " + y);
-        }
     }
 
     @Override
@@ -804,6 +741,72 @@ public class Game implements GameInterface {
 
     public History getHistory() {
         return history;
+    }
+
+
+    // private methods
+
+    private UndoableCommand switchColor() {
+        UndoableCommand ret = new UndoableCommand() {
+            UndoableCommand thisCommand;
+
+            @Override
+            public void execute(boolean saveEffects) {
+                thisCommand = setCurColor(StoneColor.getOpposite(curColor));
+                if(saveEffects) {
+                    getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
+                    getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
+                }
+            }
+
+            @Override
+            public void undo() {
+                if(thisCommand != null) {
+                    thisCommand.undo();
+                }
+            }
+        };
+        ret.execute(true);
+
+        return ret;
+
+    }
+
+    private UndoableCommand setCurColor(final StoneColor c) {
+        if (c == null) {
+            throw new NullPointerException();
+        }
+
+        final StoneColor oldColor = this.curColor;
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                Game.this.curColor = c;
+            }
+
+            @Override
+            public void undo() {
+                Game.this.curColor = oldColor;
+            }
+        };
+        ret.execute(true);
+
+        return ret;
+    }
+
+    private void removeAllMarks() {
+        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), curMoveNumber)));
+    }
+
+    private void reDisplayMarks() {
+        history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.getX(), key.getY(), value));
+    }
+
+    private void checkCoords(int x, int y) {
+        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
+            throw new IllegalArgumentException("Invalid coordinates x = " + x + ", y = " + y);
+        }
     }
 
     public enum GameState {
