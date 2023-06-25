@@ -3,6 +3,7 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.model.helper.GameCommand;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
@@ -375,6 +376,25 @@ class BoardTest {
         assertEquals(null, board.getColorAt(3, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
         assertEquals(BLACK, board.getColorAt(4, 1));
+    }
+
+    @Test
+    void undoAndRedoCapture() {
+        loadFile("./testFiles/KoSituation.sgf");
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        UndoableCommand c = board.setStone(2, 1, BLACK, false);
+        assertEquals(BLACK, board.getColorAt(2, 1));
+        assertEquals(null, board.getColorAt(1, 1));
+
+        c.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        c.execute(false);
+        assertEquals(BLACK, board.getColorAt(2, 1));
+        assertEquals(null, board.getColorAt(1, 1));
     }
 
     @Test

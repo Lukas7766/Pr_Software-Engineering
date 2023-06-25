@@ -199,9 +199,7 @@ public class Board implements BoardInterface {
                     uC0402AddCapturedStonesCommand.undo();
                 }
 
-                for(UndoableCommand c : uc0401RemoveStoneCommands) {
-                    c.undo();
-                }
+                uc0401RemoveStoneCommands.forEach(UndoableCommand::undo);
             }
         };
         ret.execute(true);
