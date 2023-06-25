@@ -1,6 +1,7 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.helper.UndoableCommand;
 
 public interface BoardInterface {
     /**

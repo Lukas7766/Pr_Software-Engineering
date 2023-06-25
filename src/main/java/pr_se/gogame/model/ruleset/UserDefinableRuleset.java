@@ -2,6 +2,7 @@ package pr_se.gogame.model.ruleset;
 
 import pr_se.gogame.model.*;
 import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.helper.UndoableCommand;
 
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;

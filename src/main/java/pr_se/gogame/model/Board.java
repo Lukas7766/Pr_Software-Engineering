@@ -3,6 +3,7 @@ package pr_se.gogame.model;
 import pr_se.gogame.model.helper.GameCommand;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.view_controller.observer.DebugEvent;
 import pr_se.gogame.view_controller.observer.GameEvent;
 
