@@ -52,6 +52,9 @@ public final class FileHandler {
                 if(node != null && node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
                     t = SGFToken.ofHistoryNode(node);
 
+                    if(t == null) {
+                        throw new IOException("Can't get SGF token for node " + node);
+                    }
                     output.write(String.format(t.getValue(), getStringFromCoords(node.getX(), node.getY())));
                     node = iter.next();
 
@@ -79,6 +82,10 @@ public final class FileHandler {
 
             // Write game contents
             for (;;) {
+                if(node == null) {
+                    throw new IllegalStateException("Reached end of history while saving!");
+                }
+
                 if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
                     throw new IOException("Can't save handicap after game has commenced!");
                 } else {
@@ -267,7 +274,7 @@ public final class FileHandler {
                                 game.setComment(currentComment);
                             }
                             currentComment = null;
-                            marks.entrySet().forEach(e -> game.mark(e.getKey().getX(), e.getKey().getY(), e.getValue()));
+                            marks.forEach((key, value) -> game.mark(key.getX(), key.getY(), value));
                             marks = new LinkedHashMap<>();
                             if(t.getToken() == RPAR) {
                                 break loop2;
