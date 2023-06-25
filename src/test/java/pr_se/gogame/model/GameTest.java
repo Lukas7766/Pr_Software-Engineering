@@ -131,8 +131,8 @@ class GameTest {
     void usePositionArgs() {
         assertThrows(IllegalArgumentException.class, () -> game.usePosition(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> game.usePosition(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> game.usePosition(game.getSize(), 0));
-        assertThrows(IllegalArgumentException.class, () -> game.usePosition(0, game.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> game.usePosition(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> game.usePosition(0, maxCoord + 1));
     }
 
     @Test
@@ -140,8 +140,8 @@ class GameTest {
         game.setSetupMode(true);
         assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(-1, 0, BLACK));
         assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(0, -1, BLACK));
-        assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(game.getSize(), 0, BLACK));
-        assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(0, game.getSize(), BLACK));
+        assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(maxCoord + 1, 0, BLACK));
+        assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(0, maxCoord + 1, BLACK));
         assertThrows(NullPointerException.class, () -> game.placeSetupStone(0, 0, null));
     }
 

@@ -80,13 +80,17 @@ public class Board implements BoardInterface {
             .filter(sg -> sg.getStoneColor() != color)
             .collect(Collectors.toSet());
 
-        if (!prepareMode && newGroup.getLiberties().isEmpty() && firstSameColorGroup.getLiberties().size() <= 1) { // if adding this stone would take away all liberties from the group it's being added to
-            if (otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)) { // if there are any groups of the opposite color with only one liberty, the attacker wins and the existing group is removed instead.
-                if (!game.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
-                    return null;
-                }
-                permittedSuicide = true;
+        /*
+         * if adding this stone would take away all liberties from the group it's being added to, and
+         * if there are no groups of the opposite color with only one liberty, that could thus be captured ...
+         */
+        if (!prepareMode && newGroup.getLiberties().isEmpty() && firstSameColorGroup.getLiberties().size() <= 1 &&
+            otherColorGroups.stream().noneMatch(sg -> sg.getLiberties().size() == 1)
+        ) {
+            if (!game.getRuleset().getSuicide(firstSameColorGroup, newGroup)) {
+                return null;
             }
+            permittedSuicide = true;
         }
 
         /*
