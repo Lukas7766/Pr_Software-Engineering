@@ -182,18 +182,19 @@ public class Board implements BoardInterface {
 
             @Override
             public void execute(boolean saveEffects) {
-                for (StoneGroup sg : surroundingSGs) {
-                    if ((sg.getStoneColor() != color || permittedSuicide) && sg.getLiberties().isEmpty()) {
-                        for (Position p : sg.getLocations()) {
-                            UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
-                            uc0401RemoveStoneCommands.add(tmpCmd);
-                            if(saveEffects) {
-                                getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
-                                getUndoEvents().addAll(tmpCmd.getUndoEvents());
-                            }
+                Set<StoneGroup> deadGroups = surroundingSGs.stream()
+                    .filter(sg -> (sg.getStoneColor() != color || permittedSuicide) && sg.getLiberties().isEmpty())
+                    .collect(Collectors.toSet());
+                for (StoneGroup sg : deadGroups) {
+                    for (Position p : sg.getLocations()) {
+                        UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
+                        uc0401RemoveStoneCommands.add(tmpCmd);
+                        if(saveEffects) {
+                            getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
+                            getUndoEvents().addAll(tmpCmd.getUndoEvents());
                         }
-                        uC0402AddCapturedStonesCommand = game.addCapturedStones(color, sg.getLocations().size());
                     }
+                    uC0402AddCapturedStonesCommand = game.addCapturedStones(color, sg.getLocations().size());
                 }
             }
 

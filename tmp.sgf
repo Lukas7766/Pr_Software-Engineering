@@ -1,5 +1,8 @@
 (;FF[4]GM[1]SZ[19]
 
-HA[9]AB[jj][jd][jp][pj][dj][dd][pp][pd][dp]CR[aa]C[Good Luck!]
+HA[0]
+
+;B[aa]C[playMove(0, 0)]
+;W[ba]C[playMove(1, 0)]
 
 )
