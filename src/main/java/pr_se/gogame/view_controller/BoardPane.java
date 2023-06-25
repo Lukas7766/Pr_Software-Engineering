@@ -550,7 +550,7 @@ public class BoardPane extends GridPane {
      * @param zip the ZipFile of the graphics pack
      * @return the fully instantiated image
      */
-    private Image loadImageFromGraphicsPack(String fileName, ZipFile zip) {
+    private Image loadImageFromGraphicsPack(String fileName, ZipFile zip) throws IOException {
         if(fileName == null || zip == null) {
             throw new NullPointerException();
         }
@@ -559,7 +559,7 @@ public class BoardPane extends GridPane {
 
         if(zipEntry == null) {
             CustomExceptionDialog.show(new IOException(), "File " + fileName + " is not present in graphics pack " + graphicsPath + "!");
-            return null;
+            throw new IOException();
         }
 
         Image ret = null;
@@ -576,6 +576,7 @@ public class BoardPane extends GridPane {
                 SMOOTH_IMAGES);     // smooth
         } catch (IOException e) {
             CustomExceptionDialog.show(e, "File " + fileName + " appears to be present but unreadable in graphics pack " + graphicsPath + "!");
+            throw new IOException();
         }
 
         return ret;

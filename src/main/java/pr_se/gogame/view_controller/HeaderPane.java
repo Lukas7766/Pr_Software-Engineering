@@ -448,12 +448,12 @@ public class HeaderPane extends VBox {
         }
 
         ComboBox<String> graphicsPackSelectorComboBox = new ComboBox<>(comboBoxItems);
-        graphicsPackSelectorComboBox.setValue("default.zip");
+        graphicsPackSelectorComboBox.setValue(GlobalSettings.getGraphicsPackFileName());
         graphicsPackSelectorComboBox.setTooltip(new Tooltip("Select the graphics pack zip file."));
         graphicsPackSelectorComboBox.setMinWidth(125);
         graphicsPackSelectorComboBox.setTranslateX(-15);
         graphicsPackSelectorComboBox.setFocusTraversable(false);
-        graphicsPackSelectorComboBox.setOnAction(e -> GlobalSettings.setGraphicsPack("/" + graphicsPackSelectorComboBox.getValue()));
+        graphicsPackSelectorComboBox.setOnAction(e -> GlobalSettings.setGraphicsPackFileName("/" + graphicsPackSelectorComboBox.getValue()));
 
         gameShortCuts.getChildren().add(graphicsPackSelectorComboBox);
 
