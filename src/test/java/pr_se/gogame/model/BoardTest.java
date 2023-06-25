@@ -3,9 +3,13 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.model.helper.Position;
+import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
+
+import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -25,7 +29,7 @@ class BoardTest {
     void setUp() {
         game = new Game();
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
-        board = new Board(game, 19);
+        board = new Board(game, game.getSize());
         maxCoord = board.getSize() - 1;
     }
 
@@ -369,5 +373,29 @@ class BoardTest {
         assertEquals(null, board.getColorAt(3, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
         assertEquals(BLACK, board.getColorAt(4, 1));
+    }
+
+    @Test
+    void checkNoFalseSuicideAlarm() {
+        loadFile("./testFiles/FalseAlarm.sgf");
+
+        assertNotNull(board.setStone(9, 5, BLACK, false));
+        assertNotNull(board.setStone(9, 9, WHITE, false));
+    }
+
+    void loadFile(String fileName) {
+        game.loadGame(new File(fileName));
+        game.goToEnd();
+
+        board = new Board(game, game.getSize());
+
+        for(int x = 0; x < board.getSize(); x++) {
+            for(int y = 0; y < board.getSize(); y++) {
+                StoneColor c = game.getColorAt(x, y);
+                if(c != null) {
+                    assertNotNull(board.setStone(x, y, c, true));
+                }
+            }
+        }
     }
 }
