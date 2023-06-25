@@ -118,12 +118,7 @@ public enum SGFToken {
     /**
      * Marks the end of the file.
      */
-    EOF("EOF", false),
-
-    /**
-     * The format for the first line of a File
-     */
-    START("(;FF[4]GM[1]SZ[%s]", false);
+    EOF("EOF", false);
 
     /**
      * The value for the enum

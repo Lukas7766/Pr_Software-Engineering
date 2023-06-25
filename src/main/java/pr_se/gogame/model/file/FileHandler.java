@@ -38,7 +38,10 @@ public final class FileHandler {
         try (FileWriter output = new FileWriter(file)) {
             // Write file header
 
-            output.write(String.format(START.getValue(), game.getSize()));
+            output.write(LPAR.getValue() + SEMICOLON.getValue());
+            output.write(String.format(FF.getValue(), 4));
+            output.write(String.format(GM.getValue(), 1));
+            output.write(String.format(SZ.getValue(), game.getSize()));
             output.write( "\n\n");
             output.write(String.format(HA.getValue(), game.getHandicap()));
 

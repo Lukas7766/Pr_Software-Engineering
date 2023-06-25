@@ -2,7 +2,6 @@ package pr_se.gogame.model.file;
 
 import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.io.Reader;
 
 import static pr_se.gogame.model.file.SGFToken.*;
@@ -33,22 +32,28 @@ public class SGFScanner {
         SGFToken t = null;
         String attribute = "";
 
+        boolean hasAttribute = true;
+
         switch (ch) {
             case '[':
                 t = LONE_ATTRIBUTE;
                 attribute = getAttribute();
+                hasAttribute = false;
                 break;
 
             case ';':
                 t = SEMICOLON;
+                hasAttribute = false;
                 break;
 
             case '(':
                 t = LPAR;
+                hasAttribute = false;
                 break;
 
             case ')':
                 t = RPAR;
+                hasAttribute = false;
                 break;
 
             case 'A':
@@ -62,20 +67,14 @@ public class SGFScanner {
                 } else {
                     unexpected('B', 'W', 'E');
                 }
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'B':
                 t = B;
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'W':
                 t = W;
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'C':
@@ -86,46 +85,43 @@ public class SGFScanner {
                     getNextChar();
                 }
                 attribute = getAttribute();
+                hasAttribute = false;
                 break;
 
             case 'F':
                 getNextChar();
                 expect('F');
                 t = FF;
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'G':
                 getNextChar();
                 expect('M');
                 t = GM;
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'H':
                 getNextChar();
                 expect('A');
                 t = HA;
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'K':
                 getNextChar();
                 expect('M');
                 t = KM;
+                break;
+
+            case 'L':
                 getNextChar();
-                attribute = getAttribute();
+                expect('B');
+                t = LB;
                 break;
 
             case 'M':
                 getNextChar();
                 expect('A');
                 t = MA;
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'P':
@@ -137,8 +133,6 @@ public class SGFScanner {
                 } else {
                     unexpected('B', 'W');
                 }
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'S':
@@ -150,25 +144,26 @@ public class SGFScanner {
                 } else {
                     unexpected('Q', 'Z');
                 }
-
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case 'T':
                 getNextChar();
                 expect('R');
                 t = TR;
-                getNextChar();
-                attribute = getAttribute();
                 break;
 
             case (char)-1:
                 t = SGFToken.EOF;
+                hasAttribute = false;
                 break;
 
             default:
                 throw new IOException("Invalid token '" + ch + "'!");
+        }
+
+        if(hasAttribute) {
+            getNextChar();
+            attribute = getAttribute();
         }
 
         return new ScannedToken(t, attribute, line, col);
