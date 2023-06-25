@@ -72,7 +72,7 @@ public class HeaderPane extends VBox {
      * @param stage     instance of actual stage -> needed to show file dialog
      * @param game      instance of actual game -> needed for triggering and observing changes in model
      */
-    public HeaderPane(Color backcolor, Application app, Scene scene, Stage stage, Game game) {
+    public HeaderPane(Color backcolor, Application app, Scene scene, Stage stage, Game game) throws IOException {
         this.backColor = backcolor;
         this.app = app;
         this.stage = stage;
@@ -331,7 +331,7 @@ public class HeaderPane extends VBox {
      *
      * @return a horizontal box layout object which includes all needed elements of the short menu
      */
-    private HBox shortMenu() {
+    private HBox shortMenu() throws IOException {
         HBox lane = new HBox();
         lane.setPrefHeight(35);
 
@@ -441,10 +441,15 @@ public class HeaderPane extends VBox {
         ObservableList<String> comboBoxItems = FXCollections.observableArrayList();
         File graphicsFolder = new File(GlobalSettings.GRAPHICS_PACK_FOLDER);
         FileFilter zipFilter = pathname -> pathname.getName().toLowerCase().endsWith(".zip");
-        for(File f : graphicsFolder.listFiles(zipFilter)) {
-            if(f.isFile()) { // We still need to check this because you could have a folder whose name ends with ".zip".
-                comboBoxItems.add(f.getName());
+        File[] directoryListing = graphicsFolder.listFiles(zipFilter);
+        if(directoryListing != null) {
+            for (File f : directoryListing) {
+                if (f.isFile()) { // We still need to check this because you could have a folder whose name ends with ".zip".
+                    comboBoxItems.add(f.getName());
+                }
             }
+        } else {
+            throw new IOException("Couldn't find graphics pack folder!");
         }
 
         ComboBox<String> graphicsPackSelectorComboBox = new ComboBox<>(comboBoxItems);

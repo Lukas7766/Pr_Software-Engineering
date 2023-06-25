@@ -10,6 +10,7 @@ import pr_se.gogame.model.Game;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -36,7 +37,9 @@ public class GoApplication extends Application {
             }
 
             File dir = new File(graphicsDir);
-            dir.mkdirs();
+            if(!dir.mkdirs()) {
+                throw new IOException("Couldn't create graphics pack folder!");
+            }
 
             File file = new File(graphicsDir + graphicsPack);
             Files.copy(link, file.getAbsoluteFile().toPath());
