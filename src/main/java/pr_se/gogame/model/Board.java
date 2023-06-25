@@ -134,42 +134,8 @@ public class Board implements BoardInterface {
             subcommands.add(uc03PlacePointer);
         }
 
-        final boolean finalPermittedSuicide = permittedSuicide;
-
-        UndoableCommand uc04RemoveCapturedStones = (prepareMode) ? (null) : new UndoableCommand() {
-            final LinkedList<UndoableCommand> uc0401RemoveStoneCommands = new LinkedList<>();
-            UndoableCommand uC0402AddCapturedStonesCommand = null;
-
-            @Override
-            public void execute(boolean saveEffects) {
-                for (StoneGroup sg : surroundingSGs) {
-                    if ((sg.getStoneColor() != color || finalPermittedSuicide) && sg.getLiberties().isEmpty()) {
-                        for (Position p : sg.getLocations()) {
-                            UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
-                            uc0401RemoveStoneCommands.add(tmpCmd);
-                            if(saveEffects) {
-                                getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
-                                getUndoEvents().addAll(tmpCmd.getUndoEvents());
-                            }
-                        }
-                        uC0402AddCapturedStonesCommand = game.addCapturedStones(color, sg.getLocations().size());
-                    }
-                }
-            }
-
-            @Override
-            public void undo() {
-                if(uC0402AddCapturedStonesCommand != null) {
-                    uC0402AddCapturedStonesCommand.undo();
-                }
-
-                for(UndoableCommand c : uc0401RemoveStoneCommands) {
-                    c.undo();
-                }
-            }
-        };
+        UndoableCommand uc04RemoveCapturedStones = (prepareMode) ? (null) : removeGroupsWithoutLiberties(surroundingSGs, color, permittedSuicide);
         if(uc04RemoveCapturedStones != null) {
-            uc04RemoveCapturedStones.execute(true);
             subcommands.add(uc04RemoveCapturedStones);
         }
 
@@ -202,6 +168,43 @@ public class Board implements BoardInterface {
         }
 
 
+        return ret;
+    }
+
+    private UndoableCommand removeGroupsWithoutLiberties(final Set<StoneGroup> surroundingSGs, final StoneColor color, final boolean permittedSuicide) {
+        UndoableCommand ret = new UndoableCommand() {
+            final LinkedList<UndoableCommand> uc0401RemoveStoneCommands = new LinkedList<>();
+            UndoableCommand uC0402AddCapturedStonesCommand = null;
+
+            @Override
+            public void execute(boolean saveEffects) {
+                for (StoneGroup sg : surroundingSGs) {
+                    if ((sg.getStoneColor() != color || permittedSuicide) && sg.getLiberties().isEmpty()) {
+                        for (Position p : sg.getLocations()) {
+                            UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
+                            uc0401RemoveStoneCommands.add(tmpCmd);
+                            if(saveEffects) {
+                                getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
+                                getUndoEvents().addAll(tmpCmd.getUndoEvents());
+                            }
+                        }
+                        uC0402AddCapturedStonesCommand = game.addCapturedStones(color, sg.getLocations().size());
+                    }
+                }
+            }
+
+            @Override
+            public void undo() {
+                if(uC0402AddCapturedStonesCommand != null) {
+                    uC0402AddCapturedStonesCommand.undo();
+                }
+
+                for(UndoableCommand c : uc0401RemoveStoneCommands) {
+                    c.undo();
+                }
+            }
+        };
+        ret.execute(true);
         return ret;
     }
 
