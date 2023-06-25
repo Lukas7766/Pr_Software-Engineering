@@ -4,6 +4,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.ruleset.NewZealandRuleset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -135,8 +136,10 @@ class BoardTest {
         assertNotNull(board.setStone(9, 2, BLACK, false));
     }
 
-    /*@Test
+    @Test
     void setStoneSuicideAllowed() {
+        game.newGame(BLACK, 19, 0, new NewZealandRuleset());
+
         assertNotNull(board.setStone(9, 1, BLACK, false));
         assertNotNull(board.setStone(10, 1, BLACK, false));
         assertNotNull(board.setStone(9, 3, BLACK, false));
@@ -145,7 +148,8 @@ class BoardTest {
         assertNotNull(board.setStone(11, 2, BLACK, false));
 
         assertNotNull(board.setStone(9, 2, WHITE, false));
-    }*/
+        assertNotNull(board.setStone(10, 2, WHITE, false));
+    }
 
     @Test
     void removeStone() {

@@ -1,5 +1,7 @@
 package pr_se.gogame.model;
 
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.file.FileHandler;
@@ -46,66 +48,42 @@ class FileHandlerTest {
     // Edge cases
 
     @Test
-    void emptySave() {
-        assertSavingWorks();
+    void empty() {
+
     }
 
     @Test
-    void emptySaveAndLoad() {
-        emptySave();
-
-        assertLoadingWorks();
-    }
-
-    @Test
-    void onlyHandicapSave() {
+    void onlyHandicap() {
         handicap = 9;
         setUp();
-        assertSavingWorks();
     }
 
     @Test
-    void onlyHandicapSaveAndLoad() {
-        onlyHandicapSave();
-
-        assertLoadingWorks();
+    void onlyHandicapCommentsAndMark() {
+        handicap = 2;
+        setUp();
+        game.mark(0, 0, MarkShape.CIRCLE);
+        game.setComment("Good Luck!");
     }
 
     @Test
-    void handicapAndOneStoneSave() {
+    void handicapAndOneStone() {
         handicap = 9;
         setUp();
         game.playMove(0, 0);
-        assertSavingWorks();
     }
 
     @Test
-    void handicapAndOneStoneSaveAndLoad() {
-        handicapAndOneStoneSave();
-
-        assertLoadingWorks();
-    }
-
-    @Test
-    void onlySetupSave() {
+    void onlySetup() {
         game.setSetupMode(true);
         game.placeSetupStone(0, 0, BLACK);
         game.placeSetupStone(1, 0, BLACK);
         game.placeSetupStone(0, 1, WHITE);
         game.placeSetupStone(1, 1, WHITE);
-
-        assertSavingWorks();
     }
 
     @Test
-    void onlySetupSaveAndLoad() {
-        onlySetupSave();
-
-        assertLoadingWorks();
-    }
-
-    @Test
-    void onlySetupAndOneStoneSave() {
+    void onlySetupAndOneStone() {
         game.setSetupMode(true);
         game.placeSetupStone(0, 0, BLACK);
         game.placeSetupStone(1, 0, BLACK);
@@ -114,43 +92,29 @@ class FileHandlerTest {
 
         game.setSetupMode(false);
         game.playMove(0, 2);
-
-        assertSavingWorks();
     }
 
     @Test
-    void onlySetupAndOneStoneSaveAndLoad() {
-        onlySetupAndOneStoneSave();
-
-        assertLoadingWorks();
-    }
-
-    @Test
-    void onlyPassSave() {
+    void onlyPass() {
         game.pass();
-
-        assertSavingWorks();
     }
 
     @Test
-    void onlyPassSaveAndLoad() {
-        onlyPassSave();
-
-        assertLoadingWorks();
-    }
-
-    @Test
-    void onlyPassAndOneStoneSave() {
+    void onlyPassAndOneStone() {
         game.pass();
         game.playMove(0, 0);
-
-        assertSavingWorks();
     }
 
-    @Test
-    void onlyPassAndOneStoneSaveAndLoad() {
-        onlyPassAndOneStoneSave();
+    @AfterEach
+    void addCommentAndMarks() {
+        game.setComment("Good Luck!");
+        game.mark(0, 0, MarkShape.CIRCLE);
 
+        assertSavingAndLoadingWorks();
+    }
+
+    void assertSavingAndLoadingWorks() {
+        assertSavingWorks();
         assertLoadingWorks();
     }
 
@@ -159,7 +123,7 @@ class FileHandlerTest {
     }
 
     void assertLoadingWorks() {
-        FileHandler.loadFile(game, file);
+        assertTrue(FileHandler.loadFile(game, file));
 
         assertEquals(size, game.getSize());
         assertEquals(handicap, game.getHandicap());
