@@ -2,7 +2,9 @@ package pr_se.gogame.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.ruleset.NewZealandRuleset;
 import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.observer.DebugEvent;
 import pr_se.gogame.view_controller.observer.GameEvent;
@@ -65,6 +67,8 @@ class GameTest {
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(maxCoord + 1, 0, true));
         game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, maxCoord + 1, true));
+        game.setHandicapStoneCounter(1);
+        assertThrows(NullPointerException.class, () -> game.placeHandicapPosition(0, 0, true, null));
     }
 
     @Test
@@ -120,6 +124,63 @@ class GameTest {
     @Test
     void loadGameArgs() {
         assertThrows(NullPointerException.class, () -> game.loadGame(null));
+    }
+
+    @Test
+    void usePositionArgs() {
+        assertThrows(IllegalArgumentException.class, () -> game.usePosition(-1, 0));
+        assertThrows(IllegalArgumentException.class, () -> game.usePosition(0, -1));
+        assertThrows(IllegalArgumentException.class, () -> game.usePosition(game.getSize(), 0));
+        assertThrows(IllegalArgumentException.class, () -> game.usePosition(0, game.getSize()));
+    }
+
+    @Test
+    void placeSetupStoneArgs() {
+        game.setSetupMode(true);
+        assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(-1, 0, BLACK));
+        assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(0, -1, BLACK));
+        assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(game.getSize(), 0, BLACK));
+        assertThrows(IllegalArgumentException.class, () -> game.placeSetupStone(0, game.getSize(), BLACK));
+        assertThrows(NullPointerException.class, () -> game.placeSetupStone(0, 0, null));
+    }
+
+    // State Pattern
+    @Test
+    void dontPlaceHandicapStonesAfterStart() {
+        game.playMove(0, 0);
+        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(1, 1, true));
+    }
+
+    @Test
+    void dontUsePositionWhenGameOver() {
+        assertNotPossibleWhenGameOver(() -> game.usePosition(0, 0));
+    }
+
+    @Test
+    void dontPlayAfterGameIsOver() {
+        assertNotPossibleWhenGameOver(() -> game.playMove(0, 0));
+    }
+
+    @Test
+    void dontPlaceHandicapAfterGameOver() {
+        assertNotPossibleWhenGameOver(() -> game.placeHandicapPosition(0, 0, true));
+    }
+
+    @Test
+    void dontPlaceSetupAfterGameOver() {
+        assertNotPossibleWhenGameOver(() -> game.placeSetupStone(0, 0, BLACK));
+    }
+
+    @Test
+    void dontPassWhenGameIsOver() {
+        assertNotPossibleWhenGameOver(() -> game.pass());
+    }
+
+
+
+    void assertNotPossibleWhenGameOver(Executable ex) {
+        game.resign();
+        assertThrows(IllegalStateException.class, ex);
     }
 
     // other tests
@@ -445,18 +506,6 @@ class GameTest {
     }
 
     @Test
-    void dontPlaceHandicapStonesAfterStart() {
-        game.playMove(0, 0);
-        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(1, 1, true));
-    }
-
-    @Test
-    void dontPlayAfterGameIsOver() {
-        game.resign();
-        assertThrows(IllegalStateException.class, () -> game.playMove(0, 0));
-    }
-
-    @Test
     void playMoveKoPrevention() {
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
 
@@ -465,5 +514,20 @@ class GameTest {
 
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
+    }
+
+    @Test
+    void handicapCtrButSetManually() {
+        // Used by the FileHandler
+        game.newGame(BLACK, 19, 0, new JapaneseRuleset(), false);
+
+        assertEquals(Game.GameState.RUNNING, game.getGameState());
+    }
+
+    @Test
+    void newZealandRuleSet() {
+        game.newGame(BLACK, 19, 9, new NewZealandRuleset());
+
+        assertEquals(Game.GameState.SETTING_UP, game.getGameState());
     }
 }

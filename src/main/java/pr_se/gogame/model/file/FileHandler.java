@@ -244,7 +244,7 @@ public final class FileHandler {
                 game.setHandicapStoneCounter(handicap);
                 do {
                     decodedCoords = getCoordsFromString(t.getAttributeValue());
-                    game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
+                    game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true, handicapColor);
 
                     t = scanner.next();
                 } while (t.getToken() == LONE_ATTRIBUTE);

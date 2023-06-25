@@ -397,11 +397,11 @@ public class Game implements GameInterface {
 
     @Override
     public void placeHandicapPosition(int x, int y, boolean placeStone) {
-        placeHandicapPosition(x, y, curColor, placeStone);
+        placeHandicapPosition(x, y, placeStone, curColor);
     }
 
     @Override
-    public void placeHandicapPosition(int x, int y, StoneColor color, boolean placeStone) {
+    public void placeHandicapPosition(int x, int y, boolean placeStone, StoneColor color) {
         if(gameState != GameState.SETTING_UP) {
             throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
         }
@@ -502,6 +502,10 @@ public class Game implements GameInterface {
 
     @Override
     public void usePosition(int x, int y) {
+        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
+            throw new IllegalArgumentException();
+        }
+
         if(gameState == GameState.RUNNING) {
             playMove(x, y);
         } else if(gameState == GameState.SETTING_UP) {

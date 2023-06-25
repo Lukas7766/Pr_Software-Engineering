@@ -66,10 +66,10 @@ public interface GameInterface {
      *
      * @param x          the x coordinate of the stone, starting at the left
      * @param y          the y coordinate of the stone, starting at the top
-     * @param color the color of the stone to be placed - if any
      * @param placeStone whether a stone is to be placed. If false, the handicap slot is still placed.
+     * @param color      the color of the stone to be placed - if any
      */
-    void placeHandicapPosition(int x, int y, StoneColor color, boolean placeStone);
+    void placeHandicapPosition(int x, int y, boolean placeStone, StoneColor color);
 
 
     void usePosition(int x, int y);
