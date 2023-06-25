@@ -76,11 +76,6 @@ public enum SGFToken {
     TR("TR[%s]", false),
 
     /**
-     * label for a coordinate
-     */
-    LB("LB[%s:%s]", false),
-
-    /**
      * The version of the SGF format that is used. We are using version 4.
      */
     FF("FF[%s]", false),

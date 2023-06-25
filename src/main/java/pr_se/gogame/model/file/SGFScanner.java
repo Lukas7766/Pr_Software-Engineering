@@ -112,12 +112,6 @@ public class SGFScanner {
                 t = KM;
                 break;
 
-            case 'L':
-                getNextChar();
-                expect('B');
-                t = LB;
-                break;
-
             case 'M':
                 getNextChar();
                 expect('A');
