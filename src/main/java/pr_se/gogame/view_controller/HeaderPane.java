@@ -127,13 +127,13 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem exportFileItem = new MenuItem("_Save");
-        exportFileItem.setDisable(true);
+        // exportFileItem.setDisable(true);
         exportFileItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItem);
         exportFileItem.setOnAction(e -> saveGame(false));
 
         MenuItem exportFileItemAs = new MenuItem("Save _as");
-        exportFileItemAs.setDisable(true);
+        // exportFileItemAs.setDisable(true);
         exportFileItemAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItemAs);
         exportFileItemAs.setOnAction(e -> saveGame(true));
@@ -231,18 +231,22 @@ public class HeaderPane extends VBox {
         scoreGameItem.setOnAction(e -> game.scoreGame());
 
         menu.getItems().addAll(gameSectionItems);
-        gameSectionItems.forEach(e -> e.setDisable(true));
+        // gameSectionItems.forEach(e -> e.setDisable(true));
 
         game.addListener(e -> {
             switch (e.getGameCommand()) {
-                case INIT, GAME_WON ->
+                case INIT:
+                    playbackControlList.stream().filter(button -> !button.isDisable()).forEach(button -> button.setDisable(true));
+                case GAME_WON:
                     gameSectionItems.stream().filter(menuItem -> !menuItem.isDisable()).forEach(menuItem -> menuItem.setDisable(true));
+                    break;
 
-                case NEW_GAME, UPDATE ->
+                case NEW_GAME, UPDATE:
                     gameSectionItems.stream().filter(MenuItem::isDisable).forEach(menuItem -> menuItem.setDisable(false));
-                default -> {
-                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
-                }
+                    playbackControlList.stream().filter(Button::isDisable).forEach(button -> button.setDisable(false));
+                    break;
+                default:
+                    break;
             }
 
         });
@@ -422,7 +426,7 @@ public class HeaderPane extends VBox {
         gameShortCutList.add(confirm);
 
         gameShortCuts.getChildren().addAll(gameShortCutList);
-        gameShortCutList.forEach(e -> e.setDisable(true));
+        // gameShortCutList.forEach(e -> e.setDisable(true));
 
         game.addListener(e -> {
             switch (e.getGameCommand()){

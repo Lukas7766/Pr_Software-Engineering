@@ -86,6 +86,8 @@ public class GoApplication extends Application {
          * above 100 %.
          */
         stage.setForceIntegerRenderScale(true);
+
+        game.initGame();
         stage.show();
     }
 

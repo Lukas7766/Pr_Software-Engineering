@@ -105,6 +105,35 @@ class FileHandlerTest {
         game.playMove(0, 0);
     }
 
+    @Test
+    void getCurrentFile() {
+        assertEquals(file, FileHandler.getCurrentFile());
+    }
+
+    @Test
+    void clearCurrentFile() {
+        getCurrentFile();
+        FileHandler.clearCurrentFile();
+        assertNull(FileHandler.getCurrentFile());
+    }
+
+    @Test
+    void sampleGame() {
+        size = 13;
+        handicap = 5;
+        setUp();
+
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        game.placeSetupStone(0, 1, BLACK);
+        game.placeSetupStone(1, 0, WHITE);
+        game.placeSetupStone(1, 1, WHITE);
+
+        game.setSetupMode(false);
+        game.playMove(2, 2);
+        game.playMove(3, 3);
+    }
+
     @AfterEach
     void addCommentAndMarks() {
         game.setComment("Good Luck!");
