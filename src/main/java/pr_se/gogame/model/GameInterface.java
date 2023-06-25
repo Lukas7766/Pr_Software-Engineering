@@ -109,7 +109,7 @@ public interface GameInterface {
     // Methods regarding "move metadata"
     String getComment();
 
-    void commentCurrentMove(String comment);
+    void setComment(String comment);
 
     void mark(int x, int y, MarkShape shape);
 

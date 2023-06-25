@@ -125,7 +125,7 @@ public class Game implements GameInterface {
         if (file == null) {
             return false;
         }
-        return FileHandler.saveFile(this, file, history);
+        return FileHandler.saveFile(this, file);
     }
 
     @Override
@@ -518,6 +518,10 @@ public class Game implements GameInterface {
 
     @Override
     public void placeSetupStone(int x, int y, StoneColor color) {
+        if(gameState != GameState.SETTING_UP) {
+            throw new IllegalStateException("Can't place setup stone when gameState is " + gameState);
+        }
+
         if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
             throw new IllegalArgumentException();
         }
@@ -582,51 +586,6 @@ public class Game implements GameInterface {
         ret.execute(true);
 
         return ret;
-    }
-
-    @Override
-    public int getStonesCapturedBy(StoneColor color) {
-        if (color == null) throw new NullPointerException();
-
-        if (color == BLACK) {
-            return this.blackCapturedStones;
-        } else {
-            return this.whiteCapturedStones;
-        }
-    }
-
-    @Override
-    public double getScore(StoneColor color) {
-        if(color == null) {
-            throw new NullPointerException();
-        }
-
-        return color == BLACK ? this.playerBlackScore : this.playerWhiteScore;
-    }
-
-    @Override
-    public GameResult getGameResult() {
-        return gameResult;
-    }
-
-    @Override
-    public void setSetupMode(boolean setupMode) {
-        if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
-            return;
-        }
-
-        if(handicapStoneCounter > 0) {
-            return;
-        }
-
-        this.setupMode = setupMode;
-
-        this.gameState = this.setupMode ? GameState.SETTING_UP : GameState.RUNNING;
-    }
-
-    @Override
-    public boolean isSetupMode() {
-        return setupMode;
     }
 
     private UndoableCommand switchColor() {
@@ -743,20 +702,6 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public String getComment() {
-        return history.currentComment();
-    }
-
-    @Override
-    public void commentCurrentMove(String comment) {
-        if(comment == null) {
-            throw new NullPointerException();
-        }
-        history.getCurrentNode().setComment(comment);
-        fireGameEvent(new GameEvent(GameCommand.UPDATE));
-    }
-
-    @Override
     public void mark(int x, int y, MarkShape shape) {
         history.getCurrentNode().addMark(x, y, shape);
         GameCommand gc = null;
@@ -780,6 +725,69 @@ public class Game implements GameInterface {
     public void unmark(int x, int y) {
         history.getCurrentNode().removeMark(x, y);
         fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
+    }
+
+    @Override
+    public String getComment() {
+        return history.currentComment();
+    }
+
+    @Override
+    public void setComment(String comment) {
+        if(comment == null) {
+            throw new NullPointerException();
+        }
+        history.getCurrentNode().setComment(comment);
+        fireGameEvent(new GameEvent(GameCommand.UPDATE));
+    }
+
+    @Override
+    public int getStonesCapturedBy(StoneColor color) {
+        if (color == null) throw new NullPointerException();
+
+        if (color == BLACK) {
+            return this.blackCapturedStones;
+        } else {
+            return this.whiteCapturedStones;
+        }
+    }
+
+    @Override
+    public double getScore(StoneColor color) {
+        if(color == null) {
+            throw new NullPointerException();
+        }
+
+        return color == BLACK ? this.playerBlackScore : this.playerWhiteScore;
+    }
+
+    @Override
+    public GameResult getGameResult() {
+        return gameResult;
+    }
+
+    @Override
+    public void setSetupMode(boolean setupMode) {
+        if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
+            return;
+        }
+
+        if(handicapStoneCounter > 0) {
+            return;
+        }
+
+        this.setupMode = setupMode;
+
+        this.gameState = this.setupMode ? GameState.SETTING_UP : GameState.RUNNING;
+    }
+
+    @Override
+    public boolean isSetupMode() {
+        return setupMode;
+    }
+
+    public History getHistory() {
+        return history;
     }
 
     public enum GameState {

@@ -23,33 +23,31 @@ public final class FileHandler {
         // This private constructor solely exists to prevent instantiation.
     }
 
-    public static boolean saveFile(Game game, File file, History history) {
-        if(game == null || file == null || history == null) {
+    public static boolean saveFile(Game game, File file) {
+        if(game == null || file == null) {
             throw new NullPointerException();
         }
 
         currentFile = file;
 
-        Iterator<HistoryNode> iter = history.iterator();
+        Iterator<HistoryNode> iter = game.getHistory().iterator();
 
         try (FileWriter output = new FileWriter(file)) {
-
-            HistoryNode node = iter.next();
-            SGFToken t;
-
             // Write file header
 
             output.write(String.format(START.getValue(), game.getSize()));
             output.write( "\n\n");
             output.write(String.format(HA.getValue(), game.getHandicap()));
 
+            HistoryNode node = null;
+            if(iter.hasNext()) {
+                node = iter.next();
+            }
+            SGFToken t;
+
             if(game.getHandicap() > 0) {
-                if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
-                    if (node.getColor() == BLACK) {
-                        t = SGFToken.AB;
-                    } else {
-                        t = SGFToken.AW;
-                    }
+                if(node != null && node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
+                    t = SGFToken.ofHistoryNode(node);
 
                     output.write(String.format(t.getValue(), getStringFromCoords(node.getX(), node.getY())));
                     node = iter.next();
@@ -64,8 +62,10 @@ public final class FileHandler {
                 }
             }
 
-            if(!iter.hasNext() && node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
-                writeNodeMetaData(output, node);
+            if(!iter.hasNext() && (node == null || node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP)) {
+                if(node != null) {
+                    writeNodeMetaData(output, node);
+                }
                 output.write("\n\n)");
                 return true;
             }
@@ -227,6 +227,7 @@ public final class FileHandler {
                 if (handicap < Game.MIN_HANDICAP_AMOUNT || handicap > Game.MAX_HANDICAP_AMOUNT) {
                     throw new IOException("Invalid handicap amount of " + handicap + "!");
                 }
+                t = scanner.next();
             }
 
             game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
@@ -234,23 +235,20 @@ public final class FileHandler {
             if(handicap > 0) {
                 StoneColor handicapColor = null;
 
-                t = scanner.next();
-
                 if(t.getToken() == AB || t.getToken() == AW) {
                     handicapColor = correspondingColors.get(t.getToken());
                 } else if(handicap > 1) {
                     unexpected(AB.getValue() + " or " + AW.getValue(), t);
                 }
 
-                if(handicapColor != null) {
-                    game.setHandicapStoneCounter(handicap);
-                    do {
-                        decodedCoords = getCoordsFromString(t.getAttributeValue());
-                        game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
+                game.setHandicapStoneCounter(handicap);
+                do {
+                    decodedCoords = getCoordsFromString(t.getAttributeValue());
+                    game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, handicapColor, true);
 
-                        t = scanner.next();
-                    } while (t.getToken() == LONE_ATTRIBUTE);
-                }
+                    t = scanner.next();
+                } while (t.getToken() == LONE_ATTRIBUTE);
+
             }
 
             Map<Position, MarkShape> marks = new LinkedHashMap<>();
@@ -260,12 +258,10 @@ public final class FileHandler {
 
                 loop2:
                 for (;;) {
-                    t = scanner.next();
-
                     switch (t.getToken()) {
                         case SEMICOLON, RPAR:
                             if(currentComment != null) {
-                                game.commentCurrentMove(currentComment);
+                                game.setComment(currentComment);
                             }
                             currentComment = null;
                             marks.entrySet().forEach(e -> game.mark(e.getKey().x, e.getKey().y, e.getValue()));
@@ -278,6 +274,7 @@ public final class FileHandler {
                         case AB, AW:
                             addStoneColor = correspondingColors.get(t.getToken());
                             decodedCoords = getCoordsFromString(t.getAttributeValue());
+                            game.setSetupMode(true);
                             game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
                             break;
 
@@ -291,6 +288,7 @@ public final class FileHandler {
 
                         case B, W:
                             StoneColor c = correspondingColors.get(t.getToken());
+                            game.setSetupMode(false);
                             if (t.getAttributeValue().equals("")) {
                                 game.pass();
                             } else {
@@ -314,6 +312,8 @@ public final class FileHandler {
                         default:
                             throw new IOException("Unsupported " + t);
                     }
+
+                    t = scanner.next();
                 }
             }
 

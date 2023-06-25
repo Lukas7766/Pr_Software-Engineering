@@ -167,7 +167,7 @@ public class SidePane extends StackPane {
         saveCommentButton.setFocusTraversable(false);
         saveCommentButton.prefWidthProperty().bind(explanationBoard.widthProperty());
         saveCommentButton.setAlignment(Pos.CENTER);
-        saveCommentButton.setOnAction(e -> game.commentCurrentMove(textArea.getText()));
+        saveCommentButton.setOnAction(e -> game.setComment(textArea.getText()));
 
         explanationBoard.getChildren().add(saveCommentButton);
 

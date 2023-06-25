@@ -75,6 +75,21 @@ public class History implements Iterable<HistoryNode> {
         return current.getPrev() == null;
     }
 
+    public boolean hasSameContentAs(History h) {
+        Iterator<HistoryNode> otherIter = h.iterator();
+        for(HistoryNode hn : this) {
+            if(!otherIter.hasNext()) {
+                return false;
+            }
+            if(!hn.equals(otherIter.next())) {
+                return false;
+            }
+        }
+
+        return !otherIter.hasNext();
+    }
+
+    // Interface Iterable
     private HistoryNode getFirstMeaningfulNode() {
         HistoryNode first = current;
         while(first.getPrev() != null) {
@@ -116,5 +131,13 @@ public class History implements Iterable<HistoryNode> {
     @Override
     public Spliterator<HistoryNode> spliterator() {
         return Iterable.super.spliterator();
+    }
+
+    // Overridden Methods from Object
+    @Override
+    public String toString() {
+        StringBuilder retVal = new StringBuilder("History \n");
+        this.forEach(hn -> retVal.append(hn.toString()).append("\n"));
+        return retVal.toString();
     }
 }

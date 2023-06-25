@@ -126,11 +126,16 @@ public class HistoryNode {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         HistoryNode that = (HistoryNode) o;
-        return x == that.x && y == that.y && Objects.equals(prev, that.prev) && Objects.equals(next, that.next) && command.equals(that.command) && comment.equals(that.comment) && saveToken == that.saveToken && color == that.color && marks.equals(that.marks);
+        return x == that.x && y == that.y && comment.equals(that.comment) && saveToken == that.saveToken && color == that.color && marks.equals(that.marks);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(prev, next, command, comment, saveToken, x, y, color, marks);
+    }
+
+    @Override
+    public String toString() {
+        return "HistoryNode (x = " + x + ", y = " + y + "): " + comment;
     }
 }
