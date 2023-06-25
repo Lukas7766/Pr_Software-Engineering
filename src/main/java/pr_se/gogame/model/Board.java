@@ -143,7 +143,7 @@ public class Board implements BoardInterface {
             subcommands.add(uc03PlacePointer);
         }
 
-        final boolean finalKillAnother = killAnother;
+        final boolean finalPermittedSuicide = permittedSuicide;
 
         UndoableCommand uc04RemoveCapturedStones = (prepareMode) ? (null) : new UndoableCommand() {
             final LinkedList<UndoableCommand> uc0401RemoveStoneCommands = new LinkedList<>();
@@ -152,7 +152,7 @@ public class Board implements BoardInterface {
             @Override
             public void execute(boolean saveEffects) {
                 for (StoneGroup sg : surroundingSGs) {
-                    if ((sg.getStoneColor() != color || !finalKillAnother) && sg.getLiberties().isEmpty()) {
+                    if ((sg.getStoneColor() != color || finalPermittedSuicide) && sg.getLiberties().isEmpty()) {
                         for (Position p : sg.getLocations()) {
                             UndoableCommand tmpCmd = removeStone(p.x, p.y);
                             uc0401RemoveStoneCommands.add(tmpCmd);
