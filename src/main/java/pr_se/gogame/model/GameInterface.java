@@ -75,6 +75,12 @@ public interface GameInterface {
     void placeHandicapPosition(int x, int y, boolean placeStone, StoneColor color);
 
 
+    /**
+     * Takes the position for a stone and determines what to do with it based on Game's internal state. Useful for GUI
+     * components that determine the position of a placed stone themselves, but nothing else.
+     * @param x the x coordinate of the stone, starting at the left
+     * @param y the y coordinate of the stone, starting at the top
+     */
     void usePosition(int x, int y);
 
 
