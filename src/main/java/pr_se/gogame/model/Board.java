@@ -92,7 +92,6 @@ public class Board implements BoardInterface {
                     return null;
                 }
                 permittedSuicide = true;
-            } else {
             }
         }
 
