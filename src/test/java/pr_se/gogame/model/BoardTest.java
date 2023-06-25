@@ -3,7 +3,6 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
@@ -12,8 +11,8 @@ import pr_se.gogame.model.ruleset.NewZealandRuleset;
 import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import static pr_se.gogame.model.helper.StoneColor.*;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 class BoardTest {
     Game game;
@@ -154,6 +153,9 @@ class BoardTest {
 
         assertNotNull(board.setStone(9, 2, WHITE, false));
         assertNotNull(board.setStone(10, 2, WHITE, false));
+
+        assertNull(board.getColorAt(9, 2));
+        assertNull(board.getColorAt(10, 2));
     }
 
     @Test
