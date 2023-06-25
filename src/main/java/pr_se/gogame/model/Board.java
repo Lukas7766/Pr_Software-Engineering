@@ -247,7 +247,9 @@ public class Board implements BoardInterface {
                 // Update UI
                 if(saveEffects) {
                     getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
-                    getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, boardAtXyPreviously.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
+                    if(boardAtXyPreviously != null) {
+                        getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, boardAtXyPreviously.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
+                    }
                 }
             }
 
