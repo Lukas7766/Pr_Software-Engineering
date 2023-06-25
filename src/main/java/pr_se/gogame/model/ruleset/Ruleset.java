@@ -51,8 +51,8 @@ public interface Ruleset {
     default void setHandicapStones(Game game, StoneColor beginner, int noStones) {
         /*
          * This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
-         *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. That is why a ruleset
-         *  may override this.
+         *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. Thus, a ruleset may override
+         *  this.
          */
         if (game == null) {
             throw new IllegalArgumentException("board must not be null");
