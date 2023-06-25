@@ -380,6 +380,12 @@ public class BoardPane extends GridPane {
                     hasMoved = true;
                     break;
 
+                case M:
+                    if(hoverPBC != null) {
+                        hoverPBC.toggleCircleMark();
+                    }
+                    break;
+
                 case SPACE:
                     if(hoverPBC != null) {
                         hoverPBC.select();
