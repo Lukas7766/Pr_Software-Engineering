@@ -69,6 +69,7 @@ public class Game implements GameInterface {
     @Override
     public void initGame() {
         gameState = GameState.NOT_STARTED_YET;
+        this.history = null;
         FileHandler.clearCurrentFile();
 
         fireGameEvent(new GameEvent(GameCommand.INIT));
