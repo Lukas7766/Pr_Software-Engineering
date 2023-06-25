@@ -1,9 +1,10 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.file;
 
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.Game;
+import pr_se.gogame.model.History;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 

@@ -1,22 +1,28 @@
 package pr_se.gogame.model.file;
 
-import java.io.FileReader;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 
 import static pr_se.gogame.model.file.SGFToken.*;
 
 public class SGFScanner {
     private static final char EOF = (char)-1;
 
-    private final FileReader input;
+    private final BufferedReader input;
 
     private char ch;
 
     private int col = 0;
     private int line = 1;
 
-    public SGFScanner(FileReader input) {
-        this.input = input;
+    public SGFScanner(Reader input) {
+        if(input == null) {
+            throw new NullPointerException();
+        }
+
+        this.input = new BufferedReader(input);
     }
 
     public ScannedToken next() throws IOException {
@@ -51,8 +57,10 @@ public class SGFScanner {
                     t = AB;
                 } else if (ch == 'W') {
                     t = AW;
+                } else if(ch == 'E') {
+                    t = AE;
                 } else {
-                    unexpected('B', 'W');
+                    unexpected('B', 'W', 'E');
                 }
                 getNextChar();
                 attribute = getAttribute();
@@ -104,10 +112,53 @@ public class SGFScanner {
                 attribute = getAttribute();
                 break;
 
+            case 'K':
+                getNextChar();
+                expect('M');
+                t = KM;
+                getNextChar();
+                attribute = getAttribute();
+                break;
+
+            case 'M':
+                getNextChar();
+                expect('A');
+                t = MA;
+                getNextChar();
+                attribute = getAttribute();
+                break;
+
+            case 'P':
+                getNextChar();
+                if(ch == 'B') {
+                    t = PB;
+                } else if(ch == 'W') {
+                    t = PW;
+                } else {
+                    unexpected('B', 'W');
+                }
+                getNextChar();
+                attribute = getAttribute();
+                break;
+
             case 'S':
                 getNextChar();
-                expect('Z');
-                t = SZ;
+                if(ch == 'Z') {
+                    t = SZ;
+                } else if(ch == 'Q') {
+                    t = SQ;
+                } else {
+                    unexpected('Q', 'Z');
+                }
+
+                getNextChar();
+                attribute = getAttribute();
+                break;
+
+            case 'T':
+                getNextChar();
+                expect('R');
+                t = TR;
                 getNextChar();
                 attribute = getAttribute();
                 break;
