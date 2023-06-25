@@ -1,6 +1,5 @@
 package pr_se.gogame.model.file;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.Game;
@@ -50,13 +49,15 @@ class FileHandlerTest {
 
     @Test
     void empty() {
-
+        comprehensiveTest();
     }
 
     @Test
     void onlyHandicap() {
         handicap = 9;
         setUp();
+
+        comprehensiveTest();
     }
 
     @Test
@@ -65,6 +66,8 @@ class FileHandlerTest {
         setUp();
         game.mark(0, 0, MarkShape.CIRCLE);
         game.setComment("Good Luck!");
+
+        comprehensiveTest();
     }
 
     @Test
@@ -72,6 +75,8 @@ class FileHandlerTest {
         handicap = 9;
         setUp();
         game.playMove(0, 0);
+
+        comprehensiveTest();
     }
 
     @Test
@@ -81,6 +86,8 @@ class FileHandlerTest {
         game.placeSetupStone(1, 0, BLACK);
         game.placeSetupStone(0, 1, WHITE);
         game.placeSetupStone(1, 1, WHITE);
+
+        comprehensiveTest();
     }
 
     @Test
@@ -93,22 +100,30 @@ class FileHandlerTest {
 
         game.setSetupMode(false);
         game.playMove(0, 2);
+
+        comprehensiveTest();
     }
 
     @Test
     void onlyPass() {
         game.pass();
+
+        comprehensiveTest();
     }
 
     @Test
     void onlyPassAndOneStone() {
         game.pass();
         game.playMove(0, 0);
+
+        comprehensiveTest();
     }
 
     @Test
     void getCurrentFile() {
         assertEquals(file, FileHandler.getCurrentFile());
+
+        comprehensiveTest();
     }
 
     @Test
@@ -116,6 +131,8 @@ class FileHandlerTest {
         getCurrentFile();
         FileHandler.clearCurrentFile();
         assertNull(FileHandler.getCurrentFile());
+
+        comprehensiveTest();
     }
 
     @Test
@@ -133,9 +150,25 @@ class FileHandlerTest {
         game.setSetupMode(false);
         game.playMove(2, 2);
         game.playMove(3, 3);
+
+        comprehensiveTest();
     }
 
-    @AfterEach
+    // Invalid configurations
+    @Test
+    void handicapAfterGameBegun() {
+        game.playMove(0, 0);
+        game.setHandicapStoneCounter(1);
+        game.placeHandicapPosition(1, 0, true);
+        assertFalse(FileHandler.saveFile(game, file));
+    }
+
+    void comprehensiveTest() {
+        assertSavingAndLoadingWorks();
+        oldHistory = game.getHistory();
+        addCommentAndMarks();
+    }
+
     void addCommentAndMarks() {
         game.setComment("Good Luck!");
         game.mark(0, 0, MarkShape.CIRCLE);
@@ -157,7 +190,7 @@ class FileHandlerTest {
 
         assertEquals(size, game.getSize());
         assertEquals(handicap, game.getHandicap());
-        assertTrue(oldHistory.hasSameContentAs(game.getHistory()));
+        assertEquals(oldHistory, game.getHistory());
     }
 
 }

@@ -2,10 +2,7 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.view_controller.observer.GameEvent;
 
-import java.util.Iterator;
-import java.util.ListIterator;
-import java.util.NoSuchElementException;
-import java.util.Spliterator;
+import java.util.*;
 import java.util.function.Consumer;
 
 public class History implements Iterable<HistoryNode> {
@@ -75,7 +72,17 @@ public class History implements Iterable<HistoryNode> {
         return current.getPrev() == null;
     }
 
-    public boolean hasSameContentAs(History h) {
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        History h = (History)o;
+
         Iterator<HistoryNode> otherIter = h.iterator();
         for(HistoryNode hn : this) {
             if(!otherIter.hasNext()) {
@@ -87,6 +94,11 @@ public class History implements Iterable<HistoryNode> {
         }
 
         return !otherIter.hasNext();
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(this);
     }
 
     // Interface Iterable

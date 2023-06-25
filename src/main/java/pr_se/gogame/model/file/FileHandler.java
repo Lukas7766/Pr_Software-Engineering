@@ -91,6 +91,8 @@ public final class FileHandler {
 
                 if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
                     throw new IOException("Can't save handicap after game has commenced!");
+                } else if(node.getSaveToken() == HistoryNode.AbstractSaveToken.RESIGN) {
+                    break;
                 } else {
                     t = SGFToken.ofHistoryNode(node);
                     if (t == AE || t == null) {
