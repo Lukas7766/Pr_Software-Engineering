@@ -117,7 +117,7 @@ public final class FileHandler {
 
     private static void writeNodeMetaData(FileWriter output, HistoryNode node) throws IOException {
         for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
-            output.write(String.format(e.getValue().getSgfToken().getValue(), getStringFromCoords(e.getKey().x, e.getKey().y)));
+            output.write(String.format(e.getValue().getSgfToken().getValue(), getStringFromCoords(e.getKey().getX(), e.getKey().getY())));
         }
 
         if (!node.getComment().equals("")) {
@@ -244,7 +244,7 @@ public final class FileHandler {
                 game.setHandicapStoneCounter(handicap);
                 do {
                     decodedCoords = getCoordsFromString(t.getAttributeValue());
-                    game.placeHandicapPosition(decodedCoords.x, decodedCoords.y, true, handicapColor);
+                    game.placeHandicapPosition(decodedCoords.getX(), decodedCoords.getY(), true, handicapColor);
 
                     t = scanner.next();
                 } while (t.getToken() == LONE_ATTRIBUTE);
@@ -264,7 +264,7 @@ public final class FileHandler {
                                 game.setComment(currentComment);
                             }
                             currentComment = null;
-                            marks.entrySet().forEach(e -> game.mark(e.getKey().x, e.getKey().y, e.getValue()));
+                            marks.entrySet().forEach(e -> game.mark(e.getKey().getX(), e.getKey().getY(), e.getValue()));
                             marks = new LinkedHashMap<>();
                             if(t.getToken() == RPAR) {
                                 break loop2;
@@ -275,7 +275,7 @@ public final class FileHandler {
                             addStoneColor = correspondingColors.get(t.getToken());
                             decodedCoords = getCoordsFromString(t.getAttributeValue());
                             game.setSetupMode(true);
-                            game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
+                            game.placeSetupStone(decodedCoords.getX(), decodedCoords.getY(), addStoneColor);
                             break;
 
                         case LONE_ATTRIBUTE:
@@ -283,7 +283,7 @@ public final class FileHandler {
                                 throw new IOException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
                             }
                             decodedCoords = getCoordsFromString(t.getAttributeValue());
-                            game.placeSetupStone(decodedCoords.x, decodedCoords.y, addStoneColor);
+                            game.placeSetupStone(decodedCoords.getX(), decodedCoords.getY(), addStoneColor);
                             break;
 
                         case B, W:
@@ -293,7 +293,7 @@ public final class FileHandler {
                                 game.pass();
                             } else {
                                 decodedCoords = getCoordsFromString(t.getAttributeValue());
-                                game.playMove(decodedCoords.x, decodedCoords.y, c);
+                                game.playMove(decodedCoords.getX(), decodedCoords.getY(), c);
                             }
                             break;
 
@@ -303,7 +303,7 @@ public final class FileHandler {
 
                         case CR:
                             decodedCoords = getCoordsFromString(t.getAttributeValue());
-                            marks.put(new Position(decodedCoords.x, decodedCoords.y), MarkShape.CIRCLE);
+                            marks.put(new Position(decodedCoords.getX(), decodedCoords.getY()), MarkShape.CIRCLE);
                             break;
 
                         case LPAR:

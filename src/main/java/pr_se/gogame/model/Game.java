@@ -705,11 +705,11 @@ public class Game implements GameInterface {
     }
 
     private void removeAllMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.x, key.y, curMoveNumber)));
+        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), curMoveNumber)));
     }
 
     private void reDisplayMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.x, key.y, value));
+        history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.getX(), key.getY(), value));
     }
 
     @Override

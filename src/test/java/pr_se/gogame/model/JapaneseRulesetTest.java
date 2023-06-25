@@ -94,7 +94,7 @@ class JapaneseRulesetTest {
         assertEquals(
                 "Black won!\n" +
                         "\n" +
-                        "Handicap: 0\n" +
+                        "Handicap: 0.0\n" +
                         "+ Territory points: 9\n" +
                         "+ Captured stones: 1\n" +
                         "\n" +
