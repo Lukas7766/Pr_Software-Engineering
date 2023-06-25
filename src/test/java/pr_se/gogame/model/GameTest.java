@@ -145,6 +145,11 @@ class GameTest {
         assertThrows(NullPointerException.class, () -> game.placeSetupStone(0, 0, null));
     }
 
+    @Test
+    void setCommentArgs() {
+        assertThrows(NullPointerException.class, () -> game.setComment(null));
+    }
+
     // State Pattern
     @Test
     void dontPlaceHandicapStonesAfterStart() {
@@ -537,5 +542,13 @@ class GameTest {
         assertFalse(game.isSetupMode());
         game.setSetupMode(true);
         assertTrue(game.isSetupMode());
+    }
+
+    @Test
+    void getComment() {
+        game.setComment("foo");
+        assertEquals("foo", game.getComment());
+        game.setComment("bar");
+        assertEquals("bar", game.getComment());
     }
 }

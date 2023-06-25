@@ -310,9 +310,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place stone when game isn't running! Game State was " + gameState);
         }
 
-        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
-            throw new IllegalArgumentException();
-        }
+        checkCoords(x, y);
 
         final UndoableCommand uc01SetColor = setCurColor(color);
 
@@ -409,9 +407,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
         }
 
-        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
-            throw new IllegalArgumentException();
-        }
+        checkCoords(x, y);
 
         if(color == null) {
             throw new NullPointerException();
@@ -505,9 +501,7 @@ public class Game implements GameInterface {
 
     @Override
     public void usePosition(int x, int y) {
-        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
-            throw new IllegalArgumentException();
-        }
+        checkCoords(x, y);
 
         if(gameState == GameState.RUNNING) {
             playMove(x, y);
@@ -529,9 +523,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place setup stone when gameState is " + gameState);
         }
 
-        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
-            throw new IllegalArgumentException();
-        }
+        checkCoords(x, y);
 
         final int OLD_CUR_MOVE_NUMBER = curMoveNumber;
         curMoveNumber = 0;
@@ -737,8 +729,16 @@ public class Game implements GameInterface {
 
     @Override
     public void unmark(int x, int y) {
+        checkCoords(x, y);
+
         history.getCurrentNode().removeMark(x, y);
         fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
+    }
+
+    private void checkCoords(int x, int y) {
+        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
+            throw new IllegalArgumentException("Invalid coordinates x = " + x + ", y = " + y);
+        }
     }
 
     @Override
