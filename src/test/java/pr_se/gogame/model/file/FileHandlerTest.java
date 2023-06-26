@@ -257,6 +257,15 @@ class FileHandlerTest {
         comprehensiveTest();
     }
 
+    @Test
+    void marksCommentsBeforeFirstMove() {
+        game.setComment("foo");
+        game.mark(0, 0, MarkShape.CIRCLE);
+        game.playMove(0, 0);
+
+        comprehensiveTest();
+    }
+
     // Invalid configurations
     @Test
     void nonExistentFile() {

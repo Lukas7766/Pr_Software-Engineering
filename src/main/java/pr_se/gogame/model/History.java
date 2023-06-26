@@ -120,12 +120,11 @@ public class History implements Iterable<History.HistoryNode> {
     }
 
     // Interface Iterable
-    private HistoryNode getFirstMeaningfulNode() {
+    private HistoryNode getFirstNode() {
         HistoryNode first = current;
         while(first.getPrev() != null) {
             first = first.getPrev();
         }
-        first = first.getNext();
         return first;
     }
 
@@ -133,7 +132,7 @@ public class History implements Iterable<History.HistoryNode> {
     public Iterator<HistoryNode> iterator() {
         return new Iterator<>() {
 
-            HistoryNode node = getFirstMeaningfulNode();
+            HistoryNode node = getFirstNode();
 
             @Override
             public boolean hasNext() {

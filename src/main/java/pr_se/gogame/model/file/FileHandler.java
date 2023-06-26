@@ -46,8 +46,14 @@ public final class FileHandler {
             output.write( "\n\n");
             output.write(String.format(HA.getValue(), game.getHandicap()));
 
-            // Write handicap positions (if any)
+            // Skip node before first move
             History.HistoryNode node = null;
+            if(iter.hasNext()) {
+                node = iter.next();
+                output.write(getNodeMetaDataString(node));
+            }
+
+            // Write handicap positions (if any)
             if(iter.hasNext()) {
                 node = iter.next();
             }

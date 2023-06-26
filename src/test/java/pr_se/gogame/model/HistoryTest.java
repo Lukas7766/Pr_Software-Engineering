@@ -181,6 +181,8 @@ class HistoryTest {
 
         Iterator<History.HistoryNode> iter = game.getHistory().iterator();
         assertTrue(iter.hasNext());
+        assertNull(iter.next().getSaveToken());
+        assertTrue(iter.hasNext());
         assertEquals(HANDICAP, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
         assertEquals(HANDICAP, iter.next().getSaveToken());
@@ -204,7 +206,7 @@ class HistoryTest {
         game.playMove(1, 1);
         game.setComment("foo");
         history.forEach(n -> {
-            if(n.getSaveToken() != END_OF_HISTORY) {
+            if(n.getSaveToken() != END_OF_HISTORY && n.getSaveToken() != null) {
                 assertEquals("foo", n.getComment());
             } else {
                 assertEquals("", n.getComment());
@@ -219,17 +221,21 @@ class HistoryTest {
 
     @Test
     void testToString() {
-        History.HistoryNode lastNode = null;
-        for(History.HistoryNode h : history) {
-            lastNode = h;
-        }
-        assertEquals("History \n" + lastNode + "\n", history.toString());
+        StringBuilder expected = new StringBuilder("History \n");
+        history.forEach(hn -> expected.append(hn.toString()).append("\n"));
+        assertEquals(expected.toString(), history.toString());
+
         History.HistoryNode firstNode = new History.HistoryNode(null, PASS, BLACK, "foo");
         history.addNode(firstNode);
-        assertEquals("History \n" + firstNode + "\n" + lastNode + "\n", history.toString());
+        StringBuilder expected2 = new StringBuilder("History \n");
+        history.forEach(hn -> expected2.append(hn.toString()).append("\n"));
+        assertEquals(expected2.toString(), history.toString());
+
         History.HistoryNode secondNode = new History.HistoryNode(null, PASS, WHITE, "bar");
         history.addNode(secondNode);
-        assertEquals("History \n" + firstNode + "\n" + secondNode + "\n" + lastNode + "\n", history.toString());
+        StringBuilder expected3 = new StringBuilder("History \n");
+        history.forEach(hn -> expected3.append(hn.toString()).append("\n"));
+        assertEquals(expected3.toString(), history.toString());
     }
 
     @Test
