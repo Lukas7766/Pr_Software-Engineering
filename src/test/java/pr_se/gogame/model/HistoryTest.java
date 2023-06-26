@@ -83,12 +83,6 @@ class HistoryTest {
     }
 
     @Test
-    void currentComment() {
-        assertEquals("", history.getCurrentComment());
-
-    }
-
-    @Test
     void getCurrentNode() {
         History.HistoryNode first = history.getCurrentNode();
         game.playMove(0, 0);
@@ -120,18 +114,24 @@ class HistoryTest {
     void testEquals() {
         game.playMove(0, 0);
         game.playMove(1, 1);
+        game.playMove(2, 2);
 
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
         game.playMove(0, 0);
         assertNotEquals(history, game.getHistory());
         game.playMove(1, 1);
-        assertEquals(history, game.getHistory());
+        assertNotEquals(history, game.getHistory());
         game.playMove(2, 2);
+        assertEquals(history, game.getHistory());
+        game.playMove(3, 3);
+        assertNotEquals(history, game.getHistory());
+        game.playMove(4, 4);
         assertNotEquals(history, game.getHistory());
 
         game.newGame(WHITE, 19, 0, new JapaneseRuleset());
         game.playMove(0, 0);
         game.playMove(1, 1);
+        game.playMove(2, 2);
         assertNotEquals(history, game.getHistory());
 
         assertEquals(history, history);
@@ -176,6 +176,8 @@ class HistoryTest {
         assertEquals(History.HistoryNode.AbstractSaveToken.MOVE, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
         assertEquals(History.HistoryNode.AbstractSaveToken.PASS, iter.next().getSaveToken());
+        assertTrue(iter.hasNext());
+        assertEquals(History.HistoryNode.AbstractSaveToken.END_OF_HISTORY, iter.next().getSaveToken());
 
         assertFalse(iter.hasNext());
         assertThrows(NoSuchElementException.class, iter::next);
@@ -187,7 +189,13 @@ class HistoryTest {
         game.setComment("foo");
         game.playMove(1, 1);
         game.setComment("foo");
-        history.forEach(n -> assertEquals("foo", n.getComment()));
+        history.forEach(n -> {
+            if(n.getSaveToken() != History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
+                assertEquals("foo", n.getComment());
+            } else {
+                assertEquals("", n.getComment());
+            }
+        });
     }
 
     @Test
@@ -197,12 +205,16 @@ class HistoryTest {
 
     @Test
     void testToString() {
-        assertEquals("History \n", history.toString());
+        History.HistoryNode lastNode = null;
+        for(History.HistoryNode h : history) {
+            lastNode = h;
+        }
+        assertEquals("History \n" + lastNode + "\n", history.toString());
         History.HistoryNode firstNode = new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.PASS, BLACK, "foo");
         history.addNode(firstNode);
-        assertEquals("History \n" + firstNode + "\n", history.toString());
+        assertEquals("History \n" + firstNode + "\n" + lastNode + "\n", history.toString());
         History.HistoryNode secondNode = new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.PASS, WHITE, "bar");
         history.addNode(secondNode);
-        assertEquals("History \n" + firstNode + "\n" + secondNode + "\n", history.toString());
+        assertEquals("History \n" + firstNode + "\n" + secondNode + "\n" + lastNode + "\n", history.toString());
     }
 }

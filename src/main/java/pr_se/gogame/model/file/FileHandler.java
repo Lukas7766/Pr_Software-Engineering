@@ -46,14 +46,18 @@ public final class FileHandler {
             output.write( "\n\n");
             output.write(String.format(HA.getValue(), game.getHandicap()));
 
+            // Write handicap positions (if any)
             History.HistoryNode node = null;
             if(iter.hasNext()) {
                 node = iter.next();
             }
+            if(node == null) {
+                throw new NullPointerException();
+            }
             SGFToken t;
 
             if(game.getHandicap() > 0) {
-                if(node != null && node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP) {
+                if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP) {
                     t = SGFToken.ofHistoryNode(node);
 
                     if(t == null) {
@@ -63,21 +67,14 @@ public final class FileHandler {
                     node = iter.next();
 
                     node = writeAttributeSequence(output, iter, node);
+
+                    output.write(getNodeMetaDataString(node.getPrev()));
                     /*
-                     * Assertion: node is either the first node after the attributeSequence or the last node in the
-                     * History.
+                     * Assertion: node is the first node after the attributeSequence.
                      */
                 } else if(game.getHandicap() > 1) {
                     throw new IllegalStateException("Handicap move expected but not found!");
                 }
-            }
-
-            if(!iter.hasNext() && (node == null || node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP)) {
-                if(node != null) {
-                    writeNodeMetaData(output, node);
-                }
-                output.write("\n\n)");
-                return true;
             }
 
             output.write("\n");
@@ -86,14 +83,20 @@ public final class FileHandler {
 
             // Write game contents
             for (;;) {
-                if(node == null) {
-                    throw new IllegalStateException("Reached end of history while saving!");
+
+                if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.RESIGN) {
+                    node = iter.next();
+                    if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
+                        break;
+                    } else {
+                        throw new IllegalStateException("Game can't continue after resigning!");
+                    }
+                } else if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
+                    break;
                 }
 
                 if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP) {
                     throw new IOException("Can't save handicap after game has commenced!");
-                } else if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.RESIGN) {
-                    break;
                 } else {
                     t = SGFToken.ofHistoryNode(node);
                     if (t == AE || t == null) {
@@ -105,20 +108,15 @@ public final class FileHandler {
                 output.write("\n" + SEMICOLON.getValue());
                 output.write(String.format(t.getValue(), coords));
 
-                if(iter.hasNext()) {
+                if (iter.hasNext()) {
                     node = iter.next();
-                    if(t == SGFToken.ofHistoryNode(node) && t.hasMultiAttribs()) {
+                    if (t == SGFToken.ofHistoryNode(node) && t.hasMultiAttribs()) {
                         node = writeAttributeSequence(output, iter, node);
                     }
 
                 }
 
-                if(iter.hasNext() || t != SGFToken.ofHistoryNode(node)) {
-                    writeNodeMetaData(output, node.getPrev());
-                } else {
-                    writeNodeMetaData(output, node);
-                    break;
-                }
+                output.write(getNodeMetaDataString(node.getPrev()));
             }
 
 
@@ -131,26 +129,30 @@ public final class FileHandler {
         return true;
     }
 
-    private static void writeNodeMetaData(FileWriter output, History.HistoryNode node) throws IOException {
-        if(output == null || node == null) {
+    private static String getNodeMetaDataString(History.HistoryNode node) {
+        if(node == null) {
             throw new NullPointerException();
         }
 
+        StringBuilder sb = new StringBuilder();
+
         for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
-            output.write(String.format(e.getValue().getSgfToken().getValue(), getStringFromCoords(e.getKey().getX(), e.getKey().getY())));
+            sb.append(String.format(e.getValue().getSgfToken().getValue(), getStringFromCoords(e.getKey().getX(), e.getKey().getY())));
         }
 
         if (!node.getComment().equals("")) {
             String reformattedComment = node.getComment().replace("\\", "\\\\").replace("]", "\\]").replace(":", "\\:");
-            output.write(String.format(C.getValue(), reformattedComment));
+            sb.append(String.format(C.getValue(), reformattedComment));
         }
+
+        return sb.toString();
     }
 
     /**
      * @param output     the FileWriter that is to be written to
      * @param iter       the Iterator over the History
      * @param parentNode the parent Node of this attribute sequence
-     * @return the first node of a different AbstractSaveToken or color, or the last node in the History.
+     * @return the first node of a different AbstractSaveToken or color.
      * @throws IOException if the FileWriter cannot be written to
      */
     private static History.HistoryNode writeAttributeSequence(FileWriter output, Iterator<History.HistoryNode> iter, History.HistoryNode parentNode) throws IOException {

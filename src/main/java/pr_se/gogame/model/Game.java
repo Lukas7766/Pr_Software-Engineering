@@ -699,7 +699,7 @@ public class Game implements GameInterface {
 
     @Override
     public String getComment() {
-        return history.getCurrentComment();
+        return history.getCurrentNode().getComment();
     }
 
     @Override

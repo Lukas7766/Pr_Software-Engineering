@@ -237,7 +237,6 @@ class FileHandlerTest {
     void twoConsecutiveSameMoves() {
         game.playMove(0, 0, BLACK);
         game.playMove(1, 1, BLACK);
-        game.playMove(2, 2, WHITE);
 
         comprehensiveTest();
     }

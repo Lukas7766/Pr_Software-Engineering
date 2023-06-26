@@ -10,6 +10,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class History implements Iterable<History.HistoryNode> {
+    private static final HistoryNode TERMINATOR = new HistoryNode(null, HistoryNode.AbstractSaveToken.END_OF_HISTORY, null, "");
 
     private final Game game;
 
@@ -21,6 +22,7 @@ public class History implements Iterable<History.HistoryNode> {
         }
         this.game = game;
         current = new HistoryNode(null, null, null, ""); // This solely exists so that the first move can be undone without an edge case.
+        current.setNext(TERMINATOR);
     }
 
     public void rewind() {
@@ -47,7 +49,7 @@ public class History implements Iterable<History.HistoryNode> {
     }
 
     public boolean stepForward() {
-        if(current.getNext() != null) {
+        if(!isAtEnd()) {
             current = current.getNext();
             current.getCommand().execute(false);
             current.getCommand().getExecuteEvents().forEach(game::fireGameEvent);
@@ -68,6 +70,7 @@ public class History implements Iterable<History.HistoryNode> {
 
         current.setNext(addedNode);
         current = current.getNext();
+        current.setNext(TERMINATOR);
     }
 
     public String getCurrentComment() {
@@ -79,7 +82,7 @@ public class History implements Iterable<History.HistoryNode> {
     }
 
     public boolean isAtEnd() {
-        return current.getNext() == null;
+        return current.getNext() == TERMINATOR;
     }
 
     public boolean isAtBeginning() {
@@ -175,6 +178,7 @@ public class History implements Iterable<History.HistoryNode> {
         return retVal.toString();
     }
 
+    // inner classes
     public static class HistoryNode {
         public enum AbstractSaveToken {
 
@@ -191,7 +195,9 @@ public class History implements Iterable<History.HistoryNode> {
              * that it has to write a !RE[sult] token. If it does, bear in mind that this token saves which color resigned,
              * but the RE-token should contain who won (so the opposite).
              */
-            RESIGN
+            RESIGN,
+
+            END_OF_HISTORY      // Used to indicate the end of history, as that removes the need for complicated edge cases
         }
 
         private HistoryNode prev;
@@ -307,7 +313,7 @@ public class History implements Iterable<History.HistoryNode> {
 
         @Override
         public String toString() {
-            return "HistoryNode " + color + " (x = " + x + ", y = " + y + "): " + comment;
+            return "HistoryNode " + saveToken + " " + color + " (x = " + x + ", y = " + y + "): " + comment;
         }
-    }
+    } // public static class HistoryNode
 }
