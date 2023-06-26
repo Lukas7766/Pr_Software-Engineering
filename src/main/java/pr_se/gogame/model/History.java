@@ -103,7 +103,7 @@ public class History implements Iterable<History.HistoryNode> {
             }
         }
 
-        return !otherIter.hasNext();
+        return true;
     }
 
     @Override
