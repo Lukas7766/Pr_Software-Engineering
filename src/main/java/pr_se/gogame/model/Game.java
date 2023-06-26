@@ -291,6 +291,10 @@ public class Game implements GameInterface {
 
         checkCoords(x, y);
 
+        if(color == null) {
+            throw new NullPointerException();
+        }
+
         final UndoableCommand uc01SetColor = setCurColor(color);
 
         final UndoableCommand uc02SetStone = board.setStone(x, y, curColor, false); // uc02SetStone is already executed within board.setStone().
@@ -327,9 +331,7 @@ public class Game implements GameInterface {
 
             @Override
             public void undo() {
-                if(thisCommand != null) {
-                    thisCommand.undo();
-                }
+                thisCommand.undo();
                 curMoveNumber = OLD_MOVE_NO;
             }
         };
@@ -392,18 +394,19 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
+        if (handicapStoneCounter <= 0) {
+            throw new IllegalStateException("Can't place any more handicap stones or positions!");
+        }
+
         final int oldHandicapCtr = handicapStoneCounter;
         handicapStoneCounter--;
         final int newHandicapCtr = handicapStoneCounter;
-
-        if (oldHandicapCtr <= 0) {
-            throw new IllegalStateException("Can't place any more handicap stones or positions!");
-        }
 
         if(placeStone) {
             final UndoableCommand uc01SetStone = board.setStone(x, y, color, true); // uc01SetStone is already executed within board.setStone().
 
             if(uc01SetStone == null) {
+                handicapStoneCounter = oldHandicapCtr;
                 return;
             }
 
@@ -761,9 +764,7 @@ public class Game implements GameInterface {
 
             @Override
             public void undo() {
-                if(thisCommand != null) {
-                    thisCommand.undo();
-                }
+                thisCommand.undo();
             }
         };
         ret.execute(true);

@@ -3,6 +3,8 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import pr_se.gogame.model.helper.MarkShape;
+import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
@@ -12,9 +14,15 @@ import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
 import java.io.File;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import static pr_se.gogame.model.Game.GameState.RUNNING;
+import static pr_se.gogame.model.Game.GameState.SETTING_UP;
+import static pr_se.gogame.model.HistoryNode.AbstractSaveToken.*;
 import static pr_se.gogame.model.helper.GameCommand.*;
 import static pr_se.gogame.model.helper.StoneColor.*;
 
@@ -55,10 +63,11 @@ class GameTest {
         assertThrows(IllegalArgumentException.class, () -> game.playMove(0, -1));
         assertThrows(IllegalArgumentException.class, () -> game.playMove(maxCoord + 1, 0));
         assertThrows(IllegalArgumentException.class, () -> game.playMove(0, maxCoord + 1));
+        assertThrows(NullPointerException.class, () -> game.playMove(0, 0, null));
     }
 
     @Test
-    void placeHandicapStoneArguments() {
+    void placeHandicapPositionArguments() {
         game.newGame(BLACK, 19, 1, ruleset);
         game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(-1, 0, true));
@@ -228,7 +237,7 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(BLACK, prevColor);
         Game.GameState prevState = game.getGameState();
-        assertEquals(Game.GameState.RUNNING, prevState);
+        assertEquals(RUNNING, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
@@ -261,7 +270,7 @@ class GameTest {
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
         Game.GameState prevState = game.getGameState();
-        assertEquals(Game.GameState.RUNNING, prevState);
+        assertEquals(RUNNING, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
 
@@ -285,6 +294,14 @@ class GameTest {
         assertNotEquals(prevColor, game.getCurColor());
         assertEquals(prevState, game.getGameState());
         assertEquals(prevMoveNumber, game.getCurMoveNumber());
+    }
+
+    @Test
+    void passDuringSetup() {
+        game.setSetupMode(true);
+        assertEquals(1, game.getCurMoveNumber());
+        assertDoesNotThrow(() -> game.pass());
+        assertEquals(1, game.getCurMoveNumber());
     }
 
     @Test
@@ -368,9 +385,9 @@ class GameTest {
 
     @Test
     void getGameState() {
-        assertEquals(Game.GameState.RUNNING, game.getGameState());
+        assertEquals(RUNNING, game.getGameState());
         game.playMove(0, 0);
-        assertEquals(Game.GameState.RUNNING, game.getGameState());
+        assertEquals(RUNNING, game.getGameState());
     }
 
     @Test
@@ -527,14 +544,14 @@ class GameTest {
         // Used by the FileHandler
         game.newGame(BLACK, 19, 0, new JapaneseRuleset(), false);
 
-        assertEquals(Game.GameState.RUNNING, game.getGameState());
+        assertEquals(RUNNING, game.getGameState());
     }
 
     @Test
     void newZealandRuleSet() {
         game.newGame(BLACK, 19, 9, new NewZealandRuleset());
 
-        assertEquals(Game.GameState.SETTING_UP, game.getGameState());
+        assertEquals(SETTING_UP, game.getGameState());
     }
 
     @Test
@@ -550,5 +567,231 @@ class GameTest {
         assertEquals("foo", game.getComment());
         game.setComment("bar");
         assertEquals("bar", game.getComment());
+    }
+
+    @Test
+    void usePosition() {
+        game.setHandicapStoneCounter(1);
+        game.usePosition(1, 1);
+        game.setSetupMode(true);
+        game.usePosition(2, 2);
+        game.setSetupMode(false);
+        game.usePosition(3, 3);
+
+        Iterator<HistoryNode> i = game.getHistory().iterator();
+        assertEquals(HANDICAP, i.next().getSaveToken());
+        assertEquals(SETUP, i.next().getSaveToken());
+        assertEquals(MOVE, i.next().getSaveToken());
+    }
+
+    @Test
+    void mark() {
+        game.playMove(1, 1);
+        Map<Position, MarkShape> mirrorImage = Collections.unmodifiableMap(game.getHistory().getCurrentNode().getMarks());
+        assertEquals(0, mirrorImage.size());
+
+        game.mark(1, 1, MarkShape.CIRCLE);
+        assertEquals(1, mirrorImage.size());
+        assertEquals(MarkShape.CIRCLE, mirrorImage.get(new Position(1, 1)));
+
+        game.mark(2, 2, MarkShape.SQUARE);
+        assertEquals(2, mirrorImage.size());
+        assertEquals(MarkShape.SQUARE, mirrorImage.get(new Position(2, 2)));
+
+        game.mark(3, 3, MarkShape.TRIANGLE);
+        assertEquals(3, mirrorImage.size());
+        assertEquals(MarkShape.TRIANGLE, mirrorImage.get(new Position(3, 3)));
+    }
+
+    @Test
+    void unmark() {
+        mark();
+        Map<Position, MarkShape> mirrorImage = Collections.unmodifiableMap(game.getHistory().getCurrentNode().getMarks());
+
+        game.unmark(1, 1);
+        assertEquals(2, mirrorImage.size());
+        assertNull(mirrorImage.get(new Position(1, 1)));
+
+        game.unmark(3, 3);
+        assertEquals(1, mirrorImage.size());
+        assertNull(mirrorImage.get(new Position(3, 3)));
+
+        game.unmark(2, 2);
+        assertEquals(0, mirrorImage.size());
+        assertNull(mirrorImage.get(new Position(2, 2)));
+    }
+
+    @Test
+    void playMoveSuicide() {
+        game.setSetupMode(true);
+        game.placeSetupStone(1, 0, BLACK);
+        game.placeSetupStone(0, 1, BLACK);
+        game.placeSetupStone(2, 1, BLACK);
+        game.placeSetupStone(1, 2, BLACK);
+        game.setSetupMode(false);
+        game.pass();
+        assertFalse(game.playMove(1, 1));
+    }
+
+    @Test
+    void tryOverridingHandicapPosition() {
+        game.setHandicapStoneCounter(2);
+        game.placeHandicapPosition(0, 0, true);
+        assertEquals(SETTING_UP, game.getGameState());
+        game.placeHandicapPosition(0, 0, true);
+        assertEquals(SETTING_UP, game.getGameState());
+        assertDoesNotThrow(() -> game.placeHandicapPosition(1, 1, true));
+        assertEquals(RUNNING, game.getGameState());
+    }
+
+    @Test
+    void tryOverridingSetupStone() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        game.placeSetupStone(0, 0, WHITE);
+        assertEquals(BLACK, game.getColorAt(0, 0));
+    }
+
+    @Test
+    void rewind() {
+        game.playMove(0, 0);
+        assertFalse(game.getHistory().isAtBeginning());
+        game.rewind();
+        assertTrue(game.getHistory().isAtBeginning());
+    }
+
+    @Test
+    void rewindWithSetup() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        game.placeSetupStone(4, 4, BLACK);
+        game.setSetupMode(false);
+        game.playMove(1, 1);
+        game.playMove(2, 2);
+        game.rewind();
+        assertNull(game.getColorAt(2, 2));
+        assertNull(game.getColorAt(1, 1));
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertFalse(game.getHistory().isAtBeginning());
+        game.rewind();
+        assertNull(game.getColorAt(0, 0));
+        assertNull(game.getColorAt(4, 4));
+        assertTrue(game.getHistory().isAtBeginning());
+    }
+
+    @Test
+    void rewindWithHandicap() {
+        game.newGame(BLACK, 19, 9, new JapaneseRuleset(), true);
+        assertFalse(game.getHistory().isAtBeginning());
+        assertEquals(BLACK, game.getColorAt(3, 3));
+        game.rewind();
+        assertTrue(game.getHistory().isAtBeginning());
+        assertNull(game.getColorAt(3, 3));
+    }
+
+    @Test
+    void rewindAtBeginning() {
+        assertTrue(game.getHistory().isAtBeginning());
+        game.rewind();
+        assertTrue(game.getHistory().isAtBeginning());
+    }
+
+    @Test
+    void fastForward() {
+        rewind();
+        game.fastForward();
+        assertTrue(game.getHistory().isAtEnd());
+    }
+
+    @Test
+    void fastForwardWithSetup() {
+        rewindWithSetup();
+        game.fastForward();
+        assertEquals(BLACK, game.getColorAt(4, 4));
+        assertNull(game.getColorAt(1, 1));
+        game.fastForward();
+        assertEquals(BLACK, game.getColorAt(1, 1));
+        assertEquals(WHITE, game.getColorAt(2, 2));
+    }
+
+    @Test
+    void fastForwardWithHandicap() {
+        rewindWithHandicap();
+        game.fastForward();
+        assertEquals(BLACK, game.getColorAt(3, 3));
+    }
+
+    @Test
+    void fastForwardAtEnd() {
+        assertTrue(game.getHistory().isAtEnd());
+        game.fastForward();
+        assertTrue(game.getHistory().isAtEnd());
+    }
+
+    // Command pattern
+    @Test
+    void undoPlayMove() {
+        game.playMove(1, 1);
+        assertEquals(BLACK, game.getColorAt(1, 1));
+        game.undo();
+        assertNull(game.getColorAt(1, 1));
+    }
+
+    @Test
+    void redoPlayMove() {
+        undoPlayMove();
+        game.redo();
+        assertEquals(BLACK, game.getColorAt(1, 1));
+    }
+
+    @Test
+    void undoPlaceHandicapPosition() {
+        game.setHandicapStoneCounter(1);
+        assertEquals(SETTING_UP, game.getGameState());
+        game.placeHandicapPosition(1, 1, true);
+        assertEquals(BLACK, game.getColorAt(1, 1));
+        assertEquals(RUNNING, game.getGameState());
+        game.undo();
+        assertNull(game.getColorAt(1, 1));
+        assertEquals(SETTING_UP, game.getGameState());
+    }
+
+    @Test
+    void redoPlaceHandicapPosition() {
+        undoPlaceHandicapPosition();
+        game.redo();
+        assertEquals(BLACK, game.getColorAt(1, 1));
+    }
+
+    @Test
+    void undoPlaceSetupStone() {
+        game.setSetupMode(true);
+        game.placeSetupStone(1, 1, BLACK);
+        assertEquals(BLACK, game.getColorAt(1, 1));
+        game.undo();
+        assertNull(game.getColorAt(1, 1));
+    }
+
+    @Test
+    void redoPlaceSetupStone() {
+        undoPlaceSetupStone();
+        game.redo();
+        assertEquals(BLACK, game.getColorAt(1, 1));
+    }
+
+    @Test
+    void undoResign() {
+        game.resign();
+        assertThrows(IllegalStateException.class, () -> game.resign());
+        game.undo();
+        assertDoesNotThrow(() -> game.resign());
+    }
+
+    @Test
+    void redoResign() {
+        undoResign();
+        game.undo();
+        game.redo();
+        assertThrows(IllegalStateException.class, () -> game.resign());
     }
 }
