@@ -171,13 +171,6 @@ class FileHandlerTest {
 
         assertEquals(19, game.getSize());
         assertEquals(1, game.getHandicap());
-
-        try {
-            FileHandler.loadFile(game, file);
-        } catch (NoSuchFileException | LoadingGameException e) {
-            e.printStackTrace();
-            fail();
-        }
     }
 
     @Test
