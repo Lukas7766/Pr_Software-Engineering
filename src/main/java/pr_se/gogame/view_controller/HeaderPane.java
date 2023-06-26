@@ -121,8 +121,14 @@ public class HeaderPane extends VBox {
         files.getItems().add(importFileItem);
         importFileItem.setOnAction(e -> {
             File f = CustomFileDialog.getFile(stage, false);
-            if (f != null && !game.loadGame(f)) {
-                CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably because the file contains unsupported SGF features.");
+            if (f != null) {
+                try {
+                    if(!game.loadGame(f)) {
+                        CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably due to a file system error.");
+                    }
+                } catch (RuntimeException exception) {
+                        CustomExceptionDialog.show(exception, "Failed to load game!\n\nThis is probably because the file contains unsupported SGF features.");
+                }
             }
         });
 

@@ -135,7 +135,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public boolean loadGame(File file) {
+    public boolean loadGame(File file) throws RuntimeException {
         if(file == null) {
             throw new NullPointerException();
         }

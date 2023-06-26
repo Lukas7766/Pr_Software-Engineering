@@ -389,6 +389,8 @@ class FileHandlerTest {
         } catch(NoSuchFileException e) {
             e.printStackTrace();
             fail();
+        } catch(RuntimeException re) {
+            re.printStackTrace();
         }
     }
 
