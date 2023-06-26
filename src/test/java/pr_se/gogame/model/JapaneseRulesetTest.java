@@ -16,6 +16,8 @@ import static pr_se.gogame.model.helper.StoneColor.WHITE;
 class JapaneseRulesetTest {
     JapaneseRuleset japaneseRuleset;
 
+    static final String TESTFILE_FOLDER = "./testFiles/";
+
     @BeforeEach
     void setUp() {
         japaneseRuleset = new JapaneseRuleset();
@@ -156,7 +158,7 @@ class JapaneseRulesetTest {
     @Test
     void isKo() {
         Game game = new Game();
-        assertTrue(game.loadGame(new File("./testFiles/KoSituation.sgf")));
+        assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf")));
         game.goToEnd();
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));

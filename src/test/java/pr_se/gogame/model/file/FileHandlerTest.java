@@ -8,6 +8,7 @@ import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.io.File;
+import java.nio.file.NoSuchFileException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
@@ -24,12 +25,14 @@ class FileHandlerTest {
 
     int handicap = 0;
 
+    static final String TEST_FILE_FOLDER = "./testFiles/";
+
     @BeforeEach
     void setUp() {
         game = new Game();
         game.newGame(BLACK, size, handicap, new JapaneseRuleset());
         oldHistory = game.getHistory();
-        file = new File("tmp.sgf");
+        file = new File(TEST_FILE_FOLDER + "tmp.sgf");
     }
 
     // Argument-Checking
@@ -156,11 +159,75 @@ class FileHandlerTest {
 
     // Invalid configurations
     @Test
+    void nonExistentFile() {
+        File f = new File("nonExistentFile");
+        if(f == null || f.exists()) {
+            fail();
+        }
+        assertThrows(NoSuchFileException.class, () -> FileHandler.loadFile(game, f));
+    }
+
+    @Test
     void handicapAfterGameBegun() {
         game.playMove(0, 0);
         game.setHandicapStoneCounter(1);
         game.placeHandicapPosition(1, 0, true);
         assertFalse(FileHandler.saveFile(game, file));
+    }
+
+    @Test
+    void noLpar() {
+        invalidTest("noLPAR.sgf");
+    }
+
+    @Test
+    void noSemic() {
+        invalidTest("noSemic.sgf");
+    }
+
+    @Test
+    void invalidAE() {
+        invalidTest("invAE.sgf");
+    }
+
+    @Test
+    void strayLoneAttribute() {
+        invalidTest("invalidStrayLoneAttr.sgf");
+    }
+
+    @Test
+    void multipleBranches() {
+        invalidTest("invalidMultipleBranches.sgf");
+    }
+
+    @Test
+    void sizeTooSmall() {
+        invalidTest("invSizeSmall.sgf");
+    }
+
+    @Test
+    void sizeTooLarge() {
+        invalidTest("invSizeLarge.sgf");
+    }
+
+    @Test
+    void handicapTooSmall() {
+        invalidTest("invHandicapSmall.sgf");
+    }
+
+    @Test
+    void handicapTooLarge() {
+        invalidTest("invHandicapLarge.sgf");
+    }
+
+    // Helper methods
+    void invalidTest(String fileName) {
+        try {
+            assertFalse(FileHandler.loadFile(game, new File(TEST_FILE_FOLDER + fileName)));
+        } catch(NoSuchFileException e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 
     void comprehensiveTest() {
@@ -186,7 +253,11 @@ class FileHandlerTest {
     }
 
     void assertLoadingWorks() {
-        assertTrue(FileHandler.loadFile(game, file));
+        try {
+            assertTrue(FileHandler.loadFile(game, file));
+        } catch (NoSuchFileException e) {
+            fail();
+        }
 
         assertEquals(size, game.getSize());
         assertEquals(handicap, game.getHandicap());

@@ -217,7 +217,7 @@ class GameTest {
     @Test
     void loadGame() {
         saveGame();
-        assertTrue(game.loadGame(new File("tmp.sgf")));
+        assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "tmp.sgf")));
         game.goToEnd();
         assertEquals(BLACK, game.getColorAt(0, 0));
         assertEquals(WHITE, game.getColorAt(1, 0));
@@ -229,7 +229,7 @@ class GameTest {
         game.playMove(1, 0);
         assertEquals(BLACK, game.getColorAt(0, 0));
         assertEquals(WHITE, game.getColorAt(1, 0));
-        assertTrue(game.saveGame(new File("tmp.sgf")));
+        assertTrue(game.saveGame(new File(TESTFILE_FOLDER + "tmp.sgf")));
     }
 
     @Test

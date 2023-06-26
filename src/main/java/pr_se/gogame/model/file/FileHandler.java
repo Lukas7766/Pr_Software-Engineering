@@ -10,6 +10,7 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -167,9 +168,12 @@ public final class FileHandler {
         return n;
     }
 
-    public static boolean loadFile(Game game, File file) {
+    public static boolean loadFile(Game game, File file) throws NoSuchFileException {
         if(file == null) {
             throw new NullPointerException();
+        }
+        if(!file.exists()) {
+            throw new NoSuchFileException(file.toString());
         }
 
         currentFile = file;

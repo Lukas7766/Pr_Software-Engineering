@@ -19,6 +19,8 @@ class BoardTest {
     Game game;
     Board board;
 
+    static final String TESTFILE_FOLDER = "./testFiles/";
+
     /*
      * This variable is mostly meant for AssertThrows()-calls, as SonarQube (rightly) points out that nested method
      * calls might create ambiguity as to which method has thrown an expected (or unexpected) exception.
@@ -380,7 +382,7 @@ class BoardTest {
 
     @Test
     void undoAndRedoCapture() {
-        loadFile("./testFiles/KoSituation.sgf");
+        loadFile(TESTFILE_FOLDER + "KoSituation.sgf");
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
@@ -399,7 +401,7 @@ class BoardTest {
 
     @Test
     void checkNoFalseSuicideAlarm() {
-        loadFile("./testFiles/FalseAlarm.sgf");
+        loadFile(TESTFILE_FOLDER + "FalseAlarm.sgf");
 
         assertNotNull(board.setStone(9, 5, BLACK, false));
         assertNotNull(board.setStone(9, 9, WHITE, false));

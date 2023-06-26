@@ -12,6 +12,7 @@ import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
 import java.io.File;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -135,7 +136,14 @@ public class Game implements GameInterface {
 
     @Override
     public boolean loadGame(File file) {
-        return FileHandler.loadFile(this, file);
+        if(file == null) {
+            throw new NullPointerException();
+        }
+        try {
+            return FileHandler.loadFile(this, file);
+        } catch (NoSuchFileException e) {
+            return false;
+        }
     }
 
     @Override
