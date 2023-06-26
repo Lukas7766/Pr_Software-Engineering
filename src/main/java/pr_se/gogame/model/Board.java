@@ -176,38 +176,47 @@ public class Board implements BoardInterface {
     }
 
     private UndoableCommand removeGroupsWithoutLiberties(final Set<StoneGroup> surroundingSGs, final StoneColor color, final boolean permittedSuicide) {
-        UndoableCommand ret = new UndoableCommand() {
-            final LinkedList<UndoableCommand> uc0401RemoveStoneCommands = new LinkedList<>();
-            UndoableCommand uC0402AddCapturedStonesCommand = null;
+        final List<UndoableCommand> retList = new LinkedList<>();
+        final List<GameEvent> executeEvents = new LinkedList<>();
+        final List<GameEvent> undoEvents = new LinkedList<>();
 
+        Set<StoneGroup> deadGroups = surroundingSGs.stream()
+                .filter(sg -> (sg.getStoneColor() != color || permittedSuicide) && sg.getLiberties().isEmpty())
+                .collect(Collectors.toSet());
+        for (StoneGroup sg : deadGroups) {
+            for (Position p : sg.getLocations()) {
+                UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
+                retList.add(tmpCmd);
+                executeEvents.addAll(tmpCmd.getExecuteEvents());
+                undoEvents.addAll(tmpCmd.getUndoEvents());
+            }
+            retList.add(game.addCapturedStones(color, sg.getLocations().size()));
+        }
+
+        final List<UndoableCommand> finalRetList = List.copyOf(retList);
+
+        UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                Set<StoneGroup> deadGroups = surroundingSGs.stream()
-                    .filter(sg -> (sg.getStoneColor() != color || permittedSuicide) && sg.getLiberties().isEmpty())
-                    .collect(Collectors.toSet());
-                for (StoneGroup sg : deadGroups) {
-                    for (Position p : sg.getLocations()) {
-                        UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
-                        uc0401RemoveStoneCommands.add(tmpCmd);
-                        if(saveEffects) {
-                            getExecuteEvents().addAll(tmpCmd.getExecuteEvents());
-                            getUndoEvents().addAll(tmpCmd.getUndoEvents());
-                        }
-                    }
-                    uC0402AddCapturedStonesCommand = game.addCapturedStones(color, sg.getLocations().size());
+                for(UndoableCommand c : finalRetList) {
+                    c.execute(saveEffects);
                 }
             }
 
             @Override
             public void undo() {
-                if(uC0402AddCapturedStonesCommand != null) {
-                    uC0402AddCapturedStonesCommand.undo();
+                // Undoing it the other way round just in case.
+                ListIterator<UndoableCommand> i = finalRetList.listIterator(finalRetList.size());
+                while(i.hasPrevious()) {
+                    UndoableCommand c = i.previous();
+                    c.undo();
                 }
-
-                uc0401RemoveStoneCommands.forEach(UndoableCommand::undo);
             }
         };
-        ret.execute(true);
+        ret.getExecuteEvents().addAll(executeEvents);
+        ret.getUndoEvents().addAll(undoEvents);
+
+
         return ret;
     }
 
