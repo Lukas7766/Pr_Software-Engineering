@@ -237,11 +237,6 @@ public class History implements Iterable<History.HistoryNode> {
             return prev;
         }
 
-        private void setPrev(HistoryNode prev) {
-            this.prev = prev;
-            prev.next = this;
-        }
-
         public HistoryNode getNext() {
             return next;
         }
