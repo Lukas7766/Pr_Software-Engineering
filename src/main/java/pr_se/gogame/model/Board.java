@@ -180,6 +180,9 @@ public class Board implements BoardInterface {
         final List<GameEvent> executeEvents = new LinkedList<>();
         final List<GameEvent> undoEvents = new LinkedList<>();
 
+        int totalCaptured = 0;
+        int totalSuicide = 0;
+
         Set<StoneGroup> deadGroups = surroundingSGs.stream()
                 .filter(sg -> (sg.getStoneColor() != color || permittedSuicide) && sg.getLiberties().isEmpty())
                 .collect(Collectors.toSet());
@@ -190,7 +193,18 @@ public class Board implements BoardInterface {
                 executeEvents.addAll(tmpCmd.getExecuteEvents());
                 undoEvents.addAll(tmpCmd.getUndoEvents());
             }
-            retList.add(game.addCapturedStones(color, sg.getLocations().size()));
+            if(sg.getStoneColor() != color) {
+                totalCaptured += sg.getLocations().size();
+            } else {
+                totalSuicide += sg.getLocations().size();
+            }
+        }
+
+        if(totalCaptured > 0) {
+            retList.add(game.addCapturedStones(color, totalCaptured));
+        }
+        if(totalSuicide > 0) {
+            retList.add(game.addCapturedStones(StoneColor.getOpposite(color), totalSuicide));
         }
 
         final List<UndoableCommand> finalRetList = List.copyOf(retList);
