@@ -1,8 +1,9 @@
-package pr_se.gogame.model;
+package pr_se.gogame.model.ruleset;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.GameResult;
