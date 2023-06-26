@@ -256,18 +256,16 @@ public final class FileHandler {
 
                 if(t.getToken() == AB || t.getToken() == AW) {
                     handicapColor = correspondingColors.get(t.getToken());
+                    game.setHandicapStoneCounter(handicap);
+                    do {
+                        decodedCoords = getCoordsFromString(t.getAttributeValue());
+                        game.placeHandicapPosition(decodedCoords.getX(), decodedCoords.getY(), true, handicapColor);
+
+                        t = scanner.next();
+                    } while (t.getToken() == LONE_ATTRIBUTE);
                 } else if(handicap > 1) {
                     unexpected(AB.getValue() + " or " + AW.getValue(), t);
                 }
-
-                game.setHandicapStoneCounter(handicap);
-                do {
-                    decodedCoords = getCoordsFromString(t.getAttributeValue());
-                    game.placeHandicapPosition(decodedCoords.getX(), decodedCoords.getY(), true, handicapColor);
-
-                    t = scanner.next();
-                } while (t.getToken() == LONE_ATTRIBUTE);
-
             }
 
             Map<Position, MarkShape> marks = new LinkedHashMap<>();
@@ -334,10 +332,6 @@ public final class FileHandler {
 
                     t = scanner.next();
                 }
-            }
-
-            if(t.getToken() != RPAR) {
-                unexpected(RPAR.getValue(), t);
             }
 
             t = scanner.next(); // Do this one last time so that we can check if we're at EOF.

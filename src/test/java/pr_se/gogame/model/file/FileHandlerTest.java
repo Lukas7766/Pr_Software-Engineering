@@ -157,6 +157,28 @@ class FileHandlerTest {
         comprehensiveTest();
     }
 
+    @Test
+    void handicapOneButNoStone() {
+        File myFile = new File(TEST_FILE_FOLDER + "okHAWithoutStones.sgf");
+
+        try {
+            assertTrue(FileHandler.loadFile(game, myFile));
+        } catch (NoSuchFileException e) {
+            e.printStackTrace();
+            fail();
+        }
+
+        assertEquals(19, game.getSize());
+        assertEquals(1, game.getHandicap());
+
+        try {
+            FileHandler.loadFile(game, file);
+        } catch (NoSuchFileException e) {
+            e.printStackTrace();
+            fail();
+        }
+    }
+
     // Invalid configurations
     @Test
     void nonExistentFile() {
@@ -176,6 +198,11 @@ class FileHandlerTest {
     }
 
     @Test
+    void noGameInfo() {
+        invalidTest("noInfo.sgf");
+    }
+
+    @Test
     void noLpar() {
         invalidTest("noLPAR.sgf");
     }
@@ -186,8 +213,28 @@ class FileHandlerTest {
     }
 
     @Test
-    void invalidAE() {
+    void invSGFVersion() {
+        invalidTest("wrongSGFVersion.sgf");
+    }
+
+    @Test
+    void invGM() {
+        invalidTest("wrongGM.sgf");
+    }
+
+    @Test
+    void tokenAE() {
         invalidTest("invAE.sgf");
+    }
+
+    @Test
+    void noEOFAfterEnd() {
+        invalidTest("invNotEOF.sgf");
+    }
+
+    @Test
+    void handicapNoStones() {
+        invalidTest("invHAWithoutStones.sgf");
     }
 
     @Test
@@ -196,7 +243,12 @@ class FileHandlerTest {
     }
 
     @Test
-    void multipleBranches() {
+    void multipleBranchesEarlier() {
+        invalidTest("invMultipleBranchesEarlier.sgf");
+    }
+
+    @Test
+    void multipleBranchesLater() {
         invalidTest("invalidMultipleBranches.sgf");
     }
 
