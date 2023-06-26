@@ -119,6 +119,9 @@ class HistoryTest {
 
     @Test
     void isAtBeginning() {
+        assertTrue(history.isAtBeginning());
+        game.playMove(0, 0);
+        assertFalse(history.isAtBeginning());
     }
 
     @Test

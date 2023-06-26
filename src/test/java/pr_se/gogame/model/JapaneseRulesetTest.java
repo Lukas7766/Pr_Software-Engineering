@@ -3,9 +3,7 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
-import pr_se.gogame.model.ruleset.Ruleset;
 
 import java.io.File;
 
@@ -100,13 +98,14 @@ class JapaneseRulesetTest {
         assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
         assertEquals(BLACK, japaneseRuleset.scoreGame(game).getWinner());
         assertEquals(
-                "Black won!\n" +
-                        "\n" +
-                        "Handicap: 0.0\n" +
-                        "+ Territory points: 9\n" +
-                        "+ Captured stones: 1\n" +
-                        "\n" +
-                        "= 10.0 points", japaneseRuleset.scoreGame(game).getDescription());
+                """
+                        Black won!
+
+                        Handicap: 0.0
+                        + Territory points: 9
+                        + Captured stones: 1
+
+                        = 10.0 points""", japaneseRuleset.scoreGame(game).getDescription());
     }
 
     @Test
@@ -145,13 +144,14 @@ class JapaneseRulesetTest {
         assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
         assertEquals(WHITE, japaneseRuleset.scoreGame(game).getWinner());
         assertEquals(
-                "White won!\n" +
-                        "\n" +
-                        "Komi: 6.5\n" +
-                        "+ Territory points: 0\n" +
-                        "+ Captured stones: 0\n" +
-                        "\n" +
-                        "= 6.5 points", japaneseRuleset.scoreGame(game).getDescription());
+                """
+                        White won!
+
+                        Komi: 6.5
+                        + Territory points: 0
+                        + Captured stones: 0
+
+                        = 6.5 points""", japaneseRuleset.scoreGame(game).getDescription());
 
     }
 
@@ -166,16 +166,13 @@ class JapaneseRulesetTest {
 
     @Test
     void reset() {
+        Game game = new Game();
+        assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf")));
+        game.goToEnd();
+        assertTrue(game.playMove(2, 1));
+        assertFalse(game.playMove(1, 1));
 
+        game.getRuleset().reset();
+        assertTrue(game.playMove(1, 1));
     }
-
-    private void printBoard(Game game) {
-        for (int i = 0; i < game.getSize(); i++) {
-            for (int j = 0; j < game.getSize(); j++) {
-                System.out.print(game.getColorAt(i, j) + " ");
-            }
-            System.out.println();
-        }
-    }
-
 }
