@@ -4,7 +4,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.History;
+import pr_se.gogame.model.HistoryNode;
 import pr_se.gogame.model.helper.MarkShape;
+import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.io.File;
@@ -179,11 +181,73 @@ class FileHandlerTest {
         }
     }
 
+    @Test
+    void noHandicapToken() {
+        File myFile = new File(TEST_FILE_FOLDER + "noHA.sgf");
+
+        try {
+            assertTrue(FileHandler.loadFile(game, myFile));
+        } catch (NoSuchFileException e) {
+            e.printStackTrace();
+            fail();
+        }
+
+        assertEquals(19, game.getSize());
+        assertEquals(0, game.getHandicap());
+    }
+
+    @Test
+    void whiteHandicap() {
+        handicap = 2;
+        game.newGame(WHITE, 19, handicap, new JapaneseRuleset());
+        oldHistory = game.getHistory();
+
+        comprehensiveTest();
+    }
+
+    @Test
+    void resignAfterGame() {
+        game.playMove(1, 1);
+        game.resign();
+
+        /*
+         * SGF doesn't appear to count resignation as a move and there's no time to store the result; this is purely
+         * to maximise code coverage.
+         */
+        assertSavingWorks();
+    }
+
+    @Test
+    void emptyComment() {
+        game.playMove(0, 0);
+        game.setComment("");
+
+        comprehensiveTest();
+    }
+
+    @Test
+    void handicapOf1() {
+        handicap = 1;
+        setUp();
+        game.playMove(0, 0);
+
+        comprehensiveTest();
+    }
+
+    @Test
+    void twoConsecutiveSameMoves() {
+        game.playMove(0, 0, BLACK);
+        game.playMove(1, 1, BLACK);
+        game.playMove(2, 2, WHITE);
+
+        comprehensiveTest();
+    }
+
     // Invalid configurations
     @Test
     void nonExistentFile() {
         File f = new File("nonExistentFile");
-        if(f == null || f.exists()) {
+        if(f.exists()) {
             fail();
         }
         assertThrows(NoSuchFileException.class, () -> FileHandler.loadFile(game, f));
@@ -195,6 +259,14 @@ class FileHandlerTest {
         game.setHandicapStoneCounter(1);
         game.placeHandicapPosition(1, 0, true);
         assertFalse(FileHandler.saveFile(game, file));
+    }
+
+    @Test
+    void saveHandicapButNoStones() {
+        game.newGame(BLACK, 19, 2, new JapaneseRuleset(), false);
+        assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
+        game.playMove(0, 0); // This is permitted by game in case of a handicap of one.
+        assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
     }
 
     @Test
@@ -223,8 +295,25 @@ class FileHandlerTest {
     }
 
     @Test
-    void tokenAE() {
+    void loadAE() {
         invalidTest("invAE.sgf");
+    }
+
+    @Test
+    void saveAE() {
+        game.getHistory().addNode(new HistoryNode(new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                return;
+            }
+
+            @Override
+            public void undo() {
+                return;
+            }
+        }, HistoryNode.AbstractSaveToken.SETUP, null, ""));
+
+        assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
     }
 
     @Test

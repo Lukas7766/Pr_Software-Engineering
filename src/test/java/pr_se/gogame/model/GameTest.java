@@ -134,6 +134,7 @@ class GameTest {
     @Test
     void loadGameArgs() {
         assertThrows(NullPointerException.class, () -> game.loadGame(null));
+        assertFalse(game.loadGame(new File("nonExistentFile")));
     }
 
     @Test

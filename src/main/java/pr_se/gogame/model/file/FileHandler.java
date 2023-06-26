@@ -132,6 +132,10 @@ public final class FileHandler {
     }
 
     private static void writeNodeMetaData(FileWriter output, HistoryNode node) throws IOException {
+        if(output == null || node == null) {
+            throw new NullPointerException();
+        }
+
         for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
             output.write(String.format(e.getValue().getSgfToken().getValue(), getStringFromCoords(e.getKey().getX(), e.getKey().getY())));
         }
@@ -227,7 +231,6 @@ public final class FileHandler {
 
                     default:
                         unexpected("Game info tokens", t);
-                        break loop;
                 }
             }
 
@@ -252,7 +255,7 @@ public final class FileHandler {
             game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
 
             if(handicap > 0) {
-                StoneColor handicapColor = null;
+                StoneColor handicapColor;
 
                 if(t.getToken() == AB || t.getToken() == AW) {
                     handicapColor = correspondingColors.get(t.getToken());

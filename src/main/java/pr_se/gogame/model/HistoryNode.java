@@ -141,6 +141,6 @@ public class HistoryNode {
 
     @Override
     public String toString() {
-        return "HistoryNode (x = " + x + ", y = " + y + "): " + comment;
+        return "HistoryNode " + color + " (x = " + x + ", y = " + y + "): " + comment;
     }
 }
