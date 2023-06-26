@@ -37,7 +37,8 @@ class HistoryTest {
     @Test
     void addNodeArgs() {
         assertThrows(NullPointerException.class, () -> history.addNode(null));
-        assertThrows(IllegalArgumentException.class, () -> history.addNode(history.getCurrentNode()));
+        History.HistoryNode current = history.getCurrentNode();
+        assertThrows(IllegalArgumentException.class, () -> history.addNode(current));
     }
 
     // Other tests
@@ -83,6 +84,13 @@ class HistoryTest {
 
     @Test
     void addNode() {
+        assertTrue(history.isAtBeginning());
+        assertTrue(history.isAtEnd());
+        History.HistoryNode n = new History.HistoryNode(null, null, null, "");
+        history.addNode(n);
+        assertFalse(history.isAtBeginning());
+        assertTrue(history.isAtEnd());
+        assertEquals(n, history.getCurrentNode());
     }
 
     @Test
@@ -223,7 +231,8 @@ class HistoryTest {
 
     @Test
     void HistoryNodeSetCommentArgs() {
-        assertThrows(NullPointerException.class, () -> history.getCurrentNode().setComment(null));
+        History.HistoryNode current = history.getCurrentNode();
+        assertThrows(NullPointerException.class, () -> current.setComment(null));
     }
 
     @Test
