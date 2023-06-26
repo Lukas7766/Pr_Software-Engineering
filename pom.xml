@@ -16,6 +16,12 @@
         <maven.compiler.release>19</maven.compiler.release>
         <javafx.version>19</javafx.version>
         <javafx.maven.plugin.version>0.0.8</javafx.maven.plugin.version>
+        <!--The following properties are necessary for SonarQube to work. -->
+        <sonar.projectKey>PR_SE</sonar.projectKey>
+        <sonar.projectName>PR_SE</sonar.projectName>
+        <property name="sonar.projectName" value="Example of SonarQube Scanner for Ant Usage" />
+        <maven.compiler.source>19</maven.compiler.source>
+        <maven.compiler.target>19</maven.compiler.target>
     </properties>
 
     <dependencies>
@@ -97,6 +103,11 @@
                         </configuration>
                     </execution>
                 </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.sonarsource.scanner.maven</groupId>
+                <artifactId>sonar-maven-plugin</artifactId>
+                <version>3.7.0.1746</version>
             </plugin>
         </plugins>
     </build>

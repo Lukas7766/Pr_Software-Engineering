@@ -1,0 +1,15 @@
+(;FF[4]GM[1]SZ[19]
+
+HA[0]
+
+
+;B[ab]C[playMove(0, 1)]
+;W[bb]C[playMove(1, 1)]
+;B[ba]C[playMove(1, 0)]
+;W[ca]C[playMove(2, 0)]
+;B[bc]C[playMove(1, 2)]
+;W[cc]C[playMove(2, 2)]
+;B[]C[pass]
+;W[db]C[playMove(3, 1)]
+
+)

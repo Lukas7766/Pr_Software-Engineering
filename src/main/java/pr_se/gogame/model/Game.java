@@ -1,39 +1,56 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.view_controller.GameEvent;
-import pr_se.gogame.view_controller.GameListener;
-import pr_se.gogame.view_controller.StoneEvent;
+import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.file.LoadingGameException;
+import pr_se.gogame.model.helper.GameCommand;
+import pr_se.gogame.model.helper.MarkShape;
+import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.helper.UndoableCommand;
+import pr_se.gogame.model.ruleset.GameResult;
+import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.ruleset.Ruleset;
+import pr_se.gogame.view_controller.observer.GameEvent;
+import pr_se.gogame.view_controller.observer.GameListener;
 
-import java.nio.file.Path;
+import java.io.File;
+import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.List;
 
-import static pr_se.gogame.model.StoneColor.BLACK;
-import static pr_se.gogame.model.StoneColor.WHITE;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
 
 public class Game implements GameInterface {
 
+    /**
+     * max size of custom board
+     */
+    public static final int MAX_CUSTOM_BOARD_SIZE = 25;
+
+    /**
+     * min size of custom board
+     */
+    public static final int MIN_CUSTOM_BOARD_SIZE = 5;
+
+    /**
+     * max handicap amount
+     */
+    public static final int MAX_HANDICAP_AMOUNT = 9;
+
+    /**
+     * min handicap amount
+     */
+    public static final int MIN_HANDICAP_AMOUNT = 0;
+
     //Settings
-    private final Ruleset ruleset = new JapaneseRuleset();
-    private int size = 19; // TODO: Just a thought, but technically, this is really just a property of the board, so maybe the Game shouldn't save this at all and instead just provide a method to obtain the board size via its interface (said method would then return board.getSize()).
+    private Ruleset ruleset = new JapaneseRuleset();
     private int handicap = 0;
-    private boolean confirmationNeeded = false;
-    private boolean showMoveNumbers = false;
-    private boolean showCoordinates = true;
 
-    private String graphicsPath = "./Grafiksets/default.zip";
-
-    private boolean demoMode = false;
-
-    //global (helper) variables
-    private Path savaGamePath;
-    private FileTree fileTree;
-    private GameCommand gameCommand;
+    private GameState gameState;
     private final List<GameListener> listeners;
     private Board board;
     private int curMoveNumber;
     private StoneColor curColor;
-    private int handicapStoneCounter = 0;   // counter for manually placed handicap stones
+    private int handicapStoneCounter = 0;
     private double playerBlackScore;
     private int blackCapturedStones;
 
@@ -41,24 +58,33 @@ public class Game implements GameInterface {
     private int whiteCapturedStones;
     private GameResult gameResult;
 
+    private History history;
+
+    private boolean setupMode;
 
     public Game() {
         this.listeners = new ArrayList<>();
-        this.gameCommand = GameCommand.INIT;
-        this.board = new Board(this);
+        this.gameState = GameState.NOT_STARTED_YET;
+        this.board = new Board(this, 19);
     }
 
     @Override
     public void initGame() {
-        this.gameCommand = GameCommand.INIT;
+        gameState = GameState.NOT_STARTED_YET;
+        this.history = null;
+        FileHandler.clearCurrentFile();
 
-        System.out.println("initGame: " + gameCommand);
-        fireGameEvent(new GameEvent(gameCommand));
+        fireGameEvent(new GameEvent(GameCommand.INIT));
     }
 
     @Override
-    public void newGame(StoneColor startingColor, int size, int handicap) {
-        if(size < 0 || handicap < 0 || handicap > 9) {
+    public void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset) {
+        newGame(startingColor, size, handicap, ruleset, true);
+    }
+
+    @Override
+    public void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset, boolean letRulesetPlaceHandicapStones) {
+        if(size < MIN_CUSTOM_BOARD_SIZE || handicap < MIN_HANDICAP_AMOUNT || handicap > MAX_HANDICAP_AMOUNT) {
             throw new IllegalArgumentException();
         }
 
@@ -66,128 +92,130 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
-        this.curColor = startingColor;
-        switch (startingColor) { // We already performed a null-check, so it can't be anything else.
-            case BLACK -> this.gameCommand = GameCommand.BLACK_STARTS;
-            case WHITE -> this.gameCommand = GameCommand.WHITE_STARTS;
-        }
+        this.setupMode = false;
+        this.gameState = GameState.SETTING_UP;
 
-        this.fileTree = new FileTree(size,"Black", "White");
-        this.size = size;
+        this.history = new History(this);
+
+        this.curColor = startingColor;
         this.handicap = handicap;
+        this.ruleset = ruleset;
+
         this.playerBlackScore = handicap;
         this.playerWhiteScore = this.ruleset.getKomi();
         this.blackCapturedStones = 0;
         this.whiteCapturedStones = 0;
-        this.curMoveNumber = 0; // Note: Indicates to the BoardPane that handicap stones are being set.
+        this.curMoveNumber = 0;
         this.gameResult = null;
 
-        this.board = new Board(this);
+        this.board = new Board(this, size);
         this.ruleset.reset();
-        fireGameEvent(new GameEvent(this.gameCommand));
-        this.ruleset.setHandicapStones(this, this.curColor, this.handicap);
+        fireGameEvent(new GameEvent(GameCommand.NEW_GAME));
+
+        int tempHandicap = 0;
+        if(letRulesetPlaceHandicapStones) {
+            tempHandicap = this.handicap;
+        }
+        this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
 
         this.curMoveNumber = 1;
-        switch(this.curColor) {
-            case BLACK:
-                this.gameCommand = GameCommand.BLACK_STARTS;
-                break;
 
-            case WHITE:
-                this.gameCommand = GameCommand.WHITE_STARTS;
-                break;
+        if(handicapStoneCounter <= 0) {
+            gameState = GameState.RUNNING;
+        } else {
+            gameState = GameState.SETTING_UP;
         }
-
-        System.out.println("\nnewGame: " + gameCommand + " Size: " + size + " Handicap: " + handicap + " Komi: " + this.ruleset.getKomi() + "\n------");
     }
 
     @Override
-    public boolean saveGame() {
-        if (savaGamePath == null) {
+    public boolean saveGame(File file) {
+        if (file == null) {
+            throw new NullPointerException();
+        }
+        return FileHandler.saveFile(this, file);
+    }
+
+    @Override
+    public boolean loadGame(File file) throws LoadingGameException {
+        if(file == null) {
+            throw new NullPointerException();
+        }
+        try {
+            return FileHandler.loadFile(this, file);
+        } catch (NoSuchFileException e) {
             return false;
         }
-        System.out.println("saved a file");
-        return fileTree.saveFile(savaGamePath);
-    }
-
-    @Override
-    public boolean loadGame(Path path) {
-        //TODO: Das board überchreiben od nd
-        FileHandler fileHandler = new FileHandler();
-        fileHandler.loadFile(path);
-
-        this.newGame(BLACK, 19, 0);
-        return false;
     }
 
     @Override
     public void pass() {
-        System.out.println("pass");
-        UndoableCommand c = switchColor(); // Everything that was removed was already being done in switchColor(), so I replaced it with a simple method call to reduce code duplication
+        if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
+            throw new IllegalStateException("Can't pass on GameState " + gameState);
+        }
 
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        UndoableCommand c = switchColor();
+
+        if(gameState != GameState.SETTING_UP) {
+            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "")); // StoneColor.getOpposite() because we switched colors before
+        }
+
+        for (GameEvent e : c.getExecuteEvents()) {
+            fireGameEvent(e);
+        }
     }
 
     @Override
     public void resign() {
-        System.out.println("resign");
+        if(gameState != GameState.RUNNING) {
+            throw new IllegalStateException("Can't score game if it isn't running! gameState was + " + gameState);
+        }
 
-        final GameResult OLD_GAME_RESULT = this.gameResult;
-        final GameCommand OLD_GAME_COMMAND = this.gameCommand;
+        final GameResult oldGameResult = this.gameResult;
+        final StoneColor finalCurColor = this.curColor;
 
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                GameResult result;
-                StringBuilder sb = new StringBuilder();
-                sb.append("Game was resigned by").append(" ");
-                switch (OLD_GAME_COMMAND) {
-                    case WHITE_PLAYS, WHITE_STARTS -> {
-                        Game.this.gameCommand = GameCommand.BLACK_WON;
-                        result = new GameResult(playerBlackScore, playerWhiteScore, BLACK,sb.toString());
-                        sb.append("White!").append("\n\n").append("Black won!");
-                    }
-                    case BLACK_PLAYS, BLACK_STARTS -> {
-                        Game.this.gameCommand = GameCommand.WHITE_WON;
-                        result = new GameResult(playerBlackScore, playerWhiteScore, WHITE,sb.toString());
-                        sb.append("Black!").append("\n\n").append("White won!");
-                    }
-                    default -> {throw new IllegalStateException("Game was not resigned! Consult your application owner!");}
+                String msg =
+                        "Game was resigned by " + finalCurColor + "!\n" +
+                        "\n" +
+                        StoneColor.getOpposite(finalCurColor) + " won!";
+                gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(finalCurColor), msg);
+                if(saveEffects) {
+                    getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
+                    getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
                 }
-                Game.this.gameResult = result;
-                fireGameEvent(new GameEvent(gameCommand));
+                gameState = GameState.GAME_OVER;
             }
 
             @Override
             public void undo() {
-                Game.this.gameResult = OLD_GAME_RESULT;
-                Game.this.gameCommand = OLD_GAME_COMMAND;
-                fireGameEvent(new GameEvent(gameCommand));
+                gameResult = oldGameResult;
+                gameState = GameState.RUNNING;
             }
         };
         c.execute(true);
 
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.RESIGN, finalCurColor, ""));
+
+        for(GameEvent e : c.getExecuteEvents()) {
+            fireGameEvent(e);
+        }
     }
 
     @Override
-    public void scoreGame() { // TODO: Is this only of cosmetic relevance or does it need to be undoable?
-        System.out.println("scoreGame");
-        this.gameResult = ruleset.scoreGame(this);
-        this.playerBlackScore = gameResult.getScoreBlack();
-        this.playerWhiteScore = gameResult.getScoreWhite();
+    public void scoreGame() {
+        gameResult = ruleset.scoreGame(this);
+        playerBlackScore = gameResult.getScoreBlack();
+        playerWhiteScore = gameResult.getScoreWhite();
+        gameState = GameState.GAME_OVER;
 
-        if (gameResult.getWinner() == BLACK) {
-            this.gameCommand = GameCommand.BLACK_WON;
-        } else {
-            this.gameCommand = GameCommand.WHITE_WON;
-        }
-        fireGameEvent(new GameEvent(gameCommand));
+        fireGameEvent(new GameEvent(GameCommand.GAME_WON));
     }
 
     @Override
     public int getSize() {
-        return this.size;
+        return board.getSize();
     }
 
     @Override
@@ -222,28 +250,21 @@ public class Game implements GameInterface {
      */
     @Override
     public void setHandicapStoneCounter(int noStones) {
-        if((noStones < 0 && noStones != -1) || noStones > handicap) {
-            throw new IllegalArgumentException();
+        /*
+         * A value greater than the actual handicap is allowed, as this counter is not only used for setting stones,
+         * but also positions (i.e., slots).
+         */
+        if(noStones < 0 || noStones > MAX_HANDICAP_AMOUNT) {
+            throw new IllegalArgumentException("Invalid handicap of " + noStones);
         }
 
-        this.handicapStoneCounter = noStones;
+        handicapStoneCounter = noStones;
+        gameState = GameState.SETTING_UP;
     }
 
     @Override
-    public GameCommand getGameState() {
-        return gameCommand;
-    }
-
-    @Override
-    public void confirmChoice() {
-        this.gameCommand = GameCommand.CONFIRM_CHOICE;
-        System.out.println(this.gameCommand);
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public Board getBoard() {
-        return this.board;
+    public GameState getGameState() {
+        return gameState;
     }
 
     @Override
@@ -262,196 +283,270 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public FileTree getFileTree() {
-        return fileTree;
-    }
-
-    @Override
     public StoneColor getColorAt(int x, int y) {
         return board.getColorAt(x, y);
     }
 
     @Override
-    public int getHandicapStoneCounter() {
-        return handicapStoneCounter;
-    }
-
-    private UndoableCommand setCurColor(StoneColor c) {
-        if (c == null) {
-            throw new NullPointerException();
-        }
-
-        final StoneColor OLD_COLOR = this.curColor;
-        final GameCommand OLD_COMMAND = this.gameCommand;
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                Game.this.curColor = c;
-                if(Game.this.curColor == BLACK) {
-                    Game.this.gameCommand = GameCommand.BLACK_PLAYS;
-                } else {
-                    Game.this.gameCommand = GameCommand.WHITE_PLAYS;
-                }
-            }
-
-            @Override
-            public void undo() {
-                Game.this.curColor = OLD_COLOR;
-                Game.this.gameCommand = OLD_COMMAND;
-            }
-        };
-        ret.execute(true);
-
-        return ret;
+    public boolean playMove(int x, int y) {
+        return playMove(x, y, this.curColor);
     }
 
     @Override
-    public void playMove(int x, int y) {
-        /*if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS &&
-            this.gameCommand != GameCommand.BLACK_PLAYS && this.gameCommand != GameCommand.WHITE_PLAYS) {
-            throw new IllegalStateException("Can't place stone when game isn't being played! Game State was " + this.gameCommand);
-        }*/
-
-        if(x < 0 || y < 0 || x >= size || y >= size) {
-            throw new IllegalArgumentException();
+    public boolean playMove(int x, int y, StoneColor color) {
+        if(gameState != GameState.RUNNING) {
+            throw new IllegalStateException("Can't place stone when game isn't running! Game State was " + gameState);
         }
 
-        final UndoableCommand UC01_setStone = board.setStone(x, y, curColor, false, true); // returned command is already executed within board.setStone().
+        checkCoords(x, y);
+
+        if(color == null) {
+            throw new NullPointerException();
+        }
+
+        final UndoableCommand uc01SetColor = setCurColor(color);
+
+        final UndoableCommand uc02SetStone = board.setStone(x, y, curColor, false); // uc02SetStone is already executed within board.setStone().
+
+        if(uc02SetStone == null) {
+            return false;
+        }
+
+        // Assertion: uc02SetStone != null and was hence a valid move.
+
+        final UndoableCommand uc03IsKo = ruleset.isKo(this);
+
+        if(uc03IsKo == null) {
+            uc02SetStone.undo();
+            uc01SetColor.undo();
+            return false;
+        }
 
         final int OLD_MOVE_NO = curMoveNumber;
 
-        UndoableCommand c = new UndoableCommand() {
-            UndoableCommand c_UC02_switchColor = null;
+        final UndoableCommand uc04SwitchColor = new UndoableCommand() {
+            UndoableCommand thisCommand = null;
 
             @Override
             public void execute(boolean saveEffects) {
-                if (UC01_setStone != null) {
-                    curMoveNumber++;
-                    System.out.println("Move played.");
-                    // Update current player color
-                    c_UC02_switchColor = switchColor();
-                } else {
-                    System.out.println("Move aborted.");
+                curMoveNumber++;
+                // Update current player color
+                thisCommand = switchColor();
+                if(saveEffects) {
+                    getExecuteEvents().addAll(thisCommand.getExecuteEvents());
+                    getUndoEvents().addAll(thisCommand.getUndoEvents());
                 }
             }
 
             @Override
             public void undo() {
-                c_UC02_switchColor.undo();
+                thisCommand.undo();
                 curMoveNumber = OLD_MOVE_NO;
-                UC01_setStone.undo();
             }
         };
-        c.execute(true);
+        uc04SwitchColor.execute(true);
 
-        // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+        UndoableCommand c = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                uc01SetColor.execute(saveEffects);
+                uc02SetStone.execute(saveEffects);
+                uc03IsKo.execute(saveEffects);
+                uc04SwitchColor.execute(saveEffects);
+            }
+
+            @Override
+            public void undo() {
+                uc04SwitchColor.undo();
+                uc03IsKo.undo();
+                uc02SetStone.undo();
+                uc01SetColor.undo();
+            }
+        };
+        // c was already executed piecemeal
+
+        /*
+         * UC02 and UC04 fire events, so those have to be added to the command containing them.
+         */
+        c.getExecuteEvents().addAll(uc02SetStone.getExecuteEvents());
+        c.getExecuteEvents().addAll(uc04SwitchColor.getExecuteEvents());
+        c.getUndoEvents().addAll(uc02SetStone.getUndoEvents());
+        c.getUndoEvents().addAll(uc04SwitchColor.getUndoEvents());
+
+        /*
+         * StoneColor.getOpposite() because we previously switched colors
+         */
+        removeAllMarks();
+        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), "", x, y));
+
+        for(GameEvent e : c.getExecuteEvents()) {
+            fireGameEvent(e);
+        }
+
+        return true;
     }
 
     @Override
     public void placeHandicapPosition(int x, int y, boolean placeStone) {
-        /*if(this.gameCommand != GameCommand.BLACK_STARTS && this.gameCommand != GameCommand.WHITE_STARTS) {
-            throw new IllegalStateException("Can't place handicap stone after game start!");
-        }*/
+        placeHandicapPosition(x, y, placeStone, curColor);
+    }
 
-        if(x < 0 || y < 0 || x >= size || y >= size) {
-            throw new IllegalArgumentException();
+    @Override
+    public void placeHandicapPosition(int x, int y, boolean placeStone, StoneColor color) {
+        if(gameState != GameState.SETTING_UP) {
+            throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
         }
 
-        final int OLD_HANDICAP_COUNTER = handicapStoneCounter;
+        checkCoords(x, y);
+
+        if(color == null) {
+            throw new NullPointerException();
+        }
+
+        if (handicapStoneCounter <= 0) {
+            throw new IllegalStateException("Can't place any more handicap stones or positions!");
+        }
+
+        final int oldHandicapCtr = handicapStoneCounter;
+        handicapStoneCounter--;
+        final int newHandicapCtr = handicapStoneCounter;
 
         if(placeStone) {
-            if (handicapStoneCounter < 0) {
-                throw new IllegalStateException("Can't place any more handicap stones!");
+            final UndoableCommand uc01SetColor = setCurColor(color);
+
+            final UndoableCommand uc02SetStone = board.setStone(x, y, color, true); // uc02SetStone is already executed within board.setStone().
+
+            if(uc02SetStone == null) {
+                handicapStoneCounter = oldHandicapCtr;
+                return;
             }
 
-            UndoableCommand c = new UndoableCommand() {
-                UndoableCommand uc01_setStone = null;
-                UndoableCommand uC02_switchColor = null;
+            // Assertion: uc02SetStone != null and was hence a valid move.
+
+            final UndoableCommand uc03UpdateCounter = new UndoableCommand() {
+                UndoableCommand uC02SwitchColor = null;
 
                 @Override
                 public void execute(boolean saveEffects) {
-                    uc01_setStone = board.setStone(x, y, curColor, true, true);
-                    handicapStoneCounter--; // TODO: Unsure whether this may cause problems.
+                    handicapStoneCounter = newHandicapCtr;
 
-                    if (handicapStoneCounter < 0) {
-                        System.out.println("handicapStoneCounter is now less than 0.");
-                        // fileTree.insertBufferedStonesBeforeGame();
-                        uC02_switchColor = switchColor();
+                    if (newHandicapCtr <= 0) {
+                        uC02SwitchColor = switchColor();
+                        if(saveEffects) {
+                            getExecuteEvents().addAll(uC02SwitchColor.getExecuteEvents());
+                            getUndoEvents().addAll(uC02SwitchColor.getUndoEvents());
+                        }
+
+                        gameState = GameState.RUNNING;
                     }
                 }
 
                 @Override
                 public void undo() {
-                    if (uC02_switchColor != null) {
-                        uC02_switchColor.undo();
+                    if(uC02SwitchColor != null) {
+                        uC02SwitchColor.undo();
                     }
-                    handicapStoneCounter = OLD_HANDICAP_COUNTER;
-                    uc01_setStone.undo();
+                    handicapStoneCounter = oldHandicapCtr;
 
+                    gameState = GameState.SETTING_UP;
                 }
             };
-            c.execute(true);
+            uc03UpdateCounter.execute(true);
 
-            // TODO: send c to FileTree, so that FileTree can save this UndoableCommand at the current node (and then, of course, append a new, command-less node).
+            UndoableCommand c = new UndoableCommand() {
+                @Override
+                public void execute(boolean saveEffects) {
+                    uc01SetColor.execute(saveEffects);
+                    uc02SetStone.execute(saveEffects);
+                    uc03UpdateCounter.execute(saveEffects);
+                }
+
+                @Override
+                public void undo() {
+                    uc03UpdateCounter.undo();
+                    uc02SetStone.undo();
+                    uc01SetColor.undo();
+                }
+            };
+            // c was already executed piecemeal
+            c.getExecuteEvents().addAll(uc01SetColor.getExecuteEvents());
+            c.getExecuteEvents().addAll(uc02SetStone.getExecuteEvents());
+            c.getExecuteEvents().addAll(uc03UpdateCounter.getExecuteEvents());
+            c.getUndoEvents().addAll(uc01SetColor.getUndoEvents());
+            c.getUndoEvents().addAll(uc02SetStone.getUndoEvents());
+            c.getUndoEvents().addAll(uc03UpdateCounter.getUndoEvents());
+
+            /*
+             * StoneColor.getOpposite() because we previously switched colors
+             */
+            StoneColor col = curColor;
+            if(newHandicapCtr <= 0) {
+                col = StoneColor.getOpposite(curColor);
+            }
+            removeAllMarks();
+            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.HANDICAP, col, "", x, y));
+
+            for(GameEvent e : c.getExecuteEvents()) {
+                fireGameEvent(e);
+            }
+
+            c.getExecuteEvents().add(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
+        }
+
+        fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
+    }
+
+    @Override
+    public void usePosition(int x, int y) {
+        checkCoords(x, y);
+
+        if(gameState == GameState.RUNNING) {
+            playMove(x, y);
+        } else if(gameState == GameState.SETTING_UP) {
+            if(handicapStoneCounter > 0) {
+                placeHandicapPosition(x, y, true);
+            } else {
+                placeSetupStone(x, y, curColor);
+            }
         } else {
-            fireGameEvent(new StoneEvent(GameCommand.HANDICAP_POS, x, y, curMoveNumber));
+            throw new IllegalStateException("Can't place stone when game is neither running nor setting up!");
+        }
+    }
+
+
+    @Override
+    public void placeSetupStone(int x, int y, StoneColor color) {
+        if(gameState != GameState.SETTING_UP) {
+            throw new IllegalStateException("Can't place setup stone when gameState is " + gameState);
+        }
+
+        checkCoords(x, y);
+
+        final int OLD_CUR_MOVE_NUMBER = curMoveNumber;
+        curMoveNumber = 0;
+        final UndoableCommand uc01SetStone = board.setStone(x, y, color, true); // uc01SetStone is already executed within board.setStone().
+        curMoveNumber = OLD_CUR_MOVE_NUMBER;
+
+        if(uc01SetStone == null) {
+            return;
+        }
+
+        // Assertion: uc01SetStone != null and was hence a valid move.
+
+        /*
+         * StoneColor.getOpposite() because we previously switched colors
+         */
+        removeAllMarks();
+        uc01SetStone.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
+        history.addNode(new History.HistoryNode(uc01SetStone, History.HistoryNode.AbstractSaveToken.SETUP, color, "", x, y));
+
+        for(GameEvent e : uc01SetStone.getExecuteEvents()) {
+            fireGameEvent(e);
         }
     }
 
     @Override
-    public boolean isDemoMode() {
-        return demoMode;
-    }
-
-    @Override
-    public void setDemoMode(boolean demoMode) {
-        this.demoMode = demoMode;
-        this.gameCommand = GameCommand.CONFIG_DEMO_MODE;
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public void setConfirmationNeeded(boolean needed) {
-        this.confirmationNeeded = needed;
-        this.gameCommand = GameCommand.CONFIG_CONFIRMATION;
-
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public boolean isConfirmationNeeded() {
-        return this.confirmationNeeded;
-    }
-
-    @Override
-    public void setShowMoveNumbers(boolean show) {
-        this.showMoveNumbers = show;
-        this.gameCommand = GameCommand.CONFIG_SHOWMOVENUMBERS;
-
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public boolean isShowMoveNumbers() {
-        return this.showMoveNumbers;
-    }
-
-    @Override
-    public void setShowCoordinates(boolean show) {
-        this.showCoordinates = show;
-        this.gameCommand = GameCommand.CONFIG_SHOW_COORDINATES;
-
-        fireGameEvent(new GameEvent(gameCommand));
-    }
-
-    @Override
-    public boolean isShowCoordinates() {
-        return this.showCoordinates;
-    }
-
-    @Override
-    public UndoableCommand addCapturedStones(StoneColor color, int amount) {
+    public UndoableCommand addCapturedStones(final StoneColor color, final int amount) {
         if (color == null) {
             throw new NullPointerException();
         }
@@ -459,16 +554,16 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        final int OLD_BLACK_CAPTURED_STONES = blackCapturedStones;
-        final int OLD_WHITE_CAPTURED_STONES = whiteCapturedStones;
-        final double OLD_BLACK_PLAYER_SCORE = playerBlackScore;
-        final double OLD_WHITE_PLAYER_SCORE = playerWhiteScore;
+        final int oldBlackCapturedStones = blackCapturedStones;
+        final int oldWhiteCapturedStones = whiteCapturedStones;
+        final double oldBlackPlayerScore = playerBlackScore;
+        final double oldWhitePlayerScore = playerWhiteScore;
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
                 if (color == BLACK) {
-                    Game.this.blackCapturedStones += amount; // TODO: If this causes issues, maybe change to "OLD_BLACK_CAPTURED_STONES + amount" and so on?
+                    Game.this.blackCapturedStones += amount;
                     Game.this.playerBlackScore += amount;
                 } else {
                     Game.this.whiteCapturedStones += amount;
@@ -478,10 +573,10 @@ public class Game implements GameInterface {
 
             @Override
             public void undo() {
-                Game.this.blackCapturedStones = OLD_BLACK_CAPTURED_STONES;
-                Game.this.whiteCapturedStones = OLD_WHITE_CAPTURED_STONES;
-                Game.this.playerBlackScore = OLD_BLACK_PLAYER_SCORE;
-                Game.this.playerWhiteScore = OLD_WHITE_PLAYER_SCORE;
+                Game.this.blackCapturedStones = oldBlackCapturedStones;
+                Game.this.whiteCapturedStones = oldWhiteCapturedStones;
+                Game.this.playerBlackScore = oldBlackPlayerScore;
+                Game.this.playerWhiteScore = oldWhitePlayerScore;
             }
         };
         ret.execute(true);
@@ -489,12 +584,134 @@ public class Game implements GameInterface {
         return ret;
     }
 
+    void fireGameEvent(GameEvent e) { // package-private by design
+        if(e == null) {
+            throw new NullPointerException();
+        }
+
+        for (GameListener l : listeners) {
+            l.gameCommand(e);
+        }
+    }
+
+    public void printDebugInfo(int x, int y) {
+        board.printDebugInfo(x, y);
+    }
+
+    // Methods controlling the history
+    @Override
+    public void undo() {
+        removeAllMarks();
+        history.stepBack();
+        reDisplayMarks();
+    }
+
+    @Override
+    public void redo() {
+        removeAllMarks();
+        history.stepForward();
+        reDisplayMarks();
+    }
+
+    @Override
+    public void rewind() {
+        removeAllMarks();
+        if(!history.isAtBeginning()) {
+            history.stepBack();
+            if((history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP)) {
+                history.rewind();
+            } else if(!history.isAtBeginning()) {
+                goBeforeFirstMove();
+            }
+        }
+        reDisplayMarks();
+    }
+
+    @Override
+    public void fastForward() {
+        removeAllMarks();
+        History.HistoryNode n = history.getCurrentNode();
+        if(n.getSaveToken() == null || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP) {
+            goBeforeFirstMove();
+            if(history.getCurrentNode() == n) {
+                history.skipToEnd();
+            }
+        } else {
+            history.skipToEnd();
+        }
+        reDisplayMarks();
+    }
+
+    @Override
+    public void goBeforeFirstMove() {
+        goToFirstMove();
+        removeAllMarks();
+        if(history.getCurrentNode().getSaveToken() != History.HistoryNode.AbstractSaveToken.SETUP && history.getCurrentNode().getSaveToken() != History.HistoryNode.AbstractSaveToken.HANDICAP) {
+            history.stepBack();
+        }
+        reDisplayMarks();
+    }
+
+    @Override
+    public void goToFirstMove() {
+        removeAllMarks();
+        history.rewind();
+
+        do {
+            history.stepForward();
+        } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP));
+        reDisplayMarks();
+    }
+
+    @Override
+    public void goToEnd() {
+        removeAllMarks();
+        history.skipToEnd();
+        reDisplayMarks();
+    }
+
+    @Override
+    public void mark(int x, int y, MarkShape shape) {
+        history.getCurrentNode().addMark(x, y, shape);
+        GameCommand gc = switch (shape) {
+            case CIRCLE -> GameCommand.MARK_CIRCLE;
+            case SQUARE -> GameCommand.MARK_SQUARE;
+            case TRIANGLE -> GameCommand.MARK_TRIANGLE;
+        };
+        fireGameEvent(new GameEvent(gc, x, y, curMoveNumber));
+    }
+
+    @Override
+    public void unmark(int x, int y) {
+        checkCoords(x, y);
+
+        history.getCurrentNode().removeMark(x, y);
+        fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
+    }
+
+    @Override
+    public String getComment() {
+        return history.getCurrentNode().getComment();
+    }
+
+    @Override
+    public void setComment(String comment) {
+        if(comment == null) {
+            throw new NullPointerException();
+        }
+        history.getCurrentNode().setComment(comment);
+        fireGameEvent(new GameEvent(GameCommand.UPDATE));
+    }
+
     @Override
     public int getStonesCapturedBy(StoneColor color) {
         if (color == null) throw new NullPointerException();
 
-        if (color == BLACK) return this.blackCapturedStones;
-        else return this.whiteCapturedStones;
+        if (color == BLACK) {
+            return this.blackCapturedStones;
+        } else {
+            return this.whiteCapturedStones;
+        }
     }
 
     @Override
@@ -512,55 +729,48 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public String getGraphicsPath() {
-        return graphicsPath;
-    }
-
-    @Override
-    public void setGraphicsPath(String path) {
-        if(path == null) {
-            throw new NullPointerException();
+    public void setSetupMode(boolean setupMode) {
+        if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
+            return;
         }
-        this.graphicsPath = path;
-        fireGameEvent(new GameEvent(GameCommand.CONFIG_GRAPHICS));
+
+        if(handicapStoneCounter > 0) {
+            return;
+        }
+
+        this.setupMode = setupMode;
+
+        this.gameState = this.setupMode ? GameState.SETTING_UP : GameState.RUNNING;
     }
 
     @Override
-    public Path getSavePath() {
-        return savaGamePath;
+    public boolean isSetupMode() {
+        return setupMode;
     }
 
-    @Override
-    public void setSavePath(Path path) {
-        if(path == null) return;
-        this.savaGamePath = path;
+    public History getHistory() {
+        return history;
     }
+
+
+    // private methods
 
     private UndoableCommand switchColor() {
-        System.out.println("Game.switchColor()");
-
         UndoableCommand ret = new UndoableCommand() {
             UndoableCommand thisCommand;
 
             @Override
             public void execute(boolean saveEffects) {
-                if (curColor == BLACK) {
-                    // this.gameCommand = GameCommand.WHITE_PLAYS; // handled by setCurColor()
-                    thisCommand = setCurColor(WHITE);
-                } else {
-                    // this.gameCommand = GameCommand.BLACK_PLAYS; // handled by setCurColor()
-                    thisCommand = setCurColor(BLACK);
+                thisCommand = setCurColor(StoneColor.getOpposite(curColor));
+                if(saveEffects) {
+                    getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
+                    getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
                 }
-
-                fireGameEvent(new GameEvent(gameCommand));
             }
 
             @Override
             public void undo() {
-                if(thisCommand != null) {
-                    thisCommand.undo();
-                    fireGameEvent(new GameEvent(gameCommand));
-                }
+                thisCommand.undo();
             }
         };
         ret.execute(true);
@@ -569,19 +779,48 @@ public class Game implements GameInterface {
 
     }
 
-    void fireGameEvent(GameEvent e) { // package-private by design
-        if(e == null) {
+    private UndoableCommand setCurColor(final StoneColor c) {
+        if (c == null) {
             throw new NullPointerException();
         }
 
-        for (GameListener l : listeners) {
-            l.gameCommand(e);
+        final StoneColor oldColor = this.curColor;
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                Game.this.curColor = c;
+            }
+
+            @Override
+            public void undo() {
+                Game.this.curColor = oldColor;
+            }
+        };
+        ret.execute(true);
+
+        return ret;
+    }
+
+    private void removeAllMarks() {
+        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), curMoveNumber)));
+    }
+
+    private void reDisplayMarks() {
+        history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.getX(), key.getY(), value));
+    }
+
+    private void checkCoords(int x, int y) {
+        if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
+            throw new IllegalArgumentException("Invalid coordinates x = " + x + ", y = " + y);
         }
     }
 
-    public void printDebugInfo(int x, int y) {
-        board.printDebugInfo(x, y);
+    public enum GameState {
+        NOT_STARTED_YET,
+        SETTING_UP,
+        RUNNING,
+        GAME_OVER
     }
-
 }
 

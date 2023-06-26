@@ -1,0 +1,10 @@
+(;FF[4]GM[1]SZ[19]
+
+HA[0]
+
+;AB[hj][ij][ji][ki][lj][mj][kk][jk]C[placeSetupStone(9, 10)]
+;AW[ii][hi][hk][ik][gj][je][ke][jg][kg][lf][mf][if][hf]C[placeSetupStone(7, 5)]
+;AB[ie][he][ig][hg][gf][kf]C[placeSetupStone(10, 5)]
+;W[kj]CR[jf]CR[jj]C[If the suicide detection works properly, white and black will not be prevented from placing their respective stones into the marked gaps.]
+
+)

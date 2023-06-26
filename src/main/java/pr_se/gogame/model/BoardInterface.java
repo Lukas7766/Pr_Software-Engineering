@@ -1,24 +1,25 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.helper.UndoableCommand;
+
 public interface BoardInterface {
     /**
      * Places a stone on the board, calculating its liberties and adding it to an existing group where applicable, as
      * well as merging groups if necessary.
-     * @param color Whether the stone to be placed is StoneColor.BLACK or WHITE
-     * @param x Horizontal coordinate from 0 to size-1, starting on the left
-     * @param y Vertical coordinate from 0 to size-1, starting on the top
+     *
+     * @param x           Horizontal coordinate from 0 to size-1, starting on the left
+     * @param y           Vertical coordinate from 0 to size-1, starting on the top
+     * @param color       Color of the stone to be placed
      * @param prepareMode Whether this stone is set before the beginning of the game (e.g., as a handicap) or by a (human or AI) player
-     * @param save Whether this move is to be saved
      */
-    UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode, boolean save);
+    UndoableCommand setStone(int x, int y, StoneColor color, boolean prepareMode);
 
     /**
-     *
      * @param x Horizontal coordinate from 0 to size-1, starting on the left
      * @param y Vertical coordinate from 0 to size-1, starting on the top
-     * @param save Whether this move is to be saved
      */
-    UndoableCommand removeStone(int x, int y, boolean save);
+    UndoableCommand removeStone(int x, int y);
 
     // Getters
     int getSize();

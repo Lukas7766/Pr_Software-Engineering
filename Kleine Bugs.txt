@@ -1,0 +1,1 @@
+Wenn man einen Handicap-Stein rückgängig macht und dann neu setzt, bleibt sowohl die ursprünglich automatisch erzeugte Slot-Markierung als auch die des neu gesetzten.

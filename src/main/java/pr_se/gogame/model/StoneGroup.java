@@ -1,9 +1,10 @@
 package pr_se.gogame.model;
 
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
+import pr_se.gogame.model.helper.Position;
+import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.helper.UndoableCommand;
+
+import java.util.*;
 
 /**
  * Model
@@ -30,7 +31,6 @@ public class StoneGroup {
      */
     private final Set<StoneGroupPointer> pointers;
 
-    // TODO: Remove these debug variables
     private static int nextSerialNo = 0;
     public final int serialNo;
 
@@ -48,7 +48,7 @@ public class StoneGroup {
         this.pointers = new HashSet<>();
 
         locations.add(new Position(x, y));
-        // TODO: Remove this debug code
+
         serialNo = nextSerialNo;
         nextSerialNo++;
     }
@@ -57,7 +57,7 @@ public class StoneGroup {
      * Adds the locations and liberties of the supplied StoneGroup to this one
      * @param other StoneGroup that is to be merged with this one
      */
-    public UndoableCommand mergeWithStoneGroup(StoneGroup other) {
+    public UndoableCommand mergeWithStoneGroup(final StoneGroup other) {
         if(other == null) {
             throw new NullPointerException();
         }
@@ -66,14 +66,16 @@ public class StoneGroup {
             throw new IllegalArgumentException("Stone group must be of the same color!");
         }
 
-        final List<Position> OLD_LOCATIONS = new LinkedList<>(locations);
-        final Set<Position> OLD_LIBERTIES = new HashSet<>(liberties);
+        final List<Position> oldLocations = List.copyOf(locations);
+        final List<Position> newLocations = List.copyOf(other.getLocations());
+        final Set<Position> oldLiberties = Set.copyOf(liberties);
+        final Set<Position> newLiberties = Set.copyOf(other.getLiberties());
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                locations.addAll(other.getLocations());
-                liberties.addAll(other.getLiberties());
+                locations.addAll(newLocations);
+                liberties.addAll(newLiberties);
                 other.getPointers().forEach(p -> {
                     p.setStoneGroup(StoneGroup.this);
                     pointers.add(p);
@@ -83,9 +85,9 @@ public class StoneGroup {
             @Override
             public void undo() {
                 locations.clear();
-                locations.addAll(OLD_LOCATIONS);
+                locations.addAll(oldLocations);
                 liberties.clear();
-                liberties.addAll(OLD_LIBERTIES);
+                liberties.addAll(oldLiberties);
                 other.getPointers().forEach(p -> {
                     p.setStoneGroup(other);
                     pointers.remove(p);
@@ -99,26 +101,26 @@ public class StoneGroup {
     }
 
     /**
-     * Adds the supplied LIBERTY to this StoneGroup
-     * @param LIBERTY unoccupied Position to be added to this StoneGroup
+     * Adds the supplied liberty to this StoneGroup
+     * @param liberty unoccupied Position to be added to this StoneGroup
      */
-    public UndoableCommand addLiberty(final Position LIBERTY) {
-        if(LIBERTY == null) {
+    public UndoableCommand addLiberty(final Position liberty) {
+        if(liberty == null) {
             throw new NullPointerException();
         }
 
-        final boolean WAS_CONTAINED = liberties.contains(LIBERTY);
+        final boolean wasContained = liberties.contains(liberty);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                liberties.add(LIBERTY);
+                liberties.add(liberty);
             }
 
             @Override
             public void undo() {
-                if(!WAS_CONTAINED) {
-                    liberties.remove(LIBERTY);
+                if(!wasContained) {
+                    liberties.remove(liberty);
                 }
             }
         };
@@ -137,7 +139,7 @@ public class StoneGroup {
             throw new NullPointerException();
         }
 
-        final boolean WAS_CONTAINED = liberties.contains(liberty);
+        final boolean wasContained = liberties.contains(liberty);
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
@@ -147,7 +149,7 @@ public class StoneGroup {
 
             @Override
             public void undo() {
-                if(WAS_CONTAINED) {
+                if(wasContained) {
                     liberties.add(liberty);
                 }
             }
@@ -181,5 +183,9 @@ public class StoneGroup {
 
     public Set<StoneGroupPointer> getPointers() {
         return pointers;
+    }
+
+    public static void resetDebug() {
+        nextSerialNo = 0;
     }
 }

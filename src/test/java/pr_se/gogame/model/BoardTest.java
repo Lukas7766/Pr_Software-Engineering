@@ -1,68 +1,78 @@
 package pr_se.gogame.model;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.model.file.LoadingGameException;
+import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.helper.UndoableCommand;
+import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.ruleset.NewZealandRuleset;
+
+import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
-
-import static pr_se.gogame.model.StoneColor.*;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 class BoardTest {
-
     Game game;
     Board board;
+
+    static final String TESTFILE_FOLDER = "./testFiles/";
+
+    /*
+     * This variable is mostly meant for AssertThrows()-calls, as SonarQube (rightly) points out that nested method
+     * calls might create ambiguity as to which method has thrown an expected (or unexpected) exception.
+     */
+    int maxCoord;
 
     @BeforeEach
     void setUp() {
         game = new Game();
-        game.newGame(BLACK, 19, 0);
-        board = game.getBoard();
-    }
-
-    @AfterEach
-    void tearDown() {
+        game.newGame(BLACK, 19, 0, new JapaneseRuleset());
+        board = new Board(game, game.getSize());
+        maxCoord = board.getSize() - 1;
     }
 
     // argument checking
     @Test
     void setStoneArguments() {
-        assertThrows(IllegalArgumentException.class, () -> board.setStone(-1, 0, BLACK, false, true));
-        assertThrows(IllegalArgumentException.class, () -> board.setStone(board.getSize(), 0, BLACK, false, true));
-        assertThrows(IllegalArgumentException.class, () -> board.setStone(0, -1, BLACK, false, true));
-        assertThrows(IllegalArgumentException.class, () -> board.setStone(0, board.getSize(), BLACK, false, true));
-        assertThrows(NullPointerException.class, () -> board.setStone(0, 0, null, false, true));
+        assertThrows(IllegalArgumentException.class, () -> board.setStone(-1, 0, BLACK, false));
+        assertThrows(IllegalArgumentException.class, () -> board.setStone(maxCoord + 1, 0, BLACK, false));
+        assertThrows(IllegalArgumentException.class, () -> board.setStone(0, -1, BLACK, false));
+        assertThrows(IllegalArgumentException.class, () -> board.setStone(0, maxCoord + 1, BLACK, false));
+        assertThrows(NullPointerException.class, () -> board.setStone(0, 0, null, false));
     }
 
     @Test
     void removeStoneArguments() {
-        assertThrows(IllegalArgumentException.class, () -> board.removeStone(-1, 0, true));
-        assertThrows(IllegalArgumentException.class, () -> board.removeStone(0, -1, true));
-        assertThrows(IllegalArgumentException.class, () -> board.removeStone(board.getSize(), 0, true));
-        assertThrows(IllegalArgumentException.class, () -> board.removeStone(0, board.getSize(), true));
+        assertThrows(IllegalArgumentException.class, () -> board.removeStone(-1, 0));
+        assertThrows(IllegalArgumentException.class, () -> board.removeStone(0, -1));
+        assertThrows(IllegalArgumentException.class, () -> board.removeStone(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> board.removeStone(0, maxCoord + 1));
     }
 
     @Test
     void getColorAtArguments() {
         assertThrows(IllegalArgumentException.class, () -> board.getColorAt(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> board.getColorAt(board.getSize(), 0));
-        assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, board.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> board.getColorAt(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, maxCoord + 1));
     }
 
     @Test
     void printDebugInfoArguments() {
         assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(board.getSize(), 0));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, board.getSize()));
+        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(maxCoord + 1, 0));
+        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, maxCoord + 1));
     }
 
     // other tests
     @Test
     void setStonePrepare() {
-        assertNotNull(board.setStone(0, 0, BLACK, true, true));
-        assertNotNull(board.setStone(1, 1, WHITE, true, true));
+        assertNotNull(board.setStone(0, 0, BLACK, true));
+        assertNotNull(board.setStone(1, 1, WHITE, true));
 
         assertEquals(BLACK, board.getColorAt(0, 0));
         assertEquals(WHITE, board.getColorAt(1, 1));
@@ -70,8 +80,8 @@ class BoardTest {
 
     @Test
     void setStoneMove() {
-        assertNotNull(board.setStone(0, 0, BLACK, false, true));
-        assertNotNull(board.setStone(1, 1, WHITE, false, true));
+        assertNotNull(board.setStone(0, 0, BLACK, false));
+        assertNotNull(board.setStone(1, 1, WHITE, false));
 
         assertEquals(BLACK, board.getColorAt(0, 0));
         assertEquals(WHITE, board.getColorAt(1, 1));
@@ -79,54 +89,37 @@ class BoardTest {
 
     @Test
     void noSetStoneOnSameSpace() {
-        assertNotNull(board.setStone(0, 0, BLACK, false, true));
-        assertNull(board.setStone(0, 0, BLACK, false, true));
+        assertNotNull(board.setStone(0, 0, BLACK, false));
+        assertNull(board.setStone(0, 0, BLACK, false));
     }
 
     @Test
     void groupMergingAndCapture() {
-        assertNotNull(board.setStone(10, 9, BLACK, false, true));
-        assertNotNull(board.setStone(10, 11, BLACK, false, true));
-        assertNotNull(board.setStone(10, 10, BLACK, false, true));
+        assertNotNull(board.setStone(10, 9, BLACK, false));
+        assertNotNull(board.setStone(10, 11, BLACK, false));
+        assertNotNull(board.setStone(10, 10, BLACK, false));
 
-        assertNotNull(board.setStone(9, 9, WHITE, false, true));
-        assertNotNull(board.setStone(9, 10, WHITE, false, true));
-        assertNotNull(board.setStone(9, 11, WHITE, false, true));
-        assertNotNull(board.setStone(11, 9, WHITE, false, true));
-        assertNotNull(board.setStone(11, 10, WHITE, false, true));
-        assertNotNull(board.setStone(11, 11, WHITE, false, true));
-        assertNotNull(board.setStone(10, 8, WHITE, false, true));
+        assertNotNull(board.setStone(9, 9, WHITE, false));
+        assertNotNull(board.setStone(9, 10, WHITE, false));
+        assertNotNull(board.setStone(9, 11, WHITE, false));
+        assertNotNull(board.setStone(11, 9, WHITE, false));
+        assertNotNull(board.setStone(11, 10, WHITE, false));
+        assertNotNull(board.setStone(11, 11, WHITE, false));
+        assertNotNull(board.setStone(10, 8, WHITE, false));
 
         assertEquals(BLACK, board.getColorAt(10, 11));
 
-        assertNotNull(board.setStone(10, 12, WHITE, false, true));
+        assertNotNull(board.setStone(10, 12, WHITE, false));
 
         assertNull(board.getColorAt(10, 11));
     }
 
     @Test
-    void setStoneKoPrevention() {
-        assertNotNull(board.setStone(9, 1, BLACK, false, true));
-        assertNotNull(board.setStone(10, 1, WHITE, false, true));
-        assertNotNull(board.setStone(9, 3, BLACK, false, true));
-        assertNotNull(board.setStone(10, 3, WHITE, false, true));
-        assertNotNull(board.setStone(8, 2, BLACK, false, true));
-        assertNotNull(board.setStone(11, 2, WHITE, false, true));
-
-        assertNotNull(board.setStone(9, 2, WHITE, false, true));
-        assertNotNull(board.setStone(10, 2, BLACK, false, true));
-
-        assertNull(board.setStone(9, 2, WHITE, false, true));
-        assertNull(board.setStone(9, 2, WHITE, false, true)); // for maximum code coverage
-        assertNotNull(board.setStone(12, 2, WHITE, false, true)); // for maximum code coverage
-    }
-
-    @Test
     void setStone() {
-        assertNotNull(board.setStone(0, 1, BLACK, false, false)); // save = false for max. code coverage
-        assertNotNull(board.setStone(1, 0, WHITE, false, false));
-        assertNotNull(board.setStone(board.getSize() - 1, board.getSize() - 2, BLACK, false, false));
-        assertNotNull(board.setStone(board.getSize() - 2, board.getSize() - 1, WHITE, false, false));
+        assertNotNull(board.setStone(0, 1, BLACK, false)); // save = false for max. code coverage
+        assertNotNull(board.setStone(1, 0, WHITE, false));
+        assertNotNull(board.setStone(board.getSize() - 1, board.getSize() - 2, BLACK, false));
+        assertNotNull(board.setStone(board.getSize() - 2, board.getSize() - 1, WHITE, false));
 
         assertEquals(BLACK, board.getColorAt(0, 1));
         assertEquals(WHITE, board.getColorAt(1, 0));
@@ -136,17 +129,19 @@ class BoardTest {
 
     @Test
     void setStoneSuicidePreventionIfNotAllowed() {
-        assertNotNull(board.setStone(9, 1, BLACK, false, true));
-        assertNotNull(board.setStone(9, 3, BLACK, false, true));
-        assertNotNull(board.setStone(8, 2, BLACK, false, true));
-        assertNotNull(board.setStone(10, 2, BLACK, false, true));
+        assertNotNull(board.setStone(9, 1, BLACK, false));
+        assertNotNull(board.setStone(9, 3, BLACK, false));
+        assertNotNull(board.setStone(8, 2, BLACK, false));
+        assertNotNull(board.setStone(10, 2, BLACK, false));
 
-        assertNull(board.setStone(9, 2, WHITE, false, true));
-        assertNotNull(board.setStone(9, 2, BLACK, false, true));
+        assertNull(board.setStone(9, 2, WHITE, false));
+        assertNotNull(board.setStone(9, 2, BLACK, false));
     }
 
-    /*@Test
+    @Test
     void setStoneSuicideAllowed() {
+        game.newGame(BLACK, 19, 0, new NewZealandRuleset());
+
         assertNotNull(board.setStone(9, 1, BLACK, false));
         assertNotNull(board.setStone(10, 1, BLACK, false));
         assertNotNull(board.setStone(9, 3, BLACK, false));
@@ -155,22 +150,26 @@ class BoardTest {
         assertNotNull(board.setStone(11, 2, BLACK, false));
 
         assertNotNull(board.setStone(9, 2, WHITE, false));
-    }*/
+        assertNotNull(board.setStone(10, 2, WHITE, false));
+
+        assertNull(board.getColorAt(9, 2));
+        assertNull(board.getColorAt(10, 2));
+    }
 
     @Test
     void removeStone() {
-        assertNotNull(board.setStone(0, 0, BLACK, false, true));
-        assertNotNull(board.setStone(1, 1, WHITE, false, true));
+        assertNotNull(board.setStone(0, 0, BLACK, false));
+        assertNotNull(board.setStone(1, 1, WHITE, false));
 
         assertEquals(BLACK, board.getColorAt(0, 0));
         assertEquals(WHITE, board.getColorAt(1, 1));
 
-        board.removeStone(1, 1, true);
+        board.removeStone(1, 1);
         assertNull(board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(0, 0));
 
         game.pass(); // for maximum code-coverage
-        board.removeStone(0, 0, true);
+        board.removeStone(0, 0);
         assertNull(board.getColorAt(0, 0));
     }
 
@@ -181,36 +180,36 @@ class BoardTest {
 
     @Test
     void getColorAt() {
-        assertNotNull(board.setStone(0, 0, BLACK, false, true));
+        assertNotNull(board.setStone(0, 0, BLACK, false));
         assertEquals(BLACK, board.getColorAt(0, 0));
     }
 
     @Test
     void printDebugInfo() {
-        assertNotNull(board.setStone(0, 0, BLACK, false, true));
+        assertNotNull(board.setStone(0, 0, BLACK, false));
         assertDoesNotThrow(() -> board.printDebugInfo(0, 0));
     }
 
     @Test
     void printDebugInfoRepeatedly() { // This method  really only exists for maximising branch coverage.
         assertDoesNotThrow(() -> board.printDebugInfo(0, 0)); // board == null
-        assertNotNull(board.setStone(0, 0, BLACK, false, true));
+        assertNotNull(board.setStone(0, 0, BLACK, false));
         assertDoesNotThrow(() -> board.printDebugInfo(0, 0)); // x == lastDebugX && y == lastDebugY
-        assertNotNull(board.setStone(0, 1, BLACK, false, true));
+        assertNotNull(board.setStone(0, 1, BLACK, false));
         assertDoesNotThrow(() -> board.printDebugInfo(0, 1)); // x == lastDebugX && y != lastDebugY
         assertDoesNotThrow(() -> board.printDebugInfo(1, 1)); // x != lastDebugX && [y == lastDebugY]
     }
 
     @Test
     void simpleUndoTest() {
-        board.setStone(1, 0, BLACK, false, true);
-        board.setStone(1, 2, BLACK, false, true);
-        board.setStone(0, 1, BLACK, false, true);
-        board.setStone(1, 1, WHITE, false, true);
+        board.setStone(1, 0, BLACK, false);
+        board.setStone(1, 2, BLACK, false);
+        board.setStone(0, 1, BLACK, false);
+        board.setStone(1, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        UndoableCommand c = board.setStone(2, 1, BLACK, false);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
 
@@ -218,21 +217,21 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute(true);
+        c.execute(false);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
 
     @Test
     void simpleUndoTest2() {
-        board.setStone(1, 0, BLACK, false, true);
-        board.setStone(1, 2, BLACK, false, true);
-        board.setStone(0, 1, BLACK, false, true);
-        board.setStone(1, 1, WHITE, false, true);
+        board.setStone(1, 0, BLACK, false);
+        board.setStone(1, 2, BLACK, false);
+        board.setStone(0, 1, BLACK, false);
+        board.setStone(1, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        UndoableCommand c = board.setStone(2, 1, BLACK, false);
         assertNotNull(c);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
@@ -242,7 +241,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        UndoableCommand c2 = board.setStone(2, 1, WHITE, false, true);
+        UndoableCommand c2 = board.setStone(2, 1, WHITE, false);
         assertNotNull(c2);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(2, 1));
@@ -252,21 +251,21 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute(true);
+        c.execute(false);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
 
     @Test
     void simpleUndoTest3() {
-        board.setStone(1, 0, BLACK, false, true);
-        board.setStone(1, 2, BLACK, false, true);
-        board.setStone(0, 1, BLACK, false, true);
-        board.setStone(1, 1, WHITE, false, true);
+        board.setStone(1, 0, BLACK, false);
+        board.setStone(1, 2, BLACK, false);
+        board.setStone(0, 1, BLACK, false);
+        board.setStone(1, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        UndoableCommand c2 = board.setStone(2, 1, WHITE, false, true);
+        UndoableCommand c2 = board.setStone(2, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(2, 1));
 
@@ -274,7 +273,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        UndoableCommand c = board.setStone(2, 1, BLACK, false);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
 
@@ -285,18 +284,18 @@ class BoardTest {
 
     @Test
     void simpleUndoTest4() {
-        board.setStone(1, 0, BLACK, false, true);
-        board.setStone(1, 2, BLACK, false, true);
-        board.setStone(0, 1, BLACK, false, true);
-        board.setStone(1, 1, WHITE, false, true);
+        board.setStone(1, 0, BLACK, false);
+        board.setStone(1, 2, BLACK, false);
+        board.setStone(0, 1, BLACK, false);
+        board.setStone(1, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        UndoableCommand c2 = board.setStone(2, 1, WHITE, false, true);
+        UndoableCommand c2 = board.setStone(2, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(2, 1));
 
-        UndoableCommand c3 = board.setStone(3, 1, WHITE, false, true);
+        UndoableCommand c3 = board.setStone(3, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(2, 1));
         assertEquals(WHITE, board.getColorAt(3, 1));
@@ -311,7 +310,7 @@ class BoardTest {
         assertEquals(null, board.getColorAt(2, 1));
         assertEquals(null, board.getColorAt(3, 1));
 
-        UndoableCommand c = board.setStone(2, 1, BLACK, false, true);
+        UndoableCommand c = board.setStone(2, 1, BLACK, false);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
         assertEquals(null, board.getColorAt(3, 1));
@@ -324,20 +323,20 @@ class BoardTest {
 
     @Test
     void complexUndoTest() {
-        board.setStone(1, 0, BLACK, false, true);
-        board.setStone(1, 2, BLACK, false, true);
-        board.setStone(0, 1, BLACK, false, true);
-        board.setStone(1, 1, WHITE, false, true);
-        board.setStone(2, 0, BLACK, false,true);
-        board.setStone(2, 2, BLACK, false,true);
-        board.setStone(3, 0, BLACK, false,true);
-        board.setStone(3, 2, BLACK, false,true);
-        board.setStone(3, 1, WHITE, false, true);
-        UndoableCommand c = board.setStone(4, 1, BLACK, false,true);
+        board.setStone(1, 0, BLACK, false);
+        board.setStone(1, 2, BLACK, false);
+        board.setStone(0, 1, BLACK, false);
+        board.setStone(1, 1, WHITE, false);
+        board.setStone(2, 0, BLACK, false);
+        board.setStone(2, 2, BLACK, false);
+        board.setStone(3, 0, BLACK, false);
+        board.setStone(3, 2, BLACK, false);
+        board.setStone(3, 1, WHITE, false);
+        UndoableCommand c = board.setStone(4, 1, BLACK, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(3, 1));
 
-        UndoableCommand c2 = board.setStone(2, 1, BLACK, false, true);
+        UndoableCommand c2 = board.setStone(2, 1, BLACK, false);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(3, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
@@ -347,7 +346,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(3, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        board.setStone(2, 1, WHITE, false, true);
+        board.setStone(2, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1)); // due to suicide detection
         assertEquals(WHITE, board.getColorAt(3, 1));
@@ -357,22 +356,70 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(3, 1));
         assertEquals(null, board.getColorAt(4, 1));
 
-        UndoableCommand c3 = board.setStone(2, 1, WHITE, false, true);
+        UndoableCommand c3 = board.setStone(2, 1, WHITE, false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(2, 1));
         assertEquals(WHITE, board.getColorAt(3, 1));
 
         c3.undo();
-        c.execute(true);
+        c.execute(false);
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(3, 1));
         assertEquals(null, board.getColorAt(2, 1));
         assertEquals(BLACK, board.getColorAt(4, 1));
 
-        c2.execute(true);
+        c2.execute(false);
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(3, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
         assertEquals(BLACK, board.getColorAt(4, 1));
+    }
+
+    @Test
+    void undoAndRedoCapture() {
+        loadFile(TESTFILE_FOLDER + "KoSituation.sgf");
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        UndoableCommand c = board.setStone(2, 1, BLACK, false);
+        assertEquals(BLACK, board.getColorAt(2, 1));
+        assertEquals(null, board.getColorAt(1, 1));
+
+        c.undo();
+        assertEquals(WHITE, board.getColorAt(1, 1));
+        assertEquals(null, board.getColorAt(2, 1));
+
+        c.execute(false);
+        assertEquals(BLACK, board.getColorAt(2, 1));
+        assertEquals(null, board.getColorAt(1, 1));
+    }
+
+    @Test
+    void checkNoFalseSuicideAlarm() {
+        loadFile(TESTFILE_FOLDER + "FalseAlarm.sgf");
+
+        assertNotNull(board.setStone(9, 5, BLACK, false));
+        assertNotNull(board.setStone(9, 9, WHITE, false));
+    }
+
+    void loadFile(String fileName) {
+        try {
+            game.loadGame(new File(fileName));
+        } catch (LoadingGameException e) {
+            e.printStackTrace();
+            fail();
+        }
+        game.goToEnd();
+
+        board = new Board(game, game.getSize());
+
+        for(int x = 0; x < board.getSize(); x++) {
+            for(int y = 0; y < board.getSize(); y++) {
+                StoneColor c = game.getColorAt(x, y);
+                if(c != null) {
+                    assertNotNull(board.setStone(x, y, c, true));
+                }
+            }
+        }
     }
 }

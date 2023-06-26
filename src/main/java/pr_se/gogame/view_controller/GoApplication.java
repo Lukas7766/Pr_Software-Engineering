@@ -5,11 +5,12 @@ import javafx.scene.Scene;
 import javafx.scene.image.Image;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
@@ -23,24 +24,22 @@ public class GoApplication extends Application {
 
     @Override
     public void start(Stage stage) throws Exception {
-        //Thread.setDefaultUncaughtExceptionHandler((t, e) -> {
-        //    CustomExceptionDialog.show(e);
-        //});
-        CustomExceptionDialog.stage = stage;
-        // Generate the necessary folder and extract the default the graphics pack if it is not present.
-        String graphicsDir = "./Grafiksets";
-        String graphicsPack = "/default.zip";
-        Path path = Paths.get(graphicsDir + graphicsPack);
-        if(Files.notExists(path, LinkOption.NOFOLLOW_LINKS)) {
-            System.out.println("The default graphics pack doesn't exist.");
+        CustomExceptionDialog.setStage(stage);
 
+        // Generate the necessary folder and extract the default the graphics pack if it is not present.
+        String graphicsDir = GlobalSettings.GRAPHICS_PACK_FOLDER;
+        String graphicsPack = "/" + GlobalSettings.getGraphicsPackFileName();
+        Path path = Paths.get(GlobalSettings.getGraphicsPath());
+        if(Files.notExists(path, LinkOption.NOFOLLOW_LINKS)) {
             InputStream link = this.getClass().getResourceAsStream(graphicsPack);
             if(link == null) {
                 throw new NullPointerException("Default graphics pack is not in JAR file!");
             }
 
             File dir = new File(graphicsDir);
-            dir.mkdirs();
+            if(!dir.mkdirs()) {
+                throw new IOException("Couldn't create graphics pack folder!");
+            }
 
             File file = new File(graphicsDir + graphicsPack);
             Files.copy(link, file.getAbsoluteFile().toPath());
@@ -65,8 +64,8 @@ public class GoApplication extends Application {
 
 
         Scene scene = new Scene(root, WIDTH, HEIGHT);
-        stage.setMinHeight(HEIGHT + 40);
-        stage.setMinWidth(WIDTH + 20);
+        stage.setMinHeight(HEIGHT + 40.0);
+        stage.setMinWidth(WIDTH + 20.0);
 
         stage.setScene(scene);
         BoardPane bp = new BoardPane(game);
@@ -80,13 +79,15 @@ public class GoApplication extends Application {
          * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,
          * except, for some reason, the menu bar. This might be desirable.
          */
-        scene.setOnDragDetected((e) -> scene.startFullDrag());
+        scene.setOnDragDetected(e -> scene.startFullDrag());
 
         /*
          * This is necessary for keeping the rows and columns of the board together if Windows's DPI Scaling is set
          * above 100 %.
          */
         stage.setForceIntegerRenderScale(true);
+
+        game.initGame();
         stage.show();
     }
 

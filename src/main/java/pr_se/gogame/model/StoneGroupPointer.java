@@ -11,7 +11,6 @@ public class StoneGroupPointer {
      */
     private StoneGroup stoneGroup;
 
-    // TODO: Remove these debug variables
     private static int nextSerialNo = 0;
     public final int serialNo;
 
@@ -26,7 +25,6 @@ public class StoneGroupPointer {
         setStoneGroup(stoneGroup);
         this.stoneGroup.addPointer(this);
 
-        // TODO: Remove this debug code
         serialNo = nextSerialNo;
         nextSerialNo++;
     }
@@ -41,5 +39,9 @@ public class StoneGroupPointer {
             throw new NullPointerException();
         }
         this.stoneGroup = stoneGroup;
+    }
+
+    public static void resetDebug() {
+        nextSerialNo = 0;
     }
 }
