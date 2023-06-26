@@ -78,29 +78,39 @@ public class AncientChineseRuleset implements Ruleset {
             throw new IllegalArgumentException("noStones must be between 0 and 9");
         }
 
-        final int SIZE = game.getSize();
-        final int DIST_FROM_EDGE = 2 + SIZE / 10;
+        final int size = game.getSize();
+        final int distFromEdge = 2 + size / 10;
 
-        game.setHandicapStoneCounter(noStones);
+        game.setHandicapStoneCounter(9);
 
-        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 9);
-        if(noStones == 9) noStones--;
-        game.placeHandicapPosition(SIZE / 2, DIST_FROM_EDGE, noStones == 8);
-        game.placeHandicapPosition(SIZE / 2, SIZE - 1 - DIST_FROM_EDGE, noStones == 8);
+        boolean centerSet = false;
+
+        if(noStones == 9) {
+            game.placeHandicapPosition(size / 2, size / 2, true);
+            centerSet = true;
+            noStones--;
+        }
+        game.placeHandicapPosition(size / 2, distFromEdge, noStones == 8);
+        game.placeHandicapPosition(size / 2, size - 1 - distFromEdge, noStones == 8);
         if(noStones == 8) noStones -= 2;
-        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 7);
-        if(noStones == 7) noStones--;
-        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, SIZE / 2, noStones == 6);
-        game.placeHandicapPosition(DIST_FROM_EDGE, SIZE / 2, noStones == 6);
+        if(noStones == 7) {
+            game.placeHandicapPosition(size / 2, size / 2, true);
+            centerSet = true;
+            noStones--;
+        }
+        game.placeHandicapPosition(size - 1 - distFromEdge, size / 2, noStones == 6);
+        game.placeHandicapPosition(distFromEdge, size / 2, noStones == 6);
         if(noStones == 6) noStones -= 2;
-        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 5);
-        if(noStones == 5) noStones--;
-        game.placeHandicapPosition(DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 4);
+        if(!centerSet) {
+            game.placeHandicapPosition(size / 2, size / 2, noStones == 5);
+        }
+        if (noStones == 5) noStones--;
+        game.placeHandicapPosition(distFromEdge, distFromEdge, noStones == 4);
         if(noStones == 4) noStones--;
-        game.placeHandicapPosition(SIZE / 2, SIZE / 2, noStones == 3);
+        game.placeHandicapPosition(size / 2, size / 2, noStones == 3);
         if(noStones == 3) noStones--;
-        game.placeHandicapPosition(SIZE - 1 - DIST_FROM_EDGE, DIST_FROM_EDGE, noStones == 2);
-        game.placeHandicapPosition(DIST_FROM_EDGE, SIZE - 1 - DIST_FROM_EDGE, noStones == 2);
+        game.placeHandicapPosition(size - 1 - distFromEdge, distFromEdge, noStones == 2);
+        game.placeHandicapPosition(distFromEdge, size - 1 - distFromEdge, noStones == 2);
     }
 
 }

@@ -5,8 +5,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.ruleset.Ruleset;
+
+import java.io.File;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 class JapaneseRulesetTest {
     JapaneseRuleset japaneseRuleset;
@@ -55,7 +60,7 @@ class JapaneseRulesetTest {
         null BLACK WHITE null null null null null null
          */
         Game game = new Game();
-        game.newGame(StoneColor.BLACK, 9, 0, new JapaneseRuleset());
+        game.newGame(BLACK, 9, 0, new JapaneseRuleset());
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -87,11 +92,11 @@ class JapaneseRulesetTest {
         game.playMove(8, 2);
 
         game.scoreGame();
-        assertEquals(10, game.getScore(StoneColor.BLACK));
-        assertEquals(6.5, game.getScore(StoneColor.WHITE));
+        assertEquals(10, game.getScore(BLACK));
+        assertEquals(6.5, game.getScore(WHITE));
         assertEquals(10, japaneseRuleset.scoreGame(game).getScoreBlack());
         assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
-        assertEquals(StoneColor.BLACK, japaneseRuleset.scoreGame(game).getWinner());
+        assertEquals(BLACK, japaneseRuleset.scoreGame(game).getWinner());
         assertEquals(
                 "Black won!\n" +
                         "\n" +
@@ -117,7 +122,7 @@ class JapaneseRulesetTest {
         null null null null null null null null null
          */
         Game game = new Game();
-        game.newGame(StoneColor.BLACK, 9, 0, new JapaneseRuleset());
+        game.newGame(BLACK, 9, 0, new JapaneseRuleset());
         game.playMove(0, 1);
         game.playMove(0, 2);
 
@@ -131,12 +136,12 @@ class JapaneseRulesetTest {
         game.playMove(2, 2);
 
         game.scoreGame();
-        assertEquals(3, game.getScore(StoneColor.BLACK));
-        assertEquals(6.5, game.getScore(StoneColor.WHITE));
+        assertEquals(3, game.getScore(BLACK));
+        assertEquals(6.5, game.getScore(WHITE));
 
         assertEquals(3, japaneseRuleset.scoreGame(game).getScoreBlack());
         assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
-        assertEquals(StoneColor.WHITE, japaneseRuleset.scoreGame(game).getWinner());
+        assertEquals(WHITE, japaneseRuleset.scoreGame(game).getWinner());
         assertEquals(
                 "White won!\n" +
                         "\n" +
@@ -145,6 +150,20 @@ class JapaneseRulesetTest {
                         "+ Captured stones: 0\n" +
                         "\n" +
                         "= 6.5 points", japaneseRuleset.scoreGame(game).getDescription());
+
+    }
+
+    @Test
+    void isKo() {
+        Game game = new Game();
+        assertTrue(game.loadGame(new File("./testFiles/KoSituation.sgf")));
+        game.goToEnd();
+        assertTrue(game.playMove(2, 1));
+        assertFalse(game.playMove(1, 1));
+    }
+
+    @Test
+    void reset() {
 
     }
 

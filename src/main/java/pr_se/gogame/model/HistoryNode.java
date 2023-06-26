@@ -136,7 +136,7 @@ public class HistoryNode {
 
     @Override
     public int hashCode() {
-        return Objects.hash(prev, next, command, comment, saveToken, x, y, color, marks);
+        return Objects.hash(command, comment, saveToken, x, y, color, marks);
     }
 
     @Override

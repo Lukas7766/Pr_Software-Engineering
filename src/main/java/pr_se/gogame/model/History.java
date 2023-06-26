@@ -12,6 +12,9 @@ public class History implements Iterable<HistoryNode> {
     private HistoryNode current;
 
     public History(Game game) {
+        if(game == null) {
+            throw new NullPointerException();
+        }
         this.game = game;
         current = new HistoryNode(null, null, null, ""); // This solely exists so that the first move can be undone without an edge case.
     }
@@ -52,11 +55,18 @@ public class History implements Iterable<HistoryNode> {
     }
 
     public void addNode(HistoryNode addedNode) {
+        if(addedNode == null) {
+            throw new NullPointerException();
+        }
+        if(addedNode == current) {
+            throw new IllegalArgumentException("Cannot add the same node again, as that would create a cycle!");
+        }
+
         current.setNext(addedNode);
         current = current.getNext();
     }
 
-    public String currentComment() {
+    public String getCurrentComment() {
         return current.getComment();
     }
 
@@ -98,7 +108,15 @@ public class History implements Iterable<HistoryNode> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(this);
+        List<Object> valueList = new LinkedList<>();
+
+        for (HistoryNode historyNode : this) {
+            valueList.add(historyNode);
+        }
+
+        valueList.add(game);
+
+        return Objects.hash(valueList.toArray());
     }
 
     // Interface Iterable

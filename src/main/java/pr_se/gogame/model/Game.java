@@ -685,7 +685,7 @@ public class Game implements GameInterface {
 
     @Override
     public String getComment() {
-        return history.currentComment();
+        return history.getCurrentComment();
     }
 
     @Override

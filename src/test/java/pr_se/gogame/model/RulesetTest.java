@@ -128,10 +128,10 @@ class RulesetTest {
     @Test
     @DisplayName("testing setHandicapStones(), wrong input")
     void testSetHandicapStonesWI() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(null, null, 0); });
-        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Game(), null, 0); });
-        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Game(), StoneColor.BLACK, -1); });
-        assertThrowsExactly(IllegalArgumentException.class, () -> { ruleset.setHandicapStones(new Game(), StoneColor.BLACK, 10); });
+        assertThrowsExactly(IllegalArgumentException.class, () -> ruleset.setHandicapStones(null, null, 0));
+        assertThrowsExactly(IllegalArgumentException.class, () -> ruleset.setHandicapStones(new Game(), null, 0));
+        assertThrowsExactly(IllegalArgumentException.class, () -> ruleset.setHandicapStones(new Game(), StoneColor.BLACK, -1));
+        assertThrowsExactly(IllegalArgumentException.class, () -> ruleset.setHandicapStones(new Game(), StoneColor.BLACK, 10));
     }
 
 
@@ -139,5 +139,10 @@ class RulesetTest {
     @DisplayName("testing getKomi(), in default is 7.5")
     void getKomi() {
         assertEquals(7.5, ruleset.getKomi());
+    }
+
+    @Test
+    void reset() {
+        assertDoesNotThrow(() -> ruleset.reset());
     }
 }
