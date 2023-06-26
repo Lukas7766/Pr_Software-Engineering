@@ -155,7 +155,7 @@ public class Game implements GameInterface {
         UndoableCommand c = switchColor();
 
         if(gameState != GameState.SETTING_UP) {
-            history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "")); // StoneColor.getOpposite() because we switched colors before
+            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "")); // StoneColor.getOpposite() because we switched colors before
         }
 
         for (GameEvent e : c.getExecuteEvents()) {
@@ -195,7 +195,7 @@ public class Game implements GameInterface {
         };
         c.execute(true);
 
-        history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.RESIGN, finalCurColor, ""));
+        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.RESIGN, finalCurColor, ""));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -376,7 +376,7 @@ public class Game implements GameInterface {
          * StoneColor.getOpposite() because we previously switched colors
          */
         removeAllMarks();
-        history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), x, y, ""));
+        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), x, y, ""));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -483,7 +483,7 @@ public class Game implements GameInterface {
                 col = StoneColor.getOpposite(curColor);
             }
             removeAllMarks();
-            history.addNode(new HistoryNode(c, HistoryNode.AbstractSaveToken.HANDICAP, col, x, y, ""));
+            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.HANDICAP, col, x, y, ""));
 
             for(GameEvent e : c.getExecuteEvents()) {
                 fireGameEvent(e);
@@ -537,7 +537,7 @@ public class Game implements GameInterface {
          */
         removeAllMarks();
         uc01SetStone.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
-        history.addNode(new HistoryNode(uc01SetStone, HistoryNode.AbstractSaveToken.SETUP, color, x, y, ""));
+        history.addNode(new History.HistoryNode(uc01SetStone, History.HistoryNode.AbstractSaveToken.SETUP, color, x, y, ""));
 
         for(GameEvent e : uc01SetStone.getExecuteEvents()) {
             fireGameEvent(e);
@@ -617,7 +617,7 @@ public class Game implements GameInterface {
         removeAllMarks();
         if(!history.isAtBeginning()) {
             history.stepBack();
-            if((history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP)) {
+            if((history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP)) {
                 history.rewind();
             } else if(!history.isAtBeginning()) {
                 goBeforeFirstMove();
@@ -629,8 +629,8 @@ public class Game implements GameInterface {
     @Override
     public void fastForward() {
         removeAllMarks();
-        HistoryNode n = history.getCurrentNode();
-        if(n.getSaveToken() == null || n.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || n.getSaveToken() == HistoryNode.AbstractSaveToken.SETUP) {
+        History.HistoryNode n = history.getCurrentNode();
+        if(n.getSaveToken() == null || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP) {
             goBeforeFirstMove();
             if(history.getCurrentNode() == n) {
                 history.skipToEnd();
@@ -645,7 +645,7 @@ public class Game implements GameInterface {
     public void goBeforeFirstMove() {
         goToFirstMove();
         removeAllMarks();
-        if(history.getCurrentNode().getSaveToken() != HistoryNode.AbstractSaveToken.SETUP && history.getCurrentNode().getSaveToken() != HistoryNode.AbstractSaveToken.HANDICAP) {
+        if(history.getCurrentNode().getSaveToken() != History.HistoryNode.AbstractSaveToken.SETUP && history.getCurrentNode().getSaveToken() != History.HistoryNode.AbstractSaveToken.HANDICAP) {
             history.stepBack();
         }
         reDisplayMarks();
@@ -658,7 +658,7 @@ public class Game implements GameInterface {
 
         do {
             history.stepForward();
-        } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == HistoryNode.AbstractSaveToken.SETUP));
+        } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP));
         reDisplayMarks();
     }
 

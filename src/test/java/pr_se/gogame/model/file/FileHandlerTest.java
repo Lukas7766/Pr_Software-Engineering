@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.History;
-import pr_se.gogame.model.HistoryNode;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
@@ -301,7 +300,7 @@ class FileHandlerTest {
 
     @Test
     void saveAE() {
-        game.getHistory().addNode(new HistoryNode(new UndoableCommand() {
+        game.getHistory().addNode(new History.HistoryNode(new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
                 return;
@@ -311,7 +310,7 @@ class FileHandlerTest {
             public void undo() {
                 return;
             }
-        }, HistoryNode.AbstractSaveToken.SETUP, null, ""));
+        }, History.HistoryNode.AbstractSaveToken.SETUP, null, ""));
 
         assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
     }

@@ -1,6 +1,6 @@
 package pr_se.gogame.model.file;
 
-import pr_se.gogame.model.HistoryNode;
+import pr_se.gogame.model.History;
 
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
@@ -147,7 +147,7 @@ public enum SGFToken {
         return supportsMultiAttribs;
     }
 
-    public static SGFToken ofHistoryNode(HistoryNode node) {
+    public static SGFToken ofHistoryNode(History.HistoryNode node) {
         switch(node.getSaveToken()) {
             case SETUP, HANDICAP:
                 if(node.getColor() == BLACK) {

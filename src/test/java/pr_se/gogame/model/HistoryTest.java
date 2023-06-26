@@ -90,7 +90,7 @@ class HistoryTest {
 
     @Test
     void getCurrentNode() {
-        HistoryNode first = history.getCurrentNode();
+        History.HistoryNode first = history.getCurrentNode();
         game.playMove(0, 0);
         assertNotEquals(first, history.getCurrentNode());
         history.stepBack();
@@ -165,17 +165,17 @@ class HistoryTest {
         game.playMove(1, 1);
         game.pass();
 
-        Iterator<HistoryNode> iter = game.getHistory().iterator();
+        Iterator<History.HistoryNode> iter = game.getHistory().iterator();
         assertTrue(iter.hasNext());
-        assertEquals(HistoryNode.AbstractSaveToken.HANDICAP, iter.next().getSaveToken());
+        assertEquals(History.HistoryNode.AbstractSaveToken.HANDICAP, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(HistoryNode.AbstractSaveToken.HANDICAP, iter.next().getSaveToken());
+        assertEquals(History.HistoryNode.AbstractSaveToken.HANDICAP, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(HistoryNode.AbstractSaveToken.SETUP, iter.next().getSaveToken());
+        assertEquals(History.HistoryNode.AbstractSaveToken.SETUP, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(HistoryNode.AbstractSaveToken.MOVE, iter.next().getSaveToken());
+        assertEquals(History.HistoryNode.AbstractSaveToken.MOVE, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(HistoryNode.AbstractSaveToken.PASS, iter.next().getSaveToken());
+        assertEquals(History.HistoryNode.AbstractSaveToken.PASS, iter.next().getSaveToken());
 
         assertFalse(iter.hasNext());
         assertThrows(NoSuchElementException.class, iter::next);
@@ -198,10 +198,10 @@ class HistoryTest {
     @Test
     void testToString() {
         assertEquals("History \n", history.toString());
-        HistoryNode firstNode = new HistoryNode(null, HistoryNode.AbstractSaveToken.PASS, BLACK, "foo");
+        History.HistoryNode firstNode = new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.PASS, BLACK, "foo");
         history.addNode(firstNode);
         assertEquals("History \n" + firstNode + "\n", history.toString());
-        HistoryNode secondNode = new HistoryNode(null, HistoryNode.AbstractSaveToken.PASS, WHITE, "bar");
+        History.HistoryNode secondNode = new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.PASS, WHITE, "bar");
         history.addNode(secondNode);
         assertEquals("History \n" + firstNode + "\n" + secondNode + "\n", history.toString());
     }

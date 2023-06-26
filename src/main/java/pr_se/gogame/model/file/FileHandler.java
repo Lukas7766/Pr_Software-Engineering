@@ -34,7 +34,7 @@ public final class FileHandler {
 
         currentFile = file;
 
-        Iterator<HistoryNode> iter = game.getHistory().iterator();
+        Iterator<History.HistoryNode> iter = game.getHistory().iterator();
 
         try (FileWriter output = new FileWriter(file)) {
             // Write file header
@@ -46,14 +46,14 @@ public final class FileHandler {
             output.write( "\n\n");
             output.write(String.format(HA.getValue(), game.getHandicap()));
 
-            HistoryNode node = null;
+            History.HistoryNode node = null;
             if(iter.hasNext()) {
                 node = iter.next();
             }
             SGFToken t;
 
             if(game.getHandicap() > 0) {
-                if(node != null && node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
+                if(node != null && node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP) {
                     t = SGFToken.ofHistoryNode(node);
 
                     if(t == null) {
@@ -72,7 +72,7 @@ public final class FileHandler {
                 }
             }
 
-            if(!iter.hasNext() && (node == null || node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP)) {
+            if(!iter.hasNext() && (node == null || node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP)) {
                 if(node != null) {
                     writeNodeMetaData(output, node);
                 }
@@ -90,16 +90,16 @@ public final class FileHandler {
                     throw new IllegalStateException("Reached end of history while saving!");
                 }
 
-                if(node.getSaveToken() == HistoryNode.AbstractSaveToken.HANDICAP) {
+                if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP) {
                     throw new IOException("Can't save handicap after game has commenced!");
-                } else if(node.getSaveToken() == HistoryNode.AbstractSaveToken.RESIGN) {
+                } else if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.RESIGN) {
                     break;
                 } else {
                     t = SGFToken.ofHistoryNode(node);
                     if (t == AE || t == null) {
                         throw new IllegalStateException(node.getSaveToken() + " with color " + node.getColor() + " not supported!");
                     }
-                    coords = node.getSaveToken() == HistoryNode.AbstractSaveToken.PASS ? "" : getStringFromCoords(node.getX(), node.getY());
+                    coords = node.getSaveToken() == History.HistoryNode.AbstractSaveToken.PASS ? "" : getStringFromCoords(node.getX(), node.getY());
                 }
 
                 output.write("\n" + SEMICOLON.getValue());
@@ -131,7 +131,7 @@ public final class FileHandler {
         return true;
     }
 
-    private static void writeNodeMetaData(FileWriter output, HistoryNode node) throws IOException {
+    private static void writeNodeMetaData(FileWriter output, History.HistoryNode node) throws IOException {
         if(output == null || node == null) {
             throw new NullPointerException();
         }
@@ -153,12 +153,12 @@ public final class FileHandler {
      * @return the first node of a different AbstractSaveToken or color, or the last node in the History.
      * @throws IOException if the FileWriter cannot be written to
      */
-    private static HistoryNode writeAttributeSequence(FileWriter output, Iterator<HistoryNode> iter, HistoryNode parentNode) throws IOException {
+    private static History.HistoryNode writeAttributeSequence(FileWriter output, Iterator<History.HistoryNode> iter, History.HistoryNode parentNode) throws IOException {
         if(output == null || parentNode == null || iter == null) {
             throw new NullPointerException();
         }
 
-        HistoryNode n = parentNode;
+        History.HistoryNode n = parentNode;
 
         do {
             output.write(String.format(LONE_ATTRIBUTE.getValue(), getStringFromCoords(n.getX(), n.getY())));

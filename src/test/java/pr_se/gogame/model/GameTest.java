@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import static pr_se.gogame.model.Game.GameState.RUNNING;
 import static pr_se.gogame.model.Game.GameState.SETTING_UP;
-import static pr_se.gogame.model.HistoryNode.AbstractSaveToken.*;
+import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 import static pr_se.gogame.model.helper.GameCommand.*;
 import static pr_se.gogame.model.helper.StoneColor.*;
 
@@ -579,7 +579,7 @@ class GameTest {
         game.setSetupMode(false);
         game.usePosition(3, 3);
 
-        Iterator<HistoryNode> i = game.getHistory().iterator();
+        Iterator<History.HistoryNode> i = game.getHistory().iterator();
         assertEquals(HANDICAP, i.next().getSaveToken());
         assertEquals(SETUP, i.next().getSaveToken());
         assertEquals(MOVE, i.next().getSaveToken());
