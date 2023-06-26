@@ -1,5 +1,6 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
@@ -33,7 +34,7 @@ public interface GameInterface {
      */
     void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset, boolean letRulesetPlaceHandicapStones);
 
-    boolean loadGame(File file);
+    boolean loadGame(File file) throws LoadingGameException;
 
     boolean saveGame(File file);
 

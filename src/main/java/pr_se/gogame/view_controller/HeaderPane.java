@@ -16,6 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.view_controller.dialog.CustomCloseAction;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 import pr_se.gogame.view_controller.dialog.CustomFileDialog;
@@ -126,7 +127,7 @@ public class HeaderPane extends VBox {
                     if(!game.loadGame(f)) {
                         CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably due to a file system error.");
                     }
-                } catch (RuntimeException exception) {
+                } catch (LoadingGameException exception) {
                         CustomExceptionDialog.show(exception, "Failed to load game!\n\nThis is probably because the file contains unsupported SGF features.");
                 }
             }

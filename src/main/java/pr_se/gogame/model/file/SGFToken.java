@@ -148,25 +148,26 @@ public enum SGFToken {
     }
 
     public static SGFToken ofHistoryNode(History.HistoryNode node) {
-        switch(node.getSaveToken()) {
-            case SETUP, HANDICAP:
-                if(node.getColor() == BLACK) {
+        switch (node.getSaveToken()) {
+            case SETUP, HANDICAP -> {
+                if (node.getColor() == BLACK) {
                     return AB;
-                } else if(node.getColor() == WHITE) {
+                } else if (node.getColor() == WHITE) {
                     return AW;
                 } else {
                     return AE;
                 }
-
-            case MOVE, PASS:
-                if(node.getColor() == BLACK) {
+            }
+            case MOVE, PASS -> {
+                if (node.getColor() == BLACK) {
                     return B;
                 } else {
                     return W;
                 }
-
-            default:
+            }
+            default -> {
                 return null;
+            }
         }
     }
 }

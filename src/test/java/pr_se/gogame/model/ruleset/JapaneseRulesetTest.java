@@ -4,7 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.file.LoadingGameException;
 
 import java.io.File;
 
@@ -158,8 +158,7 @@ class JapaneseRulesetTest {
 
     @Test
     void isKo() {
-        Game game = new Game();
-        assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf")));
+        Game game = loadFile("KoSituation.sgf");
         game.goToEnd();
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
@@ -167,13 +166,25 @@ class JapaneseRulesetTest {
 
     @Test
     void reset() {
-        Game game = new Game();
-        assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf")));
+        Game game = loadFile("KoSituation.sgf");
         game.goToEnd();
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
 
         game.getRuleset().reset();
         assertTrue(game.playMove(1, 1));
+    }
+
+    //helper methods
+    Game loadFile(String fileName) {
+        Game game = new Game();
+        try {
+            assertTrue(game.loadGame(new File(TESTFILE_FOLDER + fileName)));
+        } catch (LoadingGameException e) {
+            e.printStackTrace();
+            fail();
+        }
+
+        return game;
     }
 }

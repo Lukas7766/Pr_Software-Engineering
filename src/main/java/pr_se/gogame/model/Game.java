@@ -1,6 +1,7 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.GameCommand;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.StoneColor;
@@ -135,7 +136,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public boolean loadGame(File file) throws RuntimeException {
+    public boolean loadGame(File file) throws LoadingGameException {
         if(file == null) {
             throw new NullPointerException();
         }
@@ -672,20 +673,11 @@ public class Game implements GameInterface {
     @Override
     public void mark(int x, int y, MarkShape shape) {
         history.getCurrentNode().addMark(x, y, shape);
-        GameCommand gc = null;
-        switch(shape) {
-            case CIRCLE:
-                gc = GameCommand.MARK_CIRCLE;
-                break;
-
-            case SQUARE:
-                gc = GameCommand.MARK_SQUARE;
-                break;
-
-            case TRIANGLE:
-                gc = GameCommand.MARK_TRIANGLE;
-                break;
-        }
+        GameCommand gc = switch (shape) {
+            case CIRCLE -> GameCommand.MARK_CIRCLE;
+            case SQUARE -> GameCommand.MARK_SQUARE;
+            case TRIANGLE -> GameCommand.MARK_TRIANGLE;
+        };
         fireGameEvent(new GameEvent(gc, x, y, curMoveNumber));
     }
 

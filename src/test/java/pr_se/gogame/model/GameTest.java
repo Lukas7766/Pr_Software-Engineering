@@ -3,6 +3,7 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
@@ -134,7 +135,12 @@ class GameTest {
     @Test
     void loadGameArgs() {
         assertThrows(NullPointerException.class, () -> game.loadGame(null));
-        assertFalse(game.loadGame(new File("nonExistentFile")));
+        try {
+            assertFalse(game.loadGame(new File("nonExistentFile")));
+        } catch(LoadingGameException e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 
     @Test
@@ -218,7 +224,12 @@ class GameTest {
     @Test
     void loadGame() {
         saveGame();
-        assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "tmp.sgf")));
+        try {
+            assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "tmp.sgf")));
+        } catch (LoadingGameException e) {
+            e.printStackTrace();
+            fail();
+        }
         game.goToEnd();
         assertEquals(BLACK, game.getColorAt(0, 0));
         assertEquals(WHITE, game.getColorAt(1, 0));
@@ -533,7 +544,12 @@ class GameTest {
     void playMoveKoPrevention() {
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
 
-        game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf"));
+        try {
+            game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf"));
+        } catch (LoadingGameException e) {
+            e.printStackTrace();
+            fail();
+        }
         game.fastForward();
 
         assertTrue(game.playMove(2, 1));

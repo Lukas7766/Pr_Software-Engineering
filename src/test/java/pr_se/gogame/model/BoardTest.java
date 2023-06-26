@@ -1,9 +1,8 @@
 package pr_se.gogame.model;
 
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pr_se.gogame.model.helper.GameCommand;
+import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
@@ -33,10 +32,6 @@ class BoardTest {
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
         board = new Board(game, game.getSize());
         maxCoord = board.getSize() - 1;
-    }
-
-    @AfterEach
-    void tearDown() {
     }
 
     // argument checking
@@ -408,7 +403,12 @@ class BoardTest {
     }
 
     void loadFile(String fileName) {
-        game.loadGame(new File(fileName));
+        try {
+            game.loadGame(new File(fileName));
+        } catch (LoadingGameException e) {
+            e.printStackTrace();
+            fail();
+        }
         game.goToEnd();
 
         board = new Board(game, game.getSize());

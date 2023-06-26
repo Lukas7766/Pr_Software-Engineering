@@ -1,6 +1,8 @@
 package pr_se.gogame.model.file;
 
-public class ScannedToken {
+import java.io.Serializable;
+
+public class ScannedToken implements Serializable {
     private final SGFToken token;
 
     private final String attributeValue;

@@ -211,25 +211,12 @@ public class BoardPane extends GridPane {
                 case UNMARK, MARK_CIRCLE, MARK_SQUARE, MARK_TRIANGLE:
                     destinationPBC = getPlayableCell(e.getX(), e.getY());
 
-                    switch(e.getGameCommand()) {
-                        case UNMARK:
-                            destinationPBC.unMark();
-                            break;
-
-                        case MARK_CIRCLE:
-                            destinationPBC.markCircle();
-                            break;
-
-                        case MARK_SQUARE:
-                            destinationPBC.markSquare();
-                            break;
-
-                        case MARK_TRIANGLE:
-                            destinationPBC.markTriangle();
-                            break;
-
-                        default:
-                            throw new IllegalStateException("Unsupported GameCommand " + e.getGameCommand());
+                    switch (e.getGameCommand()) {
+                        case UNMARK -> destinationPBC.unMark();
+                        case MARK_CIRCLE -> destinationPBC.markCircle();
+                        case MARK_SQUARE -> destinationPBC.markSquare();
+                        case MARK_TRIANGLE -> destinationPBC.markTriangle();
+                        default -> throw new IllegalStateException("Unsupported GameCommand " + e.getGameCommand());
                     }
                     break;
 

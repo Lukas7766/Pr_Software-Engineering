@@ -166,7 +166,7 @@ public final class FileHandler {
         return n;
     }
 
-    public static boolean loadFile(Game game, File file) throws NoSuchFileException, RuntimeException {
+    public static boolean loadFile(Game game, File file) throws NoSuchFileException, LoadingGameException {
         if(file == null) {
             throw new NullPointerException();
         }
@@ -200,25 +200,25 @@ public final class FileHandler {
                 switch (t.getToken()) {
                     case FF:
                         if (Integer.parseInt(t.getAttributeValue()) != 4) {
-                            throw new RuntimeException("Illegal SGF version! Must be 4 but was '" + t.getAttributeValue() + "'");
+                            throw new LoadingGameException("Illegal SGF version! Must be 4 but was '" + t.getAttributeValue() + "'", t);
                         }
                         break;
 
                     case GM:
                         if (Integer.parseInt(t.getAttributeValue()) != 1) {
-                            throw new RuntimeException("SGF file is for wrong game! Must be 1 but is '" + t.getAttributeValue() + "'");
+                            throw new LoadingGameException("SGF file is for wrong game! Must be 1 but is '" + t.getAttributeValue() + "'", t);
                         }
                         break;
 
                     case SZ:
                         size = Integer.parseInt(t.getAttributeValue());
                         if(size < Game.MIN_CUSTOM_BOARD_SIZE || size > Game.MAX_CUSTOM_BOARD_SIZE) {
-                            throw new RuntimeException("Invalid size '" + size + "' in SGF file!");
+                            throw new LoadingGameException("Invalid size '" + size + "' in SGF file!", t);
                         }
                         break;
 
                     case LPAR:
-                        throw new RuntimeException("This program does not support multiple GameTrees!");
+                        throw new LoadingGameException("This program does not support multiple GameTrees!", t);
 
                     case HA, SEMICOLON, RPAR:
                         break loop;
@@ -241,7 +241,7 @@ public final class FileHandler {
             if(t.getToken() == HA) {
                 handicap = Integer.parseInt(t.getAttributeValue());
                 if (handicap < Game.MIN_HANDICAP_AMOUNT || handicap > Game.MAX_HANDICAP_AMOUNT) {
-                    throw new RuntimeException("Invalid handicap amount of " + handicap + "!");
+                    throw new LoadingGameException("Invalid handicap amount of " + handicap + "!", t);
                 }
                 t = scanner.next();
             }
@@ -294,7 +294,7 @@ public final class FileHandler {
 
                         case LONE_ATTRIBUTE:
                             if (addStoneColor == null) {
-                                throw new RuntimeException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol());
+                                throw new LoadingGameException("Stray lone attribute encountered at line " + t.getLine() + ", col " + t.getCol(), t);
                             }
                             decodedCoords = getCoordsFromString(t.getAttributeValue());
                             game.placeSetupStone(decodedCoords.getX(), decodedCoords.getY(), addStoneColor);
@@ -321,10 +321,10 @@ public final class FileHandler {
                             break;
 
                         case LPAR:
-                            throw new RuntimeException("Line " + t.getLine() + ", col " + t.getCol() + ": This SGF file has multiple branches, a feature currently unsupported by this program.");
+                            throw new LoadingGameException("Line " + t.getLine() + ", col " + t.getCol() + ": This SGF file has multiple branches, a feature currently unsupported by this program.", t);
 
                         default:
-                            throw new RuntimeException("Unsupported " + t);
+                            throw new LoadingGameException("Unsupported " + t, t);
                     }
 
                     t = scanner.next();
@@ -346,8 +346,8 @@ public final class FileHandler {
         return true;
     }
 
-    private static void unexpected(String expectedToken, ScannedToken actualToken) throws RuntimeException {
-        throw new RuntimeException("Expected " + expectedToken + " but parsed " + actualToken);
+    private static void unexpected(String expectedToken, ScannedToken actualToken) throws LoadingGameException {
+        throw new LoadingGameException("Expected " + expectedToken + " but parsed " + actualToken, actualToken);
     }
 
     /**

@@ -164,7 +164,7 @@ class FileHandlerTest {
 
         try {
             assertTrue(FileHandler.loadFile(game, myFile));
-        } catch (NoSuchFileException e) {
+        } catch (NoSuchFileException | LoadingGameException e) {
             e.printStackTrace();
             fail();
         }
@@ -174,7 +174,7 @@ class FileHandlerTest {
 
         try {
             FileHandler.loadFile(game, file);
-        } catch (NoSuchFileException e) {
+        } catch (NoSuchFileException | LoadingGameException e) {
             e.printStackTrace();
             fail();
         }
@@ -186,7 +186,7 @@ class FileHandlerTest {
 
         try {
             assertTrue(FileHandler.loadFile(game, myFile));
-        } catch (NoSuchFileException e) {
+        } catch (NoSuchFileException | LoadingGameException e) {
             e.printStackTrace();
             fail();
         }
@@ -398,8 +398,8 @@ class FileHandlerTest {
         } catch(NoSuchFileException e) {
             e.printStackTrace();
             fail();
-        } catch(RuntimeException re) {
-            re.printStackTrace();
+        } catch(LoadingGameException le) {
+            le.printStackTrace();
         }
     }
 
@@ -428,7 +428,7 @@ class FileHandlerTest {
     void assertLoadingWorks() {
         try {
             assertTrue(FileHandler.loadFile(game, file));
-        } catch (NoSuchFileException e) {
+        } catch (NoSuchFileException | LoadingGameException e) {
             fail();
         }
 
