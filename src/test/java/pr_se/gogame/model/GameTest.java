@@ -722,10 +722,39 @@ class GameTest {
     }
 
     @Test
+    void fastForwardFromHandicap() {
+        rewindWithHandicap();
+        assertNull(game.getColorAt(game.getSize() / 2, game.getSize() / 2));
+        game.redo();
+        assertEquals(BLACK, game.getColorAt(game.getSize() / 2, game.getSize() / 2));
+        assertNull(game.getColorAt(3, 3));
+        game.fastForward();
+        assertEquals(BLACK, game.getColorAt(3, 3));
+    }
+
+    @Test
     void fastForwardAtEnd() {
         assertTrue(game.getHistory().isAtEnd());
         game.fastForward();
         assertTrue(game.getHistory().isAtEnd());
+    }
+
+    @Test
+    void goBeforeFirstMove() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        game.setSetupMode(false);
+        game.playMove(5, 5);
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getColorAt(5, 5));
+
+        game.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertNull(game.getColorAt(5, 5));
+
+        game.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertNull(game.getColorAt(5, 5));
     }
 
     // Command pattern
