@@ -653,6 +653,32 @@ class GameTest {
     }
 
     @Test
+    void setSetupMode() {
+        game.setSetupMode(true);
+        assertTrue(game.isSetupMode());
+    }
+
+    @Test
+    void setSetupModeWhileHandicapActive() {
+        game.setHandicapStoneCounter(9);
+        assertFalse(game.isSetupMode());
+        game.setSetupMode(true);
+        assertFalse(game.isSetupMode());
+        game.placeHandicapPosition(0, 0, true);
+        assertFalse(game.isSetupMode());
+        game.setSetupMode(true);
+        assertFalse(game.isSetupMode());
+    }
+
+    @Test
+    void setSetupModeAfterResigning() {
+        assertFalse(game.isSetupMode());
+        game.resign();
+        game.setSetupMode(true);
+        assertFalse(game.isSetupMode());
+    }
+
+    @Test
     void rewind() {
         game.playMove(0, 0);
         assertFalse(game.getHistory().isAtBeginning());
@@ -755,6 +781,33 @@ class GameTest {
         game.goBeforeFirstMove();
         assertEquals(BLACK, game.getColorAt(0, 0));
         assertNull(game.getColorAt(5, 5));
+    }
+
+    @Test
+    void goBeforeFirstMoveWithoutMoves() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        game.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+    }
+
+    @Test
+    void goToFirstMove() {
+        game.playMove(1, 1);
+        game.playMove(2, 2);
+        game.goToFirstMove();
+        assertNull(game.getColorAt(2, 2));
+        assertEquals(BLACK, game.getColorAt(1, 1));
+    }
+
+    @Test
+    void goToFirstMoveWithoutMoves() {
+        game.setSetupMode(true);
+        game.placeSetupStone(1, 1, BLACK);
+        game.placeSetupStone(2, 2, WHITE);
+        game.goToFirstMove();
+        assertEquals(BLACK, game.getColorAt(1, 1));
+        assertEquals(WHITE, game.getColorAt(2, 2));
     }
 
     // Command pattern
