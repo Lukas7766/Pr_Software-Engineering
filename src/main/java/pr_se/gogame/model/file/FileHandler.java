@@ -82,7 +82,7 @@ public final class FileHandler {
             String coords;
 
             // Write game contents
-            for (;;) {
+            while(node.getSaveToken() != History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
 
                 if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.RESIGN) {
                     node = iter.next();
@@ -91,8 +91,6 @@ public final class FileHandler {
                     } else {
                         throw new IllegalStateException("Game can't continue after resigning!");
                     }
-                } else if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
-                    break;
                 }
 
                 if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP) {
@@ -130,10 +128,6 @@ public final class FileHandler {
     }
 
     private static String getNodeMetaDataString(History.HistoryNode node) {
-        if(node == null) {
-            throw new NullPointerException();
-        }
-
         StringBuilder sb = new StringBuilder();
 
         for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
@@ -156,10 +150,6 @@ public final class FileHandler {
      * @throws IOException if the FileWriter cannot be written to
      */
     private static History.HistoryNode writeAttributeSequence(FileWriter output, Iterator<History.HistoryNode> iter, History.HistoryNode parentNode) throws IOException {
-        if(output == null || parentNode == null || iter == null) {
-            throw new NullPointerException();
-        }
-
         History.HistoryNode n = parentNode;
 
         do {

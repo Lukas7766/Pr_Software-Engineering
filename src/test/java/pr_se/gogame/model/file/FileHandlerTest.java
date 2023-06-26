@@ -318,15 +318,22 @@ class FileHandlerTest {
         game.getHistory().addNode(new History.HistoryNode(new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                return;
+
             }
 
             @Override
             public void undo() {
-                return;
+
             }
         }, History.HistoryNode.AbstractSaveToken.SETUP, null, ""));
 
+        assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
+    }
+
+    @Test
+    void playAfterResign() {
+        game.resign();
+        game.getHistory().addNode(new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.MOVE, BLACK, ""));
         assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
     }
 
