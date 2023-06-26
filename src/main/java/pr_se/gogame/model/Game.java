@@ -376,7 +376,7 @@ public class Game implements GameInterface {
          * StoneColor.getOpposite() because we previously switched colors
          */
         removeAllMarks();
-        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), x, y, ""));
+        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), "", x, y));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -483,7 +483,7 @@ public class Game implements GameInterface {
                 col = StoneColor.getOpposite(curColor);
             }
             removeAllMarks();
-            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.HANDICAP, col, x, y, ""));
+            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.HANDICAP, col, "", x, y));
 
             for(GameEvent e : c.getExecuteEvents()) {
                 fireGameEvent(e);
@@ -537,7 +537,7 @@ public class Game implements GameInterface {
          */
         removeAllMarks();
         uc01SetStone.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
-        history.addNode(new History.HistoryNode(uc01SetStone, History.HistoryNode.AbstractSaveToken.SETUP, color, x, y, ""));
+        history.addNode(new History.HistoryNode(uc01SetStone, History.HistoryNode.AbstractSaveToken.SETUP, color, "", x, y));
 
         for(GameEvent e : uc01SetStone.getExecuteEvents()) {
             fireGameEvent(e);

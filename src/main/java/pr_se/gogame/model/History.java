@@ -73,10 +73,6 @@ public class History implements Iterable<History.HistoryNode> {
         current.setNext(TERMINATOR);
     }
 
-    public String getCurrentComment() {
-        return current.getComment();
-    }
-
     public HistoryNode getCurrentNode() {
         return current;
     }
@@ -102,9 +98,6 @@ public class History implements Iterable<History.HistoryNode> {
 
         Iterator<HistoryNode> otherIter = h.iterator();
         for(HistoryNode hn : this) {
-            if(!otherIter.hasNext()) {
-                return false;
-            }
             if(!hn.equals(otherIter.next())) {
                 return false;
             }
@@ -227,7 +220,7 @@ public class History implements Iterable<History.HistoryNode> {
             this.y = -1;
         }
 
-        public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, int x, int y, String comment) {
+        public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, String comment, int x, int y) {
             this.command = command;
             setComment(comment);
             this.saveToken = saveToken;

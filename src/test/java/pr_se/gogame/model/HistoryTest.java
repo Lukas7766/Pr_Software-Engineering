@@ -2,6 +2,8 @@ package pr_se.gogame.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.model.helper.MarkShape;
+import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.util.HashSet;
@@ -9,6 +11,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
@@ -167,17 +170,17 @@ class HistoryTest {
 
         Iterator<History.HistoryNode> iter = game.getHistory().iterator();
         assertTrue(iter.hasNext());
-        assertEquals(History.HistoryNode.AbstractSaveToken.HANDICAP, iter.next().getSaveToken());
+        assertEquals(HANDICAP, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(History.HistoryNode.AbstractSaveToken.HANDICAP, iter.next().getSaveToken());
+        assertEquals(HANDICAP, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(History.HistoryNode.AbstractSaveToken.SETUP, iter.next().getSaveToken());
+        assertEquals(SETUP, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(History.HistoryNode.AbstractSaveToken.MOVE, iter.next().getSaveToken());
+        assertEquals(MOVE, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(History.HistoryNode.AbstractSaveToken.PASS, iter.next().getSaveToken());
+        assertEquals(PASS, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
-        assertEquals(History.HistoryNode.AbstractSaveToken.END_OF_HISTORY, iter.next().getSaveToken());
+        assertEquals(END_OF_HISTORY, iter.next().getSaveToken());
 
         assertFalse(iter.hasNext());
         assertThrows(NoSuchElementException.class, iter::next);
@@ -190,7 +193,7 @@ class HistoryTest {
         game.playMove(1, 1);
         game.setComment("foo");
         history.forEach(n -> {
-            if(n.getSaveToken() != History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
+            if(n.getSaveToken() != END_OF_HISTORY) {
                 assertEquals("foo", n.getComment());
             } else {
                 assertEquals("", n.getComment());
@@ -210,11 +213,82 @@ class HistoryTest {
             lastNode = h;
         }
         assertEquals("History \n" + lastNode + "\n", history.toString());
-        History.HistoryNode firstNode = new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.PASS, BLACK, "foo");
+        History.HistoryNode firstNode = new History.HistoryNode(null, PASS, BLACK, "foo");
         history.addNode(firstNode);
         assertEquals("History \n" + firstNode + "\n" + lastNode + "\n", history.toString());
-        History.HistoryNode secondNode = new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.PASS, WHITE, "bar");
+        History.HistoryNode secondNode = new History.HistoryNode(null, PASS, WHITE, "bar");
         history.addNode(secondNode);
         assertEquals("History \n" + firstNode + "\n" + secondNode + "\n" + lastNode + "\n", history.toString());
+    }
+
+    @Test
+    void HistoryNodeSetCommentArgs() {
+        assertThrows(NullPointerException.class, () -> history.getCurrentNode().setComment(null));
+    }
+
+    @Test
+    void HistoryNodeSetComment() {
+        history.getCurrentNode().setComment("foo");
+        assertEquals("foo", history.getCurrentNode().getComment());
+        history.getCurrentNode().setComment("bar");
+        assertEquals("bar", history.getCurrentNode().getComment());
+    }
+
+    @Test
+    void HistoryNodeGetters() {
+        game.playMove(3, 5);
+        game.setComment("Test");
+
+        assertEquals(3, history.getCurrentNode().getX());
+        assertEquals(5, history.getCurrentNode().getY());
+        assertEquals("Test", history.getCurrentNode().getComment());
+        assertEquals(MOVE, history.getCurrentNode().getSaveToken());
+        assertEquals(BLACK, history.getCurrentNode().getColor());
+        assertNotNull(history.getCurrentNode().getCommand());
+    }
+
+    @Test
+    void HistoryNodeAddMark() {
+        History.HistoryNode n = history.getCurrentNode();
+        n.addMark(0, 0, MarkShape.CIRCLE);
+        assertEquals(1, n.getMarks().size());
+        assertEquals(MarkShape.CIRCLE, n.getMarks().get(new Position(0, 0)));
+    }
+
+    @Test
+    void HistoryNodeRemoveMark() {
+        HistoryNodeAddMark();
+        History.HistoryNode n = history.getCurrentNode();
+        n.removeMark(0, 0);
+        assertEquals(0, n.getMarks().size());
+        assertNull(n.getMarks().get(new Position(0, 0)));
+    }
+
+    @Test
+    void HistoryNodeEquals() {
+        game.playMove(0, 0);
+
+        assertEquals(history.getCurrentNode(), history.getCurrentNode());
+        assertNotEquals(history.getCurrentNode(), null);
+        assertNotEquals(history.getCurrentNode(), new Object());
+
+        History.HistoryNode other = new History.HistoryNode(history.getCurrentNode().getCommand(), history.getCurrentNode().getSaveToken(), history.getCurrentNode().getColor(), "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
+        assertEquals(history.getCurrentNode(), other);
+        other = new History.HistoryNode(null, history.getCurrentNode().getSaveToken(), history.getCurrentNode().getColor(), "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
+        assertEquals(history.getCurrentNode(), other); // The command shouldn't actually be compared, as too much could differ in semantically identical commands).
+
+        other = new History.HistoryNode(history.getCurrentNode().getCommand(), null, history.getCurrentNode().getColor(), "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
+        assertNotEquals(history.getCurrentNode(), other);
+        other = new History.HistoryNode(history.getCurrentNode().getCommand(), history.getCurrentNode().getSaveToken(), null, "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
+        assertNotEquals(history.getCurrentNode(), other);
+        other = new History.HistoryNode(history.getCurrentNode().getCommand(), history.getCurrentNode().getSaveToken(), history.getCurrentNode().getColor(), "foo", history.getCurrentNode().getX(), history.getCurrentNode().getY());
+        assertNotEquals(history.getCurrentNode(), other);
+        other = new History.HistoryNode(history.getCurrentNode().getCommand(), history.getCurrentNode().getSaveToken(), history.getCurrentNode().getColor(), "", -1, history.getCurrentNode().getY());
+        assertNotEquals(history.getCurrentNode(), other);
+        other = new History.HistoryNode(history.getCurrentNode().getCommand(), history.getCurrentNode().getSaveToken(), history.getCurrentNode().getColor(), "", history.getCurrentNode().getX(), -1);
+        assertNotEquals(history.getCurrentNode(), other);
+        other = new History.HistoryNode(history.getCurrentNode().getCommand(), history.getCurrentNode().getSaveToken(), history.getCurrentNode().getColor(), "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
+        other.addMark(0, 0, MarkShape.TRIANGLE);
+        assertNotEquals(history.getCurrentNode(), other);
     }
 }
