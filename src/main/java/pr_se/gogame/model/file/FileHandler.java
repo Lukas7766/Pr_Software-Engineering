@@ -164,11 +164,7 @@ public final class FileHandler {
 
         do {
             output.write(String.format(LONE_ATTRIBUTE.getValue(), getStringFromCoords(n.getX(), n.getY())));
-            if(iter.hasNext()) {
-                n = iter.next();
-            } else {
-                break;
-            }
+            n = iter.next();
         } while(n.getSaveToken() == parentNode.getSaveToken() && n.getColor() == parentNode.getColor());
 
         return n;

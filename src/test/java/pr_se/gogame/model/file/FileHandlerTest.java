@@ -241,6 +241,22 @@ class FileHandlerTest {
         comprehensiveTest();
     }
 
+    @Test
+    void blackSetup() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+
+        comprehensiveTest();
+    }
+
+    @Test
+    void whiteSetup() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, WHITE);
+
+        comprehensiveTest();
+    }
+
     // Invalid configurations
     @Test
     void nonExistentFile() {
