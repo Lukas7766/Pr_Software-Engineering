@@ -3,15 +3,8 @@ package pr_se.gogame.view_controller.dialog;
 import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.file.FileHandler;
-
-import java.io.File;
-import java.io.IOException;
-import java.util.Optional;
 
 public final class CustomCloseAction {
 
@@ -41,39 +34,23 @@ public final class CustomCloseAction {
         alert.setContentText("Choose your option:");
         alert.initOwner(stage);
 
-        ButtonType noSaveBtn = new ButtonType("no");
-        ButtonType saveBtn = new ButtonType("yes");
-        ButtonType cancelBtn = new ButtonType("cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
-
-        alert.getButtonTypes().setAll(saveBtn, noSaveBtn, cancelBtn);
-
-        Optional<ButtonType> btnResult = alert.showAndWait();
-
-        btnResult.ifPresent(er -> {
-            switch (er.getText()) {
-                case "no" -> Platform.exit();
-                case "yes" -> {
-                    File f = FileHandler.getCurrentFile();
-                    if(f == null){
-                        f = CustomFileDialog.getFile(stage,true);
-                        if(f == null) {
-                            return;
-                        }
-                    }
-
-                    if (game.saveGame(f)) {
-                        Platform.exit();
-                        System.exit(0);
-                    }
-
-                    CustomExceptionDialog.show(new IOException(), "Could not save the game!");
-                    if (e != null) e.consume();
+        CustomSaveAction.onSaveAction(
+            stage,
+            alert,
+            game,
+            () -> {
+                if(e != null) {
+                    e.consume();
                 }
-                case "cancel" ->  {if (e != null) e.consume();}
-                default -> {
-                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
+
+                Platform.exit();
+            },
+            Platform::exit,
+            () -> {
+                if(e != null) {
+                    e.consume();
                 }
             }
-        });
+        );
     }
 }

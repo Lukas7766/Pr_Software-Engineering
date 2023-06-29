@@ -7,6 +7,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.view_controller.dialog.CustomCloseAction;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 
 import java.io.File;
@@ -74,6 +75,8 @@ public class GoApplication extends Application {
         root.setTop(hp);
         SidePane sp = new SidePane(Color.LIGHTGRAY, stage, game);
         root.setLeft(sp);
+
+        stage.setOnCloseRequest(e -> CustomCloseAction.onCloseAction(stage, game, e));
 
         /*
          * If this is active, dragging onto the playable area of the board is possible from anywhere within the window,

@@ -90,8 +90,6 @@ public class HeaderPane extends VBox {
 
         this.getChildren().add(menuBar);
         this.getChildren().add(shortMenu());
-
-        stage.setOnCloseRequest(e -> CustomCloseAction.onCloseAction(stage, game, e));
     }
 
     /**
