@@ -191,7 +191,7 @@ class FileHandlerTest {
     @Test
     void whiteHandicap() {
         handicap = 2;
-        game.newGame(WHITE, 19, handicap, new JapaneseRuleset());
+        game.newGame(WHITE, size, handicap, new JapaneseRuleset());
         oldHistory = game.getHistory();
 
         comprehensiveTest();
