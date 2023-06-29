@@ -83,7 +83,7 @@ public class JapaneseRuleset implements Ruleset {
             throw new NullPointerException();
         }
 
-        double komi = game.getKomi();
+        double komi = getKomi();
         double handicap = game.getHandicap();
 
         int capturedStonesBlack = game.getStonesCapturedBy(StoneColor.BLACK);
