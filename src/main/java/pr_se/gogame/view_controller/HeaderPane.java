@@ -112,7 +112,7 @@ public class HeaderPane extends VBox {
             if (game.getGameState() == Game.GameState.NOT_STARTED_YET) {
                 return;
             }
-            CustomNewGameAction.onSaveAction(stage, game);
+            CustomNewGameAction.onNewGameAction(stage, game);
         });
 
         MenuItem importFileItem = new MenuItem("L_oad Game");

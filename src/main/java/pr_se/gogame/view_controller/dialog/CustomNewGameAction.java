@@ -19,7 +19,7 @@ public final class CustomNewGameAction {
      * @param stage pass stage
      * @param game pass game
      */
-    public static void onSaveAction(Stage stage, Game game) {
+    public static void onNewGameAction(Stage stage, Game game) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Go Game - Save Game");
         alert.setHeaderText("Do you want to save your game before starting a new one?");
