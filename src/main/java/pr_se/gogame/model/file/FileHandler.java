@@ -50,7 +50,7 @@ public final class FileHandler {
 
             /*
              * NOTE: The reason why iter.hasNext() is never checked here is that History is guaranteed to always have at
-             * least its starting and terminating node
+             * least its starting and terminating node.
              */
 
             // Get first node in history and save its metadata
