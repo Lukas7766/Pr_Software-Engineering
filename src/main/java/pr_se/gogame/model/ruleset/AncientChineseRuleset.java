@@ -69,13 +69,13 @@ public class AncientChineseRuleset implements Ruleset {
     @Override
     public boolean setHandicapStones(Game game, StoneColor beginner , int noStones) {
         if (game == null) {
-            throw new IllegalArgumentException("board must not be null");
+            throw new NullPointerException("game must not be null");
         }
         if (beginner == null) {
-            throw new IllegalArgumentException("beginner must not be null");
+            throw new NullPointerException("beginner must not be null");
         }
-        if (noStones < 0 || noStones > 9){
-            throw new IllegalArgumentException("noStones must be between 0 and 9");
+        if (noStones < Game.MIN_HANDICAP_AMOUNT || noStones > Game.MAX_HANDICAP_AMOUNT){
+            throw new IllegalArgumentException("noStones must be between " + Game.MIN_HANDICAP_AMOUNT + " and " + Game.MAX_HANDICAP_AMOUNT);
         }
 
         final int size = game.getSize();
