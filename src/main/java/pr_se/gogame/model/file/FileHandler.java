@@ -143,7 +143,13 @@ public final class FileHandler {
         StringBuilder sb = new StringBuilder();
 
         for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
-            sb.append(String.format(e.getValue().getSgfToken().getValue(), getStringFromCoords(e.getKey().getX(), e.getKey().getY())));
+            SGFToken t = switch (e.getValue()) {
+                case CIRCLE -> CR;
+                case SQUARE -> SQ;
+                case TRIANGLE -> TR;
+            };
+
+            sb.append(String.format(t.getValue(), getStringFromCoords(e.getKey().getX(), e.getKey().getY())));
         }
 
         if (!node.getComment().equals("")) {
@@ -317,6 +323,16 @@ public final class FileHandler {
                         case CR:
                             decodedCoords = getCoordsFromString(t.getAttributeValue());
                             marks.put(new Position(decodedCoords.getX(), decodedCoords.getY()), MarkShape.CIRCLE);
+                            break;
+
+                        case SQ:
+                            decodedCoords = getCoordsFromString(t.getAttributeValue());
+                            marks.put(new Position(decodedCoords.getX(), decodedCoords.getY()), MarkShape.SQUARE);
+                            break;
+
+                        case TR:
+                            decodedCoords = getCoordsFromString(t.getAttributeValue());
+                            marks.put(new Position(decodedCoords.getX(), decodedCoords.getY()), MarkShape.TRIANGLE);
                             break;
 
                         case LPAR:

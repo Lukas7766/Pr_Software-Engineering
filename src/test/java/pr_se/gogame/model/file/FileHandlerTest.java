@@ -404,6 +404,8 @@ class FileHandlerTest {
     void addCommentAndMarks() {
         game.setComment("Good Luck!");
         game.mark(0, 0, MarkShape.CIRCLE);
+        game.mark(1, 1, MarkShape.SQUARE);
+        game.mark(2, 2, MarkShape.TRIANGLE);
 
         assertSavingAndLoadingWorks();
     }
