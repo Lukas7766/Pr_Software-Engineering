@@ -264,10 +264,10 @@ public final class FileHandler {
 
                         t = scanner.next();
                     } while (t.getToken() == LONE_ATTRIBUTE);
-                } else if(handicap > 1) {
-                    unexpected(AB.getValue() + " or " + AW.getValue(), t);
-                } else {
+                } else if(handicap == 1) {
                     game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
+                } else {
+                    unexpected(AB.getValue() + " or " + AW.getValue(), t);
                 }
             } else {
                 game.newGame(BLACK, size, handicap, new JapaneseRuleset(), false); // This is to ensure that default handicap positions are still displayed, without stones being set yet.
