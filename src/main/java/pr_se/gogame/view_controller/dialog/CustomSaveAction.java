@@ -12,6 +12,10 @@ import java.io.IOException;
 import java.util.Optional;
 
 public class CustomSaveAction {
+    private CustomSaveAction() {
+        // This private constructor solely exists to prevent instantiation.
+    }
+
     public static void onSaveAction(Stage stage, Alert alert, Game game, Procedure onYes, Procedure onNo, Procedure onCancel) {
         ButtonType noBtn = new ButtonType("no");
         ButtonType saveBtn = new ButtonType("yes");
