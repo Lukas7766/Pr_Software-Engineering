@@ -381,7 +381,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void placeHandicapPosition(int x, int y, boolean placeStone, StoneColor color) {
+    public void placeHandicapPosition(int x, int y, boolean placeStone, final StoneColor color) {
         if(gameState != GameState.SETTING_UP) {
             throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
         }
@@ -400,8 +400,6 @@ public class Game implements GameInterface {
             final int oldHandicapCtr = handicapStoneCounter;
             handicapStoneCounter--;
             final int newHandicapCtr = handicapStoneCounter;
-
-            final UndoableCommand uc01SetColor = setCurColor(color);
 
             final UndoableCommand uc02SetStone = board.setStone(x, y, color, true); // uc02SetStone is already executed within board.setStone().
 
@@ -445,7 +443,6 @@ public class Game implements GameInterface {
             UndoableCommand c = new UndoableCommand() {
                 @Override
                 public void execute(boolean saveEffects) {
-                    uc01SetColor.execute(saveEffects);
                     uc02SetStone.execute(saveEffects);
                     uc03UpdateCounter.execute(saveEffects);
                 }
@@ -454,26 +451,19 @@ public class Game implements GameInterface {
                 public void undo() {
                     uc03UpdateCounter.undo();
                     uc02SetStone.undo();
-                    uc01SetColor.undo();
                 }
             };
             // c was already executed piecemeal
-            c.getExecuteEvents().addAll(uc01SetColor.getExecuteEvents());
             c.getExecuteEvents().addAll(uc02SetStone.getExecuteEvents());
             c.getExecuteEvents().addAll(uc03UpdateCounter.getExecuteEvents());
-            c.getUndoEvents().addAll(uc01SetColor.getUndoEvents());
             c.getUndoEvents().addAll(uc02SetStone.getUndoEvents());
             c.getUndoEvents().addAll(uc03UpdateCounter.getUndoEvents());
 
             /*
              * StoneColor.getOpposite() because we previously switched colors
              */
-            StoneColor col = curColor;
-            if(newHandicapCtr <= 0) {
-                col = StoneColor.getOpposite(curColor);
-            }
             removeAllMarks();
-            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.HANDICAP, col, "", x, y));
+            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.HANDICAP, color, "", x, y));
 
             for(GameEvent e : c.getExecuteEvents()) {
                 fireGameEvent(e);

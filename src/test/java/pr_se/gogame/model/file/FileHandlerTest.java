@@ -198,6 +198,17 @@ class FileHandlerTest {
     }
 
     @Test
+    void whiteHandicapExtended() {
+        whiteHandicap();
+        game.getHistory().rewind();
+        assertEquals(WHITE, game.getCurColor());
+        game.redo();
+        assertEquals(WHITE, game.getCurColor());
+        game.redo();
+        assertEquals(BLACK, game.getCurColor());
+    }
+
+    @Test
     void resignAfterGame() {
         game.playMove(1, 1);
         game.resign();
