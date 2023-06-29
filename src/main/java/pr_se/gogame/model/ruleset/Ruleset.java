@@ -61,8 +61,8 @@ public interface Ruleset {
         if (beginner == null) {
             throw new NullPointerException("beginner must not be null");
         }
-        if (noStones < game.MIN_HANDICAP_AMOUNT || noStones > game.MAX_HANDICAP_AMOUNT){
-            throw new IllegalArgumentException("noStones must be between " + game.MIN_HANDICAP_AMOUNT + " and " + game.MAX_HANDICAP_AMOUNT);
+        if (noStones < Game.MIN_HANDICAP_AMOUNT || noStones > Game.MAX_HANDICAP_AMOUNT){
+            throw new IllegalArgumentException("noStones must be between " + Game.MIN_HANDICAP_AMOUNT + " and " + Game.MAX_HANDICAP_AMOUNT);
         }
 
         final int size = game.getSize();
