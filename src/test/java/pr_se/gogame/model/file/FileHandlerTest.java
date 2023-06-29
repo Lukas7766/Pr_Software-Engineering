@@ -272,8 +272,7 @@ class FileHandlerTest {
     @Test
     void handicapAfterGameBegun() {
         game.playMove(0, 0);
-        game.setHandicapStoneCounter(1);
-        game.placeHandicapPosition(1, 0, true);
+        game.getHistory().addNode(new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.HANDICAP, null, ""));
         assertFalse(FileHandler.saveFile(game, file));
     }
 
@@ -281,7 +280,7 @@ class FileHandlerTest {
     void saveHandicapButNoStones() {
         game.newGame(BLACK, 19, 2, new JapaneseRuleset(), false);
         assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
-        game.playMove(0, 0); // This is permitted by game in case of a handicap of one.
+        game.getHistory().addNode(new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.MOVE, null, ""));
         assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
     }
 

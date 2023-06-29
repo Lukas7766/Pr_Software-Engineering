@@ -34,9 +34,11 @@ public class NewZealandRuleset implements Ruleset {
     /**
      * The New Zealand Ruleset allows for free placement of handicap stones.
      * See <a href="https://en.wikipedia.org/wiki/Handicapping_in_Go#Free_placement">...</a>
+     *
+     * @return false, as this ruleset has manual handicap placement
      */
     @Override
-    public void setHandicapStones(Game game, StoneColor beginner, int noStones) {
+    public boolean setHandicapStones(Game game, StoneColor beginner, int noStones) {
         if(game == null || beginner == null) {
             throw new NullPointerException();
         }
@@ -45,6 +47,6 @@ public class NewZealandRuleset implements Ruleset {
             throw new IllegalArgumentException();
         }
 
-        game.setHandicapStoneCounter(noStones);
+        return false;
     }
 }

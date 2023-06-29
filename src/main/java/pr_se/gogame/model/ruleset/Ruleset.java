@@ -45,29 +45,28 @@ public interface Ruleset {
      * Places custom handicap stones according to the ruleset, either by calling the Game.setHandicapStone method
      * for automatic placement, or by setting the handicap stone counter of Game for manual placement.
      *
-     * @param game The game that these handicap stones are to be set for.
+     * @param game     The game that these handicap stones are to be set for.
      * @param noStones The number of handicap stones to be placed
+     * @return true if the ruleset has automatic handicap placement, false if it has manual placement.
      */
-    default void setHandicapStones(Game game, StoneColor beginner, int noStones) {
+    default boolean setHandicapStones(Game game, StoneColor beginner, int noStones) {
         /*
          * This is a default implementation, the ancient Chinese ruleset has a different placement for 3, and the
          *  New-Zealand-Ruleset, among others, permits free placement of handicap stones. Thus, a ruleset may override
          *  this.
          */
         if (game == null) {
-            throw new IllegalArgumentException("board must not be null");
+            throw new NullPointerException("game must not be null");
         }
         if (beginner == null) {
-            throw new IllegalArgumentException("beginner must not be null");
+            throw new NullPointerException("beginner must not be null");
         }
-        if (noStones < 0 || noStones > 9){
-            throw new IllegalArgumentException("noStones must be between 0 and 9");
+        if (noStones < game.MIN_HANDICAP_AMOUNT || noStones > game.MAX_HANDICAP_AMOUNT){
+            throw new IllegalArgumentException("noStones must be between " + game.MIN_HANDICAP_AMOUNT + " and " + game.MAX_HANDICAP_AMOUNT);
         }
 
         final int size = game.getSize();
         final int distFromEdge = 2 + size / 10;
-
-        game.setHandicapStoneCounter(9);
 
         boolean centerSet = false;
 
@@ -97,6 +96,8 @@ public interface Ruleset {
         if(noStones == 3) noStones--;
         game.placeHandicapPosition(size - 1 - distFromEdge, distFromEdge, noStones == 2);
         game.placeHandicapPosition(distFromEdge, size - 1 - distFromEdge, noStones == 2);
+
+        return true;
     }
 
     /**

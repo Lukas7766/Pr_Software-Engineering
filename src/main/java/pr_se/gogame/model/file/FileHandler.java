@@ -253,7 +253,6 @@ public final class FileHandler {
 
                 if(t.getToken() == AB || t.getToken() == AW) {
                     handicapColor = correspondingColors.get(t.getToken());
-                    game.setHandicapStoneCounter(handicap);
                     do {
                         decodedCoords = getCoordsFromString(t.getAttributeValue());
                         game.placeHandicapPosition(decodedCoords.getX(), decodedCoords.getY(), true, handicapColor);

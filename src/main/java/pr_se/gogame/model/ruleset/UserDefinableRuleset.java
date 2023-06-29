@@ -83,11 +83,13 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public void setHandicapStones(Game game, StoneColor beginner, int noStones) {
+    public boolean setHandicapStones(Game game, StoneColor beginner, int noStones) {
         if(!hasDefaultHandicap) {
             handicapStoneSetter.accept(game, noStones);
         } else {
             Ruleset.super.setHandicapStones(game, beginner, noStones);
         }
+
+        return hasDefaultHandicap;
     }
 }

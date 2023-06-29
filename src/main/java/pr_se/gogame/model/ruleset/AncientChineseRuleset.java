@@ -67,7 +67,7 @@ public class AncientChineseRuleset implements Ruleset {
     }
 
     @Override
-    public void setHandicapStones(Game game, StoneColor beginner , int noStones) {
+    public boolean setHandicapStones(Game game, StoneColor beginner , int noStones) {
         if (game == null) {
             throw new IllegalArgumentException("board must not be null");
         }
@@ -80,8 +80,6 @@ public class AncientChineseRuleset implements Ruleset {
 
         final int size = game.getSize();
         final int distFromEdge = 2 + size / 10;
-
-        game.setHandicapStoneCounter(9);
 
         boolean centerSet = false;
 
@@ -111,6 +109,8 @@ public class AncientChineseRuleset implements Ruleset {
         if(noStones == 3) noStones--;
         game.placeHandicapPosition(size - 1 - distFromEdge, distFromEdge, noStones == 2);
         game.placeHandicapPosition(distFromEdge, size - 1 - distFromEdge, noStones == 2);
+
+        return true;
     }
 
 }

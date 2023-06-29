@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
-import pr_se.gogame.model.ruleset.GameResult;
-import pr_se.gogame.model.ruleset.JapaneseRuleset;
-import pr_se.gogame.model.ruleset.Ruleset;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -129,8 +126,8 @@ class RulesetTest {
     @Test
     @DisplayName("testing setHandicapStones(), wrong input")
     void testSetHandicapStonesWI() {
-        assertThrowsExactly(IllegalArgumentException.class, () -> ruleset.setHandicapStones(null, null, 0));
-        assertThrowsExactly(IllegalArgumentException.class, () -> ruleset.setHandicapStones(new Game(), null, 0));
+        assertThrowsExactly(NullPointerException.class, () -> ruleset.setHandicapStones(null, null, 0));
+        assertThrowsExactly(NullPointerException.class, () -> ruleset.setHandicapStones(new Game(), null, 0));
         assertThrowsExactly(IllegalArgumentException.class, () -> ruleset.setHandicapStones(new Game(), StoneColor.BLACK, -1));
         assertThrowsExactly(IllegalArgumentException.class, () -> ruleset.setHandicapStones(new Game(), StoneColor.BLACK, 10));
     }

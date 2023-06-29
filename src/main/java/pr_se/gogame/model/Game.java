@@ -50,7 +50,7 @@ public class Game implements GameInterface {
     private Board board;
     private int curMoveNumber;
     private StoneColor curColor;
-    private int handicapStoneCounter = 0;
+    private int handicapStoneCounter;
     private double playerBlackScore;
     private int blackCapturedStones;
 
@@ -116,15 +116,22 @@ public class Game implements GameInterface {
         if(letRulesetPlaceHandicapStones) {
             tempHandicap = this.handicap;
         }
-        this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
 
-        this.curMoveNumber = 1;
+        this.handicapStoneCounter = this.handicap;
 
-        if(handicapStoneCounter <= 0) {
+        if(!letRulesetPlaceHandicapStones) {
+            gameState = GameState.SETTING_UP;
+        }
+
+        boolean ruleSetHasAutoPlacement = this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
+
+        if(handicapStoneCounter <= 1 && ruleSetHasAutoPlacement) {
             gameState = GameState.RUNNING;
         } else {
             gameState = GameState.SETTING_UP;
         }
+
+        this.curMoveNumber = 1;
     }
 
     @Override
@@ -242,24 +249,6 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
         listeners.remove(l);
-    }
-
-    /*
-     * Although this method changes the state, it is only called at the beginning of the game and, hence, doesn't
-     * appear to need to be undoable.
-     */
-    @Override
-    public void setHandicapStoneCounter(int noStones) {
-        /*
-         * A value greater than the actual handicap is allowed, as this counter is not only used for setting stones,
-         * but also positions (i.e., slots).
-         */
-        if(noStones < 0 || noStones > MAX_HANDICAP_AMOUNT) {
-            throw new IllegalArgumentException("Invalid handicap of " + noStones);
-        }
-
-        handicapStoneCounter = noStones;
-        gameState = GameState.SETTING_UP;
     }
 
     @Override
@@ -399,19 +388,19 @@ public class Game implements GameInterface {
 
         checkCoords(x, y);
 
-        if(color == null) {
-            throw new NullPointerException();
-        }
-
-        if (handicapStoneCounter <= 0) {
-            throw new IllegalStateException("Can't place any more handicap stones or positions!");
-        }
-
-        final int oldHandicapCtr = handicapStoneCounter;
-        handicapStoneCounter--;
-        final int newHandicapCtr = handicapStoneCounter;
-
         if(placeStone) {
+            if(color == null) {
+                throw new NullPointerException();
+            }
+
+            if (handicapStoneCounter <= 0) {
+                throw new IllegalStateException("Can't place any more handicap stones!");
+            }
+
+            final int oldHandicapCtr = handicapStoneCounter;
+            handicapStoneCounter--;
+            final int newHandicapCtr = handicapStoneCounter;
+
             final UndoableCommand uc01SetColor = setCurColor(color);
 
             final UndoableCommand uc02SetStone = board.setStone(x, y, color, true); // uc02SetStone is already executed within board.setStone().

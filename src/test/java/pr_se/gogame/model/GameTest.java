@@ -69,16 +69,11 @@ class GameTest {
 
     @Test
     void placeHandicapPositionArguments() {
-        game.newGame(BLACK, 19, 1, ruleset);
-        game.setHandicapStoneCounter(1);
+        game.newGame(BLACK, 19, 1, new NewZealandRuleset());
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(-1, 0, true));
-        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, -1, true));
-        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(maxCoord + 1, 0, true));
-        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, maxCoord + 1, true));
-        game.setHandicapStoneCounter(1);
         assertThrows(NullPointerException.class, () -> game.placeHandicapPosition(0, 0, true, null));
     }
 
@@ -114,12 +109,6 @@ class GameTest {
     @Test
     void getScoreArguments() {
         assertThrows(NullPointerException.class, () -> game.getScore(null));
-    }
-
-    @Test
-    void setHandicapStoneCounterArguments() {
-        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(Game.MAX_HANDICAP_AMOUNT + 1));
-        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(Game.MIN_HANDICAP_AMOUNT - 1));
     }
 
     @Test
@@ -431,13 +420,6 @@ class GameTest {
     }
 
     @Test
-    void setHandicapStoneCounter() {
-        game.setHandicapStoneCounter(1);
-        assertDoesNotThrow(() -> game.placeHandicapPosition(0, 0, false));
-        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(0, 0, false));
-    }
-
-    @Test
     void playMove() {
         assertNull(game.getColorAt(0, 0));
         game.playMove(0, 0);
@@ -455,8 +437,7 @@ class GameTest {
 
     @Test
     void placeHandicapStone() {
-        game.newGame(BLACK, 19, 1, ruleset); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
-        game.setHandicapStoneCounter(1);
+        game.newGame(BLACK, 19, 1, new NewZealandRuleset()); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
         assertNull(game.getColorAt(0, 0));
         game.placeHandicapPosition(0, 0, true);
         assertEquals(BLACK, game.getColorAt(0, 0));
@@ -588,7 +569,7 @@ class GameTest {
 
     @Test
     void usePosition() {
-        game.setHandicapStoneCounter(1);
+        game.newGame(BLACK, 19, 1, new NewZealandRuleset());
         game.usePosition(1, 1);
         game.setSetupMode(true);
         game.usePosition(2, 2);
@@ -653,7 +634,7 @@ class GameTest {
 
     @Test
     void tryOverridingHandicapPosition() {
-        game.setHandicapStoneCounter(2);
+        game.newGame(BLACK, 19, 2, new JapaneseRuleset(), false);
         game.placeHandicapPosition(0, 0, true);
         assertEquals(SETTING_UP, game.getGameState());
         game.placeHandicapPosition(0, 0, true);
@@ -678,7 +659,7 @@ class GameTest {
 
     @Test
     void setSetupModeWhileHandicapActive() {
-        game.setHandicapStoneCounter(9);
+        game.newGame(BLACK, 19, 9, new JapaneseRuleset(), false);
         assertFalse(game.isSetupMode());
         game.setSetupMode(true);
         assertFalse(game.isSetupMode());
@@ -846,7 +827,7 @@ class GameTest {
 
     @Test
     void undoPlaceHandicapPosition() {
-        game.setHandicapStoneCounter(1);
+        game.newGame(BLACK, 19, 1, new NewZealandRuleset());
         assertEquals(SETTING_UP, game.getGameState());
         game.placeHandicapPosition(1, 1, true);
         assertEquals(BLACK, game.getColorAt(1, 1));
@@ -893,5 +874,14 @@ class GameTest {
         game.undo();
         game.redo();
         assertThrows(IllegalStateException.class, () -> game.resign());
+    }
+
+    @Test
+    void tooManyHandicapStones() {
+        game.newGame(BLACK, 19, 2, new JapaneseRuleset(), false);
+        assertDoesNotThrow(() -> game.placeHandicapPosition(0, 0, true));
+        assertDoesNotThrow(() -> game.placeHandicapPosition(1, 1, true));
+        game.setSetupMode(true);
+        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(2, 2, true));
     }
 }

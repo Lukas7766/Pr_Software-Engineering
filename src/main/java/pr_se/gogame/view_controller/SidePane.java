@@ -11,6 +11,7 @@ import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
+import pr_se.gogame.model.ruleset.NewZealandRuleset;
 import pr_se.gogame.view_controller.dialog.CustomWinAction;
 
 /**
@@ -298,7 +299,7 @@ public class SidePane extends StackPane {
             if (selected.getId().equals("custom")) actualBoardSize = customSizeIntFactory.getValue();
             else actualBoardSize = Integer.parseInt(selected.getId());
 
-            game.newGame(StoneColor.BLACK, actualBoardSize, handicap, new JapaneseRuleset());
+            game.newGame(StoneColor.BLACK, actualBoardSize, handicap, new NewZealandRuleset());
         });
         //colum, row,
         gridPane.add(startGameBtn, 1, 15);

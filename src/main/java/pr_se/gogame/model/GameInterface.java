@@ -130,8 +130,6 @@ public interface GameInterface {
 
     void removeListener(GameListener l);
 
-    void setHandicapStoneCounter(int noStones);
-
     void setSetupMode(boolean setupMode);
 
     boolean isSetupMode();
