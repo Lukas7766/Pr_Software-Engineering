@@ -520,11 +520,6 @@ public class Game implements GameInterface {
             return;
         }
 
-        // Assertion: uc01SetStone != null and was hence a valid move.
-
-        /*
-         * StoneColor.getOpposite() because we previously switched colors
-         */
         removeAllMarks();
         uc01SetStone.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
         history.addNode(new History.HistoryNode(uc01SetStone, History.HistoryNode.AbstractSaveToken.SETUP, color, "", x, y));
