@@ -1,6 +1,7 @@
 package pr_se.gogame.model.file;
 
-import pr_se.gogame.model.*;
+import pr_se.gogame.model.Game;
+import pr_se.gogame.model.History;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
@@ -11,16 +12,22 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.nio.file.NoSuchFileException;
-import java.util.EnumMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
-import static pr_se.gogame.model.file.SGFToken.*;
 
 public final class FileHandler {
+    private static final Map<SGFToken, StoneColor> correspondingColors =
+        Map.of(
+                AW, WHITE,
+                W, WHITE,
+                AB, BLACK,
+                B, BLACK);
+
     private static File currentFile;
 
     private FileHandler() {
@@ -226,12 +233,6 @@ public final class FileHandler {
                         unexpected("Game info tokens", t);
                 }
             }
-
-            final Map<SGFToken, StoneColor> correspondingColors = new EnumMap<>(SGFToken.class);
-            correspondingColors.put(AW, WHITE);
-            correspondingColors.put(W, WHITE);
-            correspondingColors.put(AB, BLACK);
-            correspondingColors.put(B, BLACK);
 
             Position decodedCoords;
             String currentComment = null;
