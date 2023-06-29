@@ -291,7 +291,7 @@ class FileHandlerTest {
     }
 
     @Test
-    void noLpar() {
+    void noLPAR() {
         invalidTest("noLPAR.sgf");
     }
 

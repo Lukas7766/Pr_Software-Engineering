@@ -32,6 +32,8 @@ public final class FileHandler {
             throw new NullPointerException();
         }
 
+        final String terminatorString = "\n\n)";
+
         currentFile = file;
 
         Iterator<History.HistoryNode> iter = game.getHistory().iterator();
@@ -46,20 +48,20 @@ public final class FileHandler {
             output.write( "\n\n");
             output.write(String.format(HA.getValue(), game.getHandicap()));
 
-            // Skip node before first move
-            History.HistoryNode node = null;
-            if(iter.hasNext()) {
-                node = iter.next();
-                output.write(getNodeMetaDataString(node));
+            // Get first node in history and save its metadata
+            if(!iter.hasNext()) {
+                throw new IllegalStateException("History is completely empty!");
             }
 
+            History.HistoryNode node =  iter.next();
+            output.write(getNodeMetaDataString(node));
+
             // Write handicap positions (if any)
-            if(iter.hasNext()) {
-                node = iter.next();
+            if(!iter.hasNext()) {
+                throw new IllegalStateException("History ends without terminator!");
             }
-            if(node == null) {
-                throw new NullPointerException();
-            }
+
+            node = iter.next();
             SGFToken t;
 
             if(game.getHandicap() > 0) {
@@ -124,7 +126,7 @@ public final class FileHandler {
             }
 
 
-            output.write("\n\n)");
+            output.write(terminatorString);
 
         } catch(IOException e) {
             return false;
