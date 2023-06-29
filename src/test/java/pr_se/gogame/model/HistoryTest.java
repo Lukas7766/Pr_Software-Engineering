@@ -2,8 +2,10 @@ package pr_se.gogame.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.model.helper.GameCommand;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
+import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.util.HashSet;
@@ -86,7 +88,7 @@ class HistoryTest {
     void addNode() {
         assertTrue(history.isAtBeginning());
         assertTrue(history.isAtEnd());
-        History.HistoryNode n = new History.HistoryNode(null, null, null, "");
+        History.HistoryNode n = new History.HistoryNode(null, MOVE, game.getCurColor(), "");
         history.addNode(n);
         assertFalse(history.isAtBeginning());
         assertTrue(history.isAtEnd());
@@ -181,7 +183,7 @@ class HistoryTest {
 
         Iterator<History.HistoryNode> iter = game.getHistory().iterator();
         assertTrue(iter.hasNext());
-        assertNull(iter.next().getSaveToken());
+        assertEquals(BEGINNING_OF_HISTORY, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
         assertEquals(HANDICAP, iter.next().getSaveToken());
         assertTrue(iter.hasNext());
@@ -206,7 +208,7 @@ class HistoryTest {
         game.playMove(1, 1);
         game.setComment("foo");
         history.forEach(n -> {
-            if(n.getSaveToken() != END_OF_HISTORY && n.getSaveToken() != null) {
+            if(n.getSaveToken() != END_OF_HISTORY && n.getSaveToken() != BEGINNING_OF_HISTORY) {
                 assertEquals("foo", n.getComment());
             } else {
                 assertEquals("", n.getComment());
@@ -236,6 +238,22 @@ class HistoryTest {
         StringBuilder expected3 = new StringBuilder("History \n");
         history.forEach(hn -> expected3.append(hn.toString()).append("\n"));
         assertEquals(expected3.toString(), history.toString());
+    }
+
+    // History.HistoryNode
+    @Test
+    void HistoryNodeConstructorArgs() {
+        assertThrows(NullPointerException.class, () -> new History.HistoryNode(new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+
+            }
+
+            @Override
+            public void undo() {
+
+            }
+        }, null, game.getCurColor(), ""));
     }
 
     @Test
@@ -295,7 +313,7 @@ class HistoryTest {
         other = new History.HistoryNode(null, history.getCurrentNode().getSaveToken(), history.getCurrentNode().getColor(), "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
         assertEquals(history.getCurrentNode(), other); // The command shouldn't actually be compared, as too much could differ in semantically identical commands).
 
-        other = new History.HistoryNode(history.getCurrentNode().getCommand(), null, history.getCurrentNode().getColor(), "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
+        other = new History.HistoryNode(history.getCurrentNode().getCommand(), PASS, history.getCurrentNode().getColor(), "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
         assertNotEquals(history.getCurrentNode(), other);
         other = new History.HistoryNode(history.getCurrentNode().getCommand(), history.getCurrentNode().getSaveToken(), null, "", history.getCurrentNode().getX(), history.getCurrentNode().getY());
         assertNotEquals(history.getCurrentNode(), other);

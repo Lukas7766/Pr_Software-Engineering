@@ -596,7 +596,7 @@ class GameTest {
         game.usePosition(3, 3);
 
         Iterator<History.HistoryNode> i = game.getHistory().iterator();
-        assertEquals(null, i.next().getSaveToken());
+        assertEquals(BEGINNING_OF_HISTORY, i.next().getSaveToken());
         assertEquals(HANDICAP, i.next().getSaveToken());
         assertEquals(SETUP, i.next().getSaveToken());
         assertEquals(MOVE, i.next().getSaveToken());

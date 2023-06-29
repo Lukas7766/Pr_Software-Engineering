@@ -631,7 +631,7 @@ public class Game implements GameInterface {
     public void fastForward() {
         removeAllMarks();
         History.HistoryNode n = history.getCurrentNode();
-        if(n.getSaveToken() == null || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP) {
+        if(n.getSaveToken() == History.HistoryNode.AbstractSaveToken.BEGINNING_OF_HISTORY || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP) {
             goBeforeFirstMove();
             if(history.getCurrentNode() == n) {
                 history.skipToEnd();

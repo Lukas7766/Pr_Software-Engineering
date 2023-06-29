@@ -48,19 +48,16 @@ public final class FileHandler {
             output.write( "\n\n");
             output.write(String.format(HA.getValue(), game.getHandicap()));
 
-            // Get first node in history and save its metadata
-            if(!iter.hasNext()) {
-                throw new IllegalStateException("History is completely empty!");
-            }
+            /*
+             * NOTE: The reason why iter.hasNext() is never checked here is that History is guaranteed to always have at
+             * least its starting and terminating node
+             */
 
+            // Get first node in history and save its metadata
             History.HistoryNode node =  iter.next();
             output.write(getNodeMetaDataString(node));
 
             // Write handicap positions (if any)
-            if(!iter.hasNext()) {
-                throw new IllegalStateException("History ends without terminator!");
-            }
-
             node = iter.next();
             SGFToken t;
 
@@ -169,7 +166,7 @@ public final class FileHandler {
     }
 
     public static boolean loadFile(Game game, File file) throws NoSuchFileException, LoadingGameException {
-        if(file == null) {
+        if(game == null || file == null) {
             throw new NullPointerException();
         }
         if(!file.exists()) {
