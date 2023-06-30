@@ -98,22 +98,21 @@ public final class FileHandler {
 
                 if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.RESIGN) {
                     node = iter.next();
-                    if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
-                        break;
-                    } else {
+                    if(node.getSaveToken() != History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
                         throw new IllegalStateException("Game can't continue after resigning!");
                     }
+                    break;
                 }
 
                 if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP) {
                     throw new IOException("Can't save handicap after game has commenced!");
-                } else {
-                    t = SGFToken.ofHistoryNode(node);
-                    if (t == AE || t == null) {
-                        throw new IllegalStateException(node.getSaveToken() + " with color " + node.getColor() + " not supported!");
-                    }
-                    coords = node.getSaveToken() == History.HistoryNode.AbstractSaveToken.PASS ? "" : getStringFromCoords(node.getX(), node.getY());
                 }
+
+                t = SGFToken.ofHistoryNode(node);
+                if (t == AE || t == null) {
+                    throw new IllegalStateException(node.getSaveToken() + " with color " + node.getColor() + " not supported!");
+                }
+                coords = node.getSaveToken() == History.HistoryNode.AbstractSaveToken.PASS ? "" : getStringFromCoords(node.getX(), node.getY());
 
                 output.write("\n" + SEMICOLON.getValue());
                 output.write(String.format(t.getValue(), coords));
