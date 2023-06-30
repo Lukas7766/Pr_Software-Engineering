@@ -41,6 +41,11 @@ class SGFFileHandlerTest {
 
     // Argument-Checking
     @Test
+    void constructorArgs() {
+        assertThrows(NullPointerException.class, () -> new SGFFileHandler(null));
+    }
+
+    @Test
     void saveFileArgs() {
         assertThrows(NullPointerException.class, () -> sgfFileHandler.saveFile(null));
     }
