@@ -108,16 +108,12 @@ public class Board implements BoardInterface {
             subcommands.add(uc01AddNewToFirst);
         }
 
-        for(StoneGroup sg : sameColorGroups) {
-            subcommands.add(firstSameColorGroup.mergeWithStoneGroup(sg));
-        }
+        sameColorGroups.forEach(sg -> subcommands.add(firstSameColorGroup.mergeWithStoneGroup(sg)));
 
         final UndoableCommand uc02RemoveNewPosFromFirstLiberties = firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
         subcommands.add(uc02RemoveNewPosFromFirstLiberties);
 
-        for(StoneGroup sg : otherColorGroups) {
-            subcommands.add(sg.removeLiberty(new Position(x, y)));
-        }
+        otherColorGroups.forEach(sg -> subcommands.add(sg.removeLiberty(new Position(x, y))));
 
         final UndoableCommand uc03PlacePointer = (permittedSuicide) ? (null) : new UndoableCommand() {
             @Override

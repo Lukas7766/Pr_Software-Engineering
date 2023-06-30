@@ -401,16 +401,16 @@ public class Game implements GameInterface {
             handicapStoneCounter--;
             final int newHandicapCtr = handicapStoneCounter;
 
-            final UndoableCommand uc02SetStone = board.setStone(x, y, color, true); // uc02SetStone is already executed within board.setStone().
+            final UndoableCommand uc01SetStone = board.setStone(x, y, color, true); // uc01SetStone is already executed within board.setStone().
 
-            if(uc02SetStone == null) {
+            if(uc01SetStone == null) {
                 handicapStoneCounter = oldHandicapCtr;
                 return;
             }
 
-            // Assertion: uc02SetStone != null and was hence a valid move.
+            // Assertion: uc01SetStone != null and was hence a valid move.
 
-            final UndoableCommand uc03UpdateCounter = new UndoableCommand() {
+            final UndoableCommand uc02UpdateCounter = new UndoableCommand() {
                 UndoableCommand uC02SwitchColor = null;
 
                 @Override
@@ -438,26 +438,26 @@ public class Game implements GameInterface {
                     gameState = GameState.SETTING_UP;
                 }
             };
-            uc03UpdateCounter.execute(true);
+            uc02UpdateCounter.execute(true);
 
             UndoableCommand c = new UndoableCommand() {
                 @Override
                 public void execute(boolean saveEffects) {
-                    uc02SetStone.execute(saveEffects);
-                    uc03UpdateCounter.execute(saveEffects);
+                    uc01SetStone.execute(saveEffects);
+                    uc02UpdateCounter.execute(saveEffects);
                 }
 
                 @Override
                 public void undo() {
-                    uc03UpdateCounter.undo();
-                    uc02SetStone.undo();
+                    uc02UpdateCounter.undo();
+                    uc01SetStone.undo();
                 }
             };
             // c was already executed piecemeal
-            c.getExecuteEvents().addAll(uc02SetStone.getExecuteEvents());
-            c.getExecuteEvents().addAll(uc03UpdateCounter.getExecuteEvents());
-            c.getUndoEvents().addAll(uc02SetStone.getUndoEvents());
-            c.getUndoEvents().addAll(uc03UpdateCounter.getUndoEvents());
+            c.getExecuteEvents().addAll(uc01SetStone.getExecuteEvents());
+            c.getExecuteEvents().addAll(uc02UpdateCounter.getExecuteEvents());
+            c.getUndoEvents().addAll(uc01SetStone.getUndoEvents());
+            c.getUndoEvents().addAll(uc02UpdateCounter.getUndoEvents());
 
             /*
              * StoneColor.getOpposite() because we previously switched colors
