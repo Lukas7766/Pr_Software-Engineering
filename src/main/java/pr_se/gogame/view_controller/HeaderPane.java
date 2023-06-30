@@ -25,8 +25,8 @@ import pr_se.gogame.view_controller.observer.ViewListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -60,11 +60,11 @@ public class HeaderPane extends VBox {
      */
     private final Scene scene;
 
-    private final List<Button> playbackControlList = new ArrayList<>();
+    private final List<Button> playbackControlList = new LinkedList<>();
 
-    private final List<Button> gameShortCutList = new ArrayList<>();
+    private final List<Button> gameShortCutList = new LinkedList<>();
 
-    private final List<MenuItem> gameSectionItems = new ArrayList<>();
+    private final List<MenuItem> gameSectionItems = new LinkedList<>();
 
     /**
      * Constructor to create a Header Pane
@@ -265,20 +265,17 @@ public class HeaderPane extends VBox {
     private Menu viewSection() {
         Menu menu = new Menu("_View");
 
-        List<MenuItem> viewSectionItems = new ArrayList<>();
-
         CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Move _Numbers");
         showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        viewSectionItems.add(showMoveNumbersCBtn);
+        menu.getItems().add(showMoveNumbersCBtn);
         showMoveNumbersCBtn.setSelected(GlobalSettings.isShowMoveNumbers());
         showMoveNumbersCBtn.setOnAction(e -> GlobalSettings.setShowMoveNumbers(showMoveNumbersCBtn.isSelected()));
 
         CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("_Coordinates");
         showCoordinatesCBtn.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        viewSectionItems.add(showCoordinatesCBtn);
+        menu.getItems().add(showCoordinatesCBtn);
         showCoordinatesCBtn.setSelected(GlobalSettings.isShowCoordinates());
         showCoordinatesCBtn.setOnAction(e -> GlobalSettings.setShowCoordinates(showCoordinatesCBtn.isSelected()));
-        menu.getItems().addAll(viewSectionItems);
 
         return menu;
     }
