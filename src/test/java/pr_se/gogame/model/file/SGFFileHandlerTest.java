@@ -132,7 +132,12 @@ class SGFFileHandlerTest {
     @Test
     void getCurrentFile() {
         assertNull(sgfFileHandler.getCurrentFile());
-        sgfFileHandler.saveFile(file);
+        try {
+            sgfFileHandler.saveFile(file);
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            fail();
+        }
         assertEquals(file, sgfFileHandler.getCurrentFile());
 
         comprehensiveTest();
@@ -283,7 +288,7 @@ class SGFFileHandlerTest {
     void handicapAfterGameBegun() {
         game.playMove(0, 0);
         game.getHistory().addNode(new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.HANDICAP, null, ""));
-        assertFalse(sgfFileHandler.saveFile(file));
+        assertThrows(IllegalStateException.class, () -> sgfFileHandler.saveFile(file));
     }
 
     @Test
@@ -432,7 +437,12 @@ class SGFFileHandlerTest {
     }
 
     void assertSavingWorks() {
-        assertTrue(sgfFileHandler.saveFile(file));
+        try {
+            assertTrue(sgfFileHandler.saveFile(file));
+        } catch (java.io.IOException e) {
+            e.printStackTrace();
+            fail();
+        }
     }
 
     void assertLoadingWorks() {

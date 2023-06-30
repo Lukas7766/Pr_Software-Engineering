@@ -782,6 +782,20 @@ class GameTest {
         assertEquals(WHITE, game.getColorAt(2, 2));
     }
 
+    @Test
+    void goToEnd() {
+        rewind();
+        assertNull(game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getCurColor());
+        assertTrue(game.getHistory().isAtBeginning());
+        assertFalse(game.getHistory().isAtEnd());
+        game.goToEnd();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertEquals(WHITE, game.getCurColor());
+        assertFalse(game.getHistory().isAtBeginning());
+        assertTrue(game.getHistory().isAtEnd());
+    }
+
     // Command pattern
     @Test
     void undoPlayMove() {

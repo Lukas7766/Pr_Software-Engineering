@@ -1,6 +1,7 @@
 package pr_se.gogame.model.file;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 
 public interface FileHandler {
@@ -9,7 +10,7 @@ public interface FileHandler {
      * @param file The file to be saved
      * @return True if saving succeeded, false otherwise
      */
-    boolean saveFile(File file);
+    boolean saveFile(File file) throws IOException, IllegalStateException;
 
     /**
      * Loads a game from the supplied file

@@ -495,8 +495,14 @@ public class HeaderPane extends VBox {
                 return;
             }
         }
-        if (!game.getFileHandler().saveFile(saveGameFile)) {
-            CustomExceptionDialog.show(new IOException(), "Could not save the game!");
+        try {
+            if (!game.getFileHandler().saveFile(saveGameFile)) {
+                CustomExceptionDialog.show(new IOException(), "Could not save the game!");
+            }
+        } catch (IOException e) {
+            CustomExceptionDialog.show(e, "Could not save the game!");
+        } catch(IllegalStateException isE) {
+            CustomExceptionDialog.show(isE, "An error occurred while saving the game.");
         }
     }
 

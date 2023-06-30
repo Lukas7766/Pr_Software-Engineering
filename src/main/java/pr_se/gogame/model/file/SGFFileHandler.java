@@ -15,6 +15,7 @@ import java.nio.file.NoSuchFileException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 
 import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
@@ -42,7 +43,7 @@ public class SGFFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean saveFile(File file) {
+    public boolean saveFile(File file) throws IOException, IllegalStateException {
         if(file == null) {
             throw new NullPointerException();
         }
@@ -81,7 +82,7 @@ public class SGFFileHandler implements FileHandler {
                     t = SGFToken.ofHistoryNode(node);
 
                     if(t == null) {
-                        throw new IOException("Can't get SGF token for node " + node);
+                        throw new IllegalStateException("Can't get SGF token for node " + node);
                     }
                     output.write(String.format(t.getValue(), getStringFromCoords(node.getX(), node.getY())));
                     node = iter.next();
@@ -113,7 +114,7 @@ public class SGFFileHandler implements FileHandler {
                 }
 
                 if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP) {
-                    throw new IOException("Can't save handicap after game has commenced!");
+                    throw new IllegalStateException("Can't save handicap after game has commenced!");
                 }
 
                 t = SGFToken.ofHistoryNode(node);
@@ -136,8 +137,6 @@ public class SGFFileHandler implements FileHandler {
 
             output.write(terminatorString);
 
-        } catch(IOException e) {
-            return false;
         }
 
         return true;
