@@ -7,6 +7,7 @@ import pr_se.gogame.model.helper.UndoableCommand;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 public class JapaneseRuleset implements Ruleset {
@@ -145,7 +146,7 @@ public class JapaneseRuleset implements Ruleset {
         for (int x = 0; x < boardSize; x++) {
             for (int y = 0; y < boardSize; y++) {
                 if (game.getColorAt(x, y) == null && !visited[x][y]) {
-                    territory = new ArrayList<>();
+                    territory = new LinkedList<>();
                     if(floodFill(game, color, x, y)) {
                         territoryPoints += territory.size();
                     }
