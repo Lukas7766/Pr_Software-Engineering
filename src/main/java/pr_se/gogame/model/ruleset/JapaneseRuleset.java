@@ -138,13 +138,12 @@ public class JapaneseRuleset implements Ruleset {
      * @return how many territory points the given player has on the given board.
      */
     private int calculateTerritoryPoints(StoneColor color, Game game) {
-        int boardSize = game.getSize();
+        final int boardSize = game.getSize();
         visited = new boolean[boardSize][boardSize];
 
         int territoryPoints = 0;
         for (int x = 0; x < boardSize; x++) {
             for (int y = 0; y < boardSize; y++) {
-
                 if (game.getColorAt(x, y) == null && !visited[x][y]) {
                     territory = new ArrayList<>();
                     if(floodFill(game, color, x, y)) {
