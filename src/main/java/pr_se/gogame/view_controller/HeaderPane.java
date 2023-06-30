@@ -26,7 +26,9 @@ import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * This class contains the controller and view function of the game header panel.<br>
@@ -459,10 +461,9 @@ public class HeaderPane extends VBox {
         FileFilter zipFilter = pathname -> pathname.getName().toLowerCase().endsWith(".zip");
         File[] directoryListing = graphicsFolder.listFiles(zipFilter);
         if(directoryListing != null) {
-            for (File f : directoryListing) {
-                if (f.isFile()) { // We still need to check this because you could have a folder whose name ends with ".zip".
-                    comboBoxItems.add(f.getName());
-                }
+            // We still need to filter out non-files because you could have a folder whose name ends with ".zip".
+            for (File f : Arrays.stream(directoryListing).filter(f -> f.isFile()).collect(Collectors.toList())) {
+                comboBoxItems.add(f.getName());
             }
         } else {
             throw new IOException("Couldn't find graphics pack folder!");
