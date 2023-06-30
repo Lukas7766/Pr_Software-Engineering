@@ -369,7 +369,6 @@ public class HeaderPane extends VBox {
                 backward.fire();
             }
         });
-
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.H), () -> {
             if (!forward.isDisabled()) {
                 forward.fire();
