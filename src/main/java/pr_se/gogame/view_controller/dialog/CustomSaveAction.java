@@ -5,7 +5,6 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.file.SGFFileHandler;
 
 import java.io.File;
 import java.io.IOException;
