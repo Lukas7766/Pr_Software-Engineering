@@ -148,10 +148,8 @@ public class HeaderPane extends VBox {
         game.addListener(e -> {
             switch (e.getGameCommand()) {
                 case STONE_WAS_SET -> {
-                    if(e.getColor() != null) {
-                        exportFileItem.setDisable(false);
-                        exportFileItemAs.setDisable(false);
-                    }
+                    exportFileItem.setDisable(false);
+                    exportFileItemAs.setDisable(false);
                 }
                 case INIT -> {
                     exportFileItem.setDisable(true);
