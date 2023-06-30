@@ -118,12 +118,9 @@ public final class FileHandler {
                 output.write("\n" + SEMICOLON.getValue());
                 output.write(String.format(t.getValue(), coords));
 
-                if (iter.hasNext()) {
-                    node = iter.next();
-                    if (t == SGFToken.ofHistoryNode(node) && t.hasMultiAttribs()) {
-                        node = writeAttributeSequence(output, iter, node);
-                    }
-
+                node = iter.next();
+                if (t == SGFToken.ofHistoryNode(node) && t.hasMultiAttribs()) {
+                    node = writeAttributeSequence(output, iter, node);
                 }
 
                 output.write(getNodeMetaDataString(node.getPrev()));
