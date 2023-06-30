@@ -266,7 +266,7 @@ public class BoardPane extends GridPane {
         );
         maxCellDimInt = Bindings.createIntegerBinding(maxCellDim::intValue, maxCellDim); // round down
 
-        // put the axes' corners in first to mess up the indexing as little as possible;
+        // Put the axes' corners in first to mess up the indexing as little as possible.
         BoardCell corner1 = new BoardCell(this.outerCorner);
         corner1.getLabel().setVisible(false);
         add(corner1, 0, 0);
