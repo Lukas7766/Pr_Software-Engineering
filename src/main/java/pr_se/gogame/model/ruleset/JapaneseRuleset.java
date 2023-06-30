@@ -164,7 +164,7 @@ public class JapaneseRuleset implements Ruleset {
      * @param x the x-coordinate of the search's origin, starting at the left
      * @param y the y-coordinate of the search's origin, starting at the top
      * @return true if an empty area without any bordering stones of the opposite of color was found, false if any stone
-     *  of the opposite color was found
+     *  of the opposite color was found next to an empty position
      */
     private boolean floodFill(Game game, StoneColor color, int x, int y) {
         if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize()) {
