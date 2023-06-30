@@ -2,7 +2,6 @@ package pr_se.gogame.model;
 
 import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.file.SGFFileHandler;
-import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.GameCommand;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.StoneColor;
@@ -13,8 +12,6 @@ import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
-import java.io.File;
-import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
