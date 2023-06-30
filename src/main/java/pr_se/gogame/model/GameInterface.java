@@ -1,5 +1,6 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.StoneColor;
@@ -33,10 +34,6 @@ public interface GameInterface {
      * @param letRulesetPlaceHandicapStones whether the Game should let the Ruleset place handicap stones (set to false when loading a game from a file)
      */
     void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset, boolean letRulesetPlaceHandicapStones);
-
-    boolean loadGame(File file) throws LoadingGameException;
-
-    boolean saveGame(File file);
 
     /**
      * Allows the current player to pass. After this, it is the opposite player's turn.
@@ -94,6 +91,7 @@ public interface GameInterface {
     int getHandicap();
 
     double getKomi();
+
     //##################################################################################################################
     //game information
 
@@ -134,6 +132,7 @@ public interface GameInterface {
 
     boolean isSetupMode();
 
+    //##################################################################################################################
     // Methods controlling the history
     void undo();
 
@@ -148,5 +147,13 @@ public interface GameInterface {
     void goToFirstMove();
 
     void goToEnd();
+
+    //##################################################################################################################
+    // Methods related to file handling
+    FileHandler getFileHandler();
+
+    boolean loadGame(File file) throws LoadingGameException;
+
+    boolean saveGame(File file);
 }
 

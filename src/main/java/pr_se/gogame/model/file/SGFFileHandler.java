@@ -20,7 +20,7 @@ import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
-public final class SGFFileHandler {
+public class SGFFileHandler implements FileHandler {
     private static final Map<SGFToken, StoneColor> correspondingColors =
         Map.of(
                 AW, WHITE,
@@ -28,14 +28,22 @@ public final class SGFFileHandler {
                 AB, BLACK,
                 B, BLACK);
 
-    private static File currentFile;
+    private File currentFile;
 
-    private SGFFileHandler() {
-        // This private constructor solely exists to prevent instantiation.
+    private final Game game;
+
+    public SGFFileHandler(Game game) {
+        if(game == null) {
+            throw new NullPointerException();
+        }
+
+        this.game = game;
+        this.currentFile = null;
     }
 
-    public static boolean saveFile(Game game, File file) {
-        if(game == null || file == null) {
+    @Override
+    public boolean saveFile(File file) {
+        if(file == null) {
             throw new NullPointerException();
         }
 
@@ -135,7 +143,7 @@ public final class SGFFileHandler {
         return true;
     }
 
-    private static String getNodeMetaDataString(History.HistoryNode node) {
+    private String getNodeMetaDataString(History.HistoryNode node) {
         StringBuilder sb = new StringBuilder();
 
         for (Map.Entry<Position, MarkShape> e : node.getMarks().entrySet()) {
@@ -163,7 +171,7 @@ public final class SGFFileHandler {
      * @return the first node of a different AbstractSaveToken or color.
      * @throws IOException if the FileWriter cannot be written to
      */
-    private static History.HistoryNode writeAttributeSequence(FileWriter output, Iterator<History.HistoryNode> iter, History.HistoryNode parentNode) throws IOException {
+    private History.HistoryNode writeAttributeSequence(FileWriter output, Iterator<History.HistoryNode> iter, History.HistoryNode parentNode) throws IOException {
         History.HistoryNode n = parentNode;
 
         do {
@@ -174,8 +182,9 @@ public final class SGFFileHandler {
         return n;
     }
 
-    public static boolean loadFile(Game game, File file) throws NoSuchFileException, LoadingGameException {
-        if(game == null || file == null) {
+    @Override
+    public boolean loadFile(File file) throws NoSuchFileException, LoadingGameException {
+        if(file == null) {
             throw new NullPointerException();
         }
         if(!file.exists()) {
@@ -381,11 +390,8 @@ public final class SGFFileHandler {
 
     // Getters and setters
 
-    public static File getCurrentFile() {
+    @Override
+    public File getCurrentFile() {
         return currentFile;
-    }
-
-    public static void clearCurrentFile() {
-        currentFile = null;
     }
 }

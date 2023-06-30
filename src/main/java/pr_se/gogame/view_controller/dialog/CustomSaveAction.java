@@ -29,7 +29,7 @@ public class CustomSaveAction {
             switch (er.getText()) {
                 case "no" -> onNo.use();
                 case "yes" -> {
-                    File f = SGFFileHandler.getCurrentFile();
+                    File f = game.getFileHandler().getCurrentFile();
                     if (f == null) {
                         f = CustomFileDialog.getFile(stage, true);
                         if (f == null) {

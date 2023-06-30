@@ -1,5 +1,6 @@
 package pr_se.gogame.model;
 
+import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.GameCommand;
@@ -63,17 +64,20 @@ public class Game implements GameInterface {
 
     private boolean setupMode;
 
+    private FileHandler fileHandler;
+
     public Game() {
         this.listeners = new ArrayList<>();
         this.gameState = GameState.NOT_STARTED_YET;
         this.board = new Board(this, 19);
+        this.fileHandler = new SGFFileHandler(this);
     }
 
     @Override
     public void initGame() {
         gameState = GameState.NOT_STARTED_YET;
         this.history = null;
-        SGFFileHandler.clearCurrentFile();
+        this.fileHandler = new SGFFileHandler(this);
 
         fireGameEvent(new GameEvent(GameCommand.INIT));
     }
@@ -140,7 +144,7 @@ public class Game implements GameInterface {
         if (file == null) {
             throw new NullPointerException();
         }
-        return SGFFileHandler.saveFile(this, file);
+        return fileHandler.saveFile(file);
     }
 
     @Override
@@ -149,7 +153,7 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
         try {
-            return SGFFileHandler.loadFile(this, file);
+            return fileHandler.loadFile(file);
         } catch (NoSuchFileException e) {
             return false;
         }
@@ -617,6 +621,11 @@ public class Game implements GameInterface {
         removeAllMarks();
         history.skipToEnd();
         reDisplayMarks();
+    }
+
+    @Override
+    public FileHandler getFileHandler() {
+        return this.fileHandler;
     }
 
     @Override

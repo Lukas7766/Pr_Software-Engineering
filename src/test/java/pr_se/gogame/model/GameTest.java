@@ -3,7 +3,9 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.file.LoadingGameException;
+import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
@@ -417,6 +419,13 @@ class GameTest {
         assertNull(game.getColorAt(0, 0));
         game.playMove(0, 0);
         assertEquals(BLACK, game.getColorAt(0, 0));
+    }
+
+    @Test
+    void getFileHandler() {
+        FileHandler fileHandler = game.getFileHandler();
+        assertNotNull(fileHandler);
+        assertInstanceOf(SGFFileHandler.class, fileHandler);
     }
 
     @Test
