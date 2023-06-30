@@ -295,6 +295,12 @@ class SGFFileHandlerTest {
     }
 
     @Test
+    void onlyGameInfo() {
+        file = new File(TEST_FILE_FOLDER + "onlyInfo.sgf");
+        assertLoadingWorks();
+    }
+
+    @Test
     void noGameInfo() {
         invalidTest("noInfo.sgf");
     }
