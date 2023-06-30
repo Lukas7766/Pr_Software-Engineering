@@ -148,15 +148,11 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public boolean loadGame(File file) throws LoadingGameException {
+    public boolean loadGame(File file) throws LoadingGameException, NoSuchFileException {
         if(file == null) {
             throw new NullPointerException();
         }
-        try {
-            return fileHandler.loadFile(file);
-        } catch (NoSuchFileException e) {
-            return false;
-        }
+        return fileHandler.loadFile(file);
     }
 
     @Override

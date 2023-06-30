@@ -183,6 +183,8 @@ class JapaneseRulesetTest {
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();
+        } catch (java.nio.file.NoSuchFileException e) {
+            throw new RuntimeException(e);
         }
 
         return game;

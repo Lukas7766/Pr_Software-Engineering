@@ -408,6 +408,8 @@ class BoardTest {
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();
+        } catch (java.nio.file.NoSuchFileException e) {
+            throw new RuntimeException(e);
         }
         game.goToEnd();
 

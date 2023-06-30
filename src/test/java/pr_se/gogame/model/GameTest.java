@@ -131,6 +131,8 @@ class GameTest {
         } catch(LoadingGameException e) {
             e.printStackTrace();
             fail();
+        } catch (java.nio.file.NoSuchFileException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -220,6 +222,8 @@ class GameTest {
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();
+        } catch (java.nio.file.NoSuchFileException e) {
+            throw new RuntimeException(e);
         }
         game.goToEnd();
         assertEquals(BLACK, game.getColorAt(0, 0));
@@ -539,6 +543,8 @@ class GameTest {
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();
+        } catch (java.nio.file.NoSuchFileException e) {
+            throw new RuntimeException(e);
         }
         game.fastForward();
 

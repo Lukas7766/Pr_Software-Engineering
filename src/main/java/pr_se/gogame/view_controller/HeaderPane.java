@@ -125,8 +125,10 @@ public class HeaderPane extends VBox {
                     if(!game.loadGame(f)) {
                         CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably due to a file system error.");
                     }
-                } catch (LoadingGameException exception) {
-                    CustomExceptionDialog.show(exception, "Failed to load game!\n\nThis is probably because the file contains unsupported SGF features.");
+                } catch (LoadingGameException lgException) {
+                    CustomExceptionDialog.show(lgException, "Failed to load game!\n\nThis is probably because the file contains unsupported SGF features.");
+                } catch (java.nio.file.NoSuchFileException nsfException) {
+                    CustomExceptionDialog.show(nsfException, "File does not exist!");
                 }
             }
         });

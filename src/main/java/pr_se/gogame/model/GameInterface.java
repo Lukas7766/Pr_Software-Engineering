@@ -10,6 +10,7 @@ import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.observer.GameListener;
 
 import java.io.File;
+import java.nio.file.NoSuchFileException;
 
 public interface GameInterface {
 
@@ -152,7 +153,7 @@ public interface GameInterface {
     // Methods related to file handling
     FileHandler getFileHandler();
 
-    boolean loadGame(File file) throws LoadingGameException;
+    boolean loadGame(File file) throws LoadingGameException, NoSuchFileException;
 
     boolean saveGame(File file);
 }
