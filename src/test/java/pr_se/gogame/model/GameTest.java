@@ -17,6 +17,7 @@ import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
 import java.io.File;
+import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -126,14 +127,7 @@ class GameTest {
     @Test
     void loadGameArgs() {
         assertThrows(NullPointerException.class, () -> game.loadGame(null));
-        try {
-            assertFalse(game.loadGame(new File("nonExistentFile")));
-        } catch(LoadingGameException e) {
-            e.printStackTrace();
-            fail();
-        } catch (java.nio.file.NoSuchFileException e) {
-            throw new RuntimeException(e);
-        }
+        assertThrows(NoSuchFileException.class, () -> game.loadGame(new File("nonExistentFile")));
     }
 
     @Test
