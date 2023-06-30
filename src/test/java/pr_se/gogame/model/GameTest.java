@@ -120,17 +120,6 @@ class GameTest {
     }
 
     @Test
-    void saveGameArgs() {
-        assertThrows(NullPointerException.class, () -> game.saveGame(null));
-    }
-
-    @Test
-    void loadGameArgs() {
-        assertThrows(NullPointerException.class, () -> game.loadGame(null));
-        assertThrows(NoSuchFileException.class, () -> game.loadGame(new File("nonExistentFile")));
-    }
-
-    @Test
     void usePositionArgs() {
         assertThrows(IllegalArgumentException.class, () -> game.usePosition(-1, 0));
         assertThrows(IllegalArgumentException.class, () -> game.usePosition(0, -1));
@@ -206,31 +195,6 @@ class GameTest {
         assertEquals(WHITE, game.getCurColor());
         assertEquals(13, game.getSize());
         assertEquals(1, game.getHandicap());
-    }
-
-    @Test
-    void loadGame() {
-        saveGame();
-        try {
-            assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "tmp.sgf")));
-        } catch (LoadingGameException e) {
-            e.printStackTrace();
-            fail();
-        } catch (java.nio.file.NoSuchFileException e) {
-            throw new RuntimeException(e);
-        }
-        game.goToEnd();
-        assertEquals(BLACK, game.getColorAt(0, 0));
-        assertEquals(WHITE, game.getColorAt(1, 0));
-    }
-
-    @Test
-    void saveGame() {
-        game.playMove(0, 0);
-        game.playMove(1, 0);
-        assertEquals(BLACK, game.getColorAt(0, 0));
-        assertEquals(WHITE, game.getColorAt(1, 0));
-        assertTrue(game.saveGame(new File(TESTFILE_FOLDER + "tmp.sgf")));
     }
 
     @Test
@@ -533,11 +497,11 @@ class GameTest {
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
 
         try {
-            game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf"));
+            game.getFileHandler().loadFile(new File(TESTFILE_FOLDER + "KoSituation.sgf"));
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();
-        } catch (java.nio.file.NoSuchFileException e) {
+        } catch (NoSuchFileException e) {
             throw new RuntimeException(e);
         }
         game.fastForward();

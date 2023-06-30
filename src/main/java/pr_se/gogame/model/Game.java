@@ -140,22 +140,6 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public boolean saveGame(File file) {
-        if (file == null) {
-            throw new NullPointerException();
-        }
-        return fileHandler.saveFile(file);
-    }
-
-    @Override
-    public boolean loadGame(File file) throws LoadingGameException, NoSuchFileException {
-        if(file == null) {
-            throw new NullPointerException();
-        }
-        return fileHandler.loadFile(file);
-    }
-
-    @Override
     public void pass() {
         if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
             throw new IllegalStateException("Can't pass on GameState " + gameState);

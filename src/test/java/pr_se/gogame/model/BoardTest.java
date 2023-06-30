@@ -9,6 +9,7 @@ import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
 
 import java.io.File;
+import java.nio.file.NoSuchFileException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
@@ -404,11 +405,11 @@ class BoardTest {
 
     void loadFile(String fileName) {
         try {
-            game.loadGame(new File(fileName));
+            game.getFileHandler().loadFile(new File(fileName));
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();
-        } catch (java.nio.file.NoSuchFileException e) {
+        } catch (NoSuchFileException e) {
             throw new RuntimeException(e);
         }
         game.goToEnd();

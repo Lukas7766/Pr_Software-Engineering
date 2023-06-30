@@ -153,8 +153,5 @@ public interface GameInterface {
     // Methods related to file handling
     FileHandler getFileHandler();
 
-    boolean loadGame(File file) throws LoadingGameException, NoSuchFileException;
-
-    boolean saveGame(File file);
 }
 

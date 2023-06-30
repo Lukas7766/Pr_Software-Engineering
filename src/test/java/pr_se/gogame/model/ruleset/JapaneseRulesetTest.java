@@ -179,7 +179,7 @@ class JapaneseRulesetTest {
     Game loadFile(String fileName) {
         Game game = new Game();
         try {
-            assertTrue(game.loadGame(new File(TESTFILE_FOLDER + fileName)));
+            assertTrue(game.getFileHandler().loadFile(new File(TESTFILE_FOLDER + fileName)));
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();

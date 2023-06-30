@@ -122,7 +122,7 @@ public class HeaderPane extends VBox {
             File f = CustomFileDialog.getFile(stage, false);
             if (f != null) {
                 try {
-                    if(!game.loadGame(f)) {
+                    if(!game.getFileHandler().loadFile(f)) {
                         CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably due to a file system error.");
                     }
                 } catch (LoadingGameException lgException) {
@@ -495,7 +495,7 @@ public class HeaderPane extends VBox {
                 return;
             }
         }
-        if (!game.saveGame(saveGameFile)) {
+        if (!game.getFileHandler().saveFile(saveGameFile)) {
             CustomExceptionDialog.show(new IOException(), "Could not save the game!");
         }
     }
