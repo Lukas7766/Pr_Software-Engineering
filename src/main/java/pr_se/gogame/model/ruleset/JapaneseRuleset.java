@@ -142,52 +142,55 @@ public class JapaneseRuleset implements Ruleset {
         visited = new boolean[boardSize][boardSize];
 
         int territoryPoints = 0;
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
+        for (int x = 0; x < boardSize; x++) {
+            for (int y = 0; y < boardSize; y++) {
 
-                if (game.getColorAt(i, j) == null && !visited[i][j]) {
-
-                    boolean occupiedTerritory = true;
-
+                if (game.getColorAt(x, y) == null && !visited[x][y]) {
                     territory = new ArrayList<>();
-                    floodFill(game, i, j);
-
-                    for (Position p : territory) {
-                        if(     (p.getX() > 0 && game.getColorAt(p.getX() - 1, p.getY()) == StoneColor.getOpposite(color)) ||
-                                (p.getX() < game.getSize() - 1 && game.getColorAt(p.getX() + 1, p.getY()) == StoneColor.getOpposite(color)) ||
-                                (p.getY() > 0 && game.getColorAt(p.getX(), p.getY() - 1) == StoneColor.getOpposite(color)) ||
-                                (p.getY() < game.getSize() - 1 && game.getColorAt(p.getX(), p.getY() + 1) == StoneColor.getOpposite(color))) {
-                            occupiedTerritory = false;
-                            break;
-                        }
-                    }
-
-                    if (occupiedTerritory) {
+                    if(floodFill(game, color, x, y)) {
                         territoryPoints += territory.size();
                     }
                 }
             }
         }
+
         return territoryPoints;
     }
 
 
-    private void floodFill(Game game, int x, int y) {
-        if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize() || visited[x][y]) {
-            return;
+    private boolean floodFill(Game game, StoneColor color, int x, int y) {
+        if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize()) {
+            return true;
+        }
+
+        // Assertion: The coordinates are valid.
+
+        if(game.getColorAt(x, y) == StoneColor.getOpposite(color)) {
+            return false;
+        }
+
+        // Assertion: The board at this position is either empty or of the same color.
+
+        if(visited[x][y]) {
+            return true;
         }
 
         visited[x][y] = true;
 
-        if (game.getColorAt(x, y) != null) {
-            return;
+        if(game.getColorAt(x, y) != null) {
+            return true;
         }
 
         territory.add(new Position(x, y));
-        floodFill(game, x, y + 1); //top
-        floodFill(game, x + 1, y); //right
-        floodFill(game, x, y - 1); //bottom
-        floodFill(game, x - 1, y); //left
+        boolean ret = floodFill(game, color, x, y + 1); // bottom
+
+        ret &= floodFill(game, color, x + 1, y); // right           // The singular & is important, as we need to disable short-circuit evaluation.
+
+        ret &= floodFill(game, color, x, y - 1); // top
+
+        ret &= floodFill(game, color, x - 1, y); // left
+
+        return ret; // SonarQube didn't like the singular & in the return value.
     }
 
     @Override
