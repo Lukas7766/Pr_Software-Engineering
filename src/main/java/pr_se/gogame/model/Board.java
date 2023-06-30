@@ -117,7 +117,7 @@ public class Board implements BoardInterface {
 
         final UndoableCommand uc03PlacePointer = (permittedSuicide) ? (null) : new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 boardContents[x][y] =
                     firstSameColorGroup.getPointers().stream()
                         .findFirst()
@@ -139,24 +139,7 @@ public class Board implements BoardInterface {
             subcommands.add(uc04RemoveCapturedStones);
         }
 
-        final List<UndoableCommand> finalSubCommands = List.copyOf(subcommands);
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                finalSubCommands.forEach(c -> c.execute(saveEffects));
-            }
-
-            @Override
-            public void undo() {
-                // Undoing it the other way round just in case.
-                ListIterator<UndoableCommand> i = finalSubCommands.listIterator(finalSubCommands.size());
-                while(i.hasPrevious()) {
-                    UndoableCommand c = i.previous();
-                    c.undo();
-                }
-            }
-        };
+        UndoableCommand ret = UndoableCommand.of(subcommands);
         // No execute() this time, as we've already executed the subcommands piecemeal.
         if(uc04RemoveCapturedStones != null) {
             ret.getExecuteEvents().addAll(uc04RemoveCapturedStones.getExecuteEvents());
@@ -207,7 +190,7 @@ public class Board implements BoardInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 for(UndoableCommand c : finalRetList) {
                     c.execute(saveEffects);
                 }
@@ -241,7 +224,7 @@ public class Board implements BoardInterface {
             final List<UndoableCommand> addLibertyCommands = new LinkedList<>();
 
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 boardContents[x][y] = null;
 
                 Set<StoneGroup> surroundingSGs = getSurroundings(x, y, Objects::nonNull).stream()

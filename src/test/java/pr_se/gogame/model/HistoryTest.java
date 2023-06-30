@@ -245,7 +245,7 @@ class HistoryTest {
     void HistoryNodeConstructorArgs() {
         assertThrows(NullPointerException.class, () -> new History.HistoryNode(new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
 
             }
 

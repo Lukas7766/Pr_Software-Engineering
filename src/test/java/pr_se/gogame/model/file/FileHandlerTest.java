@@ -329,7 +329,7 @@ class FileHandlerTest {
     void saveAE() {
         game.getHistory().addNode(new History.HistoryNode(new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
 
             }
 

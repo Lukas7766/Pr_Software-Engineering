@@ -15,6 +15,7 @@ import pr_se.gogame.view_controller.observer.GameListener;
 import java.io.File;
 import java.nio.file.NoSuchFileException;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
@@ -182,7 +183,7 @@ public class Game implements GameInterface {
 
         UndoableCommand c = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 String msg =
                         "Game was resigned by " + finalCurColor + "!\n" +
                         "\n" +
@@ -293,7 +294,10 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
+        List<UndoableCommand> subcommands = new LinkedList<>();
+
         final UndoableCommand uc01SetColor = setCurColor(color);
+        subcommands.add(uc01SetColor);
 
         final UndoableCommand uc02SetStone = board.setStone(x, y, curColor, false); // uc02SetStone is already executed within board.setStone().
 
@@ -302,6 +306,7 @@ public class Game implements GameInterface {
         }
 
         // Assertion: uc02SetStone != null and was hence a valid move.
+        subcommands.add(uc02SetStone);
 
         final UndoableCommand uc03IsKo = ruleset.isKo(this);
 
@@ -311,13 +316,15 @@ public class Game implements GameInterface {
             return false;
         }
 
+        subcommands.add(uc03IsKo);
+
         final int OLD_MOVE_NO = curMoveNumber;
 
         final UndoableCommand uc04SwitchColor = new UndoableCommand() {
             UndoableCommand thisCommand = null;
 
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 curMoveNumber++;
                 // Update current player color
                 thisCommand = switchColor();
@@ -335,23 +342,9 @@ public class Game implements GameInterface {
         };
         uc04SwitchColor.execute(true);
 
-        UndoableCommand c = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                uc01SetColor.execute(saveEffects);
-                uc02SetStone.execute(saveEffects);
-                uc03IsKo.execute(saveEffects);
-                uc04SwitchColor.execute(saveEffects);
-            }
+        subcommands.add(uc04SwitchColor);
 
-            @Override
-            public void undo() {
-                uc04SwitchColor.undo();
-                uc03IsKo.undo();
-                uc02SetStone.undo();
-                uc01SetColor.undo();
-            }
-        };
+        UndoableCommand c = UndoableCommand.of(subcommands);
         // c was already executed piecemeal
 
         /*
@@ -397,6 +390,8 @@ public class Game implements GameInterface {
                 throw new IllegalStateException("Can't place any more handicap stones!");
             }
 
+            List<UndoableCommand> subcommands = new LinkedList<>();
+
             final int oldHandicapCtr = handicapStoneCounter;
             handicapStoneCounter--;
             final int newHandicapCtr = handicapStoneCounter;
@@ -410,11 +405,13 @@ public class Game implements GameInterface {
 
             // Assertion: uc01SetStone != null and was hence a valid move.
 
+            subcommands.add(uc01SetStone);
+
             final UndoableCommand uc02UpdateCounter = new UndoableCommand() {
                 UndoableCommand uC02SwitchColor = null;
 
                 @Override
-                public void execute(boolean saveEffects) {
+                public void execute(final boolean saveEffects) {
                     handicapStoneCounter = newHandicapCtr;
 
                     if (newHandicapCtr <= 0) {
@@ -440,19 +437,9 @@ public class Game implements GameInterface {
             };
             uc02UpdateCounter.execute(true);
 
-            UndoableCommand c = new UndoableCommand() {
-                @Override
-                public void execute(boolean saveEffects) {
-                    uc01SetStone.execute(saveEffects);
-                    uc02UpdateCounter.execute(saveEffects);
-                }
+            subcommands.add(uc02UpdateCounter);
 
-                @Override
-                public void undo() {
-                    uc02UpdateCounter.undo();
-                    uc01SetStone.undo();
-                }
-            };
+            UndoableCommand c = UndoableCommand.of(subcommands);
             // c was already executed piecemeal
             c.getExecuteEvents().addAll(uc01SetStone.getExecuteEvents());
             c.getExecuteEvents().addAll(uc02UpdateCounter.getExecuteEvents());
@@ -535,7 +522,7 @@ public class Game implements GameInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 if (color == BLACK) {
                     Game.this.blackCapturedStones += amount;
                     Game.this.playerBlackScore += amount;
@@ -734,7 +721,7 @@ public class Game implements GameInterface {
             UndoableCommand thisCommand;
 
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 thisCommand = setCurColor(StoneColor.getOpposite(curColor));
                 if(saveEffects) {
                     getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
@@ -762,7 +749,7 @@ public class Game implements GameInterface {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 Game.this.curColor = c;
             }
 

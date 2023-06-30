@@ -29,7 +29,7 @@ public class AncientChineseRuleset implements Ruleset {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 lastBoardHash = NEW_BOARD_HASH;
             }
 

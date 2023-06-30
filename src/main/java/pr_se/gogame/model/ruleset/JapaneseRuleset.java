@@ -48,7 +48,7 @@ public class JapaneseRuleset implements Ruleset {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 for(int i = 0; i < boardHashes.length - 1; i++) {
                     boardHashes[i] = boardHashes[i + 1];
                 }
