@@ -65,7 +65,7 @@ public class SGFFileHandler implements FileHandler {
 
             /*
              * NOTE: The reason why iter.hasNext() is never checked here is that History is guaranteed to always have at
-             * least its starting and terminating node.
+             * least its starting and terminating node (the latter ending the save process).
              */
 
             // Get first node in history and save its metadata
