@@ -20,6 +20,7 @@ import pr_se.gogame.view_controller.dialog.CustomCloseAction;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 import pr_se.gogame.view_controller.dialog.CustomFileDialog;
 import pr_se.gogame.view_controller.dialog.CustomNewGameAction;
+import pr_se.gogame.view_controller.observer.ViewListener;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -198,27 +199,16 @@ public class HeaderPane extends VBox {
         setupMode.setOnAction(e -> {
             game.setSetupMode(setupMode.isSelected());
 
-            if(game.isSetupMode()) {
-                passItem.setText("Switch co_lor");
-                var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Pass")).findFirst();
-                k.ifPresent(button -> button.setText("Switch color"));
+            passItem.setText(game.isSetupMode() ? "Switch co_lor" : "_Pass");
 
-            } else {
-                passItem.setText("_Pass");
-                var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Switch color")).findFirst();
-                k.ifPresent(button -> button.setText("Pass"));
-            }
+            GlobalSettings.update();
         });
 
 
         moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
-        moveConfirmationRequired.setOnAction(e -> {
-            GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected());
-            var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
-            k.ifPresent(button -> button.setVisible(GlobalSettings.isConfirmationNeeded()));
-        });
+        moveConfirmationRequired.setOnAction(e -> GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected()));
 
         passItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN));
         gameSectionItems.add(passItem);
@@ -237,14 +227,16 @@ public class HeaderPane extends VBox {
         game.addListener(e -> {
             switch (e.getGameCommand()) {
                 case INIT:
-                    playbackControlList.stream().filter(button -> !button.isDisable()).forEach(button -> button.setDisable(true));
+                    playbackControlList.forEach(button -> button.setDisable(true));
+
                 case GAME_WON:
-                    gameSectionItems.stream().filter(menuItem -> !menuItem.isDisable()).forEach(menuItem -> menuItem.setDisable(true));
+                    gameSectionItems.forEach(menuItem -> menuItem.setDisable(true));
                     break;
 
                 case NEW_GAME, UPDATE:
-                    gameSectionItems.stream().filter(MenuItem::isDisable).forEach(menuItem -> menuItem.setDisable(false));
-                    playbackControlList.stream().filter(Button::isDisable).forEach(button -> button.setDisable(false));
+                    gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
+                    setupMode.setSelected(false);
+                    playbackControlList.forEach(button -> button.setDisable(false));
                     break;
                 default:
                     break;
@@ -404,8 +396,9 @@ public class HeaderPane extends VBox {
         gameShortCuts.setAlignment(Pos.CENTER);
         gameShortCuts.setSpacing(25);
 
+        final String passText = "Pass";
 
-        Button pass = new Button("Pass");
+        Button pass = new Button(passText);
         pass.setFocusTraversable(false);
         pass.setOnAction(e -> game.pass());
         gameShortCutList.add(pass);
@@ -430,11 +423,29 @@ public class HeaderPane extends VBox {
 
         game.addListener(e -> {
             switch (e.getGameCommand()){
-                case INIT, GAME_WON -> gameShortCutList.forEach(button -> button.setDisable(true));
-                case NEW_GAME, UPDATE -> gameShortCutList.forEach(button -> button.setDisable(false));
-                default -> {
-                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
-                }
+                case INIT:
+                    pass.setText(passText);
+                case GAME_WON:
+                    gameShortCutList.forEach(button -> button.setDisable(true));
+                    break;
+                case NEW_GAME, UPDATE:
+                    gameShortCutList.forEach(button -> button.setDisable(false));
+                    break;
+                default:
+                    break;
+            }
+        });
+
+        GlobalSettings.addListener(new ViewListener() {
+            @Override
+            public void onSettingsUpdated() {
+                confirm.setVisible(GlobalSettings.isConfirmationNeeded());
+                pass.setText(game.isSetupMode() ? "Switch color" : passText);
+            }
+
+            @Override
+            public void onMoveConfirmed() {
+                // Move confirmation does not pertain to this.
             }
         });
 
