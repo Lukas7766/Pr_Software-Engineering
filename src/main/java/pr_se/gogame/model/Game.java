@@ -365,20 +365,18 @@ public class Game implements GameInterface {
 
             List<UndoableCommand> subcommands = new LinkedList<>();
 
-            final int oldHandicapCtr = handicapStoneCounter;
-            handicapStoneCounter--;
-            final int newHandicapCtr = handicapStoneCounter;
-
             final UndoableCommand uc01SetStone = board.setStone(x, y, color, true); // uc01SetStone is already executed within board.setStone().
 
             if(uc01SetStone == null) {
-                handicapStoneCounter = oldHandicapCtr;
                 return;
             }
 
             // Assertion: uc01SetStone != null and was hence a valid move.
 
             subcommands.add(uc01SetStone);
+
+            final int oldHandicapCtr = handicapStoneCounter;
+            final int newHandicapCtr = handicapStoneCounter - 1;
 
             final UndoableCommand uc02UpdateCounter = new UndoableCommand() {
                 UndoableCommand uC02SwitchColor = null;
