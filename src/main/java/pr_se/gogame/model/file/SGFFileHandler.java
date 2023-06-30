@@ -15,7 +15,6 @@ import java.nio.file.NoSuchFileException;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 
 import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
