@@ -2,10 +2,7 @@ package pr_se.gogame.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pr_se.gogame.model.helper.GameCommand;
-import pr_se.gogame.model.helper.MarkShape;
-import pr_se.gogame.model.helper.Position;
-import pr_se.gogame.model.helper.UndoableCommand;
+import pr_se.gogame.model.helper.*;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.util.HashSet;
@@ -243,7 +240,11 @@ class HistoryTest {
     // History.HistoryNode
     @Test
     void HistoryNodeConstructorArgs() {
-        assertThrows(NullPointerException.class, () -> new History.HistoryNode(new UndoableCommand() {
+        /*
+         * These variables, once again, simply exist to ensure that nothing else could throw an exception inside
+         * assertThrows().
+         */
+        UndoableCommand command = new UndoableCommand() {
             @Override
             public void execute(final boolean saveEffects) {
 
@@ -253,7 +254,10 @@ class HistoryTest {
             public void undo() {
 
             }
-        }, null, game.getCurColor(), ""));
+        };
+        StoneColor color = game.getCurColor();
+
+        assertThrows(NullPointerException.class, () -> new History.HistoryNode(command, null, color, ""));
     }
 
     @Test
