@@ -12,7 +12,7 @@ import java.util.List;
 public class JapaneseRuleset implements Ruleset {
 
     /**
-     * This helps to determine if a position is already visited by the flood fill algorithm.
+     * This helps to determine if a position has already been visited by the flood fill algorithm.
      */
     private boolean[][] visited;
 
@@ -124,7 +124,7 @@ public class JapaneseRuleset implements Ruleset {
         return new GameResult(scoreBlack, scoreWhite, winner, sb.toString());
     }
 
-    //FloodFill Algorithm, source: ALGO assignment
+    // FloodFill Algorithm, source: ALGO assignment
     /**
      * The algorithm starts at the border of the board. In the first step, all empty positions will be located.
      * In the next and final step for every empty position all neighbouring positions will be checked if a different
@@ -157,6 +157,15 @@ public class JapaneseRuleset implements Ruleset {
     }
 
 
+    /**
+     * Starts at the given location and recursively checks all neighboring positions.
+     * @param game the Game to be evaluated
+     * @param color the color whose territory score is to be calculated
+     * @param x the x-coordinate of the search's origin, starting at the left
+     * @param y the y-coordinate of the search's origin, starting at the top
+     * @return true if an empty area without any bordering stones of the opposite of color was found, false if any stone
+     *  of the opposite color was found
+     */
     private boolean floodFill(Game game, StoneColor color, int x, int y) {
         if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize()) {
             return true;
