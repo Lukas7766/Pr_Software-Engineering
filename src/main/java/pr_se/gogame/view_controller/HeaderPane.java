@@ -28,7 +28,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.stream.Collectors;
 
 /**
  * This class contains the controller and view function of the game header panel.<br>
@@ -462,7 +461,7 @@ public class HeaderPane extends VBox {
         File[] directoryListing = graphicsFolder.listFiles(zipFilter);
         if(directoryListing != null) {
             // We still need to filter out non-files because you could have a folder whose name ends with ".zip".
-            for (File f : Arrays.stream(directoryListing).filter(f -> f.isFile()).collect(Collectors.toList())) {
+            for (File f : Arrays.stream(directoryListing).filter(File::isFile).toList()) {
                 comboBoxItems.add(f.getName());
             }
         } else {
