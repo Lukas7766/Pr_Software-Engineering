@@ -1,16 +1,12 @@
 package pr_se.gogame.model;
 
 import pr_se.gogame.model.file.FileHandler;
-import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.observer.GameListener;
-
-import java.io.File;
-import java.nio.file.NoSuchFileException;
 
 public interface GameInterface {
 
