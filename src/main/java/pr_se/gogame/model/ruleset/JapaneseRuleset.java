@@ -1,11 +1,10 @@
 package pr_se.gogame.model.ruleset;
 
-import pr_se.gogame.model.*;
+import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;

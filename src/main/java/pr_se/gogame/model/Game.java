@@ -12,7 +12,6 @@ import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -64,7 +63,7 @@ public class Game implements GameInterface {
     private FileHandler fileHandler;
 
     public Game() {
-        this.listeners = new ArrayList<>();
+        this.listeners = new LinkedList<>();
         this.gameState = GameState.NOT_STARTED_YET;
         this.board = new Board(this, 19);
         this.fileHandler = new SGFFileHandler(this);
