@@ -44,7 +44,7 @@ public abstract class UndoableCommand {
 
         List<UndoableCommand> finalSubcommands = List.copyOf(subcommands);
 
-        return new UndoableCommand() {
+        UndoableCommand ret = new UndoableCommand() {
             @Override
             public void execute(final boolean saveEffects) {
                 finalSubcommands.forEach(c -> c.execute(saveEffects));
@@ -60,5 +60,12 @@ public abstract class UndoableCommand {
                 }
             }
         };
+
+        finalSubcommands.forEach(c -> {
+            ret.getExecuteEvents().addAll(c.getExecuteEvents());
+            ret.getUndoEvents().addAll(c.getUndoEvents());
+        });
+
+        return ret;
     }
 }

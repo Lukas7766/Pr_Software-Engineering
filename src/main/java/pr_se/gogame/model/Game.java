@@ -348,14 +348,6 @@ public class Game implements GameInterface {
         // c was already executed piecemeal
 
         /*
-         * UC02 and UC04 fire events, so those have to be added to the command containing them.
-         */
-        c.getExecuteEvents().addAll(uc02SetStone.getExecuteEvents());
-        c.getExecuteEvents().addAll(uc04SwitchColor.getExecuteEvents());
-        c.getUndoEvents().addAll(uc02SetStone.getUndoEvents());
-        c.getUndoEvents().addAll(uc04SwitchColor.getUndoEvents());
-
-        /*
          * StoneColor.getOpposite() because we previously switched colors
          */
         removeAllMarks();
@@ -441,10 +433,6 @@ public class Game implements GameInterface {
 
             UndoableCommand c = UndoableCommand.of(subcommands);
             // c was already executed piecemeal
-            c.getExecuteEvents().addAll(uc01SetStone.getExecuteEvents());
-            c.getExecuteEvents().addAll(uc02UpdateCounter.getExecuteEvents());
-            c.getUndoEvents().addAll(uc01SetStone.getUndoEvents());
-            c.getUndoEvents().addAll(uc02UpdateCounter.getUndoEvents());
 
             /*
              * StoneColor.getOpposite() because we previously switched colors
