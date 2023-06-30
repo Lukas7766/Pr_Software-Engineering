@@ -457,14 +457,14 @@ public class HeaderPane extends VBox {
         File graphicsFolder = new File(GlobalSettings.GRAPHICS_PACK_FOLDER);
         FileFilter zipFilter = pathname -> pathname.getName().toLowerCase().endsWith(".zip");
         File[] directoryListing = graphicsFolder.listFiles(zipFilter);
-        if(directoryListing != null) {
-            // We still need to filter out non-files because you could have a folder whose name ends with ".zip".
-            for (File f : Arrays.stream(directoryListing).filter(File::isFile).toList()) {
-                comboBoxItems.add(f.getName());
-            }
-        } else {
+        if(directoryListing == null) {
             throw new IOException("Couldn't find graphics pack folder!");
         }
+        // We still need to filter out non-files because you could have a folder whose name ends with ".zip".
+        for (File f : Arrays.stream(directoryListing).filter(File::isFile).toList()) {
+            comboBoxItems.add(f.getName());
+        }
+
 
         ComboBox<String> graphicsPackSelectorComboBox = new ComboBox<>(comboBoxItems);
         graphicsPackSelectorComboBox.setValue(GlobalSettings.getGraphicsPackFileName());
