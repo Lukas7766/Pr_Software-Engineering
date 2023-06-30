@@ -15,7 +15,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.view_controller.dialog.CustomCloseAction;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
@@ -475,7 +475,7 @@ public class HeaderPane extends VBox {
     }
 
     private void saveGame(boolean as) {
-        File saveGameFile = FileHandler.getCurrentFile();
+        File saveGameFile = SGFFileHandler.getCurrentFile();
 
         if (as || saveGameFile == null) {
             saveGameFile = CustomFileDialog.getFile(stage, true);

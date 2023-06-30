@@ -5,7 +5,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.file.SGFFileHandler;
 
 import java.io.File;
 import java.io.IOException;
@@ -29,7 +29,7 @@ public class CustomSaveAction {
             switch (er.getText()) {
                 case "no" -> onNo.use();
                 case "yes" -> {
-                    File f = FileHandler.getCurrentFile();
+                    File f = SGFFileHandler.getCurrentFile();
                     if (f == null) {
                         f = CustomFileDialog.getFile(stage, true);
                         if (f == null) {

@@ -539,7 +539,7 @@ class GameTest {
 
     @Test
     void handicapCtrButSetManually() {
-        // Used by the FileHandler
+        // Used by the SGFFileHandler
         game.newGame(BLACK, 19, 0, new JapaneseRuleset(), false);
 
         assertEquals(RUNNING, game.getGameState());

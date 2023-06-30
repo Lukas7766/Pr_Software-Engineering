@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
-class FileHandlerTest {
+class SGFFileHandlerTest {
     Game game;
 
     File file;
@@ -39,14 +39,14 @@ class FileHandlerTest {
     // Argument-Checking
     @Test
     void saveFileArgs() {
-        assertThrows(NullPointerException.class, () -> FileHandler.saveFile(null, file));
-        assertThrows(NullPointerException.class, () -> FileHandler.saveFile(game, null));
+        assertThrows(NullPointerException.class, () -> SGFFileHandler.saveFile(null, file));
+        assertThrows(NullPointerException.class, () -> SGFFileHandler.saveFile(game, null));
     }
 
     @Test
     void loadFileArgs() {
-        assertThrows(NullPointerException.class, () -> FileHandler.loadFile(null, file));
-        assertThrows(NullPointerException.class, () -> FileHandler.loadFile(game, null));
+        assertThrows(NullPointerException.class, () -> SGFFileHandler.loadFile(null, file));
+        assertThrows(NullPointerException.class, () -> SGFFileHandler.loadFile(game, null));
     }
 
     // Edge cases
@@ -125,7 +125,7 @@ class FileHandlerTest {
 
     @Test
     void getCurrentFile() {
-        assertEquals(file, FileHandler.getCurrentFile());
+        assertEquals(file, SGFFileHandler.getCurrentFile());
 
         comprehensiveTest();
     }
@@ -133,8 +133,8 @@ class FileHandlerTest {
     @Test
     void clearCurrentFile() {
         getCurrentFile();
-        FileHandler.clearCurrentFile();
-        assertNull(FileHandler.getCurrentFile());
+        SGFFileHandler.clearCurrentFile();
+        assertNull(SGFFileHandler.getCurrentFile());
 
         comprehensiveTest();
     }
@@ -163,7 +163,7 @@ class FileHandlerTest {
         File myFile = new File(TEST_FILE_FOLDER + "okHAWithoutStones.sgf");
 
         try {
-            assertTrue(FileHandler.loadFile(game, myFile));
+            assertTrue(SGFFileHandler.loadFile(game, myFile));
         } catch (NoSuchFileException | LoadingGameException e) {
             e.printStackTrace();
             fail();
@@ -178,7 +178,7 @@ class FileHandlerTest {
         File myFile = new File(TEST_FILE_FOLDER + "noHA.sgf");
 
         try {
-            assertTrue(FileHandler.loadFile(game, myFile));
+            assertTrue(SGFFileHandler.loadFile(game, myFile));
         } catch (NoSuchFileException | LoadingGameException e) {
             e.printStackTrace();
             fail();
@@ -277,22 +277,22 @@ class FileHandlerTest {
         if(f.exists()) {
             fail();
         }
-        assertThrows(NoSuchFileException.class, () -> FileHandler.loadFile(game, f));
+        assertThrows(NoSuchFileException.class, () -> SGFFileHandler.loadFile(game, f));
     }
 
     @Test
     void handicapAfterGameBegun() {
         game.playMove(0, 0);
         game.getHistory().addNode(new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.HANDICAP, null, ""));
-        assertFalse(FileHandler.saveFile(game, file));
+        assertFalse(SGFFileHandler.saveFile(game, file));
     }
 
     @Test
     void saveHandicapButNoStones() {
         game.newGame(BLACK, 19, 2, new JapaneseRuleset(), false);
-        assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
+        assertThrows(IllegalStateException.class, () -> SGFFileHandler.saveFile(game, file));
         game.getHistory().addNode(new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.MOVE, null, ""));
-        assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
+        assertThrows(IllegalStateException.class, () -> SGFFileHandler.saveFile(game, file));
     }
 
     @Test
@@ -339,14 +339,14 @@ class FileHandlerTest {
             }
         }, History.HistoryNode.AbstractSaveToken.SETUP, null, ""));
 
-        assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
+        assertThrows(IllegalStateException.class, () -> SGFFileHandler.saveFile(game, file));
     }
 
     @Test
     void playAfterResign() {
         game.resign();
         game.getHistory().addNode(new History.HistoryNode(null, History.HistoryNode.AbstractSaveToken.MOVE, BLACK, ""));
-        assertThrows(IllegalStateException.class, () -> FileHandler.saveFile(game, file));
+        assertThrows(IllegalStateException.class, () -> SGFFileHandler.saveFile(game, file));
     }
 
     @Test
@@ -397,7 +397,7 @@ class FileHandlerTest {
     // Helper methods
     void invalidTest(String fileName) {
         try {
-            assertFalse(FileHandler.loadFile(game, new File(TEST_FILE_FOLDER + fileName)));
+            assertFalse(SGFFileHandler.loadFile(game, new File(TEST_FILE_FOLDER + fileName)));
         } catch(NoSuchFileException e) {
             e.printStackTrace();
             fail();
@@ -427,12 +427,12 @@ class FileHandlerTest {
     }
 
     void assertSavingWorks() {
-        assertTrue(FileHandler.saveFile(game, file));
+        assertTrue(SGFFileHandler.saveFile(game, file));
     }
 
     void assertLoadingWorks() {
         try {
-            assertTrue(FileHandler.loadFile(game, file));
+            assertTrue(SGFFileHandler.loadFile(game, file));
         } catch (NoSuchFileException | LoadingGameException e) {
             fail();
         }

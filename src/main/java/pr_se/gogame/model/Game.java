@@ -1,6 +1,6 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.model.file.FileHandler;
+import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.GameCommand;
 import pr_se.gogame.model.helper.MarkShape;
@@ -73,7 +73,7 @@ public class Game implements GameInterface {
     public void initGame() {
         gameState = GameState.NOT_STARTED_YET;
         this.history = null;
-        FileHandler.clearCurrentFile();
+        SGFFileHandler.clearCurrentFile();
 
         fireGameEvent(new GameEvent(GameCommand.INIT));
     }
@@ -140,7 +140,7 @@ public class Game implements GameInterface {
         if (file == null) {
             throw new NullPointerException();
         }
-        return FileHandler.saveFile(this, file);
+        return SGFFileHandler.saveFile(this, file);
     }
 
     @Override
@@ -149,7 +149,7 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
         try {
-            return FileHandler.loadFile(this, file);
+            return SGFFileHandler.loadFile(this, file);
         } catch (NoSuchFileException e) {
             return false;
         }

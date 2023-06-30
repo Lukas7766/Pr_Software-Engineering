@@ -20,7 +20,7 @@ import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
-public final class FileHandler {
+public final class SGFFileHandler {
     private static final Map<SGFToken, StoneColor> correspondingColors =
         Map.of(
                 AW, WHITE,
@@ -30,7 +30,7 @@ public final class FileHandler {
 
     private static File currentFile;
 
-    private FileHandler() {
+    private SGFFileHandler() {
         // This private constructor solely exists to prevent instantiation.
     }
 
