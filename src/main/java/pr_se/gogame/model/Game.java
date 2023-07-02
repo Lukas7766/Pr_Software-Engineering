@@ -353,6 +353,8 @@ public class Game implements GameInterface {
 
         checkCoords(x, y);
 
+        UndoableCommand c = null;
+
         if(placeStone) {
             if(color == null) {
                 throw new NullPointerException();
@@ -409,7 +411,7 @@ public class Game implements GameInterface {
 
             subcommands.add(uc02UpdateCounter);
 
-            UndoableCommand c = UndoableCommand.of(subcommands);
+            c = UndoableCommand.of(subcommands);
             // c was already executed piecemeal
 
             /*
@@ -422,10 +424,17 @@ public class Game implements GameInterface {
                 fireGameEvent(e);
             }
 
-            c.getExecuteEvents().add(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
+            // c.getExecuteEvents().add(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
         }
 
-        fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
+        GameEvent handicapEvent = new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber);
+
+        if(c != null) {
+            c.getExecuteEvents().add(handicapEvent);
+            c.getUndoEvents().add(new GameEvent(GameCommand.HANDICAP_REMOVED, x, y, null, curMoveNumber));
+        }
+
+        fireGameEvent(handicapEvent);
     }
 
     @Override

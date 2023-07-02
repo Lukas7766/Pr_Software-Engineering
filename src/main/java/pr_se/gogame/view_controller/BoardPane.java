@@ -201,6 +201,13 @@ public class BoardPane extends GridPane {
 
                     break;
 
+                case HANDICAP_REMOVED:
+                    destinationPBC = getPlayableCell(e.getX(), e.getY());
+
+                    destinationPBC.hideHandicapSlot();
+
+                    break;
+
                 case SETUP_STONE_SET:
                     destinationPBC = getPlayableCell(e.getX(), e.getY());
 
