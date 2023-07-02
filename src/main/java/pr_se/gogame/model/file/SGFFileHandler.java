@@ -104,7 +104,7 @@ public class SGFFileHandler implements FileHandler {
             // Write game contents
             while(node.getSaveToken() != History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
 
-                if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.RESIGN) {
+                if(node.getSaveToken() == History.HistoryNode.AbstractSaveToken.RESIGN || node.getSaveToken() == History.HistoryNode.AbstractSaveToken.SCORED_GAME) {
                     node = iter.next();
                     if(node.getSaveToken() != History.HistoryNode.AbstractSaveToken.END_OF_HISTORY) {
                         throw new IllegalStateException("Game can't continue after resigning!");

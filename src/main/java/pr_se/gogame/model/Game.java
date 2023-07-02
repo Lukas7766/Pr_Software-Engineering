@@ -155,7 +155,7 @@ public class Game implements GameInterface {
     @Override
     public void resign() {
         if(gameState != GameState.RUNNING) {
-            throw new IllegalStateException("Can't score game if it isn't running! gameState was + " + gameState);
+            throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }
 
         final GameResult oldGameResult = this.gameResult;
@@ -193,12 +193,41 @@ public class Game implements GameInterface {
 
     @Override
     public void scoreGame() {
-        gameResult = ruleset.scoreGame(this);
-        playerBlackScore = gameResult.getScoreBlack();
-        playerWhiteScore = gameResult.getScoreWhite();
-        gameState = GameState.GAME_OVER;
+        final GameResult oldGameResult = gameResult;
+        final GameResult newGameResult = ruleset.scoreGame(this);
 
-        fireGameEvent(new GameEvent(GameCommand.GAME_WON));
+        final double oldBlackScore = playerBlackScore;
+        final double newBlackScore = newGameResult.getScoreBlack();
+
+        final double oldWhiteScore = playerWhiteScore;
+        final double newWhiteScore = newGameResult.getScoreWhite();
+
+        final GameState oldGameState = gameState;
+        final GameState newGameState = GameState.GAME_OVER;
+
+        UndoableCommand c = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                gameResult = newGameResult;
+                playerBlackScore = newBlackScore;
+                playerWhiteScore = newWhiteScore;
+                gameState = newGameState;
+            }
+
+            @Override
+            public void undo() {
+                gameResult = oldGameResult;
+                playerBlackScore = oldBlackScore;
+                playerWhiteScore = oldWhiteScore;
+                gameState = oldGameState;
+            }
+        };
+        c.execute(true);
+        c.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
+        c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
+        c.getExecuteEvents().forEach(e -> fireGameEvent(e));
+
+        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.SCORED_GAME, curColor, ""));
     }
 
     @Override

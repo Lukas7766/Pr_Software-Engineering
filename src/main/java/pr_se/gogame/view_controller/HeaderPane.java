@@ -184,7 +184,7 @@ public class HeaderPane extends VBox {
 
         List<MenuItem> historySectionItems = new LinkedList<>();
 
-        MenuItem rewindItem = new MenuItem("_Rewind");
+        MenuItem rewindItem = new MenuItem("Re_wind");
         rewindItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
         historySectionItems.add(rewindItem);
         rewindItem.setOnAction(e -> game.rewind());
@@ -199,7 +199,7 @@ public class HeaderPane extends VBox {
         historySectionItems.add(redoItem);
         redoItem.setOnAction(e -> game.redo());
 
-        MenuItem fastForwardItem = new MenuItem("_Fast Forward");
+        MenuItem fastForwardItem = new MenuItem("F_ast Forward");
         fastForwardItem.setAccelerator(new KeyCodeCombination(KeyCode.LESS, KeyCombination.CONTROL_DOWN));
         historySectionItems.add(fastForwardItem);
         fastForwardItem.setOnAction(e -> game.fastForward());
@@ -209,7 +209,7 @@ public class HeaderPane extends VBox {
         game.addListener(e -> {
             switch (e.getGameCommand()) {
                 case INIT -> menu.getItems().forEach(menuItem -> menuItem.setDisable(true));
-                case NEW_GAME -> menu.getItems().forEach(menuItem -> menuItem.setDisable(false));
+                case NEW_GAME, UPDATE -> menu.getItems().forEach(menuItem -> menuItem.setDisable(false));
                 default -> {
                     // Nothing else matters.
                 }
@@ -285,8 +285,9 @@ public class HeaderPane extends VBox {
 
                 case NEW_GAME:
                     playbackControlList.forEach(button -> button.setDisable(false));
-                    gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
                     setupMode.setSelected(false);
+                case UPDATE:
+                    gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
                     break;
                 default:
                     break;
@@ -350,7 +351,7 @@ public class HeaderPane extends VBox {
      * @return the help section for the menu bar
      */
     private Menu helpSection() {
-        Menu menu = new Menu("_Help");
+        Menu menu = new Menu("H_elp");
 
         MenuItem helpItem = new MenuItem("_Help");
         helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN));

@@ -181,6 +181,8 @@ public class History implements Iterable<History.HistoryNode> {
              */
             RESIGN,
 
+            SCORED_GAME,
+
             END_OF_HISTORY,      // removes the need for complicated edge cases
 
             BEGINNING_OF_HISTORY // no real purpose as yet, but seems sensible for demonstrating intent.

@@ -51,7 +51,7 @@ public class GoApplication extends Application {
         }
 
         // Set up the actual program
-        stage.setTitle("Go Game - App");
+        stage.setTitle("Go Game");
         Game game = new Game();
 
         BorderPane root = new BorderPane();
