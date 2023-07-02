@@ -423,8 +423,6 @@ public class Game implements GameInterface {
             for(GameEvent e : c.getExecuteEvents()) {
                 fireGameEvent(e);
             }
-
-            // c.getExecuteEvents().add(new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber));
         }
 
         GameEvent handicapEvent = new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber);
