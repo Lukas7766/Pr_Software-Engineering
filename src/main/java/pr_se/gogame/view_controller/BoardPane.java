@@ -221,6 +221,9 @@ public class BoardPane extends GridPane {
                     break;
 
                 case UPDATE:
+                    if(hoverPBC != null) {
+                        hoverPBC.hover();
+                    }
                     setMouseTransparent(false);
                     requestFocus(); // This is necessary so that focus is taken away from the comment text area upon doing anything.
                     break;
@@ -232,6 +235,16 @@ public class BoardPane extends GridPane {
 
                 case INIT, GAME_WON:
                     setMouseTransparent(true);
+                    setFocusTraversable(false);
+                    setFocused(false);
+                    if(selectionPBC != null) {
+                        selectionPBC.deselect();
+                    }
+                    if(hoverPBC != null) {
+                        hoverPBC.unhover();
+                    }
+                    keyboardCellX = -1;
+                    keyboardCellY = -1;
                     break;
 
                 case DEBUG_INFO:

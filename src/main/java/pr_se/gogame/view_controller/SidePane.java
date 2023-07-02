@@ -12,6 +12,8 @@ import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.view_controller.dialog.CustomWinAction;
+import pr_se.gogame.view_controller.observer.GameEvent;
+import pr_se.gogame.view_controller.observer.GameListener;
 
 /**
  * This class contains the controller and view function of the game information panel.<br>
@@ -302,6 +304,15 @@ public class SidePane extends StackPane {
         });
         //colum, row,
         gridPane.add(startGameBtn, 1, 15);
+
+        game.addListener(e -> {
+            switch (e.getGameCommand()) {
+                case INIT -> requestFocus();
+                default -> {
+                    // Ignore everything else
+                }
+            }
+        });
 
         return gridPane;
     }
