@@ -378,27 +378,10 @@ public class HeaderPane extends VBox {
         playbackControl.getChildren().addAll(playbackControlList);
 
         //Key Bindings for the playback control
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F), () -> {
-            if (!backward.isDisabled()) {
-                backward.fire();
-            }
-        });
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.H), () -> {
-            if (!forward.isDisabled()) {
-                forward.fire();
-            }
-        });
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T), () -> {
-            if (!fastForward.isDisabled()) {
-                fastForward.fire();
-            }
-        });
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.G), () -> {
-            if (!fastBackward.isDisabled()) {
-                fastBackward.fire();
-            }
-        });
-
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.V), fastBackward::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.B), backward::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.N), forward::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.M), fastForward::fire);
 
         lane.getChildren().add(playbackControl);
 
