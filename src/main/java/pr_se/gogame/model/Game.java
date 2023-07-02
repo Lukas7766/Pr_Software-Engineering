@@ -126,9 +126,9 @@ public class Game implements GameInterface {
 
         boolean ruleSetHasAutoPlacement = this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
 
-        if(handicapStoneCounter <= 1 && ruleSetHasAutoPlacement) {
+        if(handicapStoneCounter == 0 || (handicapStoneCounter == 1 && ruleSetHasAutoPlacement)) {
             gameState = GameState.RUNNING;
-        } else {
+        } else if(handicapStoneCounter == 1) {
             gameState = GameState.SETTING_UP;
         }
 
