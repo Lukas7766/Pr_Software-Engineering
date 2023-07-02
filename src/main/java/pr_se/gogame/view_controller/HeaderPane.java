@@ -184,7 +184,7 @@ public class HeaderPane extends VBox {
 
         List<MenuItem> historySectionItems = new LinkedList<>();
 
-        MenuItem rewindItem = new MenuItem("Re_wind");
+        MenuItem rewindItem = new MenuItem("_Rewind");
         rewindItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
         historySectionItems.add(rewindItem);
         rewindItem.setOnAction(e -> game.rewind());
@@ -194,7 +194,7 @@ public class HeaderPane extends VBox {
         historySectionItems.add(undoItem);
         undoItem.setOnAction(e -> game.undo());
 
-        MenuItem redoItem = new MenuItem("_Redo");
+        MenuItem redoItem = new MenuItem("Red_o");
         redoItem.setAccelerator(new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN));
         historySectionItems.add(redoItem);
         redoItem.setOnAction(e -> game.redo());
@@ -235,8 +235,8 @@ public class HeaderPane extends VBox {
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
         MenuItem passItem = new MenuItem("_Pass");
         MenuItem resignItem = new MenuItem("_Resign");
-        MenuItem confirmItem = new MenuItem("Confirm move");
-        MenuItem scoreGameItem = new MenuItem("_Score Game");
+        MenuItem confirmItem = new MenuItem("Confirm _move");
+        MenuItem scoreGameItem = new MenuItem("Sc_ore Game");
 
         // This item probably doesn't need a separate accelerator.
         gameSectionItems.add(setupMode);
@@ -358,7 +358,7 @@ public class HeaderPane extends VBox {
         menu.getItems().add(helpItem);
         helpItem.setOnAction(ev -> app.getHostServices().showDocument("https://en.wikipedia.org/wiki/Go_(game)"));
 
-        MenuItem aboutUs = new MenuItem("_About Us");
+        MenuItem aboutUs = new MenuItem("Abo_ut Us");
         aboutUs.setAccelerator(new KeyCodeCombination(A, KeyCombination.CONTROL_DOWN));
         menu.getItems().add(aboutUs);
         aboutUs.setOnAction(e -> {
