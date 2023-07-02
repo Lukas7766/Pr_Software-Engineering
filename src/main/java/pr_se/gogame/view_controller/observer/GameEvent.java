@@ -108,11 +108,11 @@ public class GameEvent {
     }
 
     private boolean hasPosition() {
-        return isStoneRelated() || gameCommand == MARK_CIRCLE || gameCommand == MARK_SQUARE || gameCommand == MARK_TRIANGLE|| gameCommand == UNMARK || gameCommand == DEBUG_INFO;
+        return isStoneRelated() || gameCommand == MARK_CIRCLE || gameCommand == MARK_SQUARE || gameCommand == MARK_TRIANGLE|| gameCommand == UNMARK || gameCommand == DEBUG_INFO || gameCommand == HANDICAP_SET || gameCommand == HANDICAP_REMOVED;
     }
 
     private boolean isStoneRelated() {
-        return gameCommand == STONE_WAS_SET || gameCommand == STONE_WAS_REMOVED || gameCommand == HANDICAP_SET || gameCommand == HANDICAP_REMOVED || gameCommand == SETUP_STONE_SET;
+        return gameCommand == STONE_WAS_SET || gameCommand == STONE_WAS_REMOVED || gameCommand == SETUP_STONE_SET;
     }
 
     @Override

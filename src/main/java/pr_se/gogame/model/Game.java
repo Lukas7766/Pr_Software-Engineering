@@ -425,11 +425,11 @@ public class Game implements GameInterface {
             }
         }
 
-        GameEvent handicapEvent = new GameEvent(GameCommand.HANDICAP_SET, x, y, null, curMoveNumber);
+        GameEvent handicapEvent = new GameEvent(GameCommand.HANDICAP_SET, x, y, curMoveNumber);
 
         if(c != null) {
             c.getExecuteEvents().add(handicapEvent);
-            c.getUndoEvents().add(new GameEvent(GameCommand.HANDICAP_REMOVED, x, y, null, curMoveNumber));
+            c.getUndoEvents().add(new GameEvent(GameCommand.HANDICAP_REMOVED, x, y, curMoveNumber));
         }
 
         fireGameEvent(handicapEvent);
