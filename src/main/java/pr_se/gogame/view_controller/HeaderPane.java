@@ -205,7 +205,7 @@ public class HeaderPane extends VBox {
 
             GlobalSettings.update();
         });
-        
+
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
         moveConfirmationRequired.setOnAction(e -> GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected()));
@@ -308,7 +308,7 @@ public class HeaderPane extends VBox {
         Menu menu = new Menu("_Help");
 
         MenuItem helpItem = new MenuItem("_Help");
-        helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN));
         menu.getItems().add(helpItem);
         helpItem.setOnAction(ev -> {
             String url = "https://en.wikipedia.org/wiki/Go_(game)";
