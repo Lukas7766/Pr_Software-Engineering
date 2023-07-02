@@ -205,9 +205,7 @@ public class HeaderPane extends VBox {
 
             GlobalSettings.update();
         });
-
-
-        moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
+        
         gameSectionItems.add(moveConfirmationRequired);
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
         moveConfirmationRequired.setOnAction(e -> GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected()));
@@ -284,13 +282,13 @@ public class HeaderPane extends VBox {
         Menu menu = new Menu("_View");
 
         CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Move _Numbers");
-        showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N));
         menu.getItems().add(showMoveNumbersCBtn);
         showMoveNumbersCBtn.setSelected(GlobalSettings.isShowMoveNumbers());
         showMoveNumbersCBtn.setOnAction(e -> GlobalSettings.setShowMoveNumbers(showMoveNumbersCBtn.isSelected()));
 
         CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("_Coordinates");
-        showCoordinatesCBtn.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        showCoordinatesCBtn.setAccelerator(new KeyCodeCombination(KeyCode.C));
         menu.getItems().add(showCoordinatesCBtn);
         showCoordinatesCBtn.setSelected(GlobalSettings.isShowCoordinates());
         showCoordinatesCBtn.setOnAction(e -> GlobalSettings.setShowCoordinates(showCoordinatesCBtn.isSelected()));
@@ -318,7 +316,6 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem aboutUs = new MenuItem("_About Us");
-        aboutUs.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
         menu.getItems().add(aboutUs);
         aboutUs.setOnAction(e -> {
 
@@ -378,10 +375,10 @@ public class HeaderPane extends VBox {
         playbackControl.getChildren().addAll(playbackControlList);
 
         //Key Bindings for the playback control
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.V), fastBackward::fire);
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.B), backward::fire);
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.N), forward::fire);
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.M), fastForward::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT1), fastBackward::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT2), backward::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT3), forward::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT4), fastForward::fire);
 
         lane.getChildren().add(playbackControl);
 
