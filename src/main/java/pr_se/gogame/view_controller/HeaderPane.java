@@ -356,10 +356,7 @@ public class HeaderPane extends VBox {
         MenuItem helpItem = new MenuItem("Hel_p");
         helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN));
         menu.getItems().add(helpItem);
-        helpItem.setOnAction(ev -> {
-            String url = "https://en.wikipedia.org/wiki/Go_(game)";
-            app.getHostServices().showDocument(url);
-        });
+        helpItem.setOnAction(ev -> app.getHostServices().showDocument("https://en.wikipedia.org/wiki/Go_(game)"));
 
         MenuItem aboutUs = new MenuItem("_About Us");
         aboutUs.setAccelerator(new KeyCodeCombination(A, KeyCombination.CONTROL_DOWN));
