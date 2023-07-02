@@ -278,7 +278,6 @@ public class HeaderPane extends VBox {
             switch (e.getGameCommand()) {
                 case INIT:
                     playbackControlList.forEach(button -> button.setDisable(true));
-
                 case GAME_WON:
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(true));
                     break;
