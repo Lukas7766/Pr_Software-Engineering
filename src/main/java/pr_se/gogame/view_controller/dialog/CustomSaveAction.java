@@ -16,9 +16,9 @@ public class CustomSaveAction {
     }
 
     public static void onSaveAction(Stage stage, Alert alert, Game game, Procedure onYes, Procedure onNo, Procedure onCancel) {
-        ButtonType noBtn = new ButtonType("no");
-        ButtonType saveBtn = new ButtonType("yes");
-        ButtonType cancelBtn = new ButtonType("cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
+        ButtonType noBtn = new ButtonType("No");
+        ButtonType saveBtn = new ButtonType("Yes");
+        ButtonType cancelBtn = new ButtonType("Cancel", ButtonBar.ButtonData.CANCEL_CLOSE);
 
         alert.getButtonTypes().setAll(saveBtn, noBtn, cancelBtn);
 
@@ -26,8 +26,8 @@ public class CustomSaveAction {
 
         btnResult.ifPresent(er -> {
             switch (er.getText()) {
-                case "no" -> onNo.use();
-                case "yes" -> {
+                case "No" -> onNo.use();
+                case "Yes" -> {
                     File f = game.getFileHandler().getCurrentFile();
                     if (f == null) {
                         f = CustomFileDialog.getFile(stage, true);
@@ -48,7 +48,7 @@ public class CustomSaveAction {
 
                     onYes.use();
                 }
-                case "cancel" -> onCancel.use();
+                case "Cancel" -> onCancel.use();
                 default -> {
                     // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
                 }

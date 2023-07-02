@@ -353,7 +353,7 @@ public class HeaderPane extends VBox {
     private Menu helpSection() {
         Menu menu = new Menu("H_elp");
 
-        MenuItem helpItem = new MenuItem("_Help");
+        MenuItem helpItem = new MenuItem("Hel_p");
         helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN));
         menu.getItems().add(helpItem);
         helpItem.setOnAction(ev -> {
