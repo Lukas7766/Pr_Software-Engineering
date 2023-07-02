@@ -169,10 +169,6 @@ public class Game implements GameInterface {
                         "\n" +
                         StoneColor.getOpposite(finalCurColor) + " won!";
                 gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(finalCurColor), msg);
-                if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
-                    getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
-                }
                 gameState = GameState.GAME_OVER;
             }
 
@@ -183,6 +179,8 @@ public class Game implements GameInterface {
             }
         };
         c.execute(true);
+        c.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
+        c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
 
         history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.RESIGN, finalCurColor, ""));
 
@@ -193,6 +191,10 @@ public class Game implements GameInterface {
 
     @Override
     public void scoreGame() {
+        if(gameState != GameState.RUNNING) {
+            throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
+        }
+
         final GameResult oldGameResult = gameResult;
         final GameResult newGameResult = ruleset.scoreGame(this);
 
@@ -202,16 +204,13 @@ public class Game implements GameInterface {
         final double oldWhiteScore = playerWhiteScore;
         final double newWhiteScore = newGameResult.getScoreWhite();
 
-        final GameState oldGameState = gameState;
-        final GameState newGameState = GameState.GAME_OVER;
-
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
                 gameResult = newGameResult;
                 playerBlackScore = newBlackScore;
                 playerWhiteScore = newWhiteScore;
-                gameState = newGameState;
+                gameState = GameState.GAME_OVER;
             }
 
             @Override
@@ -219,7 +218,7 @@ public class Game implements GameInterface {
                 gameResult = oldGameResult;
                 playerBlackScore = oldBlackScore;
                 playerWhiteScore = oldWhiteScore;
-                gameState = oldGameState;
+                gameState = GameState.RUNNING;
             }
         };
         c.execute(true);
