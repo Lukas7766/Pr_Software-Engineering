@@ -192,6 +192,7 @@ public class HeaderPane extends VBox {
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
         MenuItem passItem = new MenuItem("_Pass");
         MenuItem resignItem = new MenuItem("_Resign");
+        MenuItem confirmItem = new MenuItem("Confirm move");
         MenuItem scoreGameItem = new MenuItem("_Score Game");
 
         // This item probably doesn't need a separate accelerator.
@@ -211,13 +212,18 @@ public class HeaderPane extends VBox {
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
         moveConfirmationRequired.setOnAction(e -> GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected()));
 
-        passItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN));
+        passItem.setAccelerator(new KeyCodeCombination(KeyCode.P));
         gameSectionItems.add(passItem);
         passItem.setOnAction(e -> game.pass());
 
         resignItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.ALT_DOWN));
         gameSectionItems.add(resignItem);
         resignItem.setOnAction(e -> game.resign());
+
+        confirmItem.setAccelerator(new KeyCodeCombination(KeyCode.ENTER));
+        gameSectionItems.add(confirmItem);
+        confirmItem.setOnAction(e -> GlobalSettings.confirmMove());
+        confirmItem.setVisible(false);
 
         scoreGameItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN));
         gameSectionItems.add(scoreGameItem);
@@ -245,11 +251,23 @@ public class HeaderPane extends VBox {
 
         });
 
+        GlobalSettings.addListener(new ViewListener() {
+            @Override
+            public void onSettingsUpdated() {
+                confirmItem.setVisible(GlobalSettings.isConfirmationNeeded());
+            }
+
+            @Override
+            public void onMoveConfirmed() {
+                // Does not pertain to this
+            }
+        });
+
         SeparatorMenuItem sep1 = new SeparatorMenuItem();
         menu.getItems().add(2, sep1);
 
         SeparatorMenuItem sep2 = new SeparatorMenuItem();
-        menu.getItems().add(5, sep2);
+        menu.getItems().add(6, sep2);
 
         return menu;
     }

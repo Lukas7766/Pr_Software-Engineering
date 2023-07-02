@@ -379,10 +379,6 @@ public class BoardPane extends GridPane {
                     }
                     break;
 
-                case ENTER:
-                    confirmMove();
-                    break;
-
                 default: break;
             }
 
@@ -651,6 +647,7 @@ public class BoardPane extends GridPane {
             this.label = new Label("0");
             this.label.setMinSize(0, 0);
             this.label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            this.label.setVisible(GlobalSettings.isShowCoordinates());
 
             final DoubleProperty fontSize = new SimpleDoubleProperty(0);
             fontSize.bind(this.label.widthProperty().divide(2).subtract(Bindings.length(this.label.textProperty())));
