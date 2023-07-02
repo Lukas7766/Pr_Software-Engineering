@@ -87,6 +87,7 @@ public class HeaderPane extends VBox {
 
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileSection());
+        menuBar.getMenus().add(historySection());
         menuBar.getMenus().add(gameSection());
         menuBar.getMenus().add(viewSection());
         menuBar.getMenus().add(helpSection());
@@ -178,6 +179,46 @@ public class HeaderPane extends VBox {
         return files;
     }
 
+    private Menu historySection() {
+        Menu menu = new Menu("_History");
+
+        List<MenuItem> historySectionItems = new LinkedList<>();
+
+        MenuItem rewindItem = new MenuItem("_Rewind");
+        rewindItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
+        historySectionItems.add(rewindItem);
+        rewindItem.setOnAction(e -> game.rewind());
+
+        MenuItem undoItem = new MenuItem("_Undo");
+        undoItem.setAccelerator(new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN));
+        historySectionItems.add(undoItem);
+        undoItem.setOnAction(e -> game.undo());
+
+        MenuItem redoItem = new MenuItem("_Redo");
+        redoItem.setAccelerator(new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN));
+        historySectionItems.add(redoItem);
+        redoItem.setOnAction(e -> game.redo());
+
+        MenuItem fastForwardItem = new MenuItem("_Fast Forward");
+        fastForwardItem.setAccelerator(new KeyCodeCombination(KeyCode.LESS, KeyCombination.CONTROL_DOWN));
+        historySectionItems.add(fastForwardItem);
+        fastForwardItem.setOnAction(e -> game.fastForward());
+
+        menu.getItems().addAll(historySectionItems);
+
+        game.addListener(e -> {
+            switch (e.getGameCommand()) {
+                case INIT -> menu.getItems().forEach(menuItem -> menuItem.setDisable(true));
+                case NEW_GAME -> menu.getItems().forEach(menuItem -> menuItem.setDisable(false));
+                default -> {
+                    // Nothing else matters.
+                }
+            }
+        });
+
+        return menu;
+    }
+
     /**
      * Creates the game section for the menu bar <br>
      * contains at least: <br>
@@ -242,10 +283,10 @@ public class HeaderPane extends VBox {
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(true));
                     break;
 
-                case NEW_GAME, UPDATE:
+                case NEW_GAME:
+                    playbackControlList.forEach(button -> button.setDisable(false));
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
                     setupMode.setSelected(false);
-                    playbackControlList.forEach(button -> button.setDisable(false));
                     break;
                 default:
                     break;
@@ -357,20 +398,20 @@ public class HeaderPane extends VBox {
         playbackControl.setAlignment(Pos.CENTER);
         playbackControl.setSpacing(5);
 
-        Button fastBackward = new Button("<<");
-        fastBackward.setFocusTraversable(false);
-        playbackControlList.add(fastBackward);
-        fastBackward.setOnAction(e -> game.rewind());
+        Button rewind = new Button("<<");
+        rewind.setFocusTraversable(false);
+        playbackControlList.add(rewind);
+        rewind.setOnAction(e -> game.rewind());
 
-        Button backward = new Button("<");
-        backward.setFocusTraversable(false);
-        playbackControlList.add(backward);
-        backward.setOnAction(e -> game.undo());
+        Button undo = new Button("<");
+        undo.setFocusTraversable(false);
+        playbackControlList.add(undo);
+        undo.setOnAction(e -> game.undo());
 
-        Button forward = new Button(">");
-        forward.setFocusTraversable(false);
-        playbackControlList.add(forward);
-        forward.setOnAction(e -> game.redo());
+        Button redo = new Button(">");
+        redo.setFocusTraversable(false);
+        playbackControlList.add(redo);
+        redo.setOnAction(e -> game.redo());
 
         Button fastForward = new Button(">>");
         fastForward.setFocusTraversable(false);
@@ -380,9 +421,9 @@ public class HeaderPane extends VBox {
         playbackControl.getChildren().addAll(playbackControlList);
 
         //Key Bindings for the playback control
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT1), fastBackward::fire);
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT2), backward::fire);
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT3), forward::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT1), rewind::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT2), undo::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT3), redo::fire);
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT4), fastForward::fire);
 
         lane.getChildren().add(playbackControl);
