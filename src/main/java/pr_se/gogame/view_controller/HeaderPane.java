@@ -29,6 +29,8 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+import static javafx.scene.input.KeyCode.A;
+
 /**
  * This class contains the controller and view function of the game header panel.<br>
  * It is recommended to place the panel on the top of the application.
@@ -197,6 +199,7 @@ public class HeaderPane extends VBox {
 
         // This item probably doesn't need a separate accelerator.
         gameSectionItems.add(setupMode);
+        setupMode.setAccelerator(new KeyCodeCombination(KeyCode.M, KeyCombination.ALT_DOWN));
         setupMode.setSelected(game.isSetupMode());
         setupMode.setOnAction(e -> {
             game.setSetupMode(setupMode.isSelected());
@@ -207,6 +210,7 @@ public class HeaderPane extends VBox {
         });
 
         gameSectionItems.add(moveConfirmationRequired);
+        moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
         moveConfirmationRequired.setOnAction(e -> GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected()));
 
@@ -316,6 +320,7 @@ public class HeaderPane extends VBox {
         });
 
         MenuItem aboutUs = new MenuItem("_About Us");
+        aboutUs.setAccelerator(new KeyCodeCombination(A, KeyCombination.CONTROL_DOWN));
         menu.getItems().add(aboutUs);
         aboutUs.setOnAction(e -> {
 
