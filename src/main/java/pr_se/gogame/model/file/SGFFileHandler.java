@@ -233,7 +233,7 @@ public class SGFFileHandler implements FileHandler {
                         break;
 
                     case LPAR:
-                        throw new LoadingGameException("This program does not support multiple GameTrees!", t);
+                        throw new LoadingGameException("Line " + t.getLine() + ", col " + t.getCol() + ": This SGF file has multiple branches, a feature currently unsupported by this program.", t);
 
                     case HA, SEMICOLON, RPAR:
                         break loop;
