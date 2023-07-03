@@ -246,6 +246,8 @@ public class HeaderPane extends VBox {
             game.setSetupMode(setupMode.isSelected());
 
             passItem.setText(game.isSetupMode() ? "Switch co_lor" : "_Pass");
+            resignItem.setDisable(game.getGameState() != Game.GameState.RUNNING);
+            scoreGameItem.setDisable(game.getGameState() != Game.GameState.RUNNING);
 
             GlobalSettings.update();
         });
@@ -299,6 +301,10 @@ public class HeaderPane extends VBox {
                     setupMode.setSelected(false);
                 case UPDATE:
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
+                    if(game.getGameState() != Game.GameState.RUNNING) {
+                        resignItem.setDisable(true);
+                        scoreGameItem.setDisable(true);
+                    }
                     break;
                 default:
                     break;
@@ -492,6 +498,10 @@ public class HeaderPane extends VBox {
                     break;
                 case NEW_GAME, UPDATE:
                     gameShortCutList.forEach(button -> button.setDisable(false));
+                    if(game.getGameState() != Game.GameState.RUNNING) {
+                        scoreGame.setDisable(true);
+                        resign.setDisable(true);
+                    }
                     break;
                 default:
                     break;
@@ -503,6 +513,8 @@ public class HeaderPane extends VBox {
             public void onSettingsUpdated() {
                 confirm.setVisible(GlobalSettings.isConfirmationNeeded());
                 pass.setText(game.isSetupMode() ? "Switch color" : passText);
+                resign.setDisable(game.getGameState() != Game.GameState.RUNNING);
+                scoreGame.setDisable(game.getGameState() != Game.GameState.RUNNING);
             }
 
             @Override

@@ -136,6 +136,8 @@ public class Game implements GameInterface {
         }
 
         this.curMoveNumber = 1;
+
+        fireGameEvent(new GameEvent(GameCommand.UPDATE));
     }
 
     @Override
@@ -203,11 +205,11 @@ public class Game implements GameInterface {
         if(gameState != GameState.RUNNING) {
             if(gameState == GameState.SETTING_UP) {
                 if(handicapStoneCounter >= 1) {
-                    throw new IllegalStateException("Can't score game before all handicap stones have been set.");
+                    throw new IllegalStateException("Can't resign before all handicap stones have been set.");
                 }
-                throw new IllegalStateException("Can't score game when it is in setup mode!");
+                throw new IllegalStateException("Can't resign when game is in setup mode!");
             }
-            throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
+            throw new IllegalStateException("Can't resign if game isn't running! gameState was " + gameState);
         }
 
         final GameResult oldGameResult = gameResult;
