@@ -18,10 +18,11 @@ public class GameResult {
 
     public GameResult() {
         this.scoreComponents = new EnumMap<>(StoneColor.class);
+        this.description = new EnumMap<>(StoneColor.class);
         for(StoneColor c : StoneColor.values()) {
             scoreComponents.put(c, new LinkedHashMap<>());
+            description.put(c, "");
         }
-        this.description = new EnumMap<>(StoneColor.class);
     }
 
     public UndoableCommand addScoreComponent(final StoneColor c, final PointType type, final Number value) {
@@ -59,6 +60,10 @@ public class GameResult {
     }
 
     public String getDescription(StoneColor c) {
+        if(c == null) {
+            throw new NullPointerException();
+        }
+
         StringBuilder sb = new StringBuilder(description.get(c));
         Iterator<Map.Entry<PointType, Number>> iter = scoreComponents.get(c).entrySet().iterator();
         Map.Entry<PointType, Number> cur;
@@ -84,11 +89,7 @@ public class GameResult {
 
             @Override
             public void undo() {
-                if(oldDescription != null) {
-                    GameResult.this.description.put(c, oldDescription);
-                } else {
-                    GameResult.this.description.remove(c);
-                }
+                GameResult.this.description.put(c, oldDescription);
             }
         };
         ret.execute(true);
