@@ -158,11 +158,11 @@ public class Game implements GameInterface {
         if(gameState != GameState.RUNNING) {
             if(gameState == GameState.SETTING_UP) {
                 if(handicapStoneCounter >= 1) {
-                    throw new IllegalStateException("Can't score game before all handicap stones have been set.");
+                    throw new IllegalStateException("Can't resign before all handicap stones have been set.");
                 }
-                throw new IllegalStateException("Can't score game when it is in setup mode!");
+                throw new IllegalStateException("Can't resign when game is in setup mode!");
             }
-            throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
+            throw new IllegalStateException("Can't resign if game isn't running! gameState was " + gameState);
         }
 
         List<UndoableCommand> subcommands = new LinkedList<>();
@@ -185,12 +185,11 @@ public class Game implements GameInterface {
         c.execute(true);
         c.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
         c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
+        c.getExecuteEvents().forEach(this::fireGameEvent);
 
         subcommands.add(c);
 
         UndoableCommand ret = UndoableCommand.of(subcommands);
-
-        c.getExecuteEvents().forEach(this::fireGameEvent);
 
         history.addNode(new History.HistoryNode(ret, History.HistoryNode.AbstractSaveToken.RESIGN, curColor, ""));
     }
@@ -200,11 +199,11 @@ public class Game implements GameInterface {
         if(gameState != GameState.RUNNING) {
             if(gameState == GameState.SETTING_UP) {
                 if(handicapStoneCounter >= 1) {
-                    throw new IllegalStateException("Can't resign before all handicap stones have been set.");
+                    throw new IllegalStateException("Can't score game before all handicap stones have been set.");
                 }
-                throw new IllegalStateException("Can't resign when game is in setup mode!");
+                throw new IllegalStateException("Can't score game when it is in setup mode!");
             }
-            throw new IllegalStateException("Can't resign if game isn't running! gameState was " + gameState);
+            throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }
 
         List<UndoableCommand> subcommands = new LinkedList<>();
