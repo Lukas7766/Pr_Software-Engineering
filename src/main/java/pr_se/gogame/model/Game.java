@@ -15,8 +15,7 @@ import pr_se.gogame.view_controller.observer.GameListener;
 import java.util.LinkedList;
 import java.util.List;
 
-import static pr_se.gogame.model.helper.StoneColor.BLACK;
-import static pr_se.gogame.model.helper.StoneColor.WHITE;
+import static pr_se.gogame.model.helper.StoneColor.*;
 
 public class Game implements GameInterface {
 
@@ -103,8 +102,8 @@ public class Game implements GameInterface {
 
         this.curMoveNumber = 0;
         this.gameResult = new GameResult();
-        this.gameResult.addScoreComponent(BLACK, GameResult.PointType.HANDICAP, handicap);
-        this.gameResult.addScoreComponent(WHITE, GameResult.PointType.KOMI, ruleset.getKomi());
+        this.gameResult.addScoreComponent(startingColor, GameResult.PointType.HANDICAP, handicap);
+        this.gameResult.addScoreComponent(getOpposite(startingColor), GameResult.PointType.KOMI, ruleset.getKomi());
 
         this.board = new Board(this, size);
         this.ruleset.reset();
