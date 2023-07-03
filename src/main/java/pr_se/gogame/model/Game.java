@@ -190,11 +190,9 @@ public class Game implements GameInterface {
 
         UndoableCommand ret = UndoableCommand.of(subcommands);
 
-        history.addNode(new History.HistoryNode(ret, History.HistoryNode.AbstractSaveToken.RESIGN, curColor, ""));
+        c.getExecuteEvents().forEach(this::fireGameEvent);
 
-        for(GameEvent e : c.getExecuteEvents()) {
-            fireGameEvent(e);
-        }
+        history.addNode(new History.HistoryNode(ret, History.HistoryNode.AbstractSaveToken.RESIGN, curColor, ""));
     }
 
     @Override
