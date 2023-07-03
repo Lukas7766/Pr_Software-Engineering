@@ -69,7 +69,7 @@ public class UserDefinableRuleset implements Ruleset {
 
     @Override
     public GameResult scoreGame(Game game) {
-        return new GameResult(1, 1, null,"");
+        return new GameResult();
     }
 
     public void setCustomHandicapPlacement(BiConsumer<Game, Integer> stoneSetter) {

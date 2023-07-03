@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 public class Game implements GameInterface {
 
@@ -175,11 +176,11 @@ public class Game implements GameInterface {
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(final boolean saveEffects) {
-                String msg =
-                        "Game was resigned by " + finalCurColor + "!\n" +
-                        "\n" +
-                        StoneColor.getOpposite(finalCurColor) + " won!";
-                gameResult = new GameResult(playerBlackScore, playerWhiteScore, StoneColor.getOpposite(finalCurColor), msg);
+                GameResult newGameResult = ruleset.scoreGame(Game.this);
+                newGameResult.setWinner(StoneColor.getOpposite(finalCurColor));
+                newGameResult.setDescription(finalCurColor, "Game was resigned by " + finalCurColor + "!");
+                newGameResult.setDescription(StoneColor.getOpposite(finalCurColor), StoneColor.getOpposite(finalCurColor) + " won!");
+                gameResult = newGameResult;
                 gameState = GameState.GAME_OVER;
             }
 
@@ -216,10 +217,10 @@ public class Game implements GameInterface {
         final GameResult newGameResult = ruleset.scoreGame(this);
 
         final double oldBlackScore = playerBlackScore;
-        final double newBlackScore = newGameResult.getScoreBlack();
+        final double newBlackScore = newGameResult.getScore(BLACK);
 
         final double oldWhiteScore = playerWhiteScore;
-        final double newWhiteScore = newGameResult.getScoreWhite();
+        final double newWhiteScore = newGameResult.getScore(WHITE);
 
         UndoableCommand c = new UndoableCommand() {
             @Override

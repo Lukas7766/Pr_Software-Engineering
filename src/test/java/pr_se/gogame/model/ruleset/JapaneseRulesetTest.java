@@ -96,11 +96,11 @@ class JapaneseRulesetTest {
 
         printBoard(game);
 
-        assertDoesNotThrow(() -> game.scoreGame());
+        assertDoesNotThrow(game::scoreGame);
         assertEquals(10, game.getScore(BLACK));
         assertEquals(6.5, game.getScore(WHITE));
-        assertEquals(10, japaneseRuleset.scoreGame(game).getScoreBlack());
-        assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
+        assertEquals(10, japaneseRuleset.scoreGame(game).getScore(BLACK));
+        assertEquals(6.5, japaneseRuleset.scoreGame(game).getScore(WHITE));
         assertEquals(BLACK, japaneseRuleset.scoreGame(game).getWinner());
         assertEquals(
                 """
@@ -110,7 +110,7 @@ class JapaneseRulesetTest {
                         + Territory points: 9
                         + Captured stones: 1
 
-                        = 10.0 points""", japaneseRuleset.scoreGame(game).getDescription());
+                        = 10.0 points""", japaneseRuleset.scoreGame(game).getDescription(BLACK));
     }
 
     @Test
@@ -145,12 +145,12 @@ class JapaneseRulesetTest {
 
         printBoard(game);
 
-        assertDoesNotThrow(() -> game.scoreGame());
+        assertDoesNotThrow(game::scoreGame);
         assertEquals(3, game.getScore(BLACK));
         assertEquals(6.5, game.getScore(WHITE));
 
-        assertEquals(3, japaneseRuleset.scoreGame(game).getScoreBlack());
-        assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
+        assertEquals(3, japaneseRuleset.scoreGame(game).getScore(BLACK));
+        assertEquals(6.5, japaneseRuleset.scoreGame(game).getScore(WHITE));
         assertEquals(WHITE, japaneseRuleset.scoreGame(game).getWinner());
         assertEquals(
                 """
@@ -160,7 +160,7 @@ class JapaneseRulesetTest {
                         + Territory points: 0
                         + Captured stones: 0
 
-                        = 6.5 points""", japaneseRuleset.scoreGame(game).getDescription());
+                        = 6.5 points""", japaneseRuleset.scoreGame(game).getDescription(WHITE));
 
     }
 

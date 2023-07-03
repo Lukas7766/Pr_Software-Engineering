@@ -6,6 +6,7 @@ import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
 import javafx.util.Pair;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.model.helper.StoneColor;
 
 public final class CustomWinAction {
 
@@ -29,7 +30,8 @@ public final class CustomWinAction {
         Dialog<Pair<String,String>> dialog = new Dialog<>();
 
         dialog.setTitle("Game Result");
-        dialog.setHeaderText(game.getGameResult().getDescription());
+        dialog.setHeaderText(game.getGameResult().getDescription(game.getGameResult().getWinner()));
+        dialog.setContentText(game.getGameResult().getDescription(StoneColor.getOpposite(game.getGameResult().getWinner())));
         dialog.initOwner(stage);
 
         ButtonType loginButtonType = new ButtonType("Ok", ButtonBar.ButtonData.OK_DONE);

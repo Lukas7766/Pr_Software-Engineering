@@ -8,7 +8,7 @@ public class NewZealandRuleset implements Ruleset {
 
     @Override
     public GameResult scoreGame(Game game) {
-        return new GameResult(1, 1, null,"");
+        return new GameResult();
     }
 
     @Override

@@ -93,32 +93,21 @@ public class JapaneseRuleset implements Ruleset {
         double scoreBlack = capturedStonesBlack + territoryScoreBlack + handicap;
         double scoreWhite = capturedStonesWhite + territoryScoreWhite + komi;
 
-        StringBuilder sb = new StringBuilder();
-        StoneColor winner;
-        int captStone;
-        int trScore;
-        double sc;
+        GameResult ret = new GameResult();
 
-        winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
-        sb.append(winner).append(" won!\t\t\t\t").append(StoneColor.getOpposite(winner)).append(" lost!\n\n");
+        StoneColor winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
 
-        if (scoreBlack > scoreWhite) {
-            sb.append("Handicap: ").append(handicap).append("\t\t\t\tKomi: ").append(komi).append("\n");
-            captStone = capturedStonesBlack;
-            trScore = territoryScoreBlack;
-            sc = scoreBlack;
-        } else {
-            sb.append("Komi: ").append(komi).append("\t\t\t\t\tHandicap: ").append(handicap).append("\n");
-            captStone = capturedStonesWhite;
-            trScore = territoryScoreWhite;
-            sc = scoreWhite;
-        }
+        ret.setWinner(winner);
+        ret.setDescription(winner, winner + " won!");
+        ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!");
+        ret.addScoreComponent(StoneColor.BLACK, "Handicap", handicap);
+        ret.addScoreComponent(StoneColor.WHITE, "Komi", komi);
+        ret.addScoreComponent(StoneColor.BLACK, "Territory points", territoryScoreBlack);
+        ret.addScoreComponent(StoneColor.WHITE, "Territory points", territoryScoreWhite);
+        ret.addScoreComponent(StoneColor.BLACK, "Captured stones", capturedStonesBlack);
+        ret.addScoreComponent(StoneColor.WHITE, "Captured stones", capturedStonesWhite);
 
-        sb.append("+ Territory points:").append(" ").append(trScore).append("\n");
-        sb.append("+ Captured stones:").append(" ").append(captStone).append("\n\n");
-        sb.append("= ").append(sc).append(" points");
-
-        return new GameResult(scoreBlack, scoreWhite, winner, sb.toString());
+        return ret;
     }
 
     // FloodFill Algorithm, source: ALGO assignment

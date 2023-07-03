@@ -62,7 +62,16 @@ public class AncientChineseRuleset implements Ruleset {
             }
         }
 
-        return new GameResult(scoreBlack,scoreWhite,null,"");
+        StoneColor winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
+
+        GameResult ret = new GameResult();
+        ret.setWinner(winner);
+        ret.setDescription(winner, winner + " won!");
+        ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!");
+        ret.addScoreComponent(StoneColor.BLACK, "Stones on board", scoreBlack);
+        ret.addScoreComponent(StoneColor.WHITE, "Stones on board", scoreWhite);
+
+        return ret;
 
     }
 
