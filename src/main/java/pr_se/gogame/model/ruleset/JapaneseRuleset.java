@@ -100,12 +100,12 @@ public class JapaneseRuleset implements Ruleset {
         ret.setWinner(winner);
         ret.setDescription(winner, winner + " won!");
         ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!");
-        ret.addScoreComponent(StoneColor.BLACK, "Handicap", handicap);
-        ret.addScoreComponent(StoneColor.WHITE, "Komi", komi);
-        ret.addScoreComponent(StoneColor.BLACK, "Territory points", territoryScoreBlack);
-        ret.addScoreComponent(StoneColor.WHITE, "Territory points", territoryScoreWhite);
-        ret.addScoreComponent(StoneColor.BLACK, "Captured stones", capturedStonesBlack);
-        ret.addScoreComponent(StoneColor.WHITE, "Captured stones", capturedStonesWhite);
+        ret.addScoreComponent(StoneColor.BLACK, PointType.HANDICAP, handicap);
+        ret.addScoreComponent(StoneColor.WHITE, PointType.KOMI, komi);
+        ret.addScoreComponent(StoneColor.BLACK, PointType.TERRITORY, territoryScoreBlack);
+        ret.addScoreComponent(StoneColor.WHITE, PointType.TERRITORY, territoryScoreWhite);
+        ret.addScoreComponent(StoneColor.BLACK, PointType.CAPTURED_STONES, capturedStonesBlack);
+        ret.addScoreComponent(StoneColor.WHITE, PointType.CAPTURED_STONES, capturedStonesWhite);
 
         return ret;
     }

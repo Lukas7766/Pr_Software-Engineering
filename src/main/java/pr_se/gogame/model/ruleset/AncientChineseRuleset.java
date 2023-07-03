@@ -68,8 +68,8 @@ public class AncientChineseRuleset implements Ruleset {
         ret.setWinner(winner);
         ret.setDescription(winner, winner + " won!");
         ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!");
-        ret.addScoreComponent(StoneColor.BLACK, "Stones on board", scoreBlack);
-        ret.addScoreComponent(StoneColor.WHITE, "Stones on board", scoreWhite);
+        ret.addScoreComponent(StoneColor.BLACK, PointType.STONES_ON_BOARD, scoreBlack);
+        ret.addScoreComponent(StoneColor.WHITE, PointType.STONES_ON_BOARD, scoreWhite);
 
         return ret;
 

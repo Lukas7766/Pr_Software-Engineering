@@ -10,7 +10,7 @@ public class GameResult {
 
     private StoneColor winner;
 
-    private final Map<StoneColor, Map<String, Number>> scoreComponents;
+    private final Map<StoneColor, Map<PointType, Number>> scoreComponents;
 
     public GameResult() {
         this.scoreComponents = new EnumMap<>(StoneColor.class);
@@ -20,12 +20,12 @@ public class GameResult {
         this.description = new EnumMap<>(StoneColor.class);
     }
 
-    public void addScoreComponent(StoneColor c, String name, Number value) {
-        if(c == null || name == null || value == null) {
+    public void addScoreComponent(StoneColor c, PointType type, Number value) {
+        if(c == null || type == null || value == null) {
             throw new NullPointerException();
         }
 
-        scoreComponents.get(c).put(name, value);
+        scoreComponents.get(c).put(type, value);
     }
 
     public double getScore(StoneColor color) {
@@ -38,8 +38,8 @@ public class GameResult {
 
     public String getDescription(StoneColor c) {
         StringBuilder sb = new StringBuilder(description.get(c));
-        Iterator<Map.Entry<String, Number>> iter = scoreComponents.get(c).entrySet().iterator();
-        Map.Entry<String, Number> cur;
+        Iterator<Map.Entry<PointType, Number>> iter = scoreComponents.get(c).entrySet().iterator();
+        Map.Entry<PointType, Number> cur;
         if(iter.hasNext()) {
             cur = iter.next();
             sb.append("\n\n").append(cur.getKey()).append(": ").append(cur.getValue());
