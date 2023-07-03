@@ -103,12 +103,12 @@ public class JapaneseRuleset implements Ruleset {
         sb.append(winner).append(" won!\t\t\t\t").append(StoneColor.getOpposite(winner)).append(" lost!\n\n");
 
         if (scoreBlack > scoreWhite) {
-            sb.append("Handicap: ").append(handicap).append("\n");
+            sb.append("Handicap: ").append(handicap).append("\t\t\t\tKomi: ").append(komi).append("\n");
             captStone = capturedStonesBlack;
             trScore = territoryScoreBlack;
             sc = scoreBlack;
         } else {
-            sb.append("Komi: ").append(komi).append("\n");
+            sb.append("Komi: ").append(komi).append("\t\t\t\t\tHandicap: ").append(handicap).append("\n");
             captStone = capturedStonesWhite;
             trScore = territoryScoreWhite;
             sc = scoreWhite;
