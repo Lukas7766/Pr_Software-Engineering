@@ -28,23 +28,7 @@ public class CustomSaveAction {
             switch (er.getText()) {
                 case "No" -> onNo.use();
                 case "Yes" -> {
-                    File f = game.getFileHandler().getCurrentFile();
-                    if (f == null) {
-                        f = CustomFileDialog.getFile(stage, true);
-                        if (f == null) {
-                            return;
-                        }
-                    }
-
-                    try {
-                        if (!game.getFileHandler().saveFile(f)) {
-                            CustomExceptionDialog.show(new IOException(), "Could not save the game!");
-                        }
-                    } catch (IOException e) {
-                        CustomExceptionDialog.show(e, "Could not save the game!\n\n" + e.getMessage());
-                    } catch(IllegalStateException isE) {
-                        CustomExceptionDialog.show(isE, "An error occurred while saving the game.\n\n" + isE.getMessage());
-                    }
+                    saveGame(game, stage, false);
 
                     onYes.use();
                 }
@@ -54,5 +38,25 @@ public class CustomSaveAction {
                 }
             }
         });
+    }
+
+    public static void saveGame(Game game, Stage stage, boolean as) {
+        File saveGameFile = game.getFileHandler().getCurrentFile();
+
+        if (as || saveGameFile == null) {
+            saveGameFile = CustomFileDialog.getFile(stage, true);
+            if (saveGameFile == null) {
+                return;
+            }
+        }
+        try {
+            if (!game.getFileHandler().saveFile(saveGameFile)) {
+                CustomExceptionDialog.show(new IOException(), "Could not save the game!");
+            }
+        } catch (IOException e) {
+            CustomExceptionDialog.show(e, "Could not save the game!\n\n" + e.getMessage());
+        } catch(IllegalStateException isE) {
+            CustomExceptionDialog.show(isE, "An error occurred while saving the game.\n\n" + isE.getMessage());
+        }
     }
 }

@@ -16,10 +16,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.file.LoadingGameException;
-import pr_se.gogame.view_controller.dialog.CustomCloseAction;
-import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
-import pr_se.gogame.view_controller.dialog.CustomFileDialog;
-import pr_se.gogame.view_controller.dialog.CustomNewGameAction;
+import pr_se.gogame.view_controller.dialog.*;
 import pr_se.gogame.view_controller.observer.ViewListener;
 
 import java.io.File;
@@ -140,12 +137,12 @@ public class HeaderPane extends VBox {
         MenuItem exportFileItem = new MenuItem("_Save");
         exportFileItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItem);
-        exportFileItem.setOnAction(e -> saveGame(false));
+        exportFileItem.setOnAction(e -> CustomSaveAction.saveGame(game, stage, false));
 
         MenuItem exportFileItemAs = new MenuItem("Save _as");
         exportFileItemAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItemAs);
-        exportFileItemAs.setOnAction(e -> saveGame(true));
+        exportFileItemAs.setOnAction(e -> CustomSaveAction.saveGame(game, stage, true));
 
 
         game.addListener(e -> {
@@ -556,25 +553,4 @@ public class HeaderPane extends VBox {
         return lane;
 
     }
-
-    private void saveGame(boolean as) {
-        File saveGameFile = game.getFileHandler().getCurrentFile();
-
-        if (as || saveGameFile == null) {
-            saveGameFile = CustomFileDialog.getFile(stage, true);
-            if (saveGameFile == null) {
-                return;
-            }
-        }
-        try {
-            if (!game.getFileHandler().saveFile(saveGameFile)) {
-                CustomExceptionDialog.show(new IOException(), "Could not save the game!");
-            }
-        } catch (IOException e) {
-            CustomExceptionDialog.show(e, "Could not save the game!\n\n" + e.getMessage());
-        } catch(IllegalStateException isE) {
-            CustomExceptionDialog.show(isE, "An error occurred while saving the game.\n\n" + isE.getMessage());
-        }
-    }
-
 }
