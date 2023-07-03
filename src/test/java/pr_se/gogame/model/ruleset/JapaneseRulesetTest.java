@@ -96,21 +96,19 @@ class JapaneseRulesetTest {
 
         printBoard(game);
 
-        assertDoesNotThrow(game::scoreGame);
-        assertEquals(10, game.getScore(BLACK));
-        assertEquals(6.5, game.getScore(WHITE));
-        assertEquals(10, japaneseRuleset.scoreGame(game).getScore(BLACK));
-        assertEquals(6.5, japaneseRuleset.scoreGame(game).getScore(WHITE));
-        assertEquals(BLACK, japaneseRuleset.scoreGame(game).getWinner());
+        japaneseRuleset.scoreGame(game);
+        assertEquals(10, game.getGameResult().getScore(BLACK));
+        assertEquals(6.5, game.getGameResult().getScore(WHITE));
+        assertEquals(BLACK, game.getGameResult().getWinner());
         assertEquals(
                 """
                         Black won!
 
-                        Handicap: 0.0
-                        + Territory points: 9
+                        Handicap: 0
                         + Captured stones: 1
+                        + Territory points: 9
 
-                        = 10.0 points""", japaneseRuleset.scoreGame(game).getDescription(BLACK));
+                        = 10.0 points""", game.getGameResult().getDescription(BLACK));
     }
 
     @Test
@@ -145,22 +143,18 @@ class JapaneseRulesetTest {
 
         printBoard(game);
 
-        assertDoesNotThrow(game::scoreGame);
-        assertEquals(3, game.getScore(BLACK));
-        assertEquals(6.5, game.getScore(WHITE));
-
-        assertEquals(3, japaneseRuleset.scoreGame(game).getScore(BLACK));
-        assertEquals(6.5, japaneseRuleset.scoreGame(game).getScore(WHITE));
-        assertEquals(WHITE, japaneseRuleset.scoreGame(game).getWinner());
+        japaneseRuleset.scoreGame(game);
+        assertEquals(3, game.getGameResult().getScore(BLACK));
+        assertEquals(6.5, game.getGameResult().getScore(WHITE));
+        assertEquals(WHITE, game.getGameResult().getWinner());
         assertEquals(
                 """
                         White won!
 
                         Komi: 6.5
                         + Territory points: 0
-                        + Captured stones: 0
 
-                        = 6.5 points""", japaneseRuleset.scoreGame(game).getDescription(WHITE));
+                        = 6.5 points""", game.getGameResult().getDescription(WHITE));
 
     }
 

@@ -73,10 +73,10 @@ public class JapaneseRuleset implements Ruleset {
      * Komi is added to White's score count.
      *
      * @param game to calculate the score and define the winner
-     * @return an array of size 2, containing the score of black and white
+     * @return An undoablecommand to undo the updating of the GameResult
      */
     @Override
-    public GameResult scoreGame(Game game) {
+    public UndoableCommand scoreGame(Game game) {
         if (game == null) {
             throw new NullPointerException();
         }
@@ -84,30 +84,38 @@ public class JapaneseRuleset implements Ruleset {
         double komi = getKomi();
         double handicap = game.getHandicap();
 
-        int capturedStonesBlack = game.getStonesCapturedBy(StoneColor.BLACK);
+        Number capturedStonesBlack = game.getGameResult().getScoreComponents(StoneColor.BLACK).get(GameResult.PointType.CAPTURED_STONES);
+        if(capturedStonesBlack == null) {
+            capturedStonesBlack = 0;
+        }
         int territoryScoreBlack = calculateTerritoryPoints(StoneColor.BLACK, game);
 
-        int capturedStonesWhite = game.getStonesCapturedBy(StoneColor.WHITE);
+        Number capturedStonesWhite = game.getGameResult().getScoreComponents(StoneColor.WHITE).get(GameResult.PointType.CAPTURED_STONES);
+        if(capturedStonesWhite == null) {
+            capturedStonesWhite = 0;
+        }
         int territoryScoreWhite = calculateTerritoryPoints(StoneColor.WHITE, game);
 
-        double scoreBlack = capturedStonesBlack + territoryScoreBlack + handicap;
-        double scoreWhite = capturedStonesWhite + territoryScoreWhite + komi;
-
-        GameResult ret = new GameResult();
+        double scoreBlack = capturedStonesBlack.doubleValue() + territoryScoreBlack + handicap;
+        double scoreWhite = capturedStonesWhite.doubleValue() + territoryScoreWhite + komi;
 
         StoneColor winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
 
-        ret.setWinner(winner);
-        ret.setDescription(winner, winner + " won!");
-        ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!");
-        ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.HANDICAP, handicap);
-        ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.KOMI, komi);
-        ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.TERRITORY, territoryScoreBlack);
-        ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.TERRITORY, territoryScoreWhite);
-        ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.CAPTURED_STONES, capturedStonesBlack);
-        ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.CAPTURED_STONES, capturedStonesWhite);
+        List<UndoableCommand> subcommands = new LinkedList<>();
 
-        return ret;
+        GameResult ret = game.getGameResult();
+
+        subcommands.add(ret.setWinner(winner));
+        subcommands.add(ret.setDescription(winner, winner + " won!"));
+        subcommands.add(ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!"));
+        /*subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.HANDICAP, handicap));
+        subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.KOMI, komi));*/
+        subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.TERRITORY, territoryScoreBlack));
+        subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.TERRITORY, territoryScoreWhite));
+        /*subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.CAPTURED_STONES, capturedStonesBlack));
+        subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.CAPTURED_STONES, capturedStonesWhite));*/
+
+        return UndoableCommand.of(subcommands);
     }
 
     // FloodFill Algorithm, source: ALGO assignment

@@ -68,8 +68,18 @@ public class UserDefinableRuleset implements Ruleset {
     }
 
     @Override
-    public GameResult scoreGame(Game game) {
-        return new GameResult();
+    public UndoableCommand scoreGame(Game game) {
+        return new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                // Do Nothing
+            }
+
+            @Override
+            public void undo() {
+                // Do Nothing
+            }
+        };
     }
 
     public void setCustomHandicapPlacement(BiConsumer<Game, Integer> stoneSetter) {

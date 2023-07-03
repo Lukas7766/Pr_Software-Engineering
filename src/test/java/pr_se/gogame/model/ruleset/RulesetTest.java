@@ -24,8 +24,18 @@ class RulesetTest {
             }
 
             @Override
-            public GameResult scoreGame(Game game) {
-                return null;
+            public UndoableCommand scoreGame(Game game) {
+                return new UndoableCommand() {
+                    @Override
+                    public void execute(boolean saveEffects) {
+                        // Do nothing
+                    }
+
+                    @Override
+                    public void undo() {
+                        // Do nothing
+                    }
+                };
             }
         };
     }

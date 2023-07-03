@@ -7,8 +7,18 @@ import pr_se.gogame.model.helper.UndoableCommand;
 public class NewZealandRuleset implements Ruleset {
 
     @Override
-    public GameResult scoreGame(Game game) {
-        return new GameResult();
+    public UndoableCommand scoreGame(Game game) {
+        return new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                // Do Nothing
+            }
+
+            @Override
+            public void undo() {
+                // Do nothing
+            }
+        };
     }
 
     @Override

@@ -1,6 +1,8 @@
 package pr_se.gogame.model.ruleset;
 
+import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.helper.UndoableCommand;
 
 import java.util.*;
 
@@ -20,12 +22,30 @@ public class GameResult {
         this.description = new EnumMap<>(StoneColor.class);
     }
 
-    public void addScoreComponent(StoneColor c, PointType type, Number value) {
+    public UndoableCommand addScoreComponent(final StoneColor c, final PointType type, final Number value) {
         if(c == null || type == null || value == null) {
             throw new NullPointerException();
         }
 
-        scoreComponents.get(c).put(type, value);
+        final Number oldValue = scoreComponents.get(c).get(type);
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                scoreComponents.get(c).put(type, value);
+            }
+
+            @Override
+            public void undo() {
+                if(oldValue != null) {
+                    scoreComponents.get(c).put(type, oldValue);
+                } else {
+                    scoreComponents.get(c).remove(type);
+                }
+            }
+        };
+        ret.execute(true);
+        return ret;
     }
 
     public double getScore(StoneColor color) {
@@ -52,16 +72,52 @@ public class GameResult {
         return sb.toString();
     }
 
-    public void setDescription(StoneColor c, String description) {
-        this.description.put(c, description);
+    public UndoableCommand setDescription(final StoneColor c, final String description) {
+        final String oldDescription = this.description.get(c);
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                GameResult.this.description.put(c, description);
+            }
+
+            @Override
+            public void undo() {
+                if(oldDescription != null) {
+                    GameResult.this.description.put(c, oldDescription);
+                } else {
+                    GameResult.this.description.remove(c);
+                }
+            }
+        };
+        ret.execute(true);
+
+        return ret;
     }
 
     public StoneColor getWinner() {
         return winner;
     }
 
-    public void setWinner(StoneColor winner) {
-        this.winner = winner;
+    public UndoableCommand setWinner(final StoneColor winner) {
+        final StoneColor oldWinner = this.winner;
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                GameResult.this.winner = winner;
+            }
+
+            @Override
+            public void undo() {
+                GameResult.this.winner = oldWinner;
+            }
+        };
+        ret.execute(true);
+
+        return ret;
+    }
+
+    public Map<PointType, Number> getScoreComponents(StoneColor color) {
+        return Map.copyOf(scoreComponents.get(color));
     }
 
     public enum PointType {

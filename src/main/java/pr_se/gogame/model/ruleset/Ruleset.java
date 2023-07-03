@@ -35,11 +35,12 @@ public interface Ruleset {
      */
     UndoableCommand isKo(Game game);
 
-    /** This method calculates the score of the game for both players.
+    /**
+     * This method calculates the score of the game for both players.
      *
-     * @return the score of the game for both players in an array of size 2. Index 0 is the score of black, index 1 is the score of white.
+     * @return
      */
-    GameResult scoreGame(Game game);
+    UndoableCommand scoreGame(Game game);
 
     /**
      * Places custom handicap stones according to the ruleset, either by calling the Game.setHandicapStone method

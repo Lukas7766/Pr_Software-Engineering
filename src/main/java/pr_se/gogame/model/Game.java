@@ -50,11 +50,7 @@ public class Game implements GameInterface {
     private int curMoveNumber;
     private StoneColor curColor;
     private int handicapStoneCounter;
-    private double playerBlackScore;
-    private int blackCapturedStones;
 
-    private double playerWhiteScore;
-    private int whiteCapturedStones;
     private GameResult gameResult;
 
     private History history;
@@ -68,6 +64,7 @@ public class Game implements GameInterface {
         this.gameState = GameState.NOT_STARTED_YET;
         this.board = new Board(this, 19);
         this.fileHandler = new SGFFileHandler(this);
+        this.gameResult = new GameResult();
     }
 
     @Override
@@ -75,6 +72,7 @@ public class Game implements GameInterface {
         gameState = GameState.NOT_STARTED_YET;
         this.history = null;
         this.fileHandler = new SGFFileHandler(this);
+        this.gameResult = new GameResult();
 
         fireGameEvent(new GameEvent(GameCommand.INIT));
     }
@@ -103,12 +101,10 @@ public class Game implements GameInterface {
         this.handicap = handicap;
         this.ruleset = ruleset;
 
-        this.playerBlackScore = handicap;
-        this.playerWhiteScore = this.ruleset.getKomi();
-        this.blackCapturedStones = 0;
-        this.whiteCapturedStones = 0;
         this.curMoveNumber = 0;
-        this.gameResult = null;
+        this.gameResult = new GameResult();
+        this.gameResult.addScoreComponent(BLACK, GameResult.PointType.HANDICAP, handicap);
+        this.gameResult.addScoreComponent(WHITE, GameResult.PointType.KOMI, ruleset.getKomi());
 
         this.board = new Board(this, size);
         this.ruleset.reset();
@@ -170,23 +166,20 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }
 
-        final GameResult oldGameResult = this.gameResult;
-        final StoneColor finalCurColor = this.curColor;
+        List<UndoableCommand> subcommands = new LinkedList<>();
+        subcommands.add(ruleset.scoreGame(this));
+        subcommands.add(gameResult.setWinner(StoneColor.getOpposite(curColor)));
+        subcommands.add(gameResult.setDescription(curColor, "Game was resigned by " + curColor + "!"));
+        subcommands.add(gameResult.setDescription(StoneColor.getOpposite(curColor), StoneColor.getOpposite(curColor) + " won!"));
 
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(final boolean saveEffects) {
-                GameResult newGameResult = ruleset.scoreGame(Game.this);
-                newGameResult.setWinner(StoneColor.getOpposite(finalCurColor));
-                newGameResult.setDescription(finalCurColor, "Game was resigned by " + finalCurColor + "!");
-                newGameResult.setDescription(StoneColor.getOpposite(finalCurColor), StoneColor.getOpposite(finalCurColor) + " won!");
-                gameResult = newGameResult;
                 gameState = GameState.GAME_OVER;
             }
 
             @Override
             public void undo() {
-                gameResult = oldGameResult;
                 gameState = GameState.RUNNING;
             }
         };
@@ -194,7 +187,11 @@ public class Game implements GameInterface {
         c.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
         c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
 
-        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.RESIGN, finalCurColor, ""));
+        subcommands.add(c);
+
+        UndoableCommand ret = UndoableCommand.of(subcommands);
+
+        history.addNode(new History.HistoryNode(ret, History.HistoryNode.AbstractSaveToken.RESIGN, curColor, ""));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
@@ -213,29 +210,18 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't resign if game isn't running! gameState was " + gameState);
         }
 
-        final GameResult oldGameResult = gameResult;
-        final GameResult newGameResult = ruleset.scoreGame(this);
+        List<UndoableCommand> subcommands = new LinkedList<>();
 
-        final double oldBlackScore = playerBlackScore;
-        final double newBlackScore = newGameResult.getScore(BLACK);
-
-        final double oldWhiteScore = playerWhiteScore;
-        final double newWhiteScore = newGameResult.getScore(WHITE);
+        subcommands.add(ruleset.scoreGame(this));
 
         UndoableCommand c = new UndoableCommand() {
             @Override
             public void execute(boolean saveEffects) {
-                gameResult = newGameResult;
-                playerBlackScore = newBlackScore;
-                playerWhiteScore = newWhiteScore;
                 gameState = GameState.GAME_OVER;
             }
 
             @Override
             public void undo() {
-                gameResult = oldGameResult;
-                playerBlackScore = oldBlackScore;
-                playerWhiteScore = oldWhiteScore;
                 gameState = GameState.RUNNING;
             }
         };
@@ -244,7 +230,11 @@ public class Game implements GameInterface {
         c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
         c.getExecuteEvents().forEach(this::fireGameEvent);
 
-        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.SCORED_GAME, curColor, ""));
+        subcommands.add(c);
+
+        UndoableCommand ret = UndoableCommand.of(subcommands);
+
+        history.addNode(new History.HistoryNode(ret, History.HistoryNode.AbstractSaveToken.SCORED_GAME, curColor, ""));
     }
 
     @Override
@@ -534,34 +524,11 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        final int oldBlackCapturedStones = blackCapturedStones;
-        final int oldWhiteCapturedStones = whiteCapturedStones;
-        final double oldBlackPlayerScore = playerBlackScore;
-        final double oldWhitePlayerScore = playerWhiteScore;
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(final boolean saveEffects) {
-                if (color == BLACK) {
-                    Game.this.blackCapturedStones += amount;
-                    Game.this.playerBlackScore += amount;
-                } else {
-                    Game.this.whiteCapturedStones += amount;
-                    Game.this.playerWhiteScore += amount;
-                }
-            }
-
-            @Override
-            public void undo() {
-                Game.this.blackCapturedStones = oldBlackCapturedStones;
-                Game.this.whiteCapturedStones = oldWhiteCapturedStones;
-                Game.this.playerBlackScore = oldBlackPlayerScore;
-                Game.this.playerWhiteScore = oldWhitePlayerScore;
-            }
-        };
-        ret.execute(true);
-
-        return ret;
+        Number oldAmount = gameResult.getScoreComponents(color).get(GameResult.PointType.CAPTURED_STONES);
+        if(oldAmount == null) {
+            oldAmount = 0;
+        }
+        return gameResult.addScoreComponent(color, GameResult.PointType.CAPTURED_STONES, oldAmount.intValue() + amount);
     }
 
     void fireGameEvent(GameEvent e) { // package-private by design
@@ -686,26 +653,6 @@ public class Game implements GameInterface {
         }
         history.getCurrentNode().setComment(comment);
         fireGameEvent(new GameEvent(GameCommand.UPDATE));
-    }
-
-    @Override
-    public int getStonesCapturedBy(StoneColor color) {
-        if (color == null) throw new NullPointerException();
-
-        if (color == BLACK) {
-            return this.blackCapturedStones;
-        } else {
-            return this.whiteCapturedStones;
-        }
-    }
-
-    @Override
-    public double getScore(StoneColor color) {
-        if(color == null) {
-            throw new NullPointerException();
-        }
-
-        return color == BLACK ? this.playerBlackScore : this.playerWhiteScore;
     }
 
     @Override

@@ -9,6 +9,7 @@ import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
 import pr_se.gogame.model.ruleset.Ruleset;
@@ -81,11 +82,6 @@ class GameTest {
     }
 
     @Test
-    void getCapturedStonesArguments() {
-        assertThrows(NullPointerException.class, () -> game.getStonesCapturedBy(null));
-    }
-
-    @Test
     void addCapturedStonesArguments() {
         assertThrows(NullPointerException.class, () -> game.addCapturedStones(null, 1));
         assertThrows(IllegalArgumentException.class, () -> game.addCapturedStones(BLACK, -1));
@@ -107,11 +103,6 @@ class GameTest {
         assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, -1));
         assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(maxCoord + 1, 0));
         assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, maxCoord + 1));
-    }
-
-    @Test
-    void getScoreArguments() {
-        assertThrows(NullPointerException.class, () -> game.getScore(null));
     }
 
     @Test
@@ -427,48 +418,24 @@ class GameTest {
 
     @Test
     void addCapturedStones() {
-        assertEquals(0, game.getStonesCapturedBy(BLACK));
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
+        assertEquals(0, game.getGameResult().getScoreComponents(BLACK).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
+        assertEquals(0, game.getGameResult().getScoreComponents(WHITE).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
 
         game.addCapturedStones(BLACK, 10);
-        assertEquals(10, game.getStonesCapturedBy(BLACK));
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
+        assertEquals(10, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
+        assertEquals(0, game.getGameResult().getScoreComponents(WHITE).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
 
         game.addCapturedStones(WHITE, 20);
-        assertEquals(10, game.getStonesCapturedBy(BLACK));
-        assertEquals(20, game.getStonesCapturedBy(WHITE));
+        assertEquals(10, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
+        assertEquals(20, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
 
         game.addCapturedStones(BLACK, 30);
-        assertEquals(40, game.getStonesCapturedBy(BLACK));
-        assertEquals(20, game.getStonesCapturedBy(WHITE));
+        assertEquals(40, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
+        assertEquals(20, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
 
         game.addCapturedStones(WHITE, 40);
-        assertEquals(40, game.getStonesCapturedBy(BLACK));
-        assertEquals(60, game.getStonesCapturedBy(WHITE));
-    }
-
-    @Test
-    void getStonesCapturedBy() {
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
-        assertEquals(0, game.getStonesCapturedBy(BLACK));
-        game.playMove(10, 1);
-        game.playMove(10, 2);
-        game.playMove(10, 3);
-        game.playMove(18, 18); // superfluous white stone
-        game.playMove(9, 2);
-        game.playMove(17, 18); // superfluous white stone
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
-        assertEquals(0, game.getStonesCapturedBy(BLACK));
-        game.playMove(11, 2);
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
-        assertEquals(1, game.getStonesCapturedBy(BLACK));
-
-    }
-
-    @Test
-    void getScore() {
-        assertEquals(0, game.getScore(BLACK));
-        assertEquals(game.getRuleset().getKomi(), game.getScore(WHITE));
+        assertEquals(40, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
+        assertEquals(60, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
     }
 
     @Test

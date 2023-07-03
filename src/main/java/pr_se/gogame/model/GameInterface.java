@@ -94,8 +94,6 @@ public interface GameInterface {
 
     int getCurMoveNumber();
 
-    int getStonesCapturedBy(StoneColor color);
-
     void placeSetupStone(int x, int y, StoneColor color);
 
     UndoableCommand addCapturedStones(StoneColor color, int amount);
@@ -105,8 +103,6 @@ public interface GameInterface {
     StoneColor getCurColor();
 
     Ruleset getRuleset();
-
-    double getScore(StoneColor color);
 
     GameResult getGameResult();
 

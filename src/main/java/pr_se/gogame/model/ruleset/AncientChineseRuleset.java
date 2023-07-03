@@ -6,6 +6,8 @@ import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AncientChineseRuleset implements Ruleset {
     private int lastBoardHash;
@@ -44,7 +46,7 @@ public class AncientChineseRuleset implements Ruleset {
     }
 
     @Override
-    public GameResult scoreGame(Game game) {
+    public UndoableCommand scoreGame(Game game) {
 
         if (game == null) throw new IllegalArgumentException();
 
@@ -64,15 +66,17 @@ public class AncientChineseRuleset implements Ruleset {
 
         StoneColor winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
 
-        GameResult ret = new GameResult();
-        ret.setWinner(winner);
-        ret.setDescription(winner, winner + " won!");
-        ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!");
-        ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.STONES_ON_BOARD, scoreBlack);
-        ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.STONES_ON_BOARD, scoreWhite);
+        List<UndoableCommand> subcommands = new LinkedList<>();
 
-        return ret;
+        GameResult ret = game.getGameResult();
 
+        subcommands.add(ret.setWinner(winner));
+        subcommands.add(ret.setDescription(winner, winner + " won!"));
+        subcommands.add(ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!"));
+        subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.STONES_ON_BOARD, scoreBlack));
+        subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.STONES_ON_BOARD, scoreWhite));
+
+        return UndoableCommand.of(subcommands);
     }
 
     @Override

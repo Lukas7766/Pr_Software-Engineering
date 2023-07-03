@@ -120,7 +120,7 @@ public class SidePane extends StackPane {
         p1.setFont(Font.font(null, FontWeight.BOLD, 13));
         scorePane.add(p1, 0, 0);
 
-        Label scoreCountBlackLbl = new Label(game.getScore(StoneColor.BLACK) + "");
+        Label scoreCountBlackLbl = new Label(game.getGameResult().getScore(StoneColor.BLACK) + "");
         scoreCountBlackLbl.setPadding(new Insets(0, 0, 0, 15));
         scoreCountBlackLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
         scorePane.add(scoreCountBlackLbl, 1, 0);
@@ -130,7 +130,7 @@ public class SidePane extends StackPane {
         p2.setFont(Font.font(null, FontWeight.BOLD, 13));
         scorePane.add(p2, 0, 1);
 
-        Label scoreCountWhiteLbl = new Label(game.getScore(StoneColor.WHITE) + "");
+        Label scoreCountWhiteLbl = new Label(game.getGameResult().getScore(StoneColor.WHITE) + "");
         scoreCountWhiteLbl.setPadding(new Insets(0, 0, 0, 15));
         scoreCountWhiteLbl.setFont(Font.font(null, FontWeight.NORMAL, 13));
         scorePane.add(scoreCountWhiteLbl, 1, 1);
@@ -180,8 +180,8 @@ public class SidePane extends StackPane {
 
             switch (e.getGameCommand()) {
                 case STONE_WAS_SET, STONE_WAS_REMOVED, UPDATE, NEW_GAME, GAME_WON -> {
-                    scoreCountBlackLbl.setText(game.getScore(StoneColor.BLACK) + "");
-                    scoreCountWhiteLbl.setText(game.getScore(StoneColor.WHITE) + "");
+                    scoreCountBlackLbl.setText(game.getGameResult().getScore(StoneColor.BLACK) + "");
+                    scoreCountWhiteLbl.setText(game.getGameResult().getScore(StoneColor.WHITE) + "");
                     actualPlayer.setText(game.getCurColor().toString());
                     textArea.setText(game.getComment());
                 }
