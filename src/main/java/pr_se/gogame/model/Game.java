@@ -153,7 +153,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void resign() {
+    public void resign() throws IllegalStateException {
         if(gameState != GameState.RUNNING) {
             throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }
@@ -190,7 +190,7 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void scoreGame() {
+    public void scoreGame() throws IllegalStateException {
         if(gameState != GameState.RUNNING) {
             throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }

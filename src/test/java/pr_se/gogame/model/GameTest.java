@@ -307,13 +307,13 @@ class GameTest {
     void scoreGame() {
         GameListener l1 = e -> assertEquals(GAME_WON, e.getGameCommand());
         game.addListener(l1);
-        game.scoreGame();
+        assertDoesNotThrow(() -> game.scoreGame());
         assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
         game.newGame(BLACK, 19, 9, ruleset);
         game.addListener(e -> assertEquals(GAME_WON, e.getGameCommand()));
-        game.scoreGame();
+        assertDoesNotThrow(() -> game.scoreGame());
         assertEquals(BLACK, game.getGameResult().getWinner());
     }
 

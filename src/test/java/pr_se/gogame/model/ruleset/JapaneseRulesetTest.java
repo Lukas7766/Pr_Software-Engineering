@@ -96,7 +96,7 @@ class JapaneseRulesetTest {
 
         printBoard(game);
 
-        game.scoreGame();
+        assertDoesNotThrow(() -> game.scoreGame());
         assertEquals(10, game.getScore(BLACK));
         assertEquals(6.5, game.getScore(WHITE));
         assertEquals(10, japaneseRuleset.scoreGame(game).getScoreBlack());
@@ -145,7 +145,7 @@ class JapaneseRulesetTest {
 
         printBoard(game);
 
-        game.scoreGame();
+        assertDoesNotThrow(() -> game.scoreGame());
         assertEquals(3, game.getScore(BLACK));
         assertEquals(6.5, game.getScore(WHITE));
 

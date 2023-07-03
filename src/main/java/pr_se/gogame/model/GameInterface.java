@@ -40,12 +40,12 @@ public interface GameInterface {
     /**
      * Allows the current player to resign. This causes the opposite player to win.
      */
-    void resign();
+    void resign() throws IllegalStateException;
 
     /**
      * This method uses the Game's Ruleset to calculate the score of each player.
      */
-    void scoreGame();
+    void scoreGame() throws IllegalStateException;
 
     /**
      * This method places a stone down for the current player at the specified coordinates

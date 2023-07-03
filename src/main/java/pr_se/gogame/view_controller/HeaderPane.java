@@ -261,7 +261,13 @@ public class HeaderPane extends VBox {
 
         resignItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.ALT_DOWN));
         gameSectionItems.add(resignItem);
-        resignItem.setOnAction(e -> game.resign());
+        resignItem.setOnAction(e -> {
+            try {
+                game.resign();
+            } catch (IllegalStateException ie) {
+                CustomExceptionDialog.show(ie, ie.getMessage());
+            }
+        });
 
         confirmItem.setAccelerator(new KeyCodeCombination(KeyCode.ENTER));
         gameSectionItems.add(confirmItem);
@@ -270,7 +276,13 @@ public class HeaderPane extends VBox {
 
         scoreGameItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN));
         gameSectionItems.add(scoreGameItem);
-        scoreGameItem.setOnAction(e -> game.scoreGame());
+        scoreGameItem.setOnAction(e -> {
+            try {
+                game.scoreGame();
+            } catch (IllegalStateException ie) {
+                CustomExceptionDialog.show(ie, ie.getMessage());
+            }
+        });
 
         menu.getItems().addAll(gameSectionItems);
 
@@ -443,12 +455,24 @@ public class HeaderPane extends VBox {
 
         Button resign = new Button("Resign");
         resign.setFocusTraversable(false);
-        resign.setOnAction(e -> game.resign());
+        resign.setOnAction(e -> {
+            try {
+                game.resign();
+            } catch (IllegalStateException ie) {
+                CustomExceptionDialog.show(ie, ie.getMessage());
+            }
+        });
         gameShortCutList.add(resign);
 
         Button scoreGame = new Button("Score Game");
         scoreGame.setFocusTraversable(false);
-        scoreGame.setOnAction(e -> game.scoreGame());
+        scoreGame.setOnAction(e -> {
+            try {
+                game.scoreGame();
+            } catch (IllegalStateException ie) {
+            CustomExceptionDialog.show(ie, ie.getMessage());
+        }
+        });
         gameShortCutList.add(scoreGame);
 
         Button confirm = new Button("Confirm");
