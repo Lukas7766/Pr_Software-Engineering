@@ -84,20 +84,14 @@ public class JapaneseRuleset implements Ruleset {
         double komi = getKomi();
         double handicap = game.getHandicap();
 
-        Number capturedStonesBlack = game.getGameResult().getScoreComponents(StoneColor.BLACK).get(GameResult.PointType.CAPTURED_STONES);
-        if(capturedStonesBlack == null) {
-            capturedStonesBlack = 0;
-        }
+        int capturedStonesBlack = game.getGameResult().getScoreComponents(StoneColor.BLACK).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
         int territoryScoreBlack = calculateTerritoryPoints(StoneColor.BLACK, game);
 
-        Number capturedStonesWhite = game.getGameResult().getScoreComponents(StoneColor.WHITE).get(GameResult.PointType.CAPTURED_STONES);
-        if(capturedStonesWhite == null) {
-            capturedStonesWhite = 0;
-        }
+        int capturedStonesWhite = game.getGameResult().getScoreComponents(StoneColor.WHITE).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
         int territoryScoreWhite = calculateTerritoryPoints(StoneColor.WHITE, game);
 
-        double scoreBlack = capturedStonesBlack.doubleValue() + territoryScoreBlack + handicap;
-        double scoreWhite = capturedStonesWhite.doubleValue() + territoryScoreWhite + komi;
+        double scoreBlack = capturedStonesBlack + territoryScoreBlack + handicap;
+        double scoreWhite = capturedStonesWhite + territoryScoreWhite + komi;
 
         StoneColor winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
 

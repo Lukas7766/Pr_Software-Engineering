@@ -520,11 +520,8 @@ public class Game implements GameInterface {
             throw new IllegalArgumentException();
         }
 
-        Number oldAmount = gameResult.getScoreComponents(color).get(GameResult.PointType.CAPTURED_STONES);
-        if(oldAmount == null) {
-            oldAmount = 0;
-        }
-        return gameResult.addScoreComponent(color, GameResult.PointType.CAPTURED_STONES, oldAmount.intValue() + amount);
+        int oldAmount = gameResult.getScoreComponents(color).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
+        return gameResult.addScoreComponent(color, GameResult.PointType.CAPTURED_STONES, oldAmount + amount);
     }
 
     void fireGameEvent(GameEvent e) { // package-private by design
