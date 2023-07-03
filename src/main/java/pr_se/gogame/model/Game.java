@@ -127,6 +127,9 @@ public class Game implements GameInterface {
         boolean ruleSetHasAutoPlacement = this.ruleset.setHandicapStones(this, this.curColor, tempHandicap);
 
         if(handicapStoneCounter == 0 || (handicapStoneCounter == 1 && ruleSetHasAutoPlacement)) {
+            if(handicapStoneCounter > 0) {
+                handicapStoneCounter = 0;
+            }
             gameState = GameState.RUNNING;
         } else if(handicapStoneCounter == 1) {
             gameState = GameState.SETTING_UP;
@@ -155,6 +158,12 @@ public class Game implements GameInterface {
     @Override
     public void resign() throws IllegalStateException {
         if(gameState != GameState.RUNNING) {
+            if(gameState == GameState.SETTING_UP) {
+                if(handicapStoneCounter >= 1) {
+                    throw new IllegalStateException("Can't score game before all handicap stones have been set.");
+                }
+                throw new IllegalStateException("Can't score game when it is in setup mode!");
+            }
             throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }
 
@@ -192,6 +201,12 @@ public class Game implements GameInterface {
     @Override
     public void scoreGame() throws IllegalStateException {
         if(gameState != GameState.RUNNING) {
+            if(gameState == GameState.SETTING_UP) {
+                if(handicapStoneCounter >= 1) {
+                    throw new IllegalStateException("Can't score game before all handicap stones have been set.");
+                }
+                throw new IllegalStateException("Can't score game when it is in setup mode!");
+            }
             throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }
 
@@ -224,7 +239,7 @@ public class Game implements GameInterface {
         c.execute(true);
         c.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
         c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
-        c.getExecuteEvents().forEach(e -> fireGameEvent(e));
+        c.getExecuteEvents().forEach(this::fireGameEvent);
 
         history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.SCORED_GAME, curColor, ""));
     }
