@@ -108,12 +108,8 @@ public class JapaneseRuleset implements Ruleset {
         subcommands.add(ret.setWinner(winner));
         subcommands.add(ret.setDescription(winner, winner + " won!"));
         subcommands.add(ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!"));
-        /*subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.HANDICAP, handicap));
-        subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.KOMI, komi));*/
         subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.TERRITORY, territoryScoreBlack));
         subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.TERRITORY, territoryScoreWhite));
-        /*subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.CAPTURED_STONES, capturedStonesBlack));
-        subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.CAPTURED_STONES, capturedStonesWhite));*/
 
         return UndoableCommand.of(subcommands);
     }
