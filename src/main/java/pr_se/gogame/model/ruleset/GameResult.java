@@ -1,5 +1,6 @@
 package pr_se.gogame.model.ruleset;
 
+import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
@@ -28,6 +29,10 @@ public class GameResult {
     public UndoableCommand addScoreComponent(final StoneColor c, final PointType type, final Number value) {
         if(c == null || type == null || value == null) {
             throw new NullPointerException();
+        }
+
+        if(type == PointType.HANDICAP && (value.intValue() < Game.MIN_HANDICAP_AMOUNT || value.intValue() > Game.MAX_HANDICAP_AMOUNT)) {
+            throw new IllegalStateException("Handicap value out of bounds!");
         }
 
         final Number oldValue = scoreComponents.get(c).get(type);

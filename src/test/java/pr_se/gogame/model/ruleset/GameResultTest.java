@@ -2,8 +2,10 @@ package pr_se.gogame.model.ruleset;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.UndoableCommand;
 
+import java.awt.*;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -25,6 +27,9 @@ class GameResultTest {
         assertThrows(NullPointerException.class, () -> gameResult.addScoreComponent(null, GameResult.PointType.CAPTURED_STONES, 0));
         assertThrows(NullPointerException.class, () -> gameResult.addScoreComponent(BLACK, null, 0));
         assertThrows(NullPointerException.class, () -> gameResult.addScoreComponent(BLACK, GameResult.PointType.CAPTURED_STONES, null));
+
+        assertThrows(IllegalStateException.class, () -> gameResult.addScoreComponent(BLACK, GameResult.PointType.HANDICAP, Game.MIN_HANDICAP_AMOUNT - 1));
+        assertThrows(IllegalStateException.class, () -> gameResult.addScoreComponent(BLACK, GameResult.PointType.HANDICAP, Game.MAX_HANDICAP_AMOUNT + 1));
     }
 
     @Test
@@ -117,5 +122,14 @@ class GameResultTest {
     void getScoreComponents() {
         assertNotNull(gameResult.getScoreComponents(BLACK));
         assertNotNull(gameResult.getScoreComponents(WHITE));
+    }
+
+    @Test
+    void complexTest() {
+        String emptyDesc = "\n\n= 0.0 points";
+
+        gameResult.addScoreComponent(BLACK, GameResult.PointType.HANDICAP, 9);
+        gameResult.addScoreComponent(BLACK, GameResult.PointType.CAPTURED_STONES, 1);
+        assertEquals("\n\n" + GameResult.PointType.HANDICAP + ": 9\n+ " + GameResult.PointType.CAPTURED_STONES + ": 1\n\n= 10.0 points", gameResult.getDescription(BLACK));
     }
 }
