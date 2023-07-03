@@ -5,9 +5,7 @@ import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class JapaneseRuleset implements Ruleset {
 
@@ -101,16 +99,15 @@ public class JapaneseRuleset implements Ruleset {
         int trScore;
         double sc;
 
+        winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
+        sb.append(winner).append(" won!\t\t\t\t").append(StoneColor.getOpposite(winner)).append(" lost!\n\n");
+
         if (scoreBlack > scoreWhite) {
-            winner = StoneColor.BLACK;
-            sb.append(StoneColor.BLACK).append(" won!\n\n");
             sb.append("Handicap: ").append(handicap).append("\n");
             captStone = capturedStonesBlack;
             trScore = territoryScoreBlack;
             sc = scoreBlack;
         } else {
-            winner = StoneColor.WHITE;
-            sb.append(StoneColor.WHITE).append(" won!\n\n");
             sb.append("Komi: ").append(komi).append("\n");
             captStone = capturedStonesWhite;
             trScore = territoryScoreWhite;
