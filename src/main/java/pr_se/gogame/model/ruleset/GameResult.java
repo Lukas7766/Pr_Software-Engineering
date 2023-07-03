@@ -1,10 +1,12 @@
 package pr_se.gogame.model.ruleset;
 
-import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
-import java.util.*;
+import java.util.EnumMap;
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class GameResult {
 
