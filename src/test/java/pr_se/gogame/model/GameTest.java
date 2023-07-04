@@ -874,6 +874,27 @@ class GameTest {
     }
 
     @Test
+    void pass() {
+        assertEquals(BLACK, game.getCurColor());
+        game.pass();
+        assertEquals(WHITE, game.getCurColor());
+    }
+
+    @Test
+    void undoPass() {
+        pass();
+        game.undo();
+        assertEquals(BLACK, game.getCurColor());
+    }
+
+    @Test
+    void redoPass() {
+        undoPass();
+        game.redo();
+        assertEquals(WHITE, game.getCurColor());
+    }
+
+    @Test
     void tooManyHandicapStones() {
         game.newGame(BLACK, 19, 2, new JapaneseRuleset(), false);
         assertDoesNotThrow(() -> game.placeHandicapPosition(0, 0, true));

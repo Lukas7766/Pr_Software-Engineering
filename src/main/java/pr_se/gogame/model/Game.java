@@ -634,24 +634,14 @@ public class Game implements GameInterface {
 
     }
 
-    private UndoableCommand setCurColor(final StoneColor c) {
-        if (c == null) {
+    private UndoableCommand setCurColor(final StoneColor newColor) {
+        if (newColor == null) {
             throw new NullPointerException();
         }
 
         final StoneColor oldColor = this.curColor;
 
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(final boolean saveEffects) {
-                Game.this.curColor = c;
-            }
-
-            @Override
-            public void undo() {
-                Game.this.curColor = oldColor;
-            }
-        };
+        UndoableCommand ret = UndoableCommand.updateValue(c -> curColor = c, oldColor, newColor);
         ret.execute(true);
 
         return ret;
