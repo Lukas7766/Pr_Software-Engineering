@@ -376,7 +376,7 @@ class GameTest {
         assertEquals(1, game.getCurMoveNumber());
         game.playMove(0, 0);
         assertEquals(2, game.getCurMoveNumber());
-        game.undo();
+        game.getHistory().stepBack();
         assertEquals(1, game.getCurMoveNumber());
     }
 
@@ -715,7 +715,7 @@ class GameTest {
     void fastForwardFromHandicap() {
         rewindWithHandicap();
         assertNull(game.getColorAt(game.getSize() / 2, game.getSize() / 2));
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(BLACK, game.getColorAt(game.getSize() / 2, game.getSize() / 2));
         assertNull(game.getColorAt(3, 3));
         game.fastForward();
@@ -730,58 +730,13 @@ class GameTest {
     }
 
     @Test
-    void goBeforeFirstMove() {
-        game.setSetupMode(true);
-        game.placeSetupStone(0, 0, BLACK);
-        game.setSetupMode(false);
-        game.playMove(5, 5);
-        assertEquals(BLACK, game.getColorAt(0, 0));
-        assertEquals(BLACK, game.getColorAt(5, 5));
-
-        game.goBeforeFirstMove();
-        assertEquals(BLACK, game.getColorAt(0, 0));
-        assertNull(game.getColorAt(5, 5));
-
-        game.goBeforeFirstMove();
-        assertEquals(BLACK, game.getColorAt(0, 0));
-        assertNull(game.getColorAt(5, 5));
-    }
-
-    @Test
-    void goBeforeFirstMoveWithoutMoves() {
-        game.setSetupMode(true);
-        game.placeSetupStone(0, 0, BLACK);
-        game.goBeforeFirstMove();
-        assertEquals(BLACK, game.getColorAt(0, 0));
-    }
-
-    @Test
-    void goToFirstMove() {
-        game.playMove(1, 1);
-        game.playMove(2, 2);
-        game.goToFirstMove();
-        assertNull(game.getColorAt(2, 2));
-        assertEquals(BLACK, game.getColorAt(1, 1));
-    }
-
-    @Test
-    void goToFirstMoveWithoutMoves() {
-        game.setSetupMode(true);
-        game.placeSetupStone(1, 1, BLACK);
-        game.placeSetupStone(2, 2, WHITE);
-        game.goToFirstMove();
-        assertEquals(BLACK, game.getColorAt(1, 1));
-        assertEquals(WHITE, game.getColorAt(2, 2));
-    }
-
-    @Test
     void goToEnd() {
         rewind();
         assertNull(game.getColorAt(0, 0));
         assertEquals(BLACK, game.getCurColor());
         assertTrue(game.getHistory().isAtBeginning());
         assertFalse(game.getHistory().isAtEnd());
-        game.goToEnd();
+        game.getHistory().goToEnd();
         assertEquals(BLACK, game.getColorAt(0, 0));
         assertEquals(WHITE, game.getCurColor());
         assertFalse(game.getHistory().isAtBeginning());
@@ -793,14 +748,14 @@ class GameTest {
     void undoPlayMove() {
         game.playMove(1, 1);
         assertEquals(BLACK, game.getColorAt(1, 1));
-        game.undo();
+        game.getHistory().stepBack();
         assertNull(game.getColorAt(1, 1));
     }
 
     @Test
     void redoPlayMove() {
         undoPlayMove();
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(BLACK, game.getColorAt(1, 1));
     }
 
@@ -811,7 +766,7 @@ class GameTest {
         game.placeHandicapPosition(1, 1, true);
         assertEquals(BLACK, game.getColorAt(1, 1));
         assertEquals(RUNNING, game.getGameState());
-        game.undo();
+        game.getHistory().stepBack();
         assertNull(game.getColorAt(1, 1));
         assertEquals(SETTING_UP, game.getGameState());
     }
@@ -819,7 +774,7 @@ class GameTest {
     @Test
     void redoPlaceHandicapPosition() {
         undoPlaceHandicapPosition();
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(BLACK, game.getColorAt(1, 1));
     }
 
@@ -828,14 +783,14 @@ class GameTest {
         game.setSetupMode(true);
         game.placeSetupStone(1, 1, BLACK);
         assertEquals(BLACK, game.getColorAt(1, 1));
-        game.undo();
+        game.getHistory().stepBack();
         assertNull(game.getColorAt(1, 1));
     }
 
     @Test
     void redoPlaceSetupStone() {
         undoPlaceSetupStone();
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(BLACK, game.getColorAt(1, 1));
     }
 
@@ -843,15 +798,15 @@ class GameTest {
     void undoResign() {
         game.resign();
         assertThrows(IllegalStateException.class, () -> game.resign());
-        game.undo();
+        game.getHistory().stepBack();
         assertDoesNotThrow(() -> game.resign());
     }
 
     @Test
     void redoResign() {
         undoResign();
-        game.undo();
-        game.redo();
+        game.getHistory().stepBack();
+        game.getHistory().stepForward();
         assertThrows(IllegalStateException.class, () -> game.resign());
     }
 
@@ -859,15 +814,15 @@ class GameTest {
     void undoScoreGame() {
         game.scoreGame();
         assertThrows(IllegalStateException.class, () -> game.scoreGame());
-        game.undo();
+        game.getHistory().stepBack();
         assertDoesNotThrow(() -> game.scoreGame());
     }
 
     @Test
     void redoScoreGame() {
         undoScoreGame();
-        game.undo();
-        game.redo();
+        game.getHistory().stepBack();
+        game.getHistory().stepForward();
         assertThrows(IllegalStateException.class, () -> game.scoreGame());
     }
 
@@ -881,14 +836,14 @@ class GameTest {
     @Test
     void undoPass() {
         pass();
-        game.undo();
+        game.getHistory().stepBack();
         assertEquals(BLACK, game.getCurColor());
     }
 
     @Test
     void redoPass() {
         undoPass();
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(WHITE, game.getCurColor());
     }
 

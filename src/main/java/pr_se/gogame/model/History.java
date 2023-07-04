@@ -6,6 +6,9 @@ import pr_se.gogame.view_controller.observer.GameEvent;
 import java.util.*;
 import java.util.function.Consumer;
 
+import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.HANDICAP;
+import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.SETUP;
+
 public class History implements Iterable<History.HistoryNode> {
     private final HistoryNode beginning = new HistoryNode(null, HistoryNode.AbstractSaveToken.BEGINNING_OF_HISTORY, null, "");
     private final HistoryNode end = new HistoryNode(null, HistoryNode.AbstractSaveToken.END_OF_HISTORY, null, "");
@@ -60,6 +63,21 @@ public class History implements Iterable<History.HistoryNode> {
         }
 
         return false;
+    }
+
+    public void goBeforeFirstMove() {
+        goToFirstMove();
+        if(current.getSaveToken() != SETUP && current.getSaveToken() != HANDICAP) {
+            stepBack();
+        }
+    }
+
+    public void goToFirstMove() {
+        goToBeginning();
+
+        do {
+            stepForward();
+        } while(!isAtEnd() && (current.getSaveToken() == HANDICAP || current.getSaveToken() == SETUP));
     }
 
     public void addNode(HistoryNode addedNode) {

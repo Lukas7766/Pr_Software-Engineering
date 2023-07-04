@@ -125,21 +125,9 @@ public interface GameInterface {
 
     boolean isSetupMode();
 
-    //##################################################################################################################
-    // Methods controlling the history
-    void undo();
-
-    void redo();
-
     void rewind();
 
     void fastForward();
-
-    void goBeforeFirstMove();
-
-    void goToFirstMove();
-
-    void goToEnd();
 
     //##################################################################################################################
     // Methods related to file handling

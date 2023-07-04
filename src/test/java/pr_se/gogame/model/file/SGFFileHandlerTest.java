@@ -207,9 +207,9 @@ class SGFFileHandlerTest {
         whiteHandicap();
         game.getHistory().goToBeginning();
         assertEquals(WHITE, game.getCurColor());
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(WHITE, game.getCurColor());
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(BLACK, game.getCurColor());
     }
 

@@ -457,24 +457,13 @@ public class Game implements GameInterface {
         board.printDebugInfo(x, y);
     }
 
-    // Methods controlling the history
-    @Override
-    public void undo() {
-        history.stepBack();
-    }
-
-    @Override
-    public void redo() {
-        history.stepForward();
-    }
-
     @Override
     public void rewind() {
         if(!history.isAtBeginning()) {
             if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
                 history.goToBeginning();
-            } else if(!history.isAtBeginning()) {
-                goBeforeFirstMove();
+            } else {
+                history.goBeforeFirstMove();
             }
         }
     }
@@ -483,30 +472,13 @@ public class Game implements GameInterface {
     public void fastForward() {
         History.HistoryNode n = history.getCurrentNode();
         if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
-            goBeforeFirstMove();
+            history.goBeforeFirstMove();
             if(history.getCurrentNode() == n) {
                 history.goToEnd();
             }
         } else {
             history.goToEnd();
         }
-    }
-
-    @Override
-    public void goBeforeFirstMove() {
-        goToFirstMove();
-        if(history.getCurrentNode().getSaveToken() != SETUP && history.getCurrentNode().getSaveToken() != HANDICAP) {
-            history.stepBack();
-        }
-    }
-
-    @Override
-    public void goToFirstMove() {
-        history.goToBeginning();
-
-        do {
-            history.stepForward();
-        } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP));
     }
 
     @Override

@@ -17,6 +17,7 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.model.History;
 import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.view_controller.dialog.*;
 import pr_se.gogame.view_controller.observer.ViewListener;
@@ -119,6 +120,8 @@ public class HeaderPane extends VBox {
             CustomNewGameAction.onNewGameAction(stage, game);
         });
 
+        final String loadingErrorMsg = "Failed to load the game!";
+
         MenuItem importFileItem = new MenuItem("L_oad Game");
         importFileItem.setAccelerator(new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN));
         files.getItems().add(importFileItem);
@@ -127,12 +130,14 @@ public class HeaderPane extends VBox {
             if (f != null) {
                 try {
                     if(!game.getFileHandler().loadFile(f)) {
-                        CustomExceptionDialog.show(new IOException(), "Failed to load the game!");
+                        CustomExceptionDialog.show(new IOException(), loadingErrorMsg);
+                    } else {
+                        game.getHistory().goToFirstMove();
                     }
                 } catch (NoSuchFileException nsfException) {
-                    CustomExceptionDialog.show(nsfException, "Failed to load the game!", nsfException.getMessage());
+                    CustomExceptionDialog.show(nsfException, loadingErrorMsg, nsfException.getMessage());
                 } catch (LoadingGameException | IOException exception) {
-                    CustomExceptionDialog.show(exception, "Failed to load the game!", exception.getMessage());
+                    CustomExceptionDialog.show(exception, loadingErrorMsg, exception.getMessage());
                     game.initGame();
                 }
             }
@@ -188,22 +193,22 @@ public class HeaderPane extends VBox {
         MenuItem rewindItem = new MenuItem("_Rewind");
         rewindItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
         historySectionItems.add(rewindItem);
-        rewindItem.setOnAction(e -> game.rewind());
+        rewindItem.setOnAction(e -> rewind());
 
         MenuItem undoItem = new MenuItem("_Undo");
         undoItem.setAccelerator(new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN));
         historySectionItems.add(undoItem);
-        undoItem.setOnAction(e -> game.undo());
+        undoItem.setOnAction(e -> game.getHistory().stepBack());
 
         MenuItem redoItem = new MenuItem("Red_o");
         redoItem.setAccelerator(new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN));
         historySectionItems.add(redoItem);
-        redoItem.setOnAction(e -> game.redo());
+        redoItem.setOnAction(e -> game.getHistory().stepForward());
 
         MenuItem fastForwardItem = new MenuItem("F_ast Forward");
         fastForwardItem.setAccelerator(new KeyCodeCombination(KeyCode.LESS, KeyCombination.CONTROL_DOWN));
         historySectionItems.add(fastForwardItem);
-        fastForwardItem.setOnAction(e -> game.fastForward());
+        fastForwardItem.setOnAction(e -> fastForward());
 
         menu.getItems().addAll(historySectionItems);
 
@@ -417,22 +422,22 @@ public class HeaderPane extends VBox {
         Button rewind = new Button("<<");
         rewind.setFocusTraversable(false);
         playbackControlList.add(rewind);
-        rewind.setOnAction(e -> game.rewind());
+        rewind.setOnAction(e -> rewind());
 
         Button undo = new Button("<");
         undo.setFocusTraversable(false);
         playbackControlList.add(undo);
-        undo.setOnAction(e -> game.undo());
+        undo.setOnAction(e -> game.getHistory().stepBack());
 
         Button redo = new Button(">");
         redo.setFocusTraversable(false);
         playbackControlList.add(redo);
-        redo.setOnAction(e -> game.redo());
+        redo.setOnAction(e -> game.getHistory().stepForward());
 
         Button fastForward = new Button(">>");
         fastForward.setFocusTraversable(false);
         playbackControlList.add(fastForward);
-        fastForward.setOnAction(e -> game.fastForward());
+        fastForward.setOnAction(e -> fastForward());
 
         playbackControl.getChildren().addAll(playbackControlList);
 
@@ -559,5 +564,15 @@ public class HeaderPane extends VBox {
 
         return hotbar;
 
+    }
+
+    private void rewind() {
+        History history = game.getHistory();
+        game.rewind();
+    }
+
+    private void fastForward() {
+        History history = game.getHistory();
+        game.fastForward();
     }
 }

@@ -161,7 +161,7 @@ class JapaneseRulesetTest {
     @Test
     void isKo() {
         Game game = loadFile("KoSituation.sgf");
-        game.goToEnd();
+        game.getHistory().goToEnd();
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
     }
@@ -169,7 +169,7 @@ class JapaneseRulesetTest {
     @Test
     void reset() {
         Game game = loadFile("KoSituation.sgf");
-        game.goToEnd();
+        game.getHistory().goToEnd();
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
 
