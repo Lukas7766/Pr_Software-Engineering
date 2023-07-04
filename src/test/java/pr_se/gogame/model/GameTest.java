@@ -496,7 +496,6 @@ class GameTest {
             e.printStackTrace();
             fail();
         }
-        game.fastForward();
 
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
@@ -642,7 +641,8 @@ class GameTest {
         assertFalse(game.isSetupMode());
     }
 
-    @Test
+    // On further consideration, this kind of behaviour seems view-specific.
+    /*@Test
     void rewind() {
         game.playMove(0, 0);
         assertFalse(game.getHistory().isAtBeginning());
@@ -727,11 +727,14 @@ class GameTest {
         assertTrue(game.getHistory().isAtEnd());
         game.fastForward();
         assertTrue(game.getHistory().isAtEnd());
-    }
+    }*/
 
     @Test
     void goToEnd() {
-        rewind();
+        game.playMove(0, 0);
+        assertFalse(game.getHistory().isAtBeginning());
+        game.getHistory().goToBeginning();
+        assertTrue(game.getHistory().isAtBeginning());
         assertNull(game.getColorAt(0, 0));
         assertEquals(BLACK, game.getCurColor());
         assertTrue(game.getHistory().isAtBeginning());

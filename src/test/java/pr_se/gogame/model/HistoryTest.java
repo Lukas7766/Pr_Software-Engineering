@@ -82,6 +82,51 @@ class HistoryTest {
     }
 
     @Test
+    void goBeforeFirstMove() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        game.setSetupMode(false);
+        game.playMove(5, 5);
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getColorAt(5, 5));
+
+        history.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertNull(game.getColorAt(5, 5));
+
+        history.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertNull(game.getColorAt(5, 5));
+    }
+
+    @Test
+    void goBeforeFirstMoveWithoutMoves() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        history.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+    }
+
+    @Test
+    void goToFirstMove() {
+        game.playMove(1, 1);
+        game.playMove(2, 2);
+        history.goToFirstMove();
+        assertNull(game.getColorAt(2, 2));
+        assertEquals(BLACK, game.getColorAt(1, 1));
+    }
+
+    @Test
+    void goToFirstMoveWithoutMoves() {
+        game.setSetupMode(true);
+        game.placeSetupStone(1, 1, BLACK);
+        game.placeSetupStone(2, 2, WHITE);
+        history.goToFirstMove();
+        assertEquals(BLACK, game.getColorAt(1, 1));
+        assertEquals(WHITE, game.getColorAt(2, 2));
+    }
+
+    @Test
     void addNode() {
         assertTrue(history.isAtBeginning());
         assertTrue(history.isAtEnd());
