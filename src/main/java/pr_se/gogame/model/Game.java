@@ -477,7 +477,6 @@ public class Game implements GameInterface {
     public void rewind() {
         removeAllMarks();
         if(!history.isAtBeginning()) {
-            history.stepBack();
             if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
                 history.rewind();
             } else if(!history.isAtBeginning()) {
