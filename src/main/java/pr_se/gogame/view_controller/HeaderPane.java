@@ -383,7 +383,7 @@ public class HeaderPane extends VBox {
             Alert box = new Alert(Alert.AlertType.INFORMATION);
             box.setTitle("About us");
             box.setHeaderText(null);
-            box.setContentText("This Go Game was developed by Gerald, Lukas and Sebastian.");
+            box.setContentText("This Go Game was developed by Gerald, Lukas, and Sebastian.");
             box.initStyle(StageStyle.UTILITY);
             box.initOwner(stage);
             box.show();
