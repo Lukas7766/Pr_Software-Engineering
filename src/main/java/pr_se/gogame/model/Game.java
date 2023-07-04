@@ -16,6 +16,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static pr_se.gogame.model.helper.StoneColor.*;
+import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 
 public class Game implements GameInterface {
 
@@ -145,7 +146,7 @@ public class Game implements GameInterface {
         UndoableCommand c = switchColor();
 
         if(gameState != GameState.SETTING_UP) {
-            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.PASS, StoneColor.getOpposite(curColor), "")); // StoneColor.getOpposite() because we switched colors before
+            history.addNode(new History.HistoryNode(c, PASS, StoneColor.getOpposite(curColor), "")); // StoneColor.getOpposite() because we switched colors before
         }
 
         for (GameEvent e : c.getExecuteEvents()) {
@@ -165,7 +166,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't resign if game isn't running! gameState was " + gameState);
         }
 
-        endGame(History.HistoryNode.AbstractSaveToken.RESIGN);
+        endGame(RESIGN);
     }
 
     @Override
@@ -180,7 +181,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }
 
-        endGame(History.HistoryNode.AbstractSaveToken.SCORED_GAME);
+        endGame(SCORED_GAME);
     }
 
     private void endGame(History.HistoryNode.AbstractSaveToken saveToken) {
@@ -188,14 +189,14 @@ public class Game implements GameInterface {
             throw new NullPointerException();
         }
 
-        if(saveToken != History.HistoryNode.AbstractSaveToken.SCORED_GAME && saveToken != History.HistoryNode.AbstractSaveToken.RESIGN) {
+        if(saveToken != SCORED_GAME && saveToken != RESIGN) {
             throw new IllegalArgumentException("AbstractSaveToken " + saveToken + " invalid for endGame() method");
         }
 
         List<UndoableCommand> subcommands = new LinkedList<>();
 
         subcommands.add(ruleset.scoreGame(this));
-        if(saveToken == History.HistoryNode.AbstractSaveToken.RESIGN) {
+        if(saveToken == RESIGN) {
             subcommands.add(gameResult.setWinner(StoneColor.getOpposite(curColor)));
             subcommands.add(gameResult.setDescription(curColor, "Game was resigned by " + curColor + "!"));
             subcommands.add(gameResult.setDescription(StoneColor.getOpposite(curColor), StoneColor.getOpposite(curColor) + " won!"));
@@ -354,108 +355,13 @@ public class Game implements GameInterface {
          * StoneColor.getOpposite() because we previously switched colors
          */
         removeAllMarks();
-        history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.MOVE, StoneColor.getOpposite(curColor), "", x, y));
+        history.addNode(new History.HistoryNode(c, MOVE, StoneColor.getOpposite(curColor), "", x, y));
 
         for(GameEvent e : c.getExecuteEvents()) {
             fireGameEvent(e);
         }
 
         return true;
-    }
-
-    @Override
-    public void placeHandicapPosition(int x, int y, boolean placeStone) {
-        placeHandicapPosition(x, y, placeStone, curColor);
-    }
-
-    @Override
-    public void placeHandicapPosition(int x, int y, boolean placeStone, final StoneColor color) {
-        if(gameState != GameState.SETTING_UP) {
-            throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
-        }
-
-        checkCoords(x, y);
-
-        UndoableCommand c = null;
-
-        if(placeStone) {
-            if(color == null) {
-                throw new NullPointerException();
-            }
-
-            if (handicapStoneCounter <= 0) {
-                throw new IllegalStateException("Can't place any more handicap stones!");
-            }
-
-            List<UndoableCommand> subcommands = new LinkedList<>();
-
-            final UndoableCommand uc01SetStone = board.setStone(x, y, color, true); // uc01SetStone is already executed within board.setStone().
-
-            if(uc01SetStone == null) {
-                return;
-            }
-
-            // Assertion: uc01SetStone != null and was hence a valid move.
-
-            subcommands.add(uc01SetStone);
-
-            final int oldHandicapCtr = handicapStoneCounter;
-            final int newHandicapCtr = handicapStoneCounter - 1;
-
-            final UndoableCommand uc02UpdateCounter = new UndoableCommand() {
-                UndoableCommand uC02SwitchColor = null;
-
-                @Override
-                public void execute(final boolean saveEffects) {
-                    handicapStoneCounter = newHandicapCtr;
-
-                    if (newHandicapCtr <= 0) {
-                        uC02SwitchColor = switchColor();
-                        if(saveEffects) {
-                            getExecuteEvents().addAll(uC02SwitchColor.getExecuteEvents());
-                            getUndoEvents().addAll(uC02SwitchColor.getUndoEvents());
-                        }
-
-                        gameState = GameState.RUNNING;
-                    }
-                }
-
-                @Override
-                public void undo() {
-                    if(uC02SwitchColor != null) {
-                        uC02SwitchColor.undo();
-                    }
-                    handicapStoneCounter = oldHandicapCtr;
-
-                    gameState = GameState.SETTING_UP;
-                }
-            };
-            uc02UpdateCounter.execute(true);
-
-            subcommands.add(uc02UpdateCounter);
-
-            c = UndoableCommand.of(subcommands);
-            // c was already executed piecemeal
-
-            /*
-             * StoneColor.getOpposite() because we previously switched colors
-             */
-            removeAllMarks();
-            history.addNode(new History.HistoryNode(c, History.HistoryNode.AbstractSaveToken.HANDICAP, color, "", x, y));
-
-            for(GameEvent e : c.getExecuteEvents()) {
-                fireGameEvent(e);
-            }
-        }
-
-        GameEvent handicapEvent = new GameEvent(GameCommand.HANDICAP_SET, x, y, curMoveNumber);
-
-        if(c != null) {
-            c.getExecuteEvents().add(handicapEvent);
-            c.getUndoEvents().add(new GameEvent(GameCommand.HANDICAP_REMOVED, x, y, curMoveNumber));
-        }
-
-        fireGameEvent(handicapEvent);
     }
 
     @Override
@@ -482,24 +388,112 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place setup stone when gameState is " + gameState);
         }
 
+        placeStone(x, y, color, SETUP);
+    }
+
+    @Override
+    public void placeHandicapPosition(int x, int y, boolean placeStone) {
+        placeHandicapPosition(x, y, placeStone, curColor);
+    }
+
+    @Override
+    public void placeHandicapPosition(int x, int y, boolean placeStone, final StoneColor color) {
+        if(gameState != GameState.SETTING_UP) {
+            throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
+        }
+
         checkCoords(x, y);
 
-        final int OLD_CUR_MOVE_NUMBER = curMoveNumber;
-        curMoveNumber = 0;
-        final UndoableCommand uc01SetStone = board.setStone(x, y, color, true); // uc01SetStone is already executed within board.setStone().
-        curMoveNumber = OLD_CUR_MOVE_NUMBER;
+        if(placeStone) {
+            if(color == null) {
+                throw new NullPointerException();
+            }
 
-        if(uc01SetStone == null) {
+            if (handicapStoneCounter <= 0) {
+                throw new IllegalStateException("Can't place any more handicap stones!");
+            }
+
+            placeStone(x, y, color, HANDICAP);
+        } else {
+            fireGameEvent(new GameEvent(GameCommand.HANDICAP_SET, x, y, curMoveNumber));
+        }
+    }
+
+    private void placeStone(int x, int y, StoneColor color, History.HistoryNode.AbstractSaveToken saveToken) {
+        if (color == null || saveToken == null) {
+            throw new NullPointerException();
+        }
+
+        if (saveToken != MOVE && saveToken != SETUP && saveToken != HANDICAP) {
+            throw new IllegalArgumentException("AbstractSaveToken " + saveToken + " is incompatible with placeStone().");
+        }
+
+        checkCoords(x, y);
+
+        final int oldCurMoveNumber = curMoveNumber;
+        if (saveToken == SETUP) {
+            curMoveNumber = 0;
+        }
+        final UndoableCommand uc01SetStone = board.setStone(x, y, color, saveToken == SETUP || saveToken == HANDICAP);
+        if (saveToken == SETUP) {
+            curMoveNumber = oldCurMoveNumber;
+        }
+
+        if (uc01SetStone == null) {
             return;
         }
 
-        removeAllMarks();
         uc01SetStone.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
-        history.addNode(new History.HistoryNode(uc01SetStone, History.HistoryNode.AbstractSaveToken.SETUP, color, "", x, y));
 
-        for(GameEvent e : uc01SetStone.getExecuteEvents()) {
-            fireGameEvent(e);
+        List<UndoableCommand> subcommands = new LinkedList<>();
+        subcommands.add(uc01SetStone);
+
+        if(saveToken == HANDICAP) {
+            final int oldHandicapCtr = handicapStoneCounter;
+            final int newHandicapCtr = handicapStoneCounter - 1;
+
+            final UndoableCommand uc02UpdateCounter = new UndoableCommand() {
+                UndoableCommand uC02SwitchColor = null;
+
+                @Override
+                public void execute(final boolean saveEffects) {
+                    handicapStoneCounter = newHandicapCtr;
+
+                    if (newHandicapCtr <= 0) {
+                        uC02SwitchColor = switchColor();
+                        if (saveEffects) {
+                            getExecuteEvents().addAll(uC02SwitchColor.getExecuteEvents());
+                            getUndoEvents().addAll(uC02SwitchColor.getUndoEvents());
+                        }
+
+                        gameState = GameState.RUNNING;
+                    }
+                }
+
+                @Override
+                public void undo() {
+                    if (uC02SwitchColor != null) {
+                        uC02SwitchColor.undo();
+                    }
+                    handicapStoneCounter = oldHandicapCtr;
+
+                    gameState = GameState.SETTING_UP;
+                }
+            };
+            uc02UpdateCounter.execute(true);
+
+            subcommands.add(uc02UpdateCounter);
         }
+
+        UndoableCommand ret = UndoableCommand.of(subcommands);
+        if(saveToken == HANDICAP) {
+            ret.getExecuteEvents().add(new GameEvent(GameCommand.HANDICAP_SET, x, y, curMoveNumber));
+            ret.getUndoEvents().add(new GameEvent(GameCommand.HANDICAP_REMOVED, x, y, curMoveNumber));
+        }
+
+        history.addNode(new History.HistoryNode(ret, saveToken, color, "", x, y));
+        removeAllMarks();
+        ret.getExecuteEvents().forEach(this::fireGameEvent);
     }
 
     @Override
@@ -549,7 +543,7 @@ public class Game implements GameInterface {
         removeAllMarks();
         if(!history.isAtBeginning()) {
             history.stepBack();
-            if((history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP)) {
+            if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
                 history.rewind();
             } else if(!history.isAtBeginning()) {
                 goBeforeFirstMove();
@@ -562,7 +556,7 @@ public class Game implements GameInterface {
     public void fastForward() {
         removeAllMarks();
         History.HistoryNode n = history.getCurrentNode();
-        if(n.getSaveToken() == History.HistoryNode.AbstractSaveToken.BEGINNING_OF_HISTORY || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || n.getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP) {
+        if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
             goBeforeFirstMove();
             if(history.getCurrentNode() == n) {
                 history.skipToEnd();
@@ -577,7 +571,7 @@ public class Game implements GameInterface {
     public void goBeforeFirstMove() {
         goToFirstMove();
         removeAllMarks();
-        if(history.getCurrentNode().getSaveToken() != History.HistoryNode.AbstractSaveToken.SETUP && history.getCurrentNode().getSaveToken() != History.HistoryNode.AbstractSaveToken.HANDICAP) {
+        if(history.getCurrentNode().getSaveToken() != SETUP && history.getCurrentNode().getSaveToken() != HANDICAP) {
             history.stepBack();
         }
         reDisplayMarks();
@@ -590,7 +584,7 @@ public class Game implements GameInterface {
 
         do {
             history.stepForward();
-        } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.HANDICAP || history.getCurrentNode().getSaveToken() == History.HistoryNode.AbstractSaveToken.SETUP));
+        } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP));
         reDisplayMarks();
     }
 
