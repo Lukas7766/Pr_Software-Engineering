@@ -10,7 +10,8 @@ import java.util.*;
 import java.util.function.Consumer;
 
 public class History implements Iterable<History.HistoryNode> {
-    private static final HistoryNode TERMINATOR = new HistoryNode(null, HistoryNode.AbstractSaveToken.END_OF_HISTORY, null, "");
+    private final HistoryNode beginning = new HistoryNode(null, HistoryNode.AbstractSaveToken.BEGINNING_OF_HISTORY, null, "");
+    private final HistoryNode end = new HistoryNode(null, HistoryNode.AbstractSaveToken.END_OF_HISTORY, null, "");
 
     private final Game game;
 
@@ -21,8 +22,8 @@ public class History implements Iterable<History.HistoryNode> {
             throw new NullPointerException();
         }
         this.game = game;
-        current = new HistoryNode(null, null, null, ""); // This solely exists so that the first move can be undone without an edge case.
-        current.setNext(TERMINATOR);
+        current = beginning;
+        current.setNext(end);
     }
 
     public void rewind() {
@@ -70,7 +71,7 @@ public class History implements Iterable<History.HistoryNode> {
 
         current.setNext(addedNode);
         current = current.getNext();
-        current.setNext(TERMINATOR);
+        current.setNext(end);
     }
 
     public HistoryNode getCurrentNode() {
@@ -78,7 +79,7 @@ public class History implements Iterable<History.HistoryNode> {
     }
 
     public boolean isAtEnd() {
-        return current.getNext() == TERMINATOR;
+        return current.getNext() == end;
     }
 
     public boolean isAtBeginning() {
@@ -119,20 +120,11 @@ public class History implements Iterable<History.HistoryNode> {
         return Objects.hash(valueList.toArray());
     }
 
-    // Interface Iterable
-    private HistoryNode getFirstNode() {
-        HistoryNode first = current;
-        while(first.getPrev() != null) {
-            first = first.getPrev();
-        }
-        return first;
-    }
-
     @Override
     public Iterator<HistoryNode> iterator() {
         return new Iterator<>() {
 
-            HistoryNode node = getFirstNode();
+            HistoryNode node = beginning;
 
             @Override
             public boolean hasNext() {
@@ -189,7 +181,11 @@ public class History implements Iterable<History.HistoryNode> {
              */
             RESIGN,
 
-            END_OF_HISTORY      // Used to indicate the end of history, as that removes the need for complicated edge cases
+            SCORED_GAME,
+
+            END_OF_HISTORY,      // removes the need for complicated edge cases
+
+            BEGINNING_OF_HISTORY // no real purpose as yet, but seems sensible for demonstrating intent.
         }
 
         private HistoryNode prev;
@@ -211,15 +207,14 @@ public class History implements Iterable<History.HistoryNode> {
         private final Map<Position, MarkShape> marks = new LinkedHashMap<>();
 
         public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, String comment) {
-            this.command = command;
-            setComment(comment);
-            this.saveToken = saveToken;
-            this.color = color;
-            this.x = -1;
-            this.y = -1;
+            this(command, saveToken, color, comment, -1, -1);
         }
 
         public HistoryNode(UndoableCommand command, AbstractSaveToken saveToken, StoneColor color, String comment, int x, int y) {
+            if(saveToken == null) {
+                throw new NullPointerException();
+            }
+
             this.command = command;
             setComment(comment);
             this.saveToken = saveToken;

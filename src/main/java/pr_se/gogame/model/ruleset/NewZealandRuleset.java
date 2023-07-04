@@ -7,8 +7,18 @@ import pr_se.gogame.model.helper.UndoableCommand;
 public class NewZealandRuleset implements Ruleset {
 
     @Override
-    public GameResult scoreGame(Game game) {
-        return new GameResult(1, 1, null,"");
+    public UndoableCommand scoreGame(Game game) {
+        return new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                // Do Nothing
+            }
+
+            @Override
+            public void undo() {
+                // Do nothing
+            }
+        };
     }
 
     @Override
@@ -20,7 +30,7 @@ public class NewZealandRuleset implements Ruleset {
     public UndoableCommand isKo(Game game) {
         return new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 // Returning this equates to telling the caller that ko has not occurred.
             }
 
@@ -34,9 +44,11 @@ public class NewZealandRuleset implements Ruleset {
     /**
      * The New Zealand Ruleset allows for free placement of handicap stones.
      * See <a href="https://en.wikipedia.org/wiki/Handicapping_in_Go#Free_placement">...</a>
+     *
+     * @return false, as this ruleset has manual handicap placement
      */
     @Override
-    public void setHandicapStones(Game game, StoneColor beginner, int noStones) {
+    public boolean setHandicapStones(Game game, StoneColor beginner, int noStones) {
         if(game == null || beginner == null) {
             throw new NullPointerException();
         }
@@ -45,6 +57,6 @@ public class NewZealandRuleset implements Ruleset {
             throw new IllegalArgumentException();
         }
 
-        game.setHandicapStoneCounter(noStones);
+        return false;
     }
 }

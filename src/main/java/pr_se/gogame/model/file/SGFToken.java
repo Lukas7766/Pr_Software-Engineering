@@ -120,17 +120,17 @@ public enum SGFToken {
      */
     private final String value;
 
-    private final boolean supportsMultiAttribs;
+    private final boolean hasMultiAttribs;
 
     /**
      * Creates a token
      *
      * @param token                String for the token
-     * @param supportsMultiAttribs whether the token may have multiple attributes in the file
+     * @param hasMultiAttribs whether the token may have multiple attributes in the file
      */
-    SGFToken(String token, boolean supportsMultiAttribs) {
+    SGFToken(String token, boolean hasMultiAttribs) {
         this.value = token;
-        this.supportsMultiAttribs = supportsMultiAttribs;
+        this.hasMultiAttribs = hasMultiAttribs;
     }
 
 
@@ -144,7 +144,7 @@ public enum SGFToken {
     }
 
     public boolean hasMultiAttribs() {
-        return supportsMultiAttribs;
+        return hasMultiAttribs;
     }
 
     public static SGFToken ofHistoryNode(History.HistoryNode node) {

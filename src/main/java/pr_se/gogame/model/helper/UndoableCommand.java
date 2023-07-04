@@ -4,6 +4,8 @@ import pr_se.gogame.view_controller.observer.GameEvent;
 
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.function.Consumer;
 
 public abstract class UndoableCommand {
 
@@ -13,12 +15,10 @@ public abstract class UndoableCommand {
 
     /**
      * Executes this UndoableCommand
-     * @param saveEffects if true, anything that might be saved to a file will actually be saved. If false, it will not
-     *                    be saved. This is to prevent corruption of the saved file when stepping through the program.
-     *                    This also determines whether any GameEvents to be fired in connection with this method call
-     *                    are saved internally, to avoid duplicating them upon re-execution.
+     * @param saveEffects If true, any action that should only be taken upon the very first execution of this command
+     *                    will be taken (so that the command can be used, which reduces code duplication significantly).
      */
-    public abstract void execute(boolean saveEffects);
+    public abstract void execute(final boolean saveEffects);
 
     /**
      * Undoes this UndoableCommand
@@ -31,5 +31,60 @@ public abstract class UndoableCommand {
 
     public List<GameEvent> getUndoEvents() {
         return undoEvents;
+    }
+
+    /**
+     * Wraps several UndoableCommands into a single one
+     * @param subcommands the list of UndoableCommands to be wrapped into one
+     * @return a new UndoableCommand which executes all subcommands and undoes them in reverse order
+     */
+    public static UndoableCommand of(final List<UndoableCommand> subcommands) {
+        if(subcommands == null) {
+            throw new NullPointerException();
+        }
+
+        List<UndoableCommand> finalSubcommands = List.copyOf(subcommands);
+
+        UndoableCommand ret = new UndoableCommand() {
+            @Override
+            public void execute(final boolean saveEffects) {
+                finalSubcommands.forEach(c -> c.execute(saveEffects));
+            }
+
+            @Override
+            public void undo() {
+                // Undoing it the other way round just in case.
+                ListIterator<UndoableCommand> i = finalSubcommands.listIterator(finalSubcommands.size());
+                while(i.hasPrevious()) {
+                    UndoableCommand c = i.previous();
+                    c.undo();
+                }
+            }
+        };
+
+        finalSubcommands.forEach(c -> {
+            ret.getExecuteEvents().addAll(c.getExecuteEvents());
+            ret.getUndoEvents().addAll(c.getUndoEvents());
+        });
+
+        return ret;
+    }
+
+    public static <T> UndoableCommand updateValue(final Consumer<T> updateMethod, final T oldValue, final T newValue) {
+        if(updateMethod == null) {
+            throw new NullPointerException();
+        }
+
+        return new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                updateMethod.accept(newValue);
+            }
+
+            @Override
+            public void undo() {
+                updateMethod.accept(oldValue);
+            }
+        };
     }
 }

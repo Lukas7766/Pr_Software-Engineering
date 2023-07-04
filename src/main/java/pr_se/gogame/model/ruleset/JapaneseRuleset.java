@@ -1,18 +1,16 @@
 package pr_se.gogame.model.ruleset;
 
-import pr_se.gogame.model.*;
+import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 public class JapaneseRuleset implements Ruleset {
 
     /**
-     * This helps to determine if a position is already visited by the flood fill algorithm.
+     * This helps to determine if a position has already been visited by the flood fill algorithm.
      */
     private boolean[][] visited;
 
@@ -48,7 +46,7 @@ public class JapaneseRuleset implements Ruleset {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 for(int i = 0; i < boardHashes.length - 1; i++) {
                     boardHashes[i] = boardHashes[i + 1];
                 }
@@ -75,56 +73,42 @@ public class JapaneseRuleset implements Ruleset {
      * Komi is added to White's score count.
      *
      * @param game to calculate the score and define the winner
-     * @return an array of size 2, containing the score of black and white
+     * @return An undoablecommand to undo the updating of the GameResult
      */
     @Override
-    public GameResult scoreGame(Game game) {
+    public UndoableCommand scoreGame(Game game) {
         if (game == null) {
             throw new NullPointerException();
         }
 
-        double komi = game.getKomi();
+        double komi = getKomi();
         double handicap = game.getHandicap();
 
-        int capturedStonesBlack = game.getStonesCapturedBy(StoneColor.BLACK);
+        int capturedStonesBlack = game.getGameResult().getScoreComponents(StoneColor.BLACK).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
         int territoryScoreBlack = calculateTerritoryPoints(StoneColor.BLACK, game);
 
-        int capturedStonesWhite = game.getStonesCapturedBy(StoneColor.WHITE);
+        int capturedStonesWhite = game.getGameResult().getScoreComponents(StoneColor.WHITE).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
         int territoryScoreWhite = calculateTerritoryPoints(StoneColor.WHITE, game);
 
         double scoreBlack = capturedStonesBlack + territoryScoreBlack + handicap;
         double scoreWhite = capturedStonesWhite + territoryScoreWhite + komi;
 
-        StringBuilder sb = new StringBuilder();
-        StoneColor winner;
-        int captStone;
-        int trScore;
-        double sc;
+        StoneColor winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
 
-        if (scoreBlack > scoreWhite) {
-            winner = StoneColor.BLACK;
-            sb.append(StoneColor.BLACK).append(" won!\n\n");
-            sb.append("Handicap: ").append(handicap).append("\n");
-            captStone = capturedStonesBlack;
-            trScore = territoryScoreBlack;
-            sc = scoreBlack;
-        } else {
-            winner = StoneColor.WHITE;
-            sb.append(StoneColor.WHITE).append(" won!\n\n");
-            sb.append("Komi: ").append(komi).append("\n");
-            captStone = capturedStonesWhite;
-            trScore = territoryScoreWhite;
-            sc = scoreWhite;
-        }
+        List<UndoableCommand> subcommands = new LinkedList<>();
 
-        sb.append("+ Territory points:").append(" ").append(trScore).append("\n");
-        sb.append("+ Captured stones:").append(" ").append(captStone).append("\n\n");
-        sb.append("= ").append(sc).append(" points");
+        GameResult ret = game.getGameResult();
 
-        return new GameResult(scoreBlack, scoreWhite, winner, sb.toString());
+        subcommands.add(ret.setWinner(winner));
+        subcommands.add(ret.setDescription(winner, winner + " won!"));
+        subcommands.add(ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!"));
+        subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.TERRITORY, territoryScoreBlack));
+        subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.TERRITORY, territoryScoreWhite));
+
+        return UndoableCommand.of(subcommands);
     }
 
-    //FloodFill Algorithm, source: ALGO assignment
+    // FloodFill Algorithm, source: ALGO assignment
     /**
      * The algorithm starts at the border of the board. In the first step, all empty positions will be located.
      * In the next and final step for every empty position all neighbouring positions will be checked if a different
@@ -138,56 +122,67 @@ public class JapaneseRuleset implements Ruleset {
      * @return how many territory points the given player has on the given board.
      */
     private int calculateTerritoryPoints(StoneColor color, Game game) {
-        int boardSize = game.getSize();
+        final int boardSize = game.getSize();
         visited = new boolean[boardSize][boardSize];
 
         int territoryPoints = 0;
-        for (int i = 0; i < boardSize; i++) {
-            for (int j = 0; j < boardSize; j++) {
-
-                if (game.getColorAt(i, j) == null && !visited[i][j]) {
-
-                    boolean occupiedTerritory = true;
-
-                    territory = new ArrayList<>();
-                    floodFill(game, i, j);
-
-                    for (Position p : territory) {
-                        if(     (p.getX() > 0 && game.getColorAt(p.getX() - 1, p.getY()) == StoneColor.getOpposite(color)) ||
-                                (p.getX() < game.getSize() - 1 && game.getColorAt(p.getX() + 1, p.getY()) == StoneColor.getOpposite(color)) ||
-                                (p.getY() > 0 && game.getColorAt(p.getX(), p.getY() - 1) == StoneColor.getOpposite(color)) ||
-                                (p.getY() < game.getSize() - 1 && game.getColorAt(p.getX(), p.getY() + 1) == StoneColor.getOpposite(color))) {
-                            occupiedTerritory = false;
-                            break;
-                        }
-                    }
-
-                    if (occupiedTerritory) {
+        for (int x = 0; x < boardSize; x++) {
+            for (int y = 0; y < boardSize; y++) {
+                if (game.getColorAt(x, y) == null && !visited[x][y]) {
+                    territory = new LinkedList<>();
+                    if(floodFill(game, color, x, y)) {
                         territoryPoints += territory.size();
                     }
                 }
             }
         }
+
         return territoryPoints;
     }
 
 
-    private void floodFill(Game game, int x, int y) {
-        if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize() || visited[x][y]) {
-            return;
+    /**
+     * Starts at the given location and recursively checks all neighboring positions.
+     * @param game the Game to be evaluated
+     * @param color the color whose territory score is to be calculated
+     * @param x the x-coordinate of the search's origin, starting at the left
+     * @param y the y-coordinate of the search's origin, starting at the top
+     * @return true if an empty area without any bordering stones of the opposite of color was found, false if any stone
+     *  of the opposite color was found next to an empty position
+     */
+    private boolean floodFill(Game game, StoneColor color, int x, int y) {
+        if (x < 0 || y < 0 || x >= game.getSize() || y >= game.getSize()) {
+            return true;
+        }
+
+        // Assertion: The coordinates are valid.
+
+        if(game.getColorAt(x, y) == StoneColor.getOpposite(color)) {
+            return false;
+        }
+
+        // Assertion: The board at this position is either empty or of the same color.
+
+        if(visited[x][y]) {
+            return true;
         }
 
         visited[x][y] = true;
 
-        if (game.getColorAt(x, y) != null) {
-            return;
+        if(game.getColorAt(x, y) != null) {
+            return true;
         }
 
         territory.add(new Position(x, y));
-        floodFill(game, x, y + 1); //top
-        floodFill(game, x + 1, y); //right
-        floodFill(game, x, y - 1); //bottom
-        floodFill(game, x - 1, y); //left
+        boolean ret = floodFill(game, color, x, y + 1); // bottom
+
+        ret &= floodFill(game, color, x + 1, y); // right           // The singular & is important, as we need to disable short-circuit evaluation.
+
+        ret &= floodFill(game, color, x, y - 1); // top
+
+        ret &= floodFill(game, color, x - 1, y); // left
+
+        return ret; // SonarQube didn't like the singular & in the return value.
     }
 
     @Override

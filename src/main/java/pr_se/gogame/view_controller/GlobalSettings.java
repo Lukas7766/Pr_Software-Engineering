@@ -41,7 +41,7 @@ public final class GlobalSettings {
         }
     }
 
-    private static void update() {
+    public static void update() {
         for(ViewListener l : listeners) {
             l.onSettingsUpdated();
         }

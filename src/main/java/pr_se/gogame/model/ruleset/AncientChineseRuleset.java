@@ -6,6 +6,8 @@ import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
 import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 public class AncientChineseRuleset implements Ruleset {
     private int lastBoardHash;
@@ -20,31 +22,21 @@ public class AncientChineseRuleset implements Ruleset {
             }
         }
 
-        final int LAST_BOARD_HASH = lastBoardHash;
-        final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
+        final int oldBoardHash = lastBoardHash;
+        final int newBoardHash = Arrays.deepHashCode(boardColor);
 
-        if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
+        if(newBoardHash == oldBoardHash) {
             return null;
         }
 
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                lastBoardHash = NEW_BOARD_HASH;
-            }
-
-            @Override
-            public void undo() {
-                lastBoardHash = LAST_BOARD_HASH;
-            }
-        };
+        UndoableCommand ret = UndoableCommand.updateValue(i -> lastBoardHash = i, oldBoardHash, newBoardHash);
         ret.execute(true);
 
         return ret;
     }
 
     @Override
-    public GameResult scoreGame(Game game) {
+    public UndoableCommand scoreGame(Game game) {
 
         if (game == null) throw new IllegalArgumentException();
 
@@ -62,26 +54,35 @@ public class AncientChineseRuleset implements Ruleset {
             }
         }
 
-        return new GameResult(scoreBlack,scoreWhite,null,"");
+        StoneColor winner = scoreBlack > scoreWhite ? StoneColor.BLACK : StoneColor.WHITE;
 
+        List<UndoableCommand> subcommands = new LinkedList<>();
+
+        GameResult ret = game.getGameResult();
+
+        subcommands.add(ret.setWinner(winner));
+        subcommands.add(ret.setDescription(winner, winner + " won!"));
+        subcommands.add(ret.setDescription(StoneColor.getOpposite(winner), StoneColor.getOpposite(winner) + " lost!"));
+        subcommands.add(ret.addScoreComponent(StoneColor.BLACK, GameResult.PointType.STONES_ON_BOARD, scoreBlack));
+        subcommands.add(ret.addScoreComponent(StoneColor.WHITE, GameResult.PointType.STONES_ON_BOARD, scoreWhite));
+
+        return UndoableCommand.of(subcommands);
     }
 
     @Override
-    public void setHandicapStones(Game game, StoneColor beginner , int noStones) {
+    public boolean setHandicapStones(Game game, StoneColor beginner , int noStones) {
         if (game == null) {
-            throw new IllegalArgumentException("board must not be null");
+            throw new NullPointerException("game must not be null");
         }
         if (beginner == null) {
-            throw new IllegalArgumentException("beginner must not be null");
+            throw new NullPointerException("beginner must not be null");
         }
-        if (noStones < 0 || noStones > 9){
-            throw new IllegalArgumentException("noStones must be between 0 and 9");
+        if (noStones < Game.MIN_HANDICAP_AMOUNT || noStones > Game.MAX_HANDICAP_AMOUNT){
+            throw new IllegalArgumentException("noStones must be between " + Game.MIN_HANDICAP_AMOUNT + " and " + Game.MAX_HANDICAP_AMOUNT);
         }
 
         final int size = game.getSize();
         final int distFromEdge = 2 + size / 10;
-
-        game.setHandicapStoneCounter(9);
 
         boolean centerSet = false;
 
@@ -111,6 +112,8 @@ public class AncientChineseRuleset implements Ruleset {
         if(noStones == 3) noStones--;
         game.placeHandicapPosition(size - 1 - distFromEdge, distFromEdge, noStones == 2);
         game.placeHandicapPosition(distFromEdge, size - 1 - distFromEdge, noStones == 2);
+
+        return true;
     }
 
 }

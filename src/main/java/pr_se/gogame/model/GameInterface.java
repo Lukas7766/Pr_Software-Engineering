@@ -1,14 +1,12 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.model.file.LoadingGameException;
+import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.observer.GameListener;
-
-import java.io.File;
 
 public interface GameInterface {
 
@@ -34,10 +32,6 @@ public interface GameInterface {
      */
     void newGame(StoneColor startingColor, int size, int handicap, Ruleset ruleset, boolean letRulesetPlaceHandicapStones);
 
-    boolean loadGame(File file) throws LoadingGameException;
-
-    boolean saveGame(File file);
-
     /**
      * Allows the current player to pass. After this, it is the opposite player's turn.
      */
@@ -46,12 +40,12 @@ public interface GameInterface {
     /**
      * Allows the current player to resign. This causes the opposite player to win.
      */
-    void resign();
+    void resign() throws IllegalStateException;
 
     /**
      * This method uses the Game's Ruleset to calculate the score of each player.
      */
-    void scoreGame();
+    void scoreGame() throws IllegalStateException;
 
     /**
      * This method places a stone down for the current player at the specified coordinates
@@ -94,12 +88,11 @@ public interface GameInterface {
     int getHandicap();
 
     double getKomi();
+
     //##################################################################################################################
     //game information
 
     int getCurMoveNumber();
-
-    int getStonesCapturedBy(StoneColor color);
 
     void placeSetupStone(int x, int y, StoneColor color);
 
@@ -110,8 +103,6 @@ public interface GameInterface {
     StoneColor getCurColor();
 
     Ruleset getRuleset();
-
-    double getScore(StoneColor color);
 
     GameResult getGameResult();
 
@@ -130,12 +121,11 @@ public interface GameInterface {
 
     void removeListener(GameListener l);
 
-    void setHandicapStoneCounter(int noStones);
-
     void setSetupMode(boolean setupMode);
 
     boolean isSetupMode();
 
+    //##################################################################################################################
     // Methods controlling the history
     void undo();
 
@@ -150,5 +140,10 @@ public interface GameInterface {
     void goToFirstMove();
 
     void goToEnd();
+
+    //##################################################################################################################
+    // Methods related to file handling
+    FileHandler getFileHandler();
+
 }
 

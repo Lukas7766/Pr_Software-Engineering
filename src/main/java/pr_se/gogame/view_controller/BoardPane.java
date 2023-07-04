@@ -20,6 +20,7 @@ import pr_se.gogame.view_controller.observer.ViewListener;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.NoSuchFileException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -137,6 +138,8 @@ public class BoardPane extends GridPane {
      */
     private int keyboardCellY = -1;
 
+    private String lastGraphicsPackFileName;
+
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
@@ -149,10 +152,10 @@ public class BoardPane extends GridPane {
         setMouseTransparent(true);
 
         this.game = game;
-        this.graphicsPath = GlobalSettings.getGraphicsPath();
         this.showsMoveNumbers = GlobalSettings.isShowMoveNumbers();
         this.showsCoordinates = GlobalSettings.isShowCoordinates();
         this.needsMoveConfirmation = GlobalSettings.isConfirmationNeeded();
+        this.lastGraphicsPackFileName = GlobalSettings.getGraphicsPackFileName();
 
         GlobalSettings.addListener(new ViewListener() {
             @Override
@@ -160,7 +163,8 @@ public class BoardPane extends GridPane {
                 setMoveConfirmation(GlobalSettings.isConfirmationNeeded());
                 setShowsCoordinates(GlobalSettings.isShowCoordinates());
                 setShowsMoveNumbers(GlobalSettings.isShowMoveNumbers());
-                setGraphicsPath(GlobalSettings.getGraphicsPath());
+                loadGraphics(GlobalSettings.getGraphicsPath());
+                updateGraphics();
             }
 
             @Override
@@ -201,6 +205,13 @@ public class BoardPane extends GridPane {
 
                     break;
 
+                case HANDICAP_REMOVED:
+                    destinationPBC = getPlayableCell(e.getX(), e.getY());
+
+                    destinationPBC.hideHandicapSlot();
+
+                    break;
+
                 case SETUP_STONE_SET:
                     destinationPBC = getPlayableCell(e.getX(), e.getY());
 
@@ -221,6 +232,9 @@ public class BoardPane extends GridPane {
                     break;
 
                 case UPDATE:
+                    if(hoverPBC != null) {
+                        hoverPBC.hover();
+                    }
                     setMouseTransparent(false);
                     requestFocus(); // This is necessary so that focus is taken away from the comment text area upon doing anything.
                     break;
@@ -232,6 +246,16 @@ public class BoardPane extends GridPane {
 
                 case INIT, GAME_WON:
                     setMouseTransparent(true);
+                    setFocusTraversable(false);
+                    setFocused(false);
+                    if(selectionPBC != null) {
+                        selectionPBC.deselect();
+                    }
+                    if(hoverPBC != null) {
+                        hoverPBC.unhover();
+                    }
+                    keyboardCellX = -1;
+                    keyboardCellY = -1;
                     break;
 
                 case DEBUG_INFO:
@@ -245,7 +269,7 @@ public class BoardPane extends GridPane {
 
         });
 
-        loadGraphics(graphicsPath);
+        loadGraphics(GlobalSettings.getGraphicsPath());
         init();
     }
 
@@ -266,7 +290,7 @@ public class BoardPane extends GridPane {
         );
         maxCellDimInt = Bindings.createIntegerBinding(maxCellDim::intValue, maxCellDim); // round down
 
-        // put the axes' corners in first to mess up the indexing as little as possible;
+        // Put the axes' corners in first to mess up the indexing as little as possible.
         BoardCell corner1 = new BoardCell(this.outerCorner);
         corner1.getLabel().setVisible(false);
         add(corner1, 0, 0);
@@ -379,10 +403,6 @@ public class BoardPane extends GridPane {
                     }
                     break;
 
-                case ENTER:
-                    confirmMove();
-                    break;
-
                 default: break;
             }
 
@@ -482,22 +502,6 @@ public class BoardPane extends GridPane {
         }
     }
 
-    public void setGraphicsPath(String graphicsPath) {
-        if(graphicsPath == null) {
-            throw new NullPointerException();
-        }
-
-        if(this.graphicsPath.equals(graphicsPath)) {
-            return; // Don't unnecessarily reload the entire graphics pack.
-        }
-
-        this.graphicsPath = graphicsPath;
-
-        loadGraphics(graphicsPath);
-
-        updateGraphics();
-    }
-
     public int getSize() {
         return size;
     }
@@ -508,6 +512,16 @@ public class BoardPane extends GridPane {
      * @param graphicsPath the absolute path of the graphics pack to be loaded
      */
     private void loadGraphics(String graphicsPath) {
+        if(graphicsPath == null) {
+            throw new NullPointerException();
+        }
+
+        if(graphicsPath.equals(this.graphicsPath)) {
+            return; // Don't unnecessarily reload the entire graphics pack.
+        }
+
+        this.graphicsPath = graphicsPath;
+
         try (ZipFile zip = new ZipFile(graphicsPath)) {
             tile = loadImageFromGraphicsPack("tile.png", zip);
             tileCorner = loadImageFromGraphicsPack("tile_corner.png", zip);
@@ -526,8 +540,14 @@ public class BoardPane extends GridPane {
             squareMarks[1] = loadImageFromGraphicsPack("mark_square_1.png", zip);
             squareMarks[2] = loadImageFromGraphicsPack("mark_square_2.png", zip);
             handicapSlot = loadImageFromGraphicsPack("handicap_slot.png", zip);
-        } catch (Exception e) {
-            CustomExceptionDialog.show(e, "Couldn't open graphics pack " + graphicsPath + "!");
+
+            lastGraphicsPackFileName = GlobalSettings.getGraphicsPackFileName();
+        } catch (NoSuchFileException e) {
+            CustomExceptionDialog.show(e, "Couldn't find graphics pack \"" + graphicsPath + "\"!");
+            GlobalSettings.setGraphicsPackFileName(lastGraphicsPackFileName);
+        } catch (IOException e) {
+            CustomExceptionDialog.show(e, "Couldn't open graphics pack \"" + graphicsPath + "\"!", e.getMessage());
+            GlobalSettings.setGraphicsPackFileName(lastGraphicsPackFileName);
         }
     }
 
@@ -545,8 +565,7 @@ public class BoardPane extends GridPane {
         ZipEntry zipEntry = zip.getEntry(fileName);
 
         if(zipEntry == null) {
-            CustomExceptionDialog.show(new IOException(), "File " + fileName + " is not present in graphics pack " + graphicsPath + "!");
-            throw new IOException();
+            throw new IOException("File " + fileName + " is not present in graphics pack \"" + graphicsPath + "\"!");
         }
 
         Image ret;
@@ -562,8 +581,7 @@ public class BoardPane extends GridPane {
                 true,               // preserveRatio
                 SMOOTH_IMAGES);     // smooth
         } catch (IOException e) {
-            CustomExceptionDialog.show(e, "File " + fileName + " appears to be present but unreadable in graphics pack " + graphicsPath + "!");
-            throw new IOException();
+            throw new IOException("File " + fileName + " appears to be present but unreadable in graphics pack \"" + graphicsPath + "\"! (" + e.getMessage() + ")");
         }
 
         return ret;
@@ -584,7 +602,7 @@ public class BoardPane extends GridPane {
             for(int j = 0; j < 4; j++) {
                 BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
                 bc.updateImages(outerEdge);
-                bc.getTile().setRotate(90.0 * (j % 2));
+                bc.getTile().setRotate(90.0 * j);
             }
             // center
             for(int j = 0; j < size; j++) {
@@ -651,6 +669,7 @@ public class BoardPane extends GridPane {
             this.label = new Label("0");
             this.label.setMinSize(0, 0);
             this.label.setMaxSize(Double.MAX_VALUE, Double.MAX_VALUE);
+            this.label.setVisible(GlobalSettings.isShowCoordinates());
 
             final DoubleProperty fontSize = new SimpleDoubleProperty(0);
             fontSize.bind(this.label.widthProperty().divide(2).subtract(Bindings.length(this.label.textProperty())));

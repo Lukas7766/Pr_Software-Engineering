@@ -3,6 +3,8 @@ package pr_se.gogame.view_controller;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -15,18 +17,18 @@ import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import pr_se.gogame.model.Game;
-import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.file.LoadingGameException;
-import pr_se.gogame.view_controller.dialog.CustomCloseAction;
-import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
-import pr_se.gogame.view_controller.dialog.CustomFileDialog;
-import pr_se.gogame.view_controller.dialog.CustomNewGameAction;
+import pr_se.gogame.view_controller.dialog.*;
+import pr_se.gogame.view_controller.observer.ViewListener;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
+
+import static javafx.scene.input.KeyCode.A;
 
 /**
  * This class contains the controller and view function of the game header panel.<br>
@@ -59,11 +61,11 @@ public class HeaderPane extends VBox {
      */
     private final Scene scene;
 
-    private final List<Button> playbackControlList = new ArrayList<>();
+    private final List<Button> playbackControlList = new LinkedList<>();
 
-    private final List<Button> gameShortCutList = new ArrayList<>();
+    private final List<Button> gameShortCutList = new LinkedList<>();
 
-    private final List<MenuItem> gameSectionItems = new ArrayList<>();
+    private final List<MenuItem> gameSectionItems = new LinkedList<>();
 
     /**
      * Constructor to create a Header Pane
@@ -84,14 +86,13 @@ public class HeaderPane extends VBox {
 
         MenuBar menuBar = new MenuBar();
         menuBar.getMenus().add(fileSection());
+        menuBar.getMenus().add(historySection());
         menuBar.getMenus().add(gameSection());
         menuBar.getMenus().add(viewSection());
         menuBar.getMenus().add(helpSection());
 
         this.getChildren().add(menuBar);
         this.getChildren().add(shortMenu());
-
-        stage.setOnCloseRequest(e -> CustomCloseAction.onCloseAction(stage, game, e));
     }
 
     /**
@@ -114,7 +115,7 @@ public class HeaderPane extends VBox {
             if (game.getGameState() == Game.GameState.NOT_STARTED_YET) {
                 return;
             }
-            CustomNewGameAction.onSaveAction(stage, game);
+            CustomNewGameAction.onNewGameAction(stage, game);
         });
 
         MenuItem importFileItem = new MenuItem("L_oad Game");
@@ -124,11 +125,14 @@ public class HeaderPane extends VBox {
             File f = CustomFileDialog.getFile(stage, false);
             if (f != null) {
                 try {
-                    if(!game.loadGame(f)) {
+                    if(!game.getFileHandler().loadFile(f)) {
                         CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably due to a file system error.");
                     }
-                } catch (LoadingGameException exception) {
-                        CustomExceptionDialog.show(exception, "Failed to load game!\n\nThis is probably because the file contains unsupported SGF features.");
+                } catch (LoadingGameException lgException) {
+                    CustomExceptionDialog.show(lgException, "Failed to load game!\n\n" + lgException.getMessage());
+                    game.initGame();
+                } catch (java.nio.file.NoSuchFileException nsfException) {
+                    CustomExceptionDialog.show(nsfException, "File does not exist!");
                 }
             }
         });
@@ -136,21 +140,19 @@ public class HeaderPane extends VBox {
         MenuItem exportFileItem = new MenuItem("_Save");
         exportFileItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItem);
-        exportFileItem.setOnAction(e -> saveGame(false));
+        exportFileItem.setOnAction(e -> CustomSaveAction.saveGame(game, stage, false));
 
         MenuItem exportFileItemAs = new MenuItem("Save _as");
         exportFileItemAs.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN));
         files.getItems().add(exportFileItemAs);
-        exportFileItemAs.setOnAction(e -> saveGame(true));
+        exportFileItemAs.setOnAction(e -> CustomSaveAction.saveGame(game, stage, true));
 
 
         game.addListener(e -> {
             switch (e.getGameCommand()) {
                 case STONE_WAS_SET -> {
-                    if(e.getColor() != null) {
-                        exportFileItem.setDisable(false);
-                        exportFileItemAs.setDisable(false);
-                    }
+                    exportFileItem.setDisable(false);
+                    exportFileItemAs.setDisable(false);
                 }
                 case INIT -> {
                     exportFileItem.setDisable(true);
@@ -177,6 +179,46 @@ public class HeaderPane extends VBox {
         return files;
     }
 
+    private Menu historySection() {
+        Menu menu = new Menu("_History");
+
+        List<MenuItem> historySectionItems = new LinkedList<>();
+
+        MenuItem rewindItem = new MenuItem("_Rewind");
+        rewindItem.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN));
+        historySectionItems.add(rewindItem);
+        rewindItem.setOnAction(e -> game.rewind());
+
+        MenuItem undoItem = new MenuItem("_Undo");
+        undoItem.setAccelerator(new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN));
+        historySectionItems.add(undoItem);
+        undoItem.setOnAction(e -> game.undo());
+
+        MenuItem redoItem = new MenuItem("Red_o");
+        redoItem.setAccelerator(new KeyCodeCombination(KeyCode.Y, KeyCombination.CONTROL_DOWN));
+        historySectionItems.add(redoItem);
+        redoItem.setOnAction(e -> game.redo());
+
+        MenuItem fastForwardItem = new MenuItem("F_ast Forward");
+        fastForwardItem.setAccelerator(new KeyCodeCombination(KeyCode.LESS, KeyCombination.CONTROL_DOWN));
+        historySectionItems.add(fastForwardItem);
+        fastForwardItem.setOnAction(e -> game.fastForward());
+
+        menu.getItems().addAll(historySectionItems);
+
+        game.addListener(e -> {
+            switch (e.getGameCommand()) {
+                case INIT -> menu.getItems().forEach(menuItem -> menuItem.setDisable(true));
+                case NEW_GAME, UPDATE -> menu.getItems().forEach(menuItem -> menuItem.setDisable(false));
+                default -> {
+                    // Nothing else matters.
+                }
+            }
+        });
+
+        return menu;
+    }
+
     /**
      * Creates the game section for the menu bar <br>
      * contains at least: <br>
@@ -193,61 +235,76 @@ public class HeaderPane extends VBox {
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
         MenuItem passItem = new MenuItem("_Pass");
         MenuItem resignItem = new MenuItem("_Resign");
-        MenuItem scoreGameItem = new MenuItem("_Score Game");
+        MenuItem confirmItem = new MenuItem("Confirm _move");
+        MenuItem scoreGameItem = new MenuItem("Sc_ore Game");
 
         // This item probably doesn't need a separate accelerator.
         gameSectionItems.add(setupMode);
+        setupMode.setAccelerator(new KeyCodeCombination(KeyCode.M, KeyCombination.ALT_DOWN));
         setupMode.setSelected(game.isSetupMode());
         setupMode.setOnAction(e -> {
             game.setSetupMode(setupMode.isSelected());
 
-            if(game.isSetupMode()) {
-                passItem.setText("Switch co_lor");
-                var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Pass")).findFirst();
-                k.ifPresent(button -> button.setText("Switch color"));
+            passItem.setText(game.isSetupMode() ? "Switch co_lor" : "_Pass");
+            resignItem.setDisable(game.getGameState() != Game.GameState.RUNNING);
+            scoreGameItem.setDisable(game.getGameState() != Game.GameState.RUNNING);
 
-            } else {
-                passItem.setText("_Pass");
-                var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Switch color")).findFirst();
-                k.ifPresent(button -> button.setText("Pass"));
-            }
+            GlobalSettings.update();
         });
 
-
-        moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         gameSectionItems.add(moveConfirmationRequired);
+        moveConfirmationRequired.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.ALT_DOWN));
         moveConfirmationRequired.setSelected(GlobalSettings.isConfirmationNeeded());
-        moveConfirmationRequired.setOnAction(e -> {
-            GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected());
-            var k = this.gameShortCutList.stream().filter(i -> i.getText().equals("Confirm")).findFirst();
-            k.ifPresent(button -> button.setVisible(GlobalSettings.isConfirmationNeeded()));
-        });
+        moveConfirmationRequired.setOnAction(e -> GlobalSettings.setConfirmationNeeded(moveConfirmationRequired.isSelected()));
 
-        passItem.setAccelerator(new KeyCodeCombination(KeyCode.P, KeyCombination.ALT_DOWN));
+        passItem.setAccelerator(new KeyCodeCombination(KeyCode.P));
         gameSectionItems.add(passItem);
         passItem.setOnAction(e -> game.pass());
 
         resignItem.setAccelerator(new KeyCodeCombination(KeyCode.R, KeyCombination.ALT_DOWN));
         gameSectionItems.add(resignItem);
-        resignItem.setOnAction(e -> game.resign());
+        resignItem.setOnAction(e -> {
+            try {
+                game.resign();
+            } catch (IllegalStateException ie) {
+                CustomExceptionDialog.show(ie, ie.getMessage());
+            }
+        });
+
+        confirmItem.setAccelerator(new KeyCodeCombination(KeyCode.ENTER));
+        gameSectionItems.add(confirmItem);
+        confirmItem.setOnAction(e -> GlobalSettings.confirmMove());
+        confirmItem.setVisible(false);
 
         scoreGameItem.setAccelerator(new KeyCodeCombination(KeyCode.S, KeyCombination.ALT_DOWN));
         gameSectionItems.add(scoreGameItem);
-        scoreGameItem.setOnAction(e -> game.scoreGame());
+        scoreGameItem.setOnAction(e -> {
+            try {
+                game.scoreGame();
+            } catch (IllegalStateException ie) {
+                CustomExceptionDialog.show(ie, ie.getMessage());
+            }
+        });
 
         menu.getItems().addAll(gameSectionItems);
 
         game.addListener(e -> {
             switch (e.getGameCommand()) {
                 case INIT:
-                    playbackControlList.stream().filter(button -> !button.isDisable()).forEach(button -> button.setDisable(true));
+                    playbackControlList.forEach(button -> button.setDisable(true));
                 case GAME_WON:
-                    gameSectionItems.stream().filter(menuItem -> !menuItem.isDisable()).forEach(menuItem -> menuItem.setDisable(true));
+                    gameSectionItems.forEach(menuItem -> menuItem.setDisable(true));
                     break;
 
-                case NEW_GAME, UPDATE:
-                    gameSectionItems.stream().filter(MenuItem::isDisable).forEach(menuItem -> menuItem.setDisable(false));
-                    playbackControlList.stream().filter(Button::isDisable).forEach(button -> button.setDisable(false));
+                case NEW_GAME:
+                    playbackControlList.forEach(button -> button.setDisable(false));
+                    setupMode.setSelected(false);
+                case UPDATE:
+                    gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
+                    if(game.getGameState() != Game.GameState.RUNNING) {
+                        resignItem.setDisable(true);
+                        scoreGameItem.setDisable(true);
+                    }
                     break;
                 default:
                     break;
@@ -255,11 +312,23 @@ public class HeaderPane extends VBox {
 
         });
 
+        GlobalSettings.addListener(new ViewListener() {
+            @Override
+            public void onSettingsUpdated() {
+                confirmItem.setVisible(GlobalSettings.isConfirmationNeeded());
+            }
+
+            @Override
+            public void onMoveConfirmed() {
+                // Does not pertain to this
+            }
+        });
+
         SeparatorMenuItem sep1 = new SeparatorMenuItem();
         menu.getItems().add(2, sep1);
 
         SeparatorMenuItem sep2 = new SeparatorMenuItem();
-        menu.getItems().add(5, sep2);
+        menu.getItems().add(6, sep2);
 
         return menu;
     }
@@ -275,20 +344,17 @@ public class HeaderPane extends VBox {
     private Menu viewSection() {
         Menu menu = new Menu("_View");
 
-        List<MenuItem> viewSectionItems = new ArrayList<>();
-
         CheckMenuItem showMoveNumbersCBtn = new CheckMenuItem("Move _Numbers");
-        showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        viewSectionItems.add(showMoveNumbersCBtn);
+        showMoveNumbersCBtn.setAccelerator(new KeyCodeCombination(KeyCode.N));
+        menu.getItems().add(showMoveNumbersCBtn);
         showMoveNumbersCBtn.setSelected(GlobalSettings.isShowMoveNumbers());
         showMoveNumbersCBtn.setOnAction(e -> GlobalSettings.setShowMoveNumbers(showMoveNumbersCBtn.isSelected()));
 
         CheckMenuItem showCoordinatesCBtn = new CheckMenuItem("_Coordinates");
-        showCoordinatesCBtn.setAccelerator(new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
-        viewSectionItems.add(showCoordinatesCBtn);
+        showCoordinatesCBtn.setAccelerator(new KeyCodeCombination(KeyCode.C));
+        menu.getItems().add(showCoordinatesCBtn);
         showCoordinatesCBtn.setSelected(GlobalSettings.isShowCoordinates());
         showCoordinatesCBtn.setOnAction(e -> GlobalSettings.setShowCoordinates(showCoordinatesCBtn.isSelected()));
-        menu.getItems().addAll(viewSectionItems);
 
         return menu;
     }
@@ -302,25 +368,22 @@ public class HeaderPane extends VBox {
      * @return the help section for the menu bar
      */
     private Menu helpSection() {
-        Menu menu = new Menu("_Help");
+        Menu menu = new Menu("H_elp");
 
-        MenuItem helpItem = new MenuItem("_Help");
-        helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        MenuItem helpItem = new MenuItem("Hel_p");
+        helpItem.setAccelerator(new KeyCodeCombination(KeyCode.H, KeyCombination.CONTROL_DOWN));
         menu.getItems().add(helpItem);
-        helpItem.setOnAction(ev -> {
-            String url = "https://en.wikipedia.org/wiki/Go_(game)";
-            app.getHostServices().showDocument(url);
-        });
+        helpItem.setOnAction(ev -> app.getHostServices().showDocument("https://en.wikipedia.org/wiki/Go_(game)"));
 
-        MenuItem aboutUs = new MenuItem("_About Us");
-        aboutUs.setAccelerator(new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN, KeyCombination.ALT_DOWN));
+        MenuItem aboutUs = new MenuItem("Abo_ut Us");
+        aboutUs.setAccelerator(new KeyCodeCombination(A, KeyCombination.CONTROL_DOWN));
         menu.getItems().add(aboutUs);
         aboutUs.setOnAction(e -> {
 
             Alert box = new Alert(Alert.AlertType.INFORMATION);
             box.setTitle("About us");
             box.setHeaderText(null);
-            box.setContentText("This Go Game was developed by Gerald, Lukas and Sebastian.");
+            box.setContentText("This Go Game was developed by Gerald, Lukas, and Sebastian.");
             box.initStyle(StageStyle.UTILITY);
             box.initOwner(stage);
             box.show();
@@ -340,30 +403,30 @@ public class HeaderPane extends VBox {
      * @return a horizontal box layout object which includes all needed elements of the short menu
      */
     private HBox shortMenu() throws IOException {
-        HBox lane = new HBox();
-        lane.setPrefHeight(35);
+        HBox hotbar = new HBox();
+        hotbar.setPrefHeight(35);
 
-        lane.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(0, 5, 0, 5))));
+        hotbar.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(0, 5, 0, 5))));
 
         HBox playbackControl = new HBox();
         playbackControl.setPrefWidth(250);
         playbackControl.setAlignment(Pos.CENTER);
         playbackControl.setSpacing(5);
 
-        Button fastBackward = new Button("<<");
-        fastBackward.setFocusTraversable(false);
-        playbackControlList.add(fastBackward);
-        fastBackward.setOnAction(e -> game.rewind());
+        Button rewind = new Button("<<");
+        rewind.setFocusTraversable(false);
+        playbackControlList.add(rewind);
+        rewind.setOnAction(e -> game.rewind());
 
-        Button backward = new Button("<");
-        backward.setFocusTraversable(false);
-        playbackControlList.add(backward);
-        backward.setOnAction(e -> game.undo());
+        Button undo = new Button("<");
+        undo.setFocusTraversable(false);
+        playbackControlList.add(undo);
+        undo.setOnAction(e -> game.undo());
 
-        Button forward = new Button(">");
-        forward.setFocusTraversable(false);
-        playbackControlList.add(forward);
-        forward.setOnAction(e -> game.redo());
+        Button redo = new Button(">");
+        redo.setFocusTraversable(false);
+        playbackControlList.add(redo);
+        redo.setOnAction(e -> game.redo());
 
         Button fastForward = new Button(">>");
         fastForward.setFocusTraversable(false);
@@ -373,30 +436,12 @@ public class HeaderPane extends VBox {
         playbackControl.getChildren().addAll(playbackControlList);
 
         //Key Bindings for the playback control
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.F), () -> {
-            if (!backward.isDisabled()) {
-                backward.fire();
-            }
-        });
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT1), rewind::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT2), undo::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT3), redo::fire);
+        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT4), fastForward::fire);
 
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.H), () -> {
-            if (!forward.isDisabled()) {
-                forward.fire();
-            }
-        });
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.T), () -> {
-            if (!fastForward.isDisabled()) {
-                fastForward.fire();
-            }
-        });
-        scene.getAccelerators().put(new KeyCodeCombination(KeyCode.G), () -> {
-            if (!fastBackward.isDisabled()) {
-                fastBackward.fire();
-            }
-        });
-
-
-        lane.getChildren().add(playbackControl);
+        hotbar.getChildren().add(playbackControl);
 
         HBox gameCards = new HBox();
         gameCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
@@ -407,20 +452,33 @@ public class HeaderPane extends VBox {
         gameShortCuts.setAlignment(Pos.CENTER);
         gameShortCuts.setSpacing(25);
 
+        final String passText = "Pass";
 
-        Button pass = new Button("Pass");
+        Button pass = new Button(passText);
         pass.setFocusTraversable(false);
         pass.setOnAction(e -> game.pass());
         gameShortCutList.add(pass);
 
         Button resign = new Button("Resign");
         resign.setFocusTraversable(false);
-        resign.setOnAction(e -> game.resign());
+        resign.setOnAction(e -> {
+            try {
+                game.resign();
+            } catch (IllegalStateException ie) {
+                CustomExceptionDialog.show(ie, ie.getMessage());
+            }
+        });
         gameShortCutList.add(resign);
 
         Button scoreGame = new Button("Score Game");
         scoreGame.setFocusTraversable(false);
-        scoreGame.setOnAction(e -> game.scoreGame());
+        scoreGame.setOnAction(e -> {
+            try {
+                game.scoreGame();
+            } catch (IllegalStateException ie) {
+            CustomExceptionDialog.show(ie, ie.getMessage());
+        }
+        });
         gameShortCutList.add(scoreGame);
 
         Button confirm = new Button("Confirm");
@@ -433,11 +491,20 @@ public class HeaderPane extends VBox {
 
         game.addListener(e -> {
             switch (e.getGameCommand()){
-                case INIT, GAME_WON -> gameShortCutList.forEach(button -> button.setDisable(true));
-                case NEW_GAME, UPDATE -> gameShortCutList.forEach(button -> button.setDisable(false));
-                default -> {
-                    // This comment is here to fill the default case, otherwise SonarQube will complain (as it would in the absence of a default case).
-                }
+                case INIT:
+                    pass.setText(passText);
+                case GAME_WON:
+                    gameShortCutList.forEach(button -> button.setDisable(true));
+                    break;
+                case NEW_GAME, UPDATE:
+                    gameShortCutList.forEach(button -> button.setDisable(false));
+                    if(game.getGameState() != Game.GameState.RUNNING) {
+                        scoreGame.setDisable(true);
+                        resign.setDisable(true);
+                    }
+                    break;
+                default:
+                    break;
             }
         });
 
@@ -449,15 +516,14 @@ public class HeaderPane extends VBox {
         File graphicsFolder = new File(GlobalSettings.GRAPHICS_PACK_FOLDER);
         FileFilter zipFilter = pathname -> pathname.getName().toLowerCase().endsWith(".zip");
         File[] directoryListing = graphicsFolder.listFiles(zipFilter);
-        if(directoryListing != null) {
-            for (File f : directoryListing) {
-                if (f.isFile()) { // We still need to check this because you could have a folder whose name ends with ".zip".
-                    comboBoxItems.add(f.getName());
-                }
-            }
-        } else {
+        if(directoryListing == null) {
             throw new IOException("Couldn't find graphics pack folder!");
         }
+        // We still need to filter out non-files because you could have a folder whose name ends with ".zip".
+        for (File f : Arrays.stream(directoryListing).filter(File::isFile).toList()) {
+            comboBoxItems.add(f.getName());
+        }
+
 
         ComboBox<String> graphicsPackSelectorComboBox = new ComboBox<>(comboBoxItems);
         graphicsPackSelectorComboBox.setValue(GlobalSettings.getGraphicsPackFileName());
@@ -465,29 +531,32 @@ public class HeaderPane extends VBox {
         graphicsPackSelectorComboBox.setMinWidth(125);
         graphicsPackSelectorComboBox.setTranslateX(-15);
         graphicsPackSelectorComboBox.setFocusTraversable(false);
-        graphicsPackSelectorComboBox.setOnAction(e -> GlobalSettings.setGraphicsPackFileName("/" + graphicsPackSelectorComboBox.getValue()));
+        graphicsPackSelectorComboBox.setOnAction(e -> GlobalSettings.setGraphicsPackFileName(graphicsPackSelectorComboBox.getValue()));
 
-        gameShortCuts.getChildren().add(graphicsPackSelectorComboBox);
+        GlobalSettings.addListener(new ViewListener() {
+            @Override
+            public void onSettingsUpdated() {
+                confirm.setVisible(GlobalSettings.isConfirmationNeeded());
+                pass.setText(game.isSetupMode() ? "Switch color" : passText);
+                resign.setDisable(game.getGameState() != Game.GameState.RUNNING);
+                scoreGame.setDisable(game.getGameState() != Game.GameState.RUNNING);
+
+                EventHandler<ActionEvent> comboBoxHandler = graphicsPackSelectorComboBox.getOnAction();
+                graphicsPackSelectorComboBox.setOnAction(null);
+                graphicsPackSelectorComboBox.setValue(GlobalSettings.getGraphicsPackFileName());
+                graphicsPackSelectorComboBox.setOnAction(comboBoxHandler);
+            }
+
+            @Override
+            public void onMoveConfirmed() {
+                // Move confirmation does not pertain to this.
+            }
+        });
 
         gameCards.getChildren().add(graphicsPackSelectorComboBox);
-        lane.getChildren().add(gameCards);
+        hotbar.getChildren().add(gameCards);
 
-        return lane;
+        return hotbar;
 
     }
-
-    private void saveGame(boolean as) {
-        File saveGameFile = FileHandler.getCurrentFile();
-
-        if (as || saveGameFile == null) {
-            saveGameFile = CustomFileDialog.getFile(stage, true);
-            if (saveGameFile == null) {
-                return;
-            }
-        }
-        if (!game.saveGame(saveGameFile)) {
-            CustomExceptionDialog.show(new IOException(), "Could not save the game!");
-        }
-    }
-
 }

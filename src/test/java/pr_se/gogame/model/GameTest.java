@@ -3,10 +3,13 @@ package pr_se.gogame.model;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
+import pr_se.gogame.model.file.FileHandler;
 import pr_se.gogame.model.file.LoadingGameException;
+import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
+import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
 import pr_se.gogame.model.ruleset.Ruleset;
@@ -15,6 +18,7 @@ import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
 import java.io.File;
+import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
@@ -69,22 +73,12 @@ class GameTest {
 
     @Test
     void placeHandicapPositionArguments() {
-        game.newGame(BLACK, 19, 1, ruleset);
-        game.setHandicapStoneCounter(1);
+        game.newGame(BLACK, 19, 1, new NewZealandRuleset());
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(-1, 0, true));
-        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, -1, true));
-        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(maxCoord + 1, 0, true));
-        game.setHandicapStoneCounter(1);
         assertThrows(IllegalArgumentException.class, () -> game.placeHandicapPosition(0, maxCoord + 1, true));
-        game.setHandicapStoneCounter(1);
         assertThrows(NullPointerException.class, () -> game.placeHandicapPosition(0, 0, true, null));
-    }
-
-    @Test
-    void getCapturedStonesArguments() {
-        assertThrows(NullPointerException.class, () -> game.getStonesCapturedBy(null));
     }
 
     @Test
@@ -112,35 +106,8 @@ class GameTest {
     }
 
     @Test
-    void getScoreArguments() {
-        assertThrows(NullPointerException.class, () -> game.getScore(null));
-    }
-
-    @Test
-    void setHandicapStoneCounterArguments() {
-        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(Game.MAX_HANDICAP_AMOUNT + 1));
-        assertThrows(IllegalArgumentException.class, () -> game.setHandicapStoneCounter(Game.MIN_HANDICAP_AMOUNT - 1));
-    }
-
-    @Test
     void fireGameEventArguments() {
         assertThrows(NullPointerException.class, () -> game.fireGameEvent(null));
-    }
-
-    @Test
-    void saveGameArgs() {
-        assertThrows(NullPointerException.class, () -> game.saveGame(null));
-    }
-
-    @Test
-    void loadGameArgs() {
-        assertThrows(NullPointerException.class, () -> game.loadGame(null));
-        try {
-            assertFalse(game.loadGame(new File("nonExistentFile")));
-        } catch(LoadingGameException e) {
-            e.printStackTrace();
-            fail();
-        }
     }
 
     @Test
@@ -198,7 +165,32 @@ class GameTest {
         assertNotPossibleWhenGameOver(() -> game.pass());
     }
 
+    @Test
+    void dontResignBeforeGameStarted() {
+        assertNotPossibleDuringHandicapAndSetup(() -> game.resign());
+    }
 
+    @Test
+    void dontScoreBeforeGameStarted() {
+        assertNotPossibleDuringHandicapAndSetup(() -> game.scoreGame());
+    }
+
+    @Test
+    void dontResignWhenGameOver() {
+        assertNotPossibleWhenGameOver(() -> game.resign());
+    }
+
+    @Test
+    void dontScoreWhenGameOver() {
+        assertNotPossibleWhenGameOver(() -> game.scoreGame());
+    }
+
+    void assertNotPossibleDuringHandicapAndSetup(Executable ex) {
+        game.setSetupMode(true);
+        assertThrows(IllegalStateException.class, ex);
+        game.newGame(BLACK, 19, 9, new NewZealandRuleset());
+        assertThrows(IllegalStateException.class, ex);
+    }
 
     void assertNotPossibleWhenGameOver(Executable ex) {
         game.resign();
@@ -219,29 +211,6 @@ class GameTest {
         assertEquals(WHITE, game.getCurColor());
         assertEquals(13, game.getSize());
         assertEquals(1, game.getHandicap());
-    }
-
-    @Test
-    void loadGame() {
-        saveGame();
-        try {
-            assertTrue(game.loadGame(new File(TESTFILE_FOLDER + "tmp.sgf")));
-        } catch (LoadingGameException e) {
-            e.printStackTrace();
-            fail();
-        }
-        game.goToEnd();
-        assertEquals(BLACK, game.getColorAt(0, 0));
-        assertEquals(WHITE, game.getColorAt(1, 0));
-    }
-
-    @Test
-    void saveGame() {
-        game.playMove(0, 0);
-        game.playMove(1, 0);
-        assertEquals(BLACK, game.getColorAt(0, 0));
-        assertEquals(WHITE, game.getColorAt(1, 0));
-        assertTrue(game.saveGame(new File(TESTFILE_FOLDER + "tmp.sgf")));
     }
 
     @Test
@@ -354,13 +323,13 @@ class GameTest {
     void scoreGame() {
         GameListener l1 = e -> assertEquals(GAME_WON, e.getGameCommand());
         game.addListener(l1);
-        game.scoreGame();
+        assertDoesNotThrow(() -> game.scoreGame());
         assertEquals(WHITE, game.getGameResult().getWinner());
 
         game.removeListener(l1);
         game.newGame(BLACK, 19, 9, ruleset);
         game.addListener(e -> assertEquals(GAME_WON, e.getGameCommand()));
-        game.scoreGame();
+        assertDoesNotThrow(() -> game.scoreGame());
         assertEquals(BLACK, game.getGameResult().getWinner());
     }
 
@@ -407,6 +376,8 @@ class GameTest {
         assertEquals(1, game.getCurMoveNumber());
         game.playMove(0, 0);
         assertEquals(2, game.getCurMoveNumber());
+        game.undo();
+        assertEquals(1, game.getCurMoveNumber());
     }
 
     @Test
@@ -431,10 +402,10 @@ class GameTest {
     }
 
     @Test
-    void setHandicapStoneCounter() {
-        game.setHandicapStoneCounter(1);
-        assertDoesNotThrow(() -> game.placeHandicapPosition(0, 0, false));
-        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(0, 0, false));
+    void getFileHandler() {
+        FileHandler fileHandler = game.getFileHandler();
+        assertNotNull(fileHandler);
+        assertInstanceOf(SGFFileHandler.class, fileHandler);
     }
 
     @Test
@@ -455,8 +426,7 @@ class GameTest {
 
     @Test
     void placeHandicapStone() {
-        game.newGame(BLACK, 19, 1, ruleset); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
-        game.setHandicapStoneCounter(1);
+        game.newGame(BLACK, 19, 1, new NewZealandRuleset()); // The edge case that a handicap of 1 normally just means that Black starts, as usual, comes in really handy here.
         assertNull(game.getColorAt(0, 0));
         game.placeHandicapPosition(0, 0, true);
         assertEquals(BLACK, game.getColorAt(0, 0));
@@ -475,48 +445,24 @@ class GameTest {
 
     @Test
     void addCapturedStones() {
-        assertEquals(0, game.getStonesCapturedBy(BLACK));
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
+        assertEquals(0, game.getGameResult().getScoreComponents(BLACK).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
+        assertEquals(0, game.getGameResult().getScoreComponents(WHITE).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
 
         game.addCapturedStones(BLACK, 10);
-        assertEquals(10, game.getStonesCapturedBy(BLACK));
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
+        assertEquals(10, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
+        assertEquals(0, game.getGameResult().getScoreComponents(WHITE).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
 
         game.addCapturedStones(WHITE, 20);
-        assertEquals(10, game.getStonesCapturedBy(BLACK));
-        assertEquals(20, game.getStonesCapturedBy(WHITE));
+        assertEquals(10, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
+        assertEquals(20, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
 
         game.addCapturedStones(BLACK, 30);
-        assertEquals(40, game.getStonesCapturedBy(BLACK));
-        assertEquals(20, game.getStonesCapturedBy(WHITE));
+        assertEquals(40, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
+        assertEquals(20, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
 
         game.addCapturedStones(WHITE, 40);
-        assertEquals(40, game.getStonesCapturedBy(BLACK));
-        assertEquals(60, game.getStonesCapturedBy(WHITE));
-    }
-
-    @Test
-    void getStonesCapturedBy() {
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
-        assertEquals(0, game.getStonesCapturedBy(BLACK));
-        game.playMove(10, 1);
-        game.playMove(10, 2);
-        game.playMove(10, 3);
-        game.playMove(18, 18); // superfluous white stone
-        game.playMove(9, 2);
-        game.playMove(17, 18); // superfluous white stone
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
-        assertEquals(0, game.getStonesCapturedBy(BLACK));
-        game.playMove(11, 2);
-        assertEquals(0, game.getStonesCapturedBy(WHITE));
-        assertEquals(1, game.getStonesCapturedBy(BLACK));
-
-    }
-
-    @Test
-    void getScore() {
-        assertEquals(0, game.getScore(BLACK));
-        assertEquals(game.getRuleset().getKomi(), game.getScore(WHITE));
+        assertEquals(40, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
+        assertEquals(60, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
     }
 
     @Test
@@ -545,10 +491,12 @@ class GameTest {
         game.newGame(BLACK, 19, 0, new JapaneseRuleset());
 
         try {
-            game.loadGame(new File(TESTFILE_FOLDER + "KoSituation.sgf"));
+            game.getFileHandler().loadFile(new File(TESTFILE_FOLDER + "KoSituation.sgf"));
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();
+        } catch (NoSuchFileException e) {
+            throw new RuntimeException(e);
         }
         game.fastForward();
 
@@ -558,7 +506,7 @@ class GameTest {
 
     @Test
     void handicapCtrButSetManually() {
-        // Used by the FileHandler
+        // Used by the SGFFileHandler
         game.newGame(BLACK, 19, 0, new JapaneseRuleset(), false);
 
         assertEquals(RUNNING, game.getGameState());
@@ -588,7 +536,7 @@ class GameTest {
 
     @Test
     void usePosition() {
-        game.setHandicapStoneCounter(1);
+        game.newGame(BLACK, 19, 1, new NewZealandRuleset());
         game.usePosition(1, 1);
         game.setSetupMode(true);
         game.usePosition(2, 2);
@@ -596,7 +544,7 @@ class GameTest {
         game.usePosition(3, 3);
 
         Iterator<History.HistoryNode> i = game.getHistory().iterator();
-        assertEquals(null, i.next().getSaveToken());
+        assertEquals(BEGINNING_OF_HISTORY, i.next().getSaveToken());
         assertEquals(HANDICAP, i.next().getSaveToken());
         assertEquals(SETUP, i.next().getSaveToken());
         assertEquals(MOVE, i.next().getSaveToken());
@@ -653,7 +601,7 @@ class GameTest {
 
     @Test
     void tryOverridingHandicapPosition() {
-        game.setHandicapStoneCounter(2);
+        game.newGame(BLACK, 19, 2, new JapaneseRuleset(), false);
         game.placeHandicapPosition(0, 0, true);
         assertEquals(SETTING_UP, game.getGameState());
         game.placeHandicapPosition(0, 0, true);
@@ -678,7 +626,7 @@ class GameTest {
 
     @Test
     void setSetupModeWhileHandicapActive() {
-        game.setHandicapStoneCounter(9);
+        game.newGame(BLACK, 19, 9, new JapaneseRuleset(), false);
         assertFalse(game.isSetupMode());
         game.setSetupMode(true);
         assertFalse(game.isSetupMode());
@@ -828,6 +776,20 @@ class GameTest {
         assertEquals(WHITE, game.getColorAt(2, 2));
     }
 
+    @Test
+    void goToEnd() {
+        rewind();
+        assertNull(game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getCurColor());
+        assertTrue(game.getHistory().isAtBeginning());
+        assertFalse(game.getHistory().isAtEnd());
+        game.goToEnd();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertEquals(WHITE, game.getCurColor());
+        assertFalse(game.getHistory().isAtBeginning());
+        assertTrue(game.getHistory().isAtEnd());
+    }
+
     // Command pattern
     @Test
     void undoPlayMove() {
@@ -846,7 +808,7 @@ class GameTest {
 
     @Test
     void undoPlaceHandicapPosition() {
-        game.setHandicapStoneCounter(1);
+        game.newGame(BLACK, 19, 1, new NewZealandRuleset());
         assertEquals(SETTING_UP, game.getGameState());
         game.placeHandicapPosition(1, 1, true);
         assertEquals(BLACK, game.getColorAt(1, 1));
@@ -893,5 +855,51 @@ class GameTest {
         game.undo();
         game.redo();
         assertThrows(IllegalStateException.class, () -> game.resign());
+    }
+
+    @Test
+    void undoScoreGame() {
+        game.scoreGame();
+        assertThrows(IllegalStateException.class, () -> game.scoreGame());
+        game.undo();
+        assertDoesNotThrow(() -> game.scoreGame());
+    }
+
+    @Test
+    void redoScoreGame() {
+        undoScoreGame();
+        game.undo();
+        game.redo();
+        assertThrows(IllegalStateException.class, () -> game.scoreGame());
+    }
+
+    @Test
+    void pass() {
+        assertEquals(BLACK, game.getCurColor());
+        game.pass();
+        assertEquals(WHITE, game.getCurColor());
+    }
+
+    @Test
+    void undoPass() {
+        pass();
+        game.undo();
+        assertEquals(BLACK, game.getCurColor());
+    }
+
+    @Test
+    void redoPass() {
+        undoPass();
+        game.redo();
+        assertEquals(WHITE, game.getCurColor());
+    }
+
+    @Test
+    void tooManyHandicapStones() {
+        game.newGame(BLACK, 19, 2, new JapaneseRuleset(), false);
+        assertDoesNotThrow(() -> game.placeHandicapPosition(0, 0, true));
+        assertDoesNotThrow(() -> game.placeHandicapPosition(1, 1, true));
+        game.setSetupMode(true);
+        assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(2, 2, true));
     }
 }

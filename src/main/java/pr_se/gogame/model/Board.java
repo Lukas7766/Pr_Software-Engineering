@@ -108,20 +108,16 @@ public class Board implements BoardInterface {
             subcommands.add(uc01AddNewToFirst);
         }
 
-        for(StoneGroup sg : sameColorGroups) {
-            subcommands.add(firstSameColorGroup.mergeWithStoneGroup(sg));
-        }
+        sameColorGroups.forEach(sg -> subcommands.add(firstSameColorGroup.mergeWithStoneGroup(sg)));
 
         final UndoableCommand uc02RemoveNewPosFromFirstLiberties = firstSameColorGroup.removeLiberty(new Position(x, y)); // in case any of the now obsolete, "eaten" stone groups contained this liberty
         subcommands.add(uc02RemoveNewPosFromFirstLiberties);
 
-        for(StoneGroup sg : otherColorGroups) {
-            subcommands.add(sg.removeLiberty(new Position(x, y)));
-        }
+        otherColorGroups.forEach(sg -> subcommands.add(sg.removeLiberty(new Position(x, y))));
 
         final UndoableCommand uc03PlacePointer = (permittedSuicide) ? (null) : new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 boardContents[x][y] =
                     firstSameColorGroup.getPointers().stream()
                         .findFirst()
@@ -143,24 +139,7 @@ public class Board implements BoardInterface {
             subcommands.add(uc04RemoveCapturedStones);
         }
 
-        final List<UndoableCommand> finalSubCommands = List.copyOf(subcommands);
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                finalSubCommands.forEach(c -> c.execute(saveEffects));
-            }
-
-            @Override
-            public void undo() {
-                // Undoing it the other way round just in case.
-                ListIterator<UndoableCommand> i = finalSubCommands.listIterator(finalSubCommands.size());
-                while(i.hasPrevious()) {
-                    UndoableCommand c = i.previous();
-                    c.undo();
-                }
-            }
-        };
+        UndoableCommand ret = UndoableCommand.of(subcommands);
         // No execute() this time, as we've already executed the subcommands piecemeal.
         if(uc04RemoveCapturedStones != null) {
             ret.getExecuteEvents().addAll(uc04RemoveCapturedStones.getExecuteEvents());
@@ -176,9 +155,7 @@ public class Board implements BoardInterface {
     }
 
     private UndoableCommand removeGroupsWithoutLiberties(final Set<StoneGroup> surroundingSGs, final StoneColor color, final boolean permittedSuicide) {
-        final List<UndoableCommand> retList = new LinkedList<>();
-        final List<GameEvent> executeEvents = new LinkedList<>();
-        final List<GameEvent> undoEvents = new LinkedList<>();
+        final List<UndoableCommand> subCommands = new LinkedList<>();
 
         int totalCaptured = 0;
         int totalSuicide = 0;
@@ -188,10 +165,7 @@ public class Board implements BoardInterface {
                 .collect(Collectors.toSet());
         for (StoneGroup sg : deadGroups) {
             for (Position p : sg.getLocations()) {
-                UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
-                retList.add(tmpCmd);
-                executeEvents.addAll(tmpCmd.getExecuteEvents());
-                undoEvents.addAll(tmpCmd.getUndoEvents());
+                subCommands.add(removeStone(p.getX(), p.getY()));
             }
             if(sg.getStoneColor() != color) {
                 totalCaptured += sg.getLocations().size();
@@ -201,37 +175,13 @@ public class Board implements BoardInterface {
         }
 
         if(totalCaptured > 0) {
-            retList.add(game.addCapturedStones(color, totalCaptured));
+            subCommands.add(game.addCapturedStones(color, totalCaptured));
         }
         if(totalSuicide > 0) {
-            retList.add(game.addCapturedStones(StoneColor.getOpposite(color), totalSuicide));
+            subCommands.add(game.addCapturedStones(StoneColor.getOpposite(color), totalSuicide));
         }
 
-        final List<UndoableCommand> finalRetList = List.copyOf(retList);
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                for(UndoableCommand c : finalRetList) {
-                    c.execute(saveEffects);
-                }
-            }
-
-            @Override
-            public void undo() {
-                // Undoing it the other way round just in case.
-                ListIterator<UndoableCommand> i = finalRetList.listIterator(finalRetList.size());
-                while(i.hasPrevious()) {
-                    UndoableCommand c = i.previous();
-                    c.undo();
-                }
-            }
-        };
-        ret.getExecuteEvents().addAll(executeEvents);
-        ret.getUndoEvents().addAll(undoEvents);
-
-
-        return ret;
+        return UndoableCommand.of(subCommands);
     }
 
     @Override
@@ -245,7 +195,7 @@ public class Board implements BoardInterface {
             final List<UndoableCommand> addLibertyCommands = new LinkedList<>();
 
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute(final boolean saveEffects) {
                 boardContents[x][y] = null;
 
                 Set<StoneGroup> surroundingSGs = getSurroundings(x, y, Objects::nonNull).stream()

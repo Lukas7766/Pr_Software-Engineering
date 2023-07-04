@@ -5,6 +5,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.file.LoadingGameException;
+import pr_se.gogame.model.helper.StoneColor;
 
 import java.io.File;
 
@@ -50,15 +51,16 @@ class JapaneseRulesetTest {
     @DisplayName("testing scoreGame(), black wins with 10 points")
     void scoreGameB() {
         /*
-        null BLACK WHITE null null null null null null
-        BLACK null BLACK null null null null null null
-        null BLACK WHITE WHITE null null null null null
-        null BLACK WHITE null null null null null null
-        null BLACK WHITE null null null null null null
-        null BLACK WHITE null null null null null null
-        null BLACK WHITE null null null null null null
-        null BLACK WHITE null null null null null null
-        null BLACK WHITE null null null null null null
+         *      0  1  2  3  4  5  6  7  8
+         *   0     B
+         *   1  B     B  B  B  B  B  B  B
+         *   2  W  B  W  W  W  W  W  W  W
+         *   3        W
+         *   4
+         *   5
+         *   6
+         *   7
+         *   8
          */
         Game game = new Game();
         game.newGame(BLACK, 9, 0, new JapaneseRuleset());
@@ -92,36 +94,38 @@ class JapaneseRulesetTest {
         game.playMove(8, 1);
         game.playMove(8, 2);
 
-        game.scoreGame();
-        assertEquals(10, game.getScore(BLACK));
-        assertEquals(6.5, game.getScore(WHITE));
-        assertEquals(10, japaneseRuleset.scoreGame(game).getScoreBlack());
-        assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
-        assertEquals(BLACK, japaneseRuleset.scoreGame(game).getWinner());
+        printBoard(game);
+
+        japaneseRuleset.scoreGame(game);
+        assertEquals(10, game.getGameResult().getScore(BLACK));
+        assertEquals(6.5, game.getGameResult().getScore(WHITE));
+        assertEquals(BLACK, game.getGameResult().getWinner());
         assertEquals(
                 """
                         Black won!
 
-                        Handicap: 0.0
-                        + Territory points: 9
+                        Handicap: 0
                         + Captured stones: 1
+                        + Territory points: 9
 
-                        = 10.0 points""", japaneseRuleset.scoreGame(game).getDescription());
+                        = 10.0 points""", game.getGameResult().getDescription(BLACK));
     }
 
     @Test
     @DisplayName("testing scoreGame(), white wins with 6.5 points")
     void scoreGameW() {
         /*
-        null BLACK WHITE null null null null null null
-        BLACK null BLACK null null null null null null
-        null BLACK WHITE WHITE null null null null null
-        null null null null null null null null null
-        null null null null null null null null null
-        null null null null null null null null null
-        null null null null null null null null null
-        null null null null null null null null null
-        null null null null null null null null null
+         *   Lower case = captured stone
+         *      0  1  2  3  4  5  6  7  8
+         *   0     B
+         *   1  B  w  B
+         *   2  W  B  W
+         *   3        W
+         *   4
+         *   5
+         *   6
+         *   7
+         *   8
          */
         Game game = new Game();
         game.newGame(BLACK, 9, 0, new JapaneseRuleset());
@@ -129,7 +133,7 @@ class JapaneseRulesetTest {
         game.playMove(0, 2);
 
         game.playMove(1, 0);
-        game.playMove(1, 1);
+        game.playMove(1, 1); // This WHITE stone will get captured by BLACK, adding 1 capture point to Black's score.
 
         game.playMove(1, 2);
         game.playMove(2, 3);
@@ -137,22 +141,20 @@ class JapaneseRulesetTest {
         game.playMove(2, 1);
         game.playMove(2, 2);
 
-        game.scoreGame();
-        assertEquals(3, game.getScore(BLACK));
-        assertEquals(6.5, game.getScore(WHITE));
+        printBoard(game);
 
-        assertEquals(3, japaneseRuleset.scoreGame(game).getScoreBlack());
-        assertEquals(6.5, japaneseRuleset.scoreGame(game).getScoreWhite());
-        assertEquals(WHITE, japaneseRuleset.scoreGame(game).getWinner());
+        japaneseRuleset.scoreGame(game);
+        assertEquals(3, game.getGameResult().getScore(BLACK));
+        assertEquals(6.5, game.getGameResult().getScore(WHITE));
+        assertEquals(WHITE, game.getGameResult().getWinner());
         assertEquals(
                 """
                         White won!
 
                         Komi: 6.5
                         + Territory points: 0
-                        + Captured stones: 0
 
-                        = 6.5 points""", japaneseRuleset.scoreGame(game).getDescription());
+                        = 6.5 points""", game.getGameResult().getDescription(WHITE));
 
     }
 
@@ -179,12 +181,36 @@ class JapaneseRulesetTest {
     Game loadFile(String fileName) {
         Game game = new Game();
         try {
-            assertTrue(game.loadGame(new File(TESTFILE_FOLDER + fileName)));
+            assertTrue(game.getFileHandler().loadFile(new File(TESTFILE_FOLDER + fileName)));
         } catch (LoadingGameException e) {
             e.printStackTrace();
             fail();
+        } catch (java.nio.file.NoSuchFileException e) {
+            throw new RuntimeException(e);
         }
 
         return game;
+    }
+
+    void printBoard(Game game) {
+        System.out.print("   ");
+        for(int i = 0; i < game.getSize(); i++) {
+            System.out.print(" " + i + " ");
+        }
+        System.out.println("   ");
+
+        for(int y = 0; y < game.getSize(); y++) {
+            System.out.print(" " + y + " ");
+            for(int x = 0; x < game.getSize(); x++) {
+                char output = ' ';
+                if(game.getColorAt(x, y) == StoneColor.BLACK) {
+                    output = 'B';
+                } else if(game.getColorAt(x, y) == StoneColor.WHITE) {
+                    output = 'W';
+                }
+                System.out.print(" " + output + " ");
+            }
+            System.out.println();
+        }
     }
 }
