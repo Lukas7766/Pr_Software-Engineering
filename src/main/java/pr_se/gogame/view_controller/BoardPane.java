@@ -137,6 +137,8 @@ public class BoardPane extends GridPane {
      */
     private int keyboardCellY = -1;
 
+    private String lastGraphicsPackFileName;
+
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
@@ -149,7 +151,6 @@ public class BoardPane extends GridPane {
         setMouseTransparent(true);
 
         this.game = game;
-        this.graphicsPath = GlobalSettings.getGraphicsPath();
         this.showsMoveNumbers = GlobalSettings.isShowMoveNumbers();
         this.showsCoordinates = GlobalSettings.isShowCoordinates();
         this.needsMoveConfirmation = GlobalSettings.isConfirmationNeeded();
@@ -160,7 +161,8 @@ public class BoardPane extends GridPane {
                 setMoveConfirmation(GlobalSettings.isConfirmationNeeded());
                 setShowsCoordinates(GlobalSettings.isShowCoordinates());
                 setShowsMoveNumbers(GlobalSettings.isShowMoveNumbers());
-                setGraphicsPath(GlobalSettings.getGraphicsPath());
+                loadGraphics(GlobalSettings.getGraphicsPath());
+                updateGraphics();
             }
 
             @Override
@@ -265,7 +267,7 @@ public class BoardPane extends GridPane {
 
         });
 
-        loadGraphics(graphicsPath);
+        loadGraphics(GlobalSettings.getGraphicsPath());
         init();
     }
 
@@ -498,22 +500,6 @@ public class BoardPane extends GridPane {
         }
     }
 
-    public void setGraphicsPath(String graphicsPath) {
-        if(graphicsPath == null) {
-            throw new NullPointerException();
-        }
-
-        if(this.graphicsPath.equals(graphicsPath)) {
-            return; // Don't unnecessarily reload the entire graphics pack.
-        }
-
-        this.graphicsPath = graphicsPath;
-
-        loadGraphics(graphicsPath);
-
-        updateGraphics();
-    }
-
     public int getSize() {
         return size;
     }
@@ -524,6 +510,16 @@ public class BoardPane extends GridPane {
      * @param graphicsPath the absolute path of the graphics pack to be loaded
      */
     private void loadGraphics(String graphicsPath) {
+        if(graphicsPath == null) {
+            throw new NullPointerException();
+        }
+
+        if(graphicsPath.equals(this.graphicsPath)) {
+            return; // Don't unnecessarily reload the entire graphics pack.
+        }
+
+        this.graphicsPath = graphicsPath;
+
         try (ZipFile zip = new ZipFile(graphicsPath)) {
             tile = loadImageFromGraphicsPack("tile.png", zip);
             tileCorner = loadImageFromGraphicsPack("tile_corner.png", zip);
@@ -542,8 +538,11 @@ public class BoardPane extends GridPane {
             squareMarks[1] = loadImageFromGraphicsPack("mark_square_1.png", zip);
             squareMarks[2] = loadImageFromGraphicsPack("mark_square_2.png", zip);
             handicapSlot = loadImageFromGraphicsPack("handicap_slot.png", zip);
+
+            lastGraphicsPackFileName = GlobalSettings.getGraphicsPackFileName();
         } catch (Exception e) {
             CustomExceptionDialog.show(e, "Couldn't open graphics pack " + graphicsPath + "!");
+            GlobalSettings.setGraphicsPackFileName(lastGraphicsPackFileName);
         }
     }
 

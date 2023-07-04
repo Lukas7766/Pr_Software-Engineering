@@ -3,6 +3,8 @@ package pr_se.gogame.view_controller;
 import javafx.application.Application;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -401,10 +403,10 @@ public class HeaderPane extends VBox {
      * @return a horizontal box layout object which includes all needed elements of the short menu
      */
     private HBox shortMenu() throws IOException {
-        HBox lane = new HBox();
-        lane.setPrefHeight(35);
+        HBox hotbar = new HBox();
+        hotbar.setPrefHeight(35);
 
-        lane.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(0, 5, 0, 5))));
+        hotbar.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(0, 5, 0, 5))));
 
         HBox playbackControl = new HBox();
         playbackControl.setPrefWidth(250);
@@ -439,7 +441,7 @@ public class HeaderPane extends VBox {
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT3), redo::fire);
         scene.getAccelerators().put(new KeyCodeCombination(KeyCode.DIGIT4), fastForward::fire);
 
-        lane.getChildren().add(playbackControl);
+        hotbar.getChildren().add(playbackControl);
 
         HBox gameCards = new HBox();
         gameCards.prefWidthProperty().bind(this.widthProperty().subtract(250));
@@ -506,21 +508,6 @@ public class HeaderPane extends VBox {
             }
         });
 
-        GlobalSettings.addListener(new ViewListener() {
-            @Override
-            public void onSettingsUpdated() {
-                confirm.setVisible(GlobalSettings.isConfirmationNeeded());
-                pass.setText(game.isSetupMode() ? "Switch color" : passText);
-                resign.setDisable(game.getGameState() != Game.GameState.RUNNING);
-                scoreGame.setDisable(game.getGameState() != Game.GameState.RUNNING);
-            }
-
-            @Override
-            public void onMoveConfirmed() {
-                // Move confirmation does not pertain to this.
-            }
-        });
-
         gameCards.getChildren().addAll(gameShortCuts);
 
 
@@ -546,12 +533,32 @@ public class HeaderPane extends VBox {
         graphicsPackSelectorComboBox.setFocusTraversable(false);
         graphicsPackSelectorComboBox.setOnAction(e -> GlobalSettings.setGraphicsPackFileName("/" + graphicsPackSelectorComboBox.getValue()));
 
+        GlobalSettings.addListener(new ViewListener() {
+            @Override
+            public void onSettingsUpdated() {
+                confirm.setVisible(GlobalSettings.isConfirmationNeeded());
+                pass.setText(game.isSetupMode() ? "Switch color" : passText);
+                resign.setDisable(game.getGameState() != Game.GameState.RUNNING);
+                scoreGame.setDisable(game.getGameState() != Game.GameState.RUNNING);
+                
+                EventHandler<ActionEvent> comboBoxHandler = graphicsPackSelectorComboBox.getOnAction();
+                graphicsPackSelectorComboBox.setOnAction(null);
+                graphicsPackSelectorComboBox.setValue(GlobalSettings.getGraphicsPackFileName().substring(1));
+                graphicsPackSelectorComboBox.setOnAction(comboBoxHandler);
+            }
+
+            @Override
+            public void onMoveConfirmed() {
+                // Move confirmation does not pertain to this.
+            }
+        });
+
         gameShortCuts.getChildren().add(graphicsPackSelectorComboBox);
 
         gameCards.getChildren().add(graphicsPackSelectorComboBox);
-        lane.getChildren().add(gameCards);
+        hotbar.getChildren().add(gameCards);
 
-        return lane;
+        return hotbar;
 
     }
 }
