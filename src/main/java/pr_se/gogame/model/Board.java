@@ -155,7 +155,7 @@ public class Board implements BoardInterface {
     }
 
     private UndoableCommand removeGroupsWithoutLiberties(final Set<StoneGroup> surroundingSGs, final StoneColor color, final boolean permittedSuicide) {
-        final List<UndoableCommand> retList = new LinkedList<>();
+        final List<UndoableCommand> subCommands = new LinkedList<>();
 
         int totalCaptured = 0;
         int totalSuicide = 0;
@@ -165,8 +165,7 @@ public class Board implements BoardInterface {
                 .collect(Collectors.toSet());
         for (StoneGroup sg : deadGroups) {
             for (Position p : sg.getLocations()) {
-                UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
-                retList.add(tmpCmd);
+                subCommands.add(removeStone(p.getX(), p.getY()));
             }
             if(sg.getStoneColor() != color) {
                 totalCaptured += sg.getLocations().size();
@@ -176,15 +175,13 @@ public class Board implements BoardInterface {
         }
 
         if(totalCaptured > 0) {
-            retList.add(game.addCapturedStones(color, totalCaptured));
+            subCommands.add(game.addCapturedStones(color, totalCaptured));
         }
         if(totalSuicide > 0) {
-            retList.add(game.addCapturedStones(StoneColor.getOpposite(color), totalSuicide));
+            subCommands.add(game.addCapturedStones(StoneColor.getOpposite(color), totalSuicide));
         }
 
-        UndoableCommand ret = UndoableCommand.of(retList);
-
-        return ret;
+        return UndoableCommand.of(subCommands);
     }
 
     @Override
