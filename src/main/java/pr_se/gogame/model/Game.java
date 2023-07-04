@@ -478,7 +478,7 @@ public class Game implements GameInterface {
         hideAllMarks();
         if(!history.isAtBeginning()) {
             if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
-                history.rewind();
+                history.gotoBeginning();
             } else if(!history.isAtBeginning()) {
                 goBeforeFirstMove();
             }
@@ -493,10 +493,10 @@ public class Game implements GameInterface {
         if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
             goBeforeFirstMove();
             if(history.getCurrentNode() == n) {
-                history.skipToEnd();
+                history.gotoEnd();
             }
         } else {
-            history.skipToEnd();
+            history.gotoEnd();
         }
         showAllMarks();
     }
@@ -514,7 +514,7 @@ public class Game implements GameInterface {
     @Override
     public void goToFirstMove() {
         hideAllMarks();
-        history.rewind();
+        history.gotoBeginning();
 
         do {
             history.stepForward();
@@ -525,7 +525,7 @@ public class Game implements GameInterface {
     @Override
     public void goToEnd() {
         hideAllMarks();
-        history.skipToEnd();
+        history.gotoEnd();
         showAllMarks();
     }
 

@@ -26,11 +26,11 @@ public class History implements Iterable<History.HistoryNode> {
         current.setNext(end);
     }
 
-    public void rewind() {
+    public void gotoBeginning() {
         while(stepBack());
     }
 
-    public void skipToEnd() {
+    public void gotoEnd() {
         while(stepForward());
     }
 

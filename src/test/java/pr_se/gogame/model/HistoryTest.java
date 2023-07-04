@@ -46,7 +46,7 @@ class HistoryTest {
         assertTrue(history.isAtBeginning());
         game.playMove(0, 0);
         assertFalse(history.isAtBeginning());
-        history.rewind();
+        history.gotoBeginning();
         assertTrue(history.isAtBeginning());
         assertNull(game.getColorAt(0, 0));
     }
@@ -56,7 +56,7 @@ class HistoryTest {
         assertTrue(history.isAtEnd());
         rewind();
         assertFalse(history.isAtEnd());
-        history.skipToEnd();
+        history.gotoEnd();
         assertTrue(history.isAtEnd());
         assertEquals(BLACK, game.getColorAt(0, 0));
     }
@@ -105,7 +105,7 @@ class HistoryTest {
     void isAtEnd() {
         assertTrue(history.isAtEnd());
         assertTrue(history.isAtBeginning());
-        history.rewind();
+        history.gotoBeginning();
         assertTrue(history.isAtEnd());
         assertTrue(history.isAtBeginning());
         game.playMove(0, 0);
