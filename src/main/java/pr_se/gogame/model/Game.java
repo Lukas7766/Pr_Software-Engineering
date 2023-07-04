@@ -305,10 +305,6 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place setup stone when gameState is " + gameState);
         }
 
-        if(color == null) {
-            throw new NullPointerException();
-        }
-
         placeStone(x, y, color, SETUP);
     }
 
@@ -323,13 +319,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place handicap stone when game isn't being set up! Game state was " + gameState);
         }
 
-        checkCoords(x, y);
-
         if(placeStone) {
-            if(color == null) {
-                throw new NullPointerException();
-            }
-
             if (handicapStoneCounter <= 0) {
                 throw new IllegalStateException("Can't place any more handicap stones!");
             }
@@ -349,12 +339,6 @@ public class Game implements GameInterface {
     public boolean playMove(int x, int y, StoneColor color) {
         if(gameState != GameState.RUNNING) {
             throw new IllegalStateException("Can't place stone when game isn't running! Game State was " + gameState);
-        }
-
-        checkCoords(x, y);
-
-        if(color == null) {
-            throw new NullPointerException();
         }
 
         return placeStone(x, y, color, MOVE);
