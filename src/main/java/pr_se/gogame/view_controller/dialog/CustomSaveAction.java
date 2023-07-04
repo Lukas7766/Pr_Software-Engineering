@@ -54,9 +54,9 @@ public class CustomSaveAction {
                 CustomExceptionDialog.show(new IOException(), "Could not save the game!");
             }
         } catch (IOException e) {
-            CustomExceptionDialog.show(e, "Could not save the game!\n\n" + e.getMessage());
+            CustomExceptionDialog.show(e, "Could not save the game!", e.getMessage());
         } catch(IllegalStateException isE) {
-            CustomExceptionDialog.show(isE, "An error occurred while saving the game.\n\n" + isE.getMessage());
+            CustomExceptionDialog.show(isE, "An error occurred while saving the game.", isE.getMessage());
         }
 
         return true;

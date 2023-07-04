@@ -20,7 +20,7 @@ public interface FileHandler {
      * @throws LoadingGameException If a content-related error occurred while loading the game, mostly due to
      *  unsupported features
      */
-    boolean loadFile(File file) throws NoSuchFileException, LoadingGameException;
+    boolean loadFile(File file) throws IOException, LoadingGameException;
 
     /**
      * Returns the currently set file.

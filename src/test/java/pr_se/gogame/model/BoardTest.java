@@ -406,11 +406,9 @@ class BoardTest {
     void loadFile(String fileName) {
         try {
             game.getFileHandler().loadFile(new File(fileName));
-        } catch (LoadingGameException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
-        } catch (NoSuchFileException e) {
-            throw new RuntimeException(e);
         }
         game.goToEnd();
 

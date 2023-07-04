@@ -181,12 +181,12 @@ public class SGFFileHandler implements FileHandler {
     }
 
     @Override
-    public boolean loadFile(File file) throws NoSuchFileException, LoadingGameException {
+    public boolean loadFile(File file) throws IOException, LoadingGameException {
         if(file == null) {
             throw new NullPointerException();
         }
         if(!file.exists()) {
-            throw new NoSuchFileException(file.toString());
+            throw new NoSuchFileException(file + " does not exist!");
         }
 
         currentFile = file;
@@ -358,8 +358,6 @@ public class SGFFileHandler implements FileHandler {
                 unexpected(EOF.getValue(), t);
             }
 
-        } catch(IOException e) {
-            return false;
         }
 
         game.goToFirstMove();

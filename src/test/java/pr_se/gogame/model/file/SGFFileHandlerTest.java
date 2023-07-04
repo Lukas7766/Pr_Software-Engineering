@@ -9,6 +9,7 @@ import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.NoSuchFileException;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -168,7 +169,7 @@ class SGFFileHandlerTest {
 
         try {
             assertTrue(sgfFileHandler.loadFile(myFile));
-        } catch (NoSuchFileException | LoadingGameException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
@@ -183,7 +184,7 @@ class SGFFileHandlerTest {
 
         try {
             assertTrue(sgfFileHandler.loadFile(myFile));
-        } catch (NoSuchFileException | LoadingGameException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
         }
@@ -408,7 +409,7 @@ class SGFFileHandlerTest {
     void invalidTest(String fileName) {
         try {
             assertFalse(sgfFileHandler.loadFile(new File(TEST_FILE_FOLDER + fileName)));
-        } catch(NoSuchFileException e) {
+        } catch(IOException e) {
             e.printStackTrace();
             fail();
         } catch(LoadingGameException le) {
@@ -448,7 +449,7 @@ class SGFFileHandlerTest {
     void assertLoadingWorks() {
         try {
             assertTrue(sgfFileHandler.loadFile(file));
-        } catch (NoSuchFileException | LoadingGameException e) {
+        } catch (IOException | LoadingGameException e) {
             fail();
         }
 

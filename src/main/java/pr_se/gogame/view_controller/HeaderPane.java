@@ -24,6 +24,7 @@ import pr_se.gogame.view_controller.observer.ViewListener;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.IOException;
+import java.nio.file.NoSuchFileException;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
@@ -126,13 +127,13 @@ public class HeaderPane extends VBox {
             if (f != null) {
                 try {
                     if(!game.getFileHandler().loadFile(f)) {
-                        CustomExceptionDialog.show(new IOException(), "Failed to load game!\n\nThis is probably due to a file system error.");
+                        CustomExceptionDialog.show(new IOException(), "Failed to load the game!");
                     }
-                } catch (LoadingGameException lgException) {
-                    CustomExceptionDialog.show(lgException, "Failed to load game!\n\n" + lgException.getMessage());
+                } catch (NoSuchFileException nsfException) {
+                    CustomExceptionDialog.show(nsfException, "File " + f + " does not exist!");
+                } catch (LoadingGameException | IOException lgException) {
+                    CustomExceptionDialog.show(lgException, "Failed to load the game!", lgException.getMessage());
                     game.initGame();
-                } catch (java.nio.file.NoSuchFileException nsfException) {
-                    CustomExceptionDialog.show(nsfException, "File does not exist!");
                 }
             }
         });

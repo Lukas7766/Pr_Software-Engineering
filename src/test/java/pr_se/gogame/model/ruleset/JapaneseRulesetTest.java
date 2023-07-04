@@ -182,11 +182,9 @@ class JapaneseRulesetTest {
         Game game = new Game();
         try {
             assertTrue(game.getFileHandler().loadFile(new File(TESTFILE_FOLDER + fileName)));
-        } catch (LoadingGameException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
-        } catch (java.nio.file.NoSuchFileException e) {
-            throw new RuntimeException(e);
         }
 
         return game;

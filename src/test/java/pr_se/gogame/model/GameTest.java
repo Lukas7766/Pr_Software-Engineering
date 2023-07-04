@@ -492,11 +492,9 @@ class GameTest {
 
         try {
             game.getFileHandler().loadFile(new File(TESTFILE_FOLDER + "KoSituation.sgf"));
-        } catch (LoadingGameException e) {
+        } catch (Exception e) {
             e.printStackTrace();
             fail();
-        } catch (NoSuchFileException e) {
-            throw new RuntimeException(e);
         }
         game.fastForward();
 
