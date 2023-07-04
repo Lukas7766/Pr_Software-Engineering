@@ -463,14 +463,14 @@ public class Game implements GameInterface {
     public void undo() {
         hideAllMarks();
         history.stepBack();
-        reDisplayMarks();
+        showAllMarks();
     }
 
     @Override
     public void redo() {
         hideAllMarks();
         history.stepForward();
-        reDisplayMarks();
+        showAllMarks();
     }
 
     @Override
@@ -483,7 +483,7 @@ public class Game implements GameInterface {
                 goBeforeFirstMove();
             }
         }
-        reDisplayMarks();
+        showAllMarks();
     }
 
     @Override
@@ -498,7 +498,7 @@ public class Game implements GameInterface {
         } else {
             history.skipToEnd();
         }
-        reDisplayMarks();
+        showAllMarks();
     }
 
     @Override
@@ -508,7 +508,7 @@ public class Game implements GameInterface {
         if(history.getCurrentNode().getSaveToken() != SETUP && history.getCurrentNode().getSaveToken() != HANDICAP) {
             history.stepBack();
         }
-        reDisplayMarks();
+        showAllMarks();
     }
 
     @Override
@@ -519,14 +519,14 @@ public class Game implements GameInterface {
         do {
             history.stepForward();
         } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP));
-        reDisplayMarks();
+        showAllMarks();
     }
 
     @Override
     public void goToEnd() {
         hideAllMarks();
         history.skipToEnd();
-        reDisplayMarks();
+        showAllMarks();
     }
 
     @Override
@@ -624,7 +624,7 @@ public class Game implements GameInterface {
         history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), curMoveNumber)));
     }
 
-    private void reDisplayMarks() {
+    private void showAllMarks() {
         history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.getX(), key.getY(), value));
     }
 
