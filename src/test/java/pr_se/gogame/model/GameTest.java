@@ -4,7 +4,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.function.Executable;
 import pr_se.gogame.model.file.FileHandler;
-import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
@@ -18,18 +17,17 @@ import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
 import java.io.File;
-import java.nio.file.NoSuchFileException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-
 import static pr_se.gogame.model.Game.GameState.RUNNING;
 import static pr_se.gogame.model.Game.GameState.SETTING_UP;
 import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 import static pr_se.gogame.model.helper.GameCommand.*;
-import static pr_se.gogame.model.helper.StoneColor.*;
+import static pr_se.gogame.model.helper.StoneColor.BLACK;
+import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 class GameTest {
     Game game;
@@ -642,92 +640,6 @@ class GameTest {
     }
 
     // On further consideration, this kind of behaviour seems view-specific.
-    /*@Test
-    void rewind() {
-        game.playMove(0, 0);
-        assertFalse(game.getHistory().isAtBeginning());
-        game.rewind();
-        assertTrue(game.getHistory().isAtBeginning());
-    }
-
-    @Test
-    void rewindWithSetup() {
-        game.setSetupMode(true);
-        game.placeSetupStone(0, 0, BLACK);
-        game.placeSetupStone(4, 4, BLACK);
-        game.setSetupMode(false);
-        game.playMove(1, 1);
-        game.playMove(2, 2);
-        game.rewind();
-        assertNull(game.getColorAt(2, 2));
-        assertNull(game.getColorAt(1, 1));
-        assertEquals(BLACK, game.getColorAt(0, 0));
-        assertFalse(game.getHistory().isAtBeginning());
-        game.rewind();
-        assertNull(game.getColorAt(0, 0));
-        assertNull(game.getColorAt(4, 4));
-        assertTrue(game.getHistory().isAtBeginning());
-    }
-
-    @Test
-    void rewindWithHandicap() {
-        game.newGame(BLACK, 19, 9, new JapaneseRuleset(), true);
-        assertFalse(game.getHistory().isAtBeginning());
-        assertEquals(BLACK, game.getColorAt(3, 3));
-        game.rewind();
-        assertTrue(game.getHistory().isAtBeginning());
-        assertNull(game.getColorAt(3, 3));
-    }
-
-    @Test
-    void rewindAtBeginning() {
-        assertTrue(game.getHistory().isAtBeginning());
-        game.rewind();
-        assertTrue(game.getHistory().isAtBeginning());
-    }
-
-    @Test
-    void fastForward() {
-        rewind();
-        game.fastForward();
-        assertTrue(game.getHistory().isAtEnd());
-    }
-
-    @Test
-    void fastForwardWithSetup() {
-        rewindWithSetup();
-        game.fastForward();
-        assertEquals(BLACK, game.getColorAt(4, 4));
-        assertNull(game.getColorAt(1, 1));
-        game.fastForward();
-        assertEquals(BLACK, game.getColorAt(1, 1));
-        assertEquals(WHITE, game.getColorAt(2, 2));
-    }
-
-    @Test
-    void fastForwardWithHandicap() {
-        rewindWithHandicap();
-        game.fastForward();
-        assertEquals(BLACK, game.getColorAt(3, 3));
-    }
-
-    @Test
-    void fastForwardFromHandicap() {
-        rewindWithHandicap();
-        assertNull(game.getColorAt(game.getSize() / 2, game.getSize() / 2));
-        game.getHistory().stepForward();
-        assertEquals(BLACK, game.getColorAt(game.getSize() / 2, game.getSize() / 2));
-        assertNull(game.getColorAt(3, 3));
-        game.fastForward();
-        assertEquals(BLACK, game.getColorAt(3, 3));
-    }
-
-    @Test
-    void fastForwardAtEnd() {
-        assertTrue(game.getHistory().isAtEnd());
-        game.fastForward();
-        assertTrue(game.getHistory().isAtEnd());
-    }*/
 
     @Test
     void goToEnd() {

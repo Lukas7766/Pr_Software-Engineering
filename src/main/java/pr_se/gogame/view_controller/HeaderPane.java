@@ -31,6 +31,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 import static javafx.scene.input.KeyCode.A;
+import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 
 /**
  * This class contains the controller and view function of the game header panel.<br>
@@ -568,11 +569,25 @@ public class HeaderPane extends VBox {
 
     private void rewind() {
         History history = game.getHistory();
-        game.rewind();
+        if(!history.isAtBeginning()) {
+            if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
+                history.goToBeginning();
+            } else {
+                history.goBeforeFirstMove();
+            }
+        }
     }
 
     private void fastForward() {
         History history = game.getHistory();
-        game.fastForward();
+        History.HistoryNode n = history.getCurrentNode();
+        if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
+            history.goBeforeFirstMove();
+            if(history.getCurrentNode() == n) {
+                history.goToEnd();
+            }
+        } else {
+            history.goToEnd();
+        }
     }
 }

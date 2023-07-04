@@ -458,30 +458,6 @@ public class Game implements GameInterface {
     }
 
     @Override
-    public void rewind() {
-        if(!history.isAtBeginning()) {
-            if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
-                history.goToBeginning();
-            } else {
-                history.goBeforeFirstMove();
-            }
-        }
-    }
-
-    @Override
-    public void fastForward() {
-        History.HistoryNode n = history.getCurrentNode();
-        if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
-            history.goBeforeFirstMove();
-            if(history.getCurrentNode() == n) {
-                history.goToEnd();
-            }
-        } else {
-            history.goToEnd();
-        }
-    }
-
-    @Override
     public FileHandler getFileHandler() {
         return this.fileHandler;
     }

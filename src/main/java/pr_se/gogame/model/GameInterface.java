@@ -125,10 +125,6 @@ public interface GameInterface {
 
     boolean isSetupMode();
 
-    void rewind();
-
-    void fastForward();
-
     //##################################################################################################################
     // Methods related to file handling
     FileHandler getFileHandler();
