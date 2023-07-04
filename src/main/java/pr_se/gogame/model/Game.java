@@ -598,7 +598,6 @@ public class Game implements GameInterface {
 
 
     // private methods
-
     private UndoableCommand switchColor() {
         UndoableCommand ret = setCurColor(StoneColor.getOpposite(curColor));
         ret.getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
