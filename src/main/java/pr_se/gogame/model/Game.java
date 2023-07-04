@@ -203,17 +203,7 @@ public class Game implements GameInterface {
             subcommands.add(gameResult.setDescription(StoneColor.getOpposite(curColor), StoneColor.getOpposite(curColor) + " won!"));
         }
 
-        UndoableCommand c = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                gameState = GameState.GAME_OVER;
-            }
-
-            @Override
-            public void undo() {
-                gameState = GameState.RUNNING;
-            }
-        };
+        UndoableCommand c = UndoableCommand.updateValue(gs -> gameState = gs, GameState.RUNNING, GameState.GAME_OVER);
         c.execute(true);
 
         subcommands.add(c);
@@ -611,24 +601,9 @@ public class Game implements GameInterface {
     // private methods
 
     private UndoableCommand switchColor() {
-        UndoableCommand ret = new UndoableCommand() {
-            UndoableCommand thisCommand;
-
-            @Override
-            public void execute(final boolean saveEffects) {
-                thisCommand = setCurColor(StoneColor.getOpposite(curColor));
-                if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
-                    getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
-                }
-            }
-
-            @Override
-            public void undo() {
-                thisCommand.undo();
-            }
-        };
-        ret.execute(true);
+        UndoableCommand ret = setCurColor(StoneColor.getOpposite(curColor));
+        ret.getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
+        ret.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
 
         return ret;
 

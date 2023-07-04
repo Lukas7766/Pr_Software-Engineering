@@ -156,8 +156,6 @@ public class Board implements BoardInterface {
 
     private UndoableCommand removeGroupsWithoutLiberties(final Set<StoneGroup> surroundingSGs, final StoneColor color, final boolean permittedSuicide) {
         final List<UndoableCommand> retList = new LinkedList<>();
-        final List<GameEvent> executeEvents = new LinkedList<>();
-        final List<GameEvent> undoEvents = new LinkedList<>();
 
         int totalCaptured = 0;
         int totalSuicide = 0;
@@ -169,8 +167,6 @@ public class Board implements BoardInterface {
             for (Position p : sg.getLocations()) {
                 UndoableCommand tmpCmd = removeStone(p.getX(), p.getY());
                 retList.add(tmpCmd);
-                executeEvents.addAll(tmpCmd.getExecuteEvents());
-                undoEvents.addAll(tmpCmd.getUndoEvents());
             }
             if(sg.getStoneColor() != color) {
                 totalCaptured += sg.getLocations().size();
@@ -186,29 +182,7 @@ public class Board implements BoardInterface {
             retList.add(game.addCapturedStones(StoneColor.getOpposite(color), totalSuicide));
         }
 
-        final List<UndoableCommand> finalRetList = List.copyOf(retList);
-
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(final boolean saveEffects) {
-                for(UndoableCommand c : finalRetList) {
-                    c.execute(saveEffects);
-                }
-            }
-
-            @Override
-            public void undo() {
-                // Undoing it the other way round just in case.
-                ListIterator<UndoableCommand> i = finalRetList.listIterator(finalRetList.size());
-                while(i.hasPrevious()) {
-                    UndoableCommand c = i.previous();
-                    c.undo();
-                }
-            }
-        };
-        ret.getExecuteEvents().addAll(executeEvents);
-        ret.getUndoEvents().addAll(undoEvents);
-
+        UndoableCommand ret = UndoableCommand.of(retList);
 
         return ret;
     }
