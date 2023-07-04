@@ -22,24 +22,14 @@ public class AncientChineseRuleset implements Ruleset {
             }
         }
 
-        final int LAST_BOARD_HASH = lastBoardHash;
-        final int NEW_BOARD_HASH = Arrays.deepHashCode(boardColor);
+        final int oldBoardHash = lastBoardHash;
+        final int newBoardHash = Arrays.deepHashCode(boardColor);
 
-        if(NEW_BOARD_HASH == LAST_BOARD_HASH) {
+        if(newBoardHash == oldBoardHash) {
             return null;
         }
 
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(final boolean saveEffects) {
-                lastBoardHash = NEW_BOARD_HASH;
-            }
-
-            @Override
-            public void undo() {
-                lastBoardHash = LAST_BOARD_HASH;
-            }
-        };
+        UndoableCommand ret = UndoableCommand.updateValue(i -> lastBoardHash = i, oldBoardHash, newBoardHash);
         ret.execute(true);
 
         return ret;
