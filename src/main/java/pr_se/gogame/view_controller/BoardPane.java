@@ -20,6 +20,7 @@ import pr_se.gogame.view_controller.observer.ViewListener;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.NoSuchFileException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -541,7 +542,10 @@ public class BoardPane extends GridPane {
             handicapSlot = loadImageFromGraphicsPack("handicap_slot.png", zip);
 
             lastGraphicsPackFileName = GlobalSettings.getGraphicsPackFileName();
-        } catch (Exception e) {
+        } catch (NoSuchFileException e) {
+            CustomExceptionDialog.show(e, "Couldn't find graphics pack \"" + graphicsPath + "\"!");
+            GlobalSettings.setGraphicsPackFileName(lastGraphicsPackFileName);
+        } catch (IOException e) {
             CustomExceptionDialog.show(e, "Couldn't open graphics pack \"" + graphicsPath + "\"!", e.getMessage());
             GlobalSettings.setGraphicsPackFileName(lastGraphicsPackFileName);
         }
@@ -598,7 +602,7 @@ public class BoardPane extends GridPane {
             for(int j = 0; j < 4; j++) {
                 BoardCell bc = (BoardCell)getChildren().get(4 + i * 4 + j);
                 bc.updateImages(outerEdge);
-                bc.getTile().setRotate(90.0 * (j % 2));
+                bc.getTile().setRotate(90.0 * j);
             }
             // center
             for(int j = 0; j < size; j++) {

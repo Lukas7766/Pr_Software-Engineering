@@ -41,7 +41,7 @@ public final class CustomExceptionDialog {
 
         alert.setHeaderText(headerMessage != null ? headerMessage : "An error occurred!");
 
-        alert.setContentText(contentMessage != null ? contentMessage : "");
+        alert.setContentText(contentMessage != null ? contentMessage : "Developers may see the exception stacktrace for details.");
 
         if (stage != null) {
             alert.initOwner(stage);

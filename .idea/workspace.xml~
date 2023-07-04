@@ -1,0 +1,537 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ArtifactsWorkspaceSettings">
+    <artifacts-to-build>
+      <artifact name="Pr_Software-Engineering:jar" />
+    </artifacts-to-build>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="ebb4a2f2-8462-409b-8626-9835c8f61844" name="Changes" comment="cleaned up some more">
+      <change beforePath="$PROJECT_DIR$/Graphics Packs/debug.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Graphics Packs/default.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Graphics Packs/inverted.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Graphics Packs/reallyLongFileNameGodIsItLong.zip" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/Graphics Packs/unerwuenschteDatei.txt" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/handicap_slot.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_circle_0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_circle_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_circle_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_help.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_square_0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_square_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_square_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_triangle_0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_triangle_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/mark_triangle_2.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/outer_corner.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/outer_edge.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/stone_0.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/stone_1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/tile.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/tile_corner.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/tile_edge.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pr_se/gogame/view_controller/BoardPane.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pr_se/gogame/view_controller/BoardPane.java" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Class" />
+        <option value="Interface" />
+        <option value="Enum" />
+        <option value="JUnit5 Test Class" />
+      </list>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectId" id="2NCO8vMmGEU9NiCeJCq4E88YKgZ" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;SHARE_PROJECT_CONFIGURATION_FILES&quot;: &quot;true&quot;,
+    &quot;TODO_SCOPE&quot;: &quot;All Places&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrary&quot;: &quot;JUnit5&quot;,
+    &quot;com.intellij.testIntegration.createTest.CreateTestDialog.defaultLibrarySuperClass.JUnit5&quot;: &quot;&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/Gerald/.openjfx/cache/19+11/amd64/vcruntime140_1.dll&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Artifacts&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.15&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.2&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;sonarlint&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  }
+}</component>
+  <component name="RecentsManager">
+    <key name="CreateTestDialog.Recents.Supers">
+      <recent name="" />
+    </key>
+    <key name="ExtractSuperBase.RECENT_KEYS">
+      <recent name="pr_se.gogame.model" />
+    </key>
+    <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="pr_se.gogame.model.ruleset" />
+      <recent name="pr_se.gogame.model.file" />
+    </key>
+    <key name="CreateTestDialog.RecentsKey">
+      <recent name="pr_se.gogame.model.ruleset" />
+      <recent name="pr_se.gogame.model" />
+      <recent name="pr_se.gogame.model.file" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="pr_se.gogame.view_controller" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Application.Unnamed">
+    <configuration name="Unnamed" type="Application" factoryName="Application" nameIsGenerated="true">
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.view_controller.GoApplication" />
+      <module name="Pr_Software-Engineering" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="AllTests" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model" />
+      <option name="MAIN_CLASS_NAME" value="" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="package" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="BoardTests" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model" />
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.model.BoardTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GameResultTest" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model.ruleset" />
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.model.ruleset.GameResultTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="GameTests" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model" />
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.model.GameTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="HistoryTest" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model" />
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.model.HistoryTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="JapaneseRulesetTest" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model.ruleset" />
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.model.ruleset.JapaneseRulesetTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="RulesetTest" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model.ruleset" />
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.model.ruleset.RulesetTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SGFFileHandlerTest" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model.file" />
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.model.file.SGFFileHandlerTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="SGFScannerTest" type="JUnit" factoryName="JUnit">
+      <module name="Pr_Software-Engineering" />
+      <extension name="coverage" sample_coverage="false" />
+      <option name="PACKAGE_NAME" value="pr_se.gogame.model.file" />
+      <option name="MAIN_CLASS_NAME" value="pr_se.gogame.model.file.SGFScannerTest" />
+      <option name="METHOD_NAME" value="" />
+      <option name="TEST_OBJECT" value="class" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Pr_Software-Engineering [sonar:sonar]" type="MavenRunConfiguration" factoryName="Maven">
+      <MavenSettings>
+        <option name="myGeneralSettings" />
+        <option name="myRunnerSettings" />
+        <option name="myRunnerParameters">
+          <MavenRunnerParameters>
+            <option name="profiles">
+              <set />
+            </option>
+            <option name="goals">
+              <list>
+                <option value="sonar:sonar" />
+                <option value="-Dsonar.token=sqp_7f6f290e8dc5781eb584bea1a15469cedeb28e9b" />
+              </list>
+            </option>
+            <option name="pomFileName" value="pom.xml" />
+            <option name="profilesMap">
+              <map />
+            </option>
+            <option name="resolveToWorkspace" value="false" />
+            <option name="workingDirPath" value="$PROJECT_DIR$" />
+          </MavenRunnerParameters>
+        </option>
+      </MavenSettings>
+      <method v="2" />
+    </configuration>
+    <list>
+      <item itemvalue="Application.Unnamed" />
+      <item itemvalue="JUnit.GameResultTest" />
+      <item itemvalue="JUnit.AllTests" />
+      <item itemvalue="JUnit.SGFScannerTest" />
+      <item itemvalue="JUnit.SGFFileHandlerTest" />
+      <item itemvalue="JUnit.HistoryTest" />
+      <item itemvalue="JUnit.RulesetTest" />
+      <item itemvalue="JUnit.JapaneseRulesetTest" />
+      <item itemvalue="JUnit.BoardTests" />
+      <item itemvalue="JUnit.GameTests" />
+      <item itemvalue="Maven.Pr_Software-Engineering [sonar:sonar]" />
+    </list>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="ebb4a2f2-8462-409b-8626-9835c8f61844" name="Changes" comment="" />
+      <created>1679164442438</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1679164442438</updated>
+      <workItem from="1679164446339" duration="1108000" />
+      <workItem from="1679166074757" duration="654000" />
+      <workItem from="1679168291924" duration="224000" />
+      <workItem from="1679237831276" duration="3572000" />
+      <workItem from="1679419998841" duration="286000" />
+      <workItem from="1679683498824" duration="5144000" />
+      <workItem from="1680364013806" duration="712000" />
+      <workItem from="1680365144699" duration="3616000" />
+      <workItem from="1680702149181" duration="13518000" />
+      <workItem from="1680718508899" duration="13352000" />
+      <workItem from="1680792174602" duration="4269000" />
+      <workItem from="1680800327487" duration="616000" />
+      <workItem from="1680832654579" duration="4187000" />
+      <workItem from="1680876108544" duration="2655000" />
+      <workItem from="1680878853492" duration="82000" />
+      <workItem from="1680879673506" duration="749000" />
+      <workItem from="1680883885399" duration="11850000" />
+      <workItem from="1680903781649" duration="3780000" />
+      <workItem from="1680907576555" duration="7526000" />
+      <workItem from="1680964733125" duration="6421000" />
+      <workItem from="1680972662591" duration="1226000" />
+      <workItem from="1680973996466" duration="156000" />
+      <workItem from="1680976814917" duration="1912000" />
+      <workItem from="1680979264603" duration="54000" />
+      <workItem from="1680981572973" duration="745000" />
+      <workItem from="1680987175516" duration="3542000" />
+      <workItem from="1681053374905" duration="2999000" />
+      <workItem from="1681073915317" duration="19070000" />
+      <workItem from="1681093695464" duration="82000" />
+      <workItem from="1681137032259" duration="7858000" />
+      <workItem from="1681147501866" duration="5854000" />
+      <workItem from="1681167492712" duration="16091000" />
+      <workItem from="1681234485797" duration="55000" />
+      <workItem from="1681235389154" duration="18598000" />
+      <workItem from="1681258317407" duration="43000" />
+      <workItem from="1681258628321" duration="6340000" />
+      <workItem from="1681305118271" duration="5487000" />
+      <workItem from="1681312767982" duration="2157000" />
+      <workItem from="1681409771115" duration="14000" />
+      <workItem from="1681427991615" duration="3032000" />
+      <workItem from="1681521798205" duration="5455000" />
+      <workItem from="1681569839283" duration="9649000" />
+      <workItem from="1681587437428" duration="2036000" />
+      <workItem from="1681595342335" duration="6653000" />
+      <workItem from="1681652735127" duration="4382000" />
+      <workItem from="1681664922077" duration="6675000" />
+      <workItem from="1681684097783" duration="890000" />
+      <workItem from="1681686533566" duration="2278000" />
+      <workItem from="1681692152235" duration="142000" />
+      <workItem from="1681692515593" duration="476000" />
+      <workItem from="1681693462580" duration="4258000" />
+      <workItem from="1681734556259" duration="200000" />
+      <workItem from="1681770331352" duration="86000" />
+      <workItem from="1681770435576" duration="52000" />
+      <workItem from="1681772812849" duration="1994000" />
+      <workItem from="1682694272372" duration="8512000" />
+      <workItem from="1682739190154" duration="3208000" />
+      <workItem from="1682742460503" duration="18000" />
+      <workItem from="1682771942139" duration="13540000" />
+      <workItem from="1682788013643" duration="889000" />
+      <workItem from="1682789066495" duration="11000" />
+      <workItem from="1683623355029" duration="3080000" />
+      <workItem from="1683999552856" duration="148000" />
+      <workItem from="1684001945962" duration="574000" />
+      <workItem from="1684002624877" duration="41000" />
+      <workItem from="1684003086237" duration="1215000" />
+      <workItem from="1684160174408" duration="291000" />
+      <workItem from="1684168233834" duration="5901000" />
+      <workItem from="1684425954015" duration="277000" />
+      <workItem from="1684439396208" duration="5732000" />
+      <workItem from="1684445244199" duration="4000" />
+      <workItem from="1684448842074" duration="146000" />
+      <workItem from="1684449606928" duration="104000" />
+      <workItem from="1684458396666" duration="6210000" />
+      <workItem from="1684464753361" duration="21000" />
+      <workItem from="1684465040308" duration="2726000" />
+      <workItem from="1684468374416" duration="66000" />
+      <workItem from="1684547348349" duration="2954000" />
+      <workItem from="1684550319368" duration="19000" />
+      <workItem from="1684597847803" duration="2759000" />
+      <workItem from="1684624689889" duration="452000" />
+      <workItem from="1684626262823" duration="5362000" />
+      <workItem from="1684632672192" duration="3778000" />
+      <workItem from="1684675247487" duration="605000" />
+      <workItem from="1684712936210" duration="2216000" />
+      <workItem from="1684764227763" duration="6931000" />
+      <workItem from="1684788869033" duration="2222000" />
+      <workItem from="1684803670696" duration="1767000" />
+      <workItem from="1684806960054" duration="23000" />
+      <workItem from="1685387205656" duration="12760000" />
+      <workItem from="1685402009191" duration="3391000" />
+      <workItem from="1685405780338" duration="256000" />
+      <workItem from="1685406093874" duration="778000" />
+      <workItem from="1685407805302" duration="141000" />
+      <workItem from="1685453581858" duration="2050000" />
+      <workItem from="1685491947543" duration="4524000" />
+      <workItem from="1685497288343" duration="1028000" />
+      <workItem from="1685800809483" duration="16695000" />
+      <workItem from="1685835143467" duration="780000" />
+      <workItem from="1685835935740" duration="1127000" />
+      <workItem from="1685914973608" duration="4622000" />
+      <workItem from="1685919623579" duration="210000" />
+      <workItem from="1685919848792" duration="5304000" />
+      <workItem from="1685969226303" duration="4183000" />
+      <workItem from="1685991720056" duration="764000" />
+      <workItem from="1685993475597" duration="2807000" />
+      <workItem from="1686009107610" duration="5561000" />
+      <workItem from="1686096118298" duration="4271000" />
+      <workItem from="1686100603420" duration="130000" />
+      <workItem from="1686100808589" duration="70000" />
+      <workItem from="1686233052921" duration="2320000" />
+      <workItem from="1686238237664" duration="305000" />
+      <workItem from="1686261180141" duration="7847000" />
+      <workItem from="1686270093069" duration="2493000" />
+      <workItem from="1686336726522" duration="61000" />
+      <workItem from="1686336798285" duration="5926000" />
+      <workItem from="1686343982182" duration="98000" />
+      <workItem from="1686393235265" duration="6369000" />
+      <workItem from="1686404797227" duration="1207000" />
+      <workItem from="1686416664770" duration="117000" />
+      <workItem from="1686417058299" duration="1055000" />
+      <workItem from="1686419157296" duration="299000" />
+      <workItem from="1686419651074" duration="500000" />
+      <workItem from="1686420334519" duration="23000" />
+      <workItem from="1686444347194" duration="4646000" />
+      <workItem from="1686514389756" duration="630000" />
+      <workItem from="1686591295860" duration="5009000" />
+      <workItem from="1686602155017" duration="2132000" />
+      <workItem from="1686605164156" duration="1281000" />
+      <workItem from="1686606578651" duration="966000" />
+      <workItem from="1686648493370" duration="9734000" />
+      <workItem from="1686674426852" duration="8888000" />
+      <workItem from="1686683498204" duration="40000" />
+      <workItem from="1686683647486" duration="794000" />
+      <workItem from="1686684556733" duration="1168000" />
+      <workItem from="1686685998335" duration="7301000" />
+      <workItem from="1686697157046" duration="2099000" />
+      <workItem from="1686699368173" duration="266000" />
+      <workItem from="1686734626438" duration="727000" />
+      <workItem from="1686736025628" duration="600000" />
+      <workItem from="1686747831036" duration="2409000" />
+      <workItem from="1686765355814" duration="2836000" />
+      <workItem from="1686774441759" duration="11666000" />
+      <workItem from="1686786421363" duration="95000" />
+      <workItem from="1686870989955" duration="2762000" />
+      <workItem from="1687011826074" duration="9779000" />
+      <workItem from="1687042847870" duration="7419000" />
+      <workItem from="1687299287517" duration="7985000" />
+      <workItem from="1687308239887" duration="74000" />
+      <workItem from="1687351227151" duration="676000" />
+      <workItem from="1687382073809" duration="10074000" />
+      <workItem from="1687450574905" duration="3360000" />
+      <workItem from="1687461626504" duration="6000" />
+      <workItem from="1687467402177" duration="9427000" />
+      <workItem from="1687477277312" duration="202000" />
+      <workItem from="1687477503807" duration="69000" />
+      <workItem from="1687477633441" duration="455000" />
+      <workItem from="1687540681616" duration="38076000" />
+      <workItem from="1687613026223" duration="29573000" />
+      <workItem from="1687648157460" duration="10487000" />
+      <workItem from="1687658823807" duration="195000" />
+      <workItem from="1687659088684" duration="42000" />
+      <workItem from="1687662107336" duration="4072000" />
+      <workItem from="1687701096966" duration="9844000" />
+      <workItem from="1687725939605" duration="26938000" />
+      <workItem from="1687800784497" duration="12497000" />
+      <workItem from="1687814163340" duration="679000" />
+      <workItem from="1687815169464" duration="92000" />
+      <workItem from="1687815280394" duration="465000" />
+      <workItem from="1687818471796" duration="1445000" />
+      <workItem from="1687993395154" duration="398000" />
+      <workItem from="1687993805160" duration="108000" />
+      <workItem from="1687998109299" duration="5930000" />
+      <workItem from="1688005317150" duration="289000" />
+      <workItem from="1688030622033" duration="610000" />
+      <workItem from="1688041320231" duration="5369000" />
+      <workItem from="1688061932049" duration="7639000" />
+      <workItem from="1688069619558" duration="102000" />
+      <workItem from="1688069971709" duration="456000" />
+      <workItem from="1688137423001" duration="10736000" />
+      <workItem from="1688156076987" duration="8490000" />
+      <workItem from="1688165894356" duration="285000" />
+      <workItem from="1688312251735" duration="1913000" />
+      <workItem from="1688320370688" duration="8160000" />
+      <workItem from="1688337251950" duration="4315000" />
+      <workItem from="1688391824817" duration="13849000" />
+      <workItem from="1688409399914" duration="1798000" />
+      <workItem from="1688427428525" duration="8564000" />
+      <workItem from="1688473873398" duration="1682000" />
+      <workItem from="1688476722754" duration="1184000" />
+      <workItem from="1688486910442" duration="4700000" />
+      <workItem from="1688491908627" duration="1555000" />
+    </task>
+    <task id="LOCAL-00001" summary="cleaned up some more">
+      <created>1680974100453</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1680974100453</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="cleaned up some more" />
+    <option name="LAST_COMMIT_MESSAGE" value="cleaned up some more" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <condition expression="serialNo == 42 &amp;&amp; !saveEffects" language="JAVA" />
+          <url>file://$PROJECT_DIR$/src/main/java/pr_se/gogame/model/StoneGroup.java</url>
+          <line>76</line>
+          <option name="timeStamp" value="47" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <condition expression="serialNo == 42" language="JAVA" />
+          <url>file://$PROJECT_DIR$/src/main/java/pr_se/gogame/model/StoneGroup.java</url>
+          <line>86</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/test/java/pr_se/gogame/model/HistoryTest.java</url>
+          <line>139</line>
+          <option name="timeStamp" value="67" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/src/main/java/pr_se/gogame/model/Game.java</url>
+          <line>213</line>
+          <option name="timeStamp" value="68" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$JapaneseRulesetTest.ic" NAME="JapaneseRulesetTest Coverage Results" MODIFIED="1688429601422" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$GameTests.ic" NAME="GameTests Coverage Results" MODIFIED="1688429572545" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$AllTests.ic" NAME="AllTests Coverage Results" MODIFIED="1688429640625" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$BoardTests.ic" NAME="BoardTests Coverage Results" MODIFIED="1687812940614" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$SGFFileHandlerTest.ic" NAME="SGFFileHandlerTest Coverage Results" MODIFIED="1688157236047" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$GameResultTest.ic" NAME="GameResultTest Coverage Results" MODIFIED="1688427876804" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$GameTest.ic" NAME="GameTest Coverage Results" MODIFIED="1685389170464" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>pr_se.gogame.model.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$BoardTest.ic" NAME="BoardTest Coverage Results" MODIFIED="1685389162354" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false">
+      <FILTER>pr_se.gogame.model.*</FILTER>
+    </SUITE>
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$Unnamed.ic" NAME="Unnamed Coverage Results" MODIFIED="1688430414494" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$SGFScannerTest.ic" NAME="SGFScannerTest Coverage Results" MODIFIED="1687813021736" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$HistoryTest.ic" NAME="HistoryTest Coverage Results" MODIFIED="1688002600078" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$RulesetTest.ic" NAME="RulesetTest Coverage Results" MODIFIED="1688429590397" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+    <SUITE FILE_PATH="coverage/Pr_Software_Engineering$FileHandlerTest.ic" NAME="FileHandlerTest Coverage Results" MODIFIED="1688143148243" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="idea" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="true" />
+  </component>
+</project>
