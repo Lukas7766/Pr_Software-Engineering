@@ -376,6 +376,8 @@ class GameTest {
         assertEquals(1, game.getCurMoveNumber());
         game.playMove(0, 0);
         assertEquals(2, game.getCurMoveNumber());
+        game.undo();
+        assertEquals(1, game.getCurMoveNumber());
     }
 
     @Test

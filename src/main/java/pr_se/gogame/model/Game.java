@@ -393,18 +393,9 @@ public class Game implements GameInterface {
             }
             subcommands.add(uc03IsKo);
 
-            final UndoableCommand uc04UpdateMoveNo = new UndoableCommand() {
-                @Override
-                public void execute(boolean saveEffects) {
-                    curMoveNumber++;
-                }
-
-                @Override
-                public void undo() {
-                    curMoveNumber = oldCurMoveNumber;
-                }
-            };
+            final UndoableCommand uc04UpdateMoveNo = UndoableCommand.updateValue(i -> curMoveNumber = i, oldCurMoveNumber, oldCurMoveNumber + 1);
             uc04UpdateMoveNo.execute(true);
+            subcommands.add(uc04UpdateMoveNo);
         }
 
         final int oldHandicapCtr = handicapStoneCounter;

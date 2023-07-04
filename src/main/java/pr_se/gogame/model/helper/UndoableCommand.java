@@ -5,6 +5,7 @@ import pr_se.gogame.view_controller.observer.GameEvent;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.function.Consumer;
 
 public abstract class UndoableCommand {
 
@@ -67,5 +68,23 @@ public abstract class UndoableCommand {
         });
 
         return ret;
+    }
+
+    public static <T> UndoableCommand updateValue(final Consumer<T> updateMethod, final T oldValue, final T newValue) {
+        if(updateMethod == null || oldValue == null || newValue == null) {
+            throw new NullPointerException();
+        }
+
+        return new UndoableCommand() {
+            @Override
+            public void execute(boolean saveEffects) {
+                updateMethod.accept(newValue);
+            }
+
+            @Override
+            public void undo() {
+                updateMethod.accept(oldValue);
+            }
+        };
     }
 }
