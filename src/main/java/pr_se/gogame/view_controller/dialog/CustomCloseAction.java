@@ -38,15 +38,15 @@ public final class CustomCloseAction {
             stage,
             alert,
             game,
-            () -> {
+            () -> {                 // onYes
                 if(e != null) {
                     e.consume();
                 }
 
                 Platform.exit();
             },
-            Platform::exit,
-            () -> {
+            Platform::exit,         // onNo
+            () -> {                 // onCancel
                 if(e != null) {
                     e.consume();
                 }

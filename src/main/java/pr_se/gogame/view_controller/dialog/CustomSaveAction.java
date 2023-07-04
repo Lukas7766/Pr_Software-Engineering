@@ -28,9 +28,9 @@ public class CustomSaveAction {
             switch (er.getText()) {
                 case "No" -> onNo.use();
                 case "Yes" -> {
-                    saveGame(game, stage, false);
-
-                    onYes.use();
+                    if(saveGame(game, stage, false)) {
+                        onYes.use();
+                    }
                 }
                 case "Cancel" -> onCancel.use();
                 default -> {
@@ -40,13 +40,13 @@ public class CustomSaveAction {
         });
     }
 
-    public static void saveGame(Game game, Stage stage, boolean as) {
+    public static boolean saveGame(Game game, Stage stage, boolean as) {
         File saveGameFile = game.getFileHandler().getCurrentFile();
 
         if (as || saveGameFile == null) {
             saveGameFile = CustomFileDialog.getFile(stage, true);
             if (saveGameFile == null) {
-                return;
+                return false;
             }
         }
         try {
@@ -58,5 +58,7 @@ public class CustomSaveAction {
         } catch(IllegalStateException isE) {
             CustomExceptionDialog.show(isE, "An error occurred while saving the game.\n\n" + isE.getMessage());
         }
+
+        return true;
     }
 }
