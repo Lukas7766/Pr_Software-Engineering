@@ -130,9 +130,9 @@ public class HeaderPane extends VBox {
                         CustomExceptionDialog.show(new IOException(), "Failed to load the game!");
                     }
                 } catch (NoSuchFileException nsfException) {
-                    CustomExceptionDialog.show(nsfException, "File " + f + " does not exist!");
-                } catch (LoadingGameException | IOException lgException) {
-                    CustomExceptionDialog.show(lgException, "Failed to load the game!", lgException.getMessage());
+                    CustomExceptionDialog.show(nsfException, nsfException.getMessage());
+                } catch (LoadingGameException | IOException exception) {
+                    CustomExceptionDialog.show(exception, "Failed to load the game!", exception.getMessage());
                     game.initGame();
                 }
             }

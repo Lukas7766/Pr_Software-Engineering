@@ -186,7 +186,7 @@ public class SGFFileHandler implements FileHandler {
             throw new NullPointerException();
         }
         if(!file.exists()) {
-            throw new NoSuchFileException(file + " does not exist!");
+            throw new NoSuchFileException("File " + file + " does not exist!");
         }
 
         currentFile = file;
