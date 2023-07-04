@@ -51,7 +51,7 @@ public class CustomSaveAction {
         }
         try {
             if (!game.getFileHandler().saveFile(saveGameFile)) {
-                CustomExceptionDialog.show(new IOException(), "Could not save the game!");
+                CustomExceptionDialog.show(new IOException(), "Failed to save the game!");
             }
         } catch (IOException e) {
             CustomExceptionDialog.show(e, "Could not save the game!", e.getMessage());

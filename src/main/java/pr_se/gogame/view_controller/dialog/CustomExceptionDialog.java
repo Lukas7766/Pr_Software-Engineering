@@ -27,7 +27,7 @@ public final class CustomExceptionDialog {
      * @param e     pass Exception
      */
     public static void show(Throwable e) {
-        show(e, null);
+        show(e, null, null);
     }
 
 
