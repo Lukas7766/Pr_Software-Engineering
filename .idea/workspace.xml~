@@ -33,7 +33,9 @@
       <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/tile.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/tile_corner.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/graphics images (delete eventually)/tile_edge.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/shade/Grafiksets/default.zip" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/src/main/java/pr_se/gogame/view_controller/BoardPane.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pr_se/gogame/view_controller/BoardPane.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/main/java/pr_se/gogame/view_controller/dialog/CustomExceptionDialog.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/main/java/pr_se/gogame/view_controller/dialog/CustomExceptionDialog.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -453,7 +455,7 @@
       <workItem from="1688473873398" duration="1682000" />
       <workItem from="1688476722754" duration="1184000" />
       <workItem from="1688486910442" duration="4700000" />
-      <workItem from="1688491908627" duration="1555000" />
+      <workItem from="1688491908627" duration="1867000" />
     </task>
     <task id="LOCAL-00001" summary="cleaned up some more">
       <created>1680974100453</created>
