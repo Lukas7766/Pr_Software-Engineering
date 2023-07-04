@@ -165,7 +165,32 @@ class GameTest {
         assertNotPossibleWhenGameOver(() -> game.pass());
     }
 
+    @Test
+    void dontResignBeforeGameStarted() {
+        assertNotPossibleDuringHandicapAndSetup(() -> game.resign());
+    }
 
+    @Test
+    void dontScoreBeforeGameStarted() {
+        assertNotPossibleDuringHandicapAndSetup(() -> game.scoreGame());
+    }
+
+    @Test
+    void dontResignWhenGameOver() {
+        assertNotPossibleWhenGameOver(() -> game.resign());
+    }
+
+    @Test
+    void dontScoreWhenGameOver() {
+        assertNotPossibleWhenGameOver(() -> game.scoreGame());
+    }
+
+    void assertNotPossibleDuringHandicapAndSetup(Executable ex) {
+        game.setSetupMode(true);
+        assertThrows(IllegalStateException.class, ex);
+        game.newGame(BLACK, 19, 9, new NewZealandRuleset());
+        assertThrows(IllegalStateException.class, ex);
+    }
 
     void assertNotPossibleWhenGameOver(Executable ex) {
         game.resign();
@@ -828,6 +853,22 @@ class GameTest {
         game.undo();
         game.redo();
         assertThrows(IllegalStateException.class, () -> game.resign());
+    }
+
+    @Test
+    void undoScoreGame() {
+        game.scoreGame();
+        assertThrows(IllegalStateException.class, () -> game.scoreGame());
+        game.undo();
+        assertDoesNotThrow(() -> game.scoreGame());
+    }
+
+    @Test
+    void redoScoreGame() {
+        undoScoreGame();
+        game.undo();
+        game.redo();
+        assertThrows(IllegalStateException.class, () -> game.scoreGame());
     }
 
     @Test
