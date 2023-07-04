@@ -472,7 +472,7 @@ public class Game implements GameInterface {
     public void rewind() {
         if(!history.isAtBeginning()) {
             if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
-                history.gotoBeginning();
+                history.goToBeginning();
             } else if(!history.isAtBeginning()) {
                 goBeforeFirstMove();
             }
@@ -485,10 +485,10 @@ public class Game implements GameInterface {
         if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
             goBeforeFirstMove();
             if(history.getCurrentNode() == n) {
-                history.gotoEnd();
+                history.goToEnd();
             }
         } else {
-            history.gotoEnd();
+            history.goToEnd();
         }
     }
 
@@ -502,16 +502,11 @@ public class Game implements GameInterface {
 
     @Override
     public void goToFirstMove() {
-        history.gotoBeginning();
+        history.goToBeginning();
 
         do {
             history.stepForward();
         } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP));
-    }
-
-    @Override
-    public void goToEnd() {
-        history.gotoEnd();
     }
 
     @Override
