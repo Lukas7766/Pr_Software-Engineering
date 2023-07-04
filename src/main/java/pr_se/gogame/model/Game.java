@@ -12,13 +12,12 @@ import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
-import static pr_se.gogame.model.helper.StoneColor.*;
 import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
+import static pr_se.gogame.model.helper.StoneColor.getOpposite;
 
 public class Game implements GameInterface {
 
