@@ -106,19 +106,9 @@ public class GameResult {
         return winner;
     }
 
-    public UndoableCommand setWinner(final StoneColor winner) {
+    public UndoableCommand setWinner(final StoneColor newWinner) {
         final StoneColor oldWinner = this.winner;
-        UndoableCommand ret = new UndoableCommand() {
-            @Override
-            public void execute(boolean saveEffects) {
-                GameResult.this.winner = winner;
-            }
-
-            @Override
-            public void undo() {
-                GameResult.this.winner = oldWinner;
-            }
-        };
+        UndoableCommand ret = UndoableCommand.updateValue(c -> winner = c, oldWinner, newWinner);
         ret.execute(true);
 
         return ret;

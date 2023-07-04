@@ -71,7 +71,7 @@ public abstract class UndoableCommand {
     }
 
     public static <T> UndoableCommand updateValue(final Consumer<T> updateMethod, final T oldValue, final T newValue) {
-        if(updateMethod == null || oldValue == null || newValue == null) {
+        if(updateMethod == null) {
             throw new NullPointerException();
         }
 
