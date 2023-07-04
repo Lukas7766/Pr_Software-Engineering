@@ -388,6 +388,10 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't place setup stone when gameState is " + gameState);
         }
 
+        if(color == null) {
+            throw new NullPointerException();
+        }
+
         placeStone(x, y, color, SETUP);
     }
 
@@ -419,7 +423,7 @@ public class Game implements GameInterface {
         }
     }
 
-    private void placeStone(int x, int y, StoneColor color, History.HistoryNode.AbstractSaveToken saveToken) {
+    private void placeStone(final int x, final int y, final StoneColor color, final History.HistoryNode.AbstractSaveToken saveToken) {
         if (color == null || saveToken == null) {
             throw new NullPointerException();
         }
