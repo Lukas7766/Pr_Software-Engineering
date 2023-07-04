@@ -12,8 +12,10 @@ import pr_se.gogame.model.ruleset.Ruleset;
 import pr_se.gogame.view_controller.observer.GameEvent;
 import pr_se.gogame.view_controller.observer.GameListener;
 
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 
 import static pr_se.gogame.model.helper.StoneColor.*;
 import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
@@ -371,13 +373,9 @@ public class Game implements GameInterface {
         checkCoords(x, y);
 
         List<UndoableCommand> subcommands = new LinkedList<>();
-        final UndoableCommand uc01SetColor;
 
         if(saveToken == MOVE) {
-            uc01SetColor = setCurColor(color);
-            subcommands.add(uc01SetColor);
-        } else {
-            uc01SetColor = null;
+            subcommands.add(setCurColor(color));
         }
 
         final int oldCurMoveNumber = curMoveNumber;
@@ -390,8 +388,9 @@ public class Game implements GameInterface {
         }
 
         if (uc02SetStone == null) {
-            if(uc01SetColor != null) {
-                uc01SetColor.undo();
+            ListIterator<UndoableCommand> reverseIter = subcommands.listIterator(subcommands.size());
+            while(reverseIter.hasPrevious()) {
+                reverseIter.previous().undo();
             }
             return false;
         }
@@ -403,8 +402,10 @@ public class Game implements GameInterface {
         if(saveToken == MOVE) {
             final UndoableCommand uc03IsKo = ruleset.isKo(this);
             if(uc03IsKo == null) {
-                uc02SetStone.undo();
-                uc01SetColor.undo();
+                ListIterator<UndoableCommand> reverseIter = subcommands.listIterator(subcommands.size());
+                while(reverseIter.hasPrevious()) {
+                    reverseIter.previous().undo();
+                }
                 return false;
             }
             subcommands.add(uc03IsKo);
