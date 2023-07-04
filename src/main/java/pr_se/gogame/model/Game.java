@@ -425,7 +425,7 @@ public class Game implements GameInterface {
         }
 
         history.addNode(new History.HistoryNode(ret, saveToken, color, "", x, y));
-        removeAllMarks();
+        hideAllMarks();
         ret.getExecuteEvents().forEach(this::fireGameEvent);
 
         return true;
@@ -461,21 +461,21 @@ public class Game implements GameInterface {
     // Methods controlling the history
     @Override
     public void undo() {
-        removeAllMarks();
+        hideAllMarks();
         history.stepBack();
         reDisplayMarks();
     }
 
     @Override
     public void redo() {
-        removeAllMarks();
+        hideAllMarks();
         history.stepForward();
         reDisplayMarks();
     }
 
     @Override
     public void rewind() {
-        removeAllMarks();
+        hideAllMarks();
         if(!history.isAtBeginning()) {
             if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
                 history.rewind();
@@ -488,7 +488,7 @@ public class Game implements GameInterface {
 
     @Override
     public void fastForward() {
-        removeAllMarks();
+        hideAllMarks();
         History.HistoryNode n = history.getCurrentNode();
         if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
             goBeforeFirstMove();
@@ -504,7 +504,7 @@ public class Game implements GameInterface {
     @Override
     public void goBeforeFirstMove() {
         goToFirstMove();
-        removeAllMarks();
+        hideAllMarks();
         if(history.getCurrentNode().getSaveToken() != SETUP && history.getCurrentNode().getSaveToken() != HANDICAP) {
             history.stepBack();
         }
@@ -513,7 +513,7 @@ public class Game implements GameInterface {
 
     @Override
     public void goToFirstMove() {
-        removeAllMarks();
+        hideAllMarks();
         history.rewind();
 
         do {
@@ -524,7 +524,7 @@ public class Game implements GameInterface {
 
     @Override
     public void goToEnd() {
-        removeAllMarks();
+        hideAllMarks();
         history.skipToEnd();
         reDisplayMarks();
     }
@@ -621,7 +621,7 @@ public class Game implements GameInterface {
         return ret;
     }
 
-    private void removeAllMarks() {
+    private void hideAllMarks() {
         history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), curMoveNumber)));
     }
 

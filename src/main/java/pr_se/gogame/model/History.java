@@ -86,40 +86,7 @@ public class History implements Iterable<History.HistoryNode> {
         return current.getPrev() == null;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if(this == o) {
-            return true;
-        }
-        if(o == null || getClass() != o.getClass()) {
-            return false;
-        }
-
-        History h = (History)o;
-
-        Iterator<HistoryNode> otherIter = h.iterator();
-        for(HistoryNode hn : this) {
-            if(!hn.equals(otherIter.next())) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
-    @Override
-    public int hashCode() {
-        List<Object> valueList = new LinkedList<>();
-
-        for (HistoryNode historyNode : this) {
-            valueList.add(historyNode);
-        }
-
-        valueList.add(game);
-
-        return Objects.hash(valueList.toArray());
-    }
-
+    // Methods from Iterable
     @Override
     public Iterator<HistoryNode> iterator() {
         return new Iterator<>() {
@@ -154,7 +121,41 @@ public class History implements Iterable<History.HistoryNode> {
         return Iterable.super.spliterator();
     }
 
-    // Overridden Methods from Object
+    // Methods from Object
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) {
+            return true;
+        }
+        if(o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        History h = (History)o;
+
+        Iterator<HistoryNode> otherIter = h.iterator();
+        for(HistoryNode hn : this) {
+            if(!hn.equals(otherIter.next())) {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        List<Object> valueList = new LinkedList<>();
+
+        for (HistoryNode historyNode : this) {
+            valueList.add(historyNode);
+        }
+
+        valueList.add(game);
+
+        return Objects.hash(valueList.toArray());
+    }
+
     @Override
     public String toString() {
         StringBuilder retVal = new StringBuilder("History \n");
