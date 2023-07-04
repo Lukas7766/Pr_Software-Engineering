@@ -31,7 +31,6 @@ public final class CustomCloseAction {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Go Game - Close Game");
         alert.setHeaderText("Do you want to save your Game before closing?");
-        alert.setContentText("Choose your option:");
         alert.initOwner(stage);
 
         CustomSaveAction.onSaveAction(
