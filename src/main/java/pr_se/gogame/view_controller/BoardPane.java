@@ -542,7 +542,7 @@ public class BoardPane extends GridPane {
 
             lastGraphicsPackFileName = GlobalSettings.getGraphicsPackFileName();
         } catch (Exception e) {
-            CustomExceptionDialog.show(e, "Couldn't open graphics pack " + graphicsPath + "!");
+            CustomExceptionDialog.show(e, "Couldn't open graphics pack \"" + graphicsPath + "\"!", e.getMessage());
             GlobalSettings.setGraphicsPackFileName(lastGraphicsPackFileName);
         }
     }
@@ -561,8 +561,7 @@ public class BoardPane extends GridPane {
         ZipEntry zipEntry = zip.getEntry(fileName);
 
         if(zipEntry == null) {
-            CustomExceptionDialog.show(new IOException(), "File " + fileName + " is not present in graphics pack " + graphicsPath + "!");
-            throw new IOException();
+            throw new IOException("File " + fileName + " is not present in graphics pack \"" + graphicsPath + "\"!");
         }
 
         Image ret;
@@ -578,8 +577,7 @@ public class BoardPane extends GridPane {
                 true,               // preserveRatio
                 SMOOTH_IMAGES);     // smooth
         } catch (IOException e) {
-            CustomExceptionDialog.show(e, "File " + fileName + " appears to be present but unreadable in graphics pack " + graphicsPath + "!");
-            throw new IOException();
+            throw new IOException("File " + fileName + " appears to be present but unreadable in graphics pack \"" + graphicsPath + "\"! (" + e.getMessage() + ")");
         }
 
         return ret;

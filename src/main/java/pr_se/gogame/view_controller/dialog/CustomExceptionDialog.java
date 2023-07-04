@@ -32,11 +32,16 @@ public final class CustomExceptionDialog {
 
 
     public static void show(Throwable e, String message) {
+        show(e, message, null);
+    }
 
+    public static void show(Throwable e, String headerMessage, String contentMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
 
-        alert.setHeaderText(message != null ? message : "An error occurred!");
+        alert.setHeaderText(headerMessage != null ? headerMessage : "An error occurred!");
+
+        alert.setContentText(contentMessage != null ? contentMessage : "");
 
         if (stage != null) {
             alert.initOwner(stage);
