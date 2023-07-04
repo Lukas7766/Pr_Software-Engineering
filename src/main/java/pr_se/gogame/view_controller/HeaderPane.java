@@ -531,7 +531,7 @@ public class HeaderPane extends VBox {
         graphicsPackSelectorComboBox.setMinWidth(125);
         graphicsPackSelectorComboBox.setTranslateX(-15);
         graphicsPackSelectorComboBox.setFocusTraversable(false);
-        graphicsPackSelectorComboBox.setOnAction(e -> GlobalSettings.setGraphicsPackFileName("/" + graphicsPackSelectorComboBox.getValue()));
+        graphicsPackSelectorComboBox.setOnAction(e -> GlobalSettings.setGraphicsPackFileName(graphicsPackSelectorComboBox.getValue()));
 
         GlobalSettings.addListener(new ViewListener() {
             @Override
@@ -540,10 +540,10 @@ public class HeaderPane extends VBox {
                 pass.setText(game.isSetupMode() ? "Switch color" : passText);
                 resign.setDisable(game.getGameState() != Game.GameState.RUNNING);
                 scoreGame.setDisable(game.getGameState() != Game.GameState.RUNNING);
-                
+
                 EventHandler<ActionEvent> comboBoxHandler = graphicsPackSelectorComboBox.getOnAction();
                 graphicsPackSelectorComboBox.setOnAction(null);
-                graphicsPackSelectorComboBox.setValue(GlobalSettings.getGraphicsPackFileName().substring(1));
+                graphicsPackSelectorComboBox.setValue(GlobalSettings.getGraphicsPackFileName());
                 graphicsPackSelectorComboBox.setOnAction(comboBoxHandler);
             }
 
@@ -552,8 +552,6 @@ public class HeaderPane extends VBox {
                 // Move confirmation does not pertain to this.
             }
         });
-
-        gameShortCuts.getChildren().add(graphicsPackSelectorComboBox);
 
         gameCards.getChildren().add(graphicsPackSelectorComboBox);
         hotbar.getChildren().add(gameCards);

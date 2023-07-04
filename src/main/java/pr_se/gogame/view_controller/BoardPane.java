@@ -154,6 +154,7 @@ public class BoardPane extends GridPane {
         this.showsMoveNumbers = GlobalSettings.isShowMoveNumbers();
         this.showsCoordinates = GlobalSettings.isShowCoordinates();
         this.needsMoveConfirmation = GlobalSettings.isConfirmationNeeded();
+        this.lastGraphicsPackFileName = GlobalSettings.getGraphicsPackFileName();
 
         GlobalSettings.addListener(new ViewListener() {
             @Override
