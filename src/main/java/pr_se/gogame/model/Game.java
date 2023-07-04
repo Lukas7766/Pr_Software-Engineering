@@ -165,33 +165,7 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't resign if game isn't running! gameState was " + gameState);
         }
 
-        List<UndoableCommand> subcommands = new LinkedList<>();
-        subcommands.add(ruleset.scoreGame(this));
-        subcommands.add(gameResult.setWinner(StoneColor.getOpposite(curColor)));
-        subcommands.add(gameResult.setDescription(curColor, "Game was resigned by " + curColor + "!"));
-        subcommands.add(gameResult.setDescription(StoneColor.getOpposite(curColor), StoneColor.getOpposite(curColor) + " won!"));
-
-        UndoableCommand c = new UndoableCommand() {
-            @Override
-            public void execute(final boolean saveEffects) {
-                gameState = GameState.GAME_OVER;
-            }
-
-            @Override
-            public void undo() {
-                gameState = GameState.RUNNING;
-            }
-        };
-        c.execute(true);
-        c.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
-        c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
-        c.getExecuteEvents().forEach(this::fireGameEvent);
-
-        subcommands.add(c);
-
-        UndoableCommand ret = UndoableCommand.of(subcommands);
-
-        history.addNode(new History.HistoryNode(ret, History.HistoryNode.AbstractSaveToken.RESIGN, curColor, ""));
+        endGame(History.HistoryNode.AbstractSaveToken.RESIGN);
     }
 
     @Override
@@ -206,9 +180,26 @@ public class Game implements GameInterface {
             throw new IllegalStateException("Can't score game if it isn't running! gameState was " + gameState);
         }
 
+        endGame(History.HistoryNode.AbstractSaveToken.SCORED_GAME);
+    }
+
+    private void endGame(History.HistoryNode.AbstractSaveToken saveToken) {
+        if(saveToken == null) {
+            throw new NullPointerException();
+        }
+
+        if(saveToken != History.HistoryNode.AbstractSaveToken.SCORED_GAME && saveToken != History.HistoryNode.AbstractSaveToken.RESIGN) {
+            throw new IllegalArgumentException("AbstractSaveToken " + saveToken + " invalid for endGame() method");
+        }
+
         List<UndoableCommand> subcommands = new LinkedList<>();
 
         subcommands.add(ruleset.scoreGame(this));
+        if(saveToken == History.HistoryNode.AbstractSaveToken.RESIGN) {
+            subcommands.add(gameResult.setWinner(StoneColor.getOpposite(curColor)));
+            subcommands.add(gameResult.setDescription(curColor, "Game was resigned by " + curColor + "!"));
+            subcommands.add(gameResult.setDescription(StoneColor.getOpposite(curColor), StoneColor.getOpposite(curColor) + " won!"));
+        }
 
         UndoableCommand c = new UndoableCommand() {
             @Override
@@ -221,16 +212,15 @@ public class Game implements GameInterface {
                 gameState = GameState.RUNNING;
             }
         };
-        c.execute(true);
         c.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
         c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
-        c.getExecuteEvents().forEach(this::fireGameEvent);
-
         subcommands.add(c);
 
         UndoableCommand ret = UndoableCommand.of(subcommands);
+        ret.execute(true);
+        ret.getExecuteEvents().forEach(this::fireGameEvent);
 
-        history.addNode(new History.HistoryNode(ret, History.HistoryNode.AbstractSaveToken.SCORED_GAME, curColor, ""));
+        history.addNode(new History.HistoryNode(c, saveToken, curColor, ""));
     }
 
     @Override
