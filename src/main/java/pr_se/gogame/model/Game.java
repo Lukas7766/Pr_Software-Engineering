@@ -425,7 +425,6 @@ public class Game implements GameInterface {
         }
 
         history.addNode(new History.HistoryNode(ret, saveToken, color, "", x, y));
-        hideAllMarks();
         ret.getExecuteEvents().forEach(this::fireGameEvent);
 
         return true;
@@ -461,21 +460,16 @@ public class Game implements GameInterface {
     // Methods controlling the history
     @Override
     public void undo() {
-        hideAllMarks();
         history.stepBack();
-        showAllMarks();
     }
 
     @Override
     public void redo() {
-        hideAllMarks();
         history.stepForward();
-        showAllMarks();
     }
 
     @Override
     public void rewind() {
-        hideAllMarks();
         if(!history.isAtBeginning()) {
             if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
                 history.gotoBeginning();
@@ -483,12 +477,10 @@ public class Game implements GameInterface {
                 goBeforeFirstMove();
             }
         }
-        showAllMarks();
     }
 
     @Override
     public void fastForward() {
-        hideAllMarks();
         History.HistoryNode n = history.getCurrentNode();
         if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
             goBeforeFirstMove();
@@ -498,35 +490,28 @@ public class Game implements GameInterface {
         } else {
             history.gotoEnd();
         }
-        showAllMarks();
     }
 
     @Override
     public void goBeforeFirstMove() {
         goToFirstMove();
-        hideAllMarks();
         if(history.getCurrentNode().getSaveToken() != SETUP && history.getCurrentNode().getSaveToken() != HANDICAP) {
             history.stepBack();
         }
-        showAllMarks();
     }
 
     @Override
     public void goToFirstMove() {
-        hideAllMarks();
         history.gotoBeginning();
 
         do {
             history.stepForward();
         } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP));
-        showAllMarks();
     }
 
     @Override
     public void goToEnd() {
-        hideAllMarks();
         history.gotoEnd();
-        showAllMarks();
     }
 
     @Override
@@ -618,14 +603,6 @@ public class Game implements GameInterface {
         ret.execute(true);
 
         return ret;
-    }
-
-    private void hideAllMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), curMoveNumber)));
-    }
-
-    private void showAllMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.getX(), key.getY(), value));
     }
 
     private void checkCoords(int x, int y) {
