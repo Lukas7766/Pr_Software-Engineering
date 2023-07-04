@@ -542,9 +542,6 @@ public class BoardPane extends GridPane {
             handicapSlot = loadImageFromGraphicsPack("handicap_slot.png", zip);
 
             lastGraphicsPackFileName = GlobalSettings.getGraphicsPackFileName();
-        } catch (NoSuchFileException e) {
-            CustomExceptionDialog.show(e, "Couldn't find graphics pack \"" + graphicsPath + "\"!");
-            GlobalSettings.setGraphicsPackFileName(lastGraphicsPackFileName);
         } catch (IOException e) {
             CustomExceptionDialog.show(e, "Couldn't open graphics pack \"" + graphicsPath + "\"!", e.getMessage());
             GlobalSettings.setGraphicsPackFileName(lastGraphicsPackFileName);
