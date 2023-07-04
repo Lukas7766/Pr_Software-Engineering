@@ -212,15 +212,16 @@ public class Game implements GameInterface {
                 gameState = GameState.RUNNING;
             }
         };
-        c.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
-        c.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
+        c.execute(true);
+
         subcommands.add(c);
 
         UndoableCommand ret = UndoableCommand.of(subcommands);
-        ret.execute(true);
+        ret.getExecuteEvents().add(new GameEvent(GameCommand.GAME_WON));
+        ret.getUndoEvents().add(new GameEvent(GameCommand.UPDATE));
         ret.getExecuteEvents().forEach(this::fireGameEvent);
 
-        history.addNode(new History.HistoryNode(c, saveToken, curColor, ""));
+        history.addNode(new History.HistoryNode(ret, saveToken, curColor, ""));
     }
 
     @Override
