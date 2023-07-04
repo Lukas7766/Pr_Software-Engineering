@@ -21,7 +21,7 @@ public final class CustomNewGameAction {
      */
     public static void onNewGameAction(Stage stage, Game game) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
-        alert.setTitle("Go Game - Save Game");
+        alert.setTitle("Go Game - New Game");
         alert.setHeaderText("Do you want to save your game before starting a new one?");
         alert.setContentText("Choose your option:");
         alert.initOwner(stage);
