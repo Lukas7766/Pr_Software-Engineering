@@ -1,13 +1,13 @@
 package pr_se.gogame.model;
 
-import pr_se.gogame.model.helper.MarkShape;
-import pr_se.gogame.model.helper.Position;
-import pr_se.gogame.model.helper.StoneColor;
-import pr_se.gogame.model.helper.UndoableCommand;
+import pr_se.gogame.model.helper.*;
 import pr_se.gogame.view_controller.observer.GameEvent;
 
 import java.util.*;
 import java.util.function.Consumer;
+
+import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.HANDICAP;
+import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.SETUP;
 
 public class History implements Iterable<History.HistoryNode> {
     private final HistoryNode beginning = new HistoryNode(null, HistoryNode.AbstractSaveToken.BEGINNING_OF_HISTORY, null, "");
@@ -26,22 +26,24 @@ public class History implements Iterable<History.HistoryNode> {
         current.setNext(end);
     }
 
-    public void rewind() {
+    public void goToBeginning() {
         while(stepBack());
     }
 
-    public void skipToEnd() {
+    public void goToEnd() {
         while(stepForward());
     }
 
     public boolean stepBack() {
-        if(current.getPrev() != null) {
+        if(!isAtBeginning()) {
+            hideAllMarks();
             current.getCommand().undo();
             ListIterator<GameEvent> i = current.getCommand().getUndoEvents().listIterator(current.getCommand().getUndoEvents().size());
             current = current.getPrev();
             while(i.hasPrevious()) {
                 game.fireGameEvent(i.previous());
             }
+            showAllMarks();
 
             return true;
         }
@@ -51,14 +53,31 @@ public class History implements Iterable<History.HistoryNode> {
 
     public boolean stepForward() {
         if(!isAtEnd()) {
+            hideAllMarks();
             current = current.getNext();
             current.getCommand().execute(false);
             current.getCommand().getExecuteEvents().forEach(game::fireGameEvent);
+            showAllMarks();
 
             return true;
         }
 
         return false;
+    }
+
+    public void goBeforeFirstMove() {
+        goToFirstMove();
+        if(current.getSaveToken() != SETUP && current.getSaveToken() != HANDICAP) {
+            stepBack();
+        }
+    }
+
+    public void goToFirstMove() {
+        goToBeginning();
+
+        do {
+            stepForward();
+        } while(!isAtEnd() && (current.getSaveToken() == HANDICAP || current.getSaveToken() == SETUP));
     }
 
     public void addNode(HistoryNode addedNode) {
@@ -69,6 +88,7 @@ public class History implements Iterable<History.HistoryNode> {
             throw new IllegalArgumentException("Cannot add the same node again, as that would create a cycle!");
         }
 
+        hideAllMarks();
         current.setNext(addedNode);
         current = current.getNext();
         current.setNext(end);
@@ -86,6 +106,42 @@ public class History implements Iterable<History.HistoryNode> {
         return current.getPrev() == null;
     }
 
+    // Methods from Iterable
+    @Override
+    public Iterator<HistoryNode> iterator() {
+        return new Iterator<>() {
+
+            HistoryNode node = beginning;
+
+            @Override
+            public boolean hasNext() {
+                return node != null;
+            }
+
+            @Override
+            public HistoryNode next() {
+                if(hasNext()) {
+                    HistoryNode ret = node;
+                    node = node.getNext();
+                    return ret;
+                } else {
+                    throw new NoSuchElementException();
+                }
+            }
+        };
+    }
+
+    @Override
+    public void forEach(Consumer<? super HistoryNode> action) {
+        Iterable.super.forEach(action);
+    }
+
+    @Override
+    public Spliterator<HistoryNode> spliterator() {
+        return Iterable.super.spliterator();
+    }
+
+    // Methods from Object
     @Override
     public boolean equals(Object o) {
         if(this == o) {
@@ -121,45 +177,19 @@ public class History implements Iterable<History.HistoryNode> {
     }
 
     @Override
-    public Iterator<HistoryNode> iterator() {
-        return new Iterator<>() {
-
-            HistoryNode node = beginning;
-
-            @Override
-            public boolean hasNext() {
-                return node != null;
-            }
-
-            @Override
-            public HistoryNode next() {
-                if(hasNext()) {
-                    HistoryNode ret = node;
-                    node = node.getNext();
-                    return ret;
-                } else {
-                    throw new NoSuchElementException();
-                }
-            }
-        };
-    }
-
-    @Override
-    public void forEach(Consumer<? super HistoryNode> action) {
-        Iterable.super.forEach(action);
-    }
-
-    @Override
-    public Spliterator<HistoryNode> spliterator() {
-        return Iterable.super.spliterator();
-    }
-
-    // Overridden Methods from Object
-    @Override
     public String toString() {
         StringBuilder retVal = new StringBuilder("History \n");
         this.forEach(hn -> retVal.append(hn.toString()).append("\n"));
         return retVal.toString();
+    }
+
+    // private methods
+    private void hideAllMarks() {
+        current.getMarks().forEach((key, value) -> game.fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), game.getCurMoveNumber())));
+    }
+
+    private void showAllMarks() {
+        current.getMarks().forEach((key, value) -> game.mark(key.getX(), key.getY(), value));
     }
 
     // inner classes

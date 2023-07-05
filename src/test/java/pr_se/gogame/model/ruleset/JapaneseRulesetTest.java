@@ -161,15 +161,23 @@ class JapaneseRulesetTest {
     @Test
     void isKo() {
         Game game = loadFile("KoSituation.sgf");
-        game.goToEnd();
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
     }
 
     @Test
+    void undoIsKo() { // You can't really test anything specific in the JapaneseRuleset; this is just for coverage.
+        Game game = loadFile("KoSituation.sgf");
+        assertTrue(game.playMove(2, 1));
+        assertFalse(game.playMove(1, 1));
+        game.getHistory().stepBack();
+        assertNull(game.getColorAt(2, 1));
+    }
+
+    @Test
     void reset() {
         Game game = loadFile("KoSituation.sgf");
-        game.goToEnd();
+        game.getHistory().goToEnd();
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
 

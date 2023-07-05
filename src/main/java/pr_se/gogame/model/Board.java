@@ -4,6 +4,7 @@ import pr_se.gogame.model.helper.GameCommand;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
+import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.view_controller.observer.DebugEvent;
 import pr_se.gogame.view_controller.observer.GameEvent;
 
@@ -174,11 +175,15 @@ public class Board implements BoardInterface {
             }
         }
 
+        GameResult gameResult = game.getGameResult();
+
         if(totalCaptured > 0) {
-            subCommands.add(game.addCapturedStones(color, totalCaptured));
+            int oldAmount = gameResult.getScoreComponents(color).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
+            subCommands.add(gameResult.addScoreComponent(color, GameResult.PointType.CAPTURED_STONES, oldAmount + totalCaptured));
         }
         if(totalSuicide > 0) {
-            subCommands.add(game.addCapturedStones(StoneColor.getOpposite(color), totalSuicide));
+            int oldAmount = gameResult.getScoreComponents(color).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
+            subCommands.add(gameResult.addScoreComponent(color, GameResult.PointType.CAPTURED_STONES, oldAmount + totalSuicide));
         }
 
         return UndoableCommand.of(subCommands);

@@ -410,7 +410,7 @@ class BoardTest {
             e.printStackTrace();
             fail();
         }
-        game.goToEnd();
+        game.getHistory().goToEnd();
 
         board = new Board(game, game.getSize());
 

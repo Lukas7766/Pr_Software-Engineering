@@ -425,23 +425,9 @@ public class Game implements GameInterface {
         }
 
         history.addNode(new History.HistoryNode(ret, saveToken, color, "", x, y));
-        removeAllMarks();
         ret.getExecuteEvents().forEach(this::fireGameEvent);
 
         return true;
-    }
-
-    @Override
-    public UndoableCommand addCapturedStones(final StoneColor color, final int amount) {
-        if (color == null) {
-            throw new NullPointerException();
-        }
-        if (amount < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        int oldAmount = gameResult.getScoreComponents(color).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
-        return gameResult.addScoreComponent(color, GameResult.PointType.CAPTURED_STONES, oldAmount + amount);
     }
 
     void fireGameEvent(GameEvent e) { // package-private by design
@@ -456,77 +442,6 @@ public class Game implements GameInterface {
 
     public void printDebugInfo(int x, int y) {
         board.printDebugInfo(x, y);
-    }
-
-    // Methods controlling the history
-    @Override
-    public void undo() {
-        removeAllMarks();
-        history.stepBack();
-        reDisplayMarks();
-    }
-
-    @Override
-    public void redo() {
-        removeAllMarks();
-        history.stepForward();
-        reDisplayMarks();
-    }
-
-    @Override
-    public void rewind() {
-        removeAllMarks();
-        if(!history.isAtBeginning()) {
-            if((history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP)) {
-                history.rewind();
-            } else if(!history.isAtBeginning()) {
-                goBeforeFirstMove();
-            }
-        }
-        reDisplayMarks();
-    }
-
-    @Override
-    public void fastForward() {
-        removeAllMarks();
-        History.HistoryNode n = history.getCurrentNode();
-        if(n.getSaveToken() == BEGINNING_OF_HISTORY || n.getSaveToken() == HANDICAP || n.getSaveToken() == SETUP) {
-            goBeforeFirstMove();
-            if(history.getCurrentNode() == n) {
-                history.skipToEnd();
-            }
-        } else {
-            history.skipToEnd();
-        }
-        reDisplayMarks();
-    }
-
-    @Override
-    public void goBeforeFirstMove() {
-        goToFirstMove();
-        removeAllMarks();
-        if(history.getCurrentNode().getSaveToken() != SETUP && history.getCurrentNode().getSaveToken() != HANDICAP) {
-            history.stepBack();
-        }
-        reDisplayMarks();
-    }
-
-    @Override
-    public void goToFirstMove() {
-        removeAllMarks();
-        history.rewind();
-
-        do {
-            history.stepForward();
-        } while(!history.isAtEnd() && (history.getCurrentNode().getSaveToken() == HANDICAP || history.getCurrentNode().getSaveToken() == SETUP));
-        reDisplayMarks();
-    }
-
-    @Override
-    public void goToEnd() {
-        removeAllMarks();
-        history.skipToEnd();
-        reDisplayMarks();
     }
 
     @Override
@@ -598,7 +513,6 @@ public class Game implements GameInterface {
 
 
     // private methods
-
     private UndoableCommand switchColor() {
         UndoableCommand ret = setCurColor(StoneColor.getOpposite(curColor));
         ret.getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
@@ -619,14 +533,6 @@ public class Game implements GameInterface {
         ret.execute(true);
 
         return ret;
-    }
-
-    private void removeAllMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> fireGameEvent(new GameEvent(GameCommand.UNMARK, key.getX(), key.getY(), curMoveNumber)));
-    }
-
-    private void reDisplayMarks() {
-        history.getCurrentNode().getMarks().forEach((key, value) -> mark(key.getX(), key.getY(), value));
     }
 
     private void checkCoords(int x, int y) {

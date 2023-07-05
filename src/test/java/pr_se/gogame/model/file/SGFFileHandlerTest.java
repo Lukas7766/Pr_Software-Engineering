@@ -205,11 +205,11 @@ class SGFFileHandlerTest {
     @Test
     void whiteHandicapExtended() {
         whiteHandicap();
-        game.getHistory().rewind();
+        game.getHistory().goToBeginning();
         assertEquals(WHITE, game.getCurColor());
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(WHITE, game.getCurColor());
-        game.redo();
+        game.getHistory().stepForward();
         assertEquals(BLACK, game.getCurColor());
     }
 

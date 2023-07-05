@@ -96,8 +96,6 @@ public interface GameInterface {
 
     void placeSetupStone(int x, int y, StoneColor color);
 
-    UndoableCommand addCapturedStones(StoneColor color, int amount);
-
     StoneColor getColorAt(int x, int y);
 
     StoneColor getCurColor();
@@ -124,22 +122,6 @@ public interface GameInterface {
     void setSetupMode(boolean setupMode);
 
     boolean isSetupMode();
-
-    //##################################################################################################################
-    // Methods controlling the history
-    void undo();
-
-    void redo();
-
-    void rewind();
-
-    void fastForward();
-
-    void goBeforeFirstMove();
-
-    void goToFirstMove();
-
-    void goToEnd();
 
     //##################################################################################################################
     // Methods related to file handling

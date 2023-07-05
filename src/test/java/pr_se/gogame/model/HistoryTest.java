@@ -46,7 +46,7 @@ class HistoryTest {
         assertTrue(history.isAtBeginning());
         game.playMove(0, 0);
         assertFalse(history.isAtBeginning());
-        history.rewind();
+        history.goToBeginning();
         assertTrue(history.isAtBeginning());
         assertNull(game.getColorAt(0, 0));
     }
@@ -56,7 +56,7 @@ class HistoryTest {
         assertTrue(history.isAtEnd());
         rewind();
         assertFalse(history.isAtEnd());
-        history.skipToEnd();
+        history.goToEnd();
         assertTrue(history.isAtEnd());
         assertEquals(BLACK, game.getColorAt(0, 0));
     }
@@ -79,6 +79,76 @@ class HistoryTest {
         assertTrue(history.isAtEnd());
         assertFalse(history.isAtBeginning());
         assertEquals(BLACK, game.getColorAt(0, 0));
+    }
+
+    @Test
+    void goBeforeFirstMove() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        game.setSetupMode(false);
+        game.playMove(5, 5);
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getColorAt(5, 5));
+
+        history.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertNull(game.getColorAt(5, 5));
+
+        history.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+        assertNull(game.getColorAt(5, 5));
+    }
+
+    @Test
+    void goBeforeFirstMoveWithoutMoves() {
+        game.setSetupMode(true);
+        game.placeSetupStone(0, 0, BLACK);
+        history.goBeforeFirstMove();
+        assertEquals(BLACK, game.getColorAt(0, 0));
+    }
+
+    @Test
+    void goBeforeFirstMoveWithHandicap() {
+        goBeforeFirstMoveWithHandicapWithoutMoves();
+        game.playMove(0, 0);
+        history.goBeforeFirstMove();
+        assertNull(game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getColorAt(game.getSize() / 2, game.getSize() / 2));
+    }
+
+    @Test
+    void goBeforeFirstMoveWithHandicapWithoutMoves() {
+        game.newGame(BLACK, 19, 9, new JapaneseRuleset());
+        history = game.getHistory();
+        history.goBeforeFirstMove();
+        assertNull(game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getColorAt(game.getSize() / 2, game.getSize() / 2));
+    }
+
+    @Test
+    void goBeforeFirstMoveWithoutPreparation() {
+        game.playMove(0, 0);
+        history.goBeforeFirstMove();
+        assertNull(game.getColorAt(0, 0));
+    }
+
+    @Test
+    void goToFirstMove() {
+        game.playMove(1, 1);
+        game.playMove(2, 2);
+        history.goToFirstMove();
+        assertNull(game.getColorAt(2, 2));
+        assertEquals(BLACK, game.getColorAt(1, 1));
+    }
+
+    @Test
+    void goToFirstMoveWithoutMoves() {
+        game.setSetupMode(true);
+        game.placeSetupStone(1, 1, BLACK);
+        game.placeSetupStone(2, 2, WHITE);
+        history.goToFirstMove();
+        assertEquals(BLACK, game.getColorAt(1, 1));
+        assertEquals(WHITE, game.getColorAt(2, 2));
     }
 
     @Test
@@ -105,7 +175,7 @@ class HistoryTest {
     void isAtEnd() {
         assertTrue(history.isAtEnd());
         assertTrue(history.isAtBeginning());
-        history.rewind();
+        history.goToBeginning();
         assertTrue(history.isAtEnd());
         assertTrue(history.isAtBeginning());
         game.playMove(0, 0);

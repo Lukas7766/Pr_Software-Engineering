@@ -360,8 +360,6 @@ public class SGFFileHandler implements FileHandler {
 
         }
 
-        game.goToFirstMove();
-
         return true;
     }
 
