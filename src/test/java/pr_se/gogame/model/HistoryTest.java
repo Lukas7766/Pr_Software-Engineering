@@ -108,6 +108,31 @@ class HistoryTest {
     }
 
     @Test
+    void goBeforeFirstMoveWithHandicap() {
+        goBeforeFirstMoveWithHandicapWithoutMoves();
+        game.playMove(0, 0);
+        history.goBeforeFirstMove();
+        assertNull(game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getColorAt(game.getSize() / 2, game.getSize() / 2));
+    }
+
+    @Test
+    void goBeforeFirstMoveWithHandicapWithoutMoves() {
+        game.newGame(BLACK, 19, 9, new JapaneseRuleset());
+        history = game.getHistory();
+        history.goBeforeFirstMove();
+        assertNull(game.getColorAt(0, 0));
+        assertEquals(BLACK, game.getColorAt(game.getSize() / 2, game.getSize() / 2));
+    }
+
+    @Test
+    void goBeforeFirstMoveWithoutPreparation() {
+        game.playMove(0, 0);
+        history.goBeforeFirstMove();
+        assertNull(game.getColorAt(0, 0));
+    }
+
+    @Test
     void goToFirstMove() {
         game.playMove(1, 1);
         game.playMove(2, 2);
