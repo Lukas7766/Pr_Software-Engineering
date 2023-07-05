@@ -166,7 +166,7 @@ class JapaneseRulesetTest {
     }
 
     @Test
-    void undoIsKo() {
+    void undoIsKo() { // You can't really test anything specific in the JapaneseRuleset; this is just for coverage.
         Game game = loadFile("KoSituation.sgf");
         assertTrue(game.playMove(2, 1));
         assertFalse(game.playMove(1, 1));
