@@ -80,12 +80,6 @@ class GameTest {
     }
 
     @Test
-    void addCapturedStonesArguments() {
-        assertThrows(NullPointerException.class, () -> game.addCapturedStones(null, 1));
-        assertThrows(IllegalArgumentException.class, () -> game.addCapturedStones(BLACK, -1));
-    }
-
-    @Test
     void addListenerArguments() {
         assertThrows(NullPointerException.class, () -> game.addListener(null));
     }
@@ -439,28 +433,6 @@ class GameTest {
     @Test
     void placeHandicapStoneNotAllowed() {
         assertThrows(IllegalStateException.class, () -> game.placeHandicapPosition(0, 0, true));
-    }
-
-    @Test
-    void addCapturedStones() {
-        assertEquals(0, game.getGameResult().getScoreComponents(BLACK).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
-        assertEquals(0, game.getGameResult().getScoreComponents(WHITE).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
-
-        game.addCapturedStones(BLACK, 10);
-        assertEquals(10, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
-        assertEquals(0, game.getGameResult().getScoreComponents(WHITE).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0));
-
-        game.addCapturedStones(WHITE, 20);
-        assertEquals(10, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
-        assertEquals(20, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
-
-        game.addCapturedStones(BLACK, 30);
-        assertEquals(40, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
-        assertEquals(20, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
-
-        game.addCapturedStones(WHITE, 40);
-        assertEquals(40, game.getGameResult().getScoreComponents(BLACK).get(GameResult.PointType.CAPTURED_STONES));
-        assertEquals(60, game.getGameResult().getScoreComponents(WHITE).get(GameResult.PointType.CAPTURED_STONES));
     }
 
     @Test

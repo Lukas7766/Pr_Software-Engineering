@@ -430,19 +430,6 @@ public class Game implements GameInterface {
         return true;
     }
 
-    @Override
-    public UndoableCommand addCapturedStones(final StoneColor color, final int amount) {
-        if (color == null) {
-            throw new NullPointerException();
-        }
-        if (amount < 0) {
-            throw new IllegalArgumentException();
-        }
-
-        int oldAmount = gameResult.getScoreComponents(color).getOrDefault(GameResult.PointType.CAPTURED_STONES, 0).intValue();
-        return gameResult.addScoreComponent(color, GameResult.PointType.CAPTURED_STONES, oldAmount + amount);
-    }
-
     void fireGameEvent(GameEvent e) { // package-private by design
         if(e == null) {
             throw new NullPointerException();

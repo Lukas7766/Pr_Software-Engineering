@@ -96,8 +96,6 @@ public interface GameInterface {
 
     void placeSetupStone(int x, int y, StoneColor color);
 
-    UndoableCommand addCapturedStones(StoneColor color, int amount);
-
     StoneColor getColorAt(int x, int y);
 
     StoneColor getCurColor();
