@@ -368,7 +368,9 @@ public class Game implements GameInterface {
             return false;
         }
 
-        uc02SetStone.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
+        if(saveToken == SETUP) {
+            uc02SetStone.getExecuteEvents().add(new GameEvent(GameCommand.SETUP_STONE_SET, x, y, null, 0));
+        }
 
         subcommands.add(uc02SetStone);
 
