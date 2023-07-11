@@ -20,7 +20,6 @@ import pr_se.gogame.view_controller.observer.ViewListener;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.NoSuchFileException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 

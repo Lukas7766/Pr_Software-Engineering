@@ -10,7 +10,7 @@ public class NewZealandRuleset implements Ruleset {
     public UndoableCommand scoreGame(Game game) {
         return new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute() {
                 // Do Nothing
             }
 
@@ -30,7 +30,7 @@ public class NewZealandRuleset implements Ruleset {
     public UndoableCommand isKo(Game game) {
         return new UndoableCommand() {
             @Override
-            public void execute(final boolean saveEffects) {
+            public void execute() {
                 // Returning this equates to telling the caller that ko has not occurred.
             }
 

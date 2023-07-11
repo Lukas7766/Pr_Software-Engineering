@@ -71,7 +71,7 @@ public class UserDefinableRuleset implements Ruleset {
     public UndoableCommand scoreGame(Game game) {
         return new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute() {
                 // Do Nothing
             }
 

@@ -39,7 +39,7 @@ public class GameResult {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute() {
                 scoreComponents.get(c).put(type, value);
             }
 
@@ -52,7 +52,7 @@ public class GameResult {
                 }
             }
         };
-        ret.execute(true);
+        ret.execute();
         return ret;
     }
 
@@ -88,7 +88,7 @@ public class GameResult {
         final String oldDescription = this.description.get(c);
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute() {
                 GameResult.this.description.put(c, description);
             }
 
@@ -97,7 +97,7 @@ public class GameResult {
                 GameResult.this.description.put(c, oldDescription);
             }
         };
-        ret.execute(true);
+        ret.execute();
 
         return ret;
     }
@@ -109,7 +109,7 @@ public class GameResult {
     public UndoableCommand setWinner(final StoneColor newWinner) {
         final StoneColor oldWinner = this.winner;
         UndoableCommand ret = UndoableCommand.updateValue(c -> winner = c, oldWinner, newWinner);
-        ret.execute(true);
+        ret.execute();
 
         return ret;
     }

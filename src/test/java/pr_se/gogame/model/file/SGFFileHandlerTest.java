@@ -340,7 +340,7 @@ class SGFFileHandlerTest {
     void saveAE() {
         game.getHistory().addNode(new History.HistoryNode(new UndoableCommand() {
             @Override
-            public void execute(final boolean saveEffects) {
+            public void execute() {
 
             }
 

@@ -15,10 +15,8 @@ public abstract class UndoableCommand {
 
     /**
      * Executes this UndoableCommand
-     * @param saveEffects If true, any action that should only be taken upon the very first execution of this command
-     *                    will be taken (so that the command can be used, which reduces code duplication significantly).
      */
-    public abstract void execute(final boolean saveEffects);
+    public abstract void execute();
 
     /**
      * Undoes this UndoableCommand
@@ -47,8 +45,8 @@ public abstract class UndoableCommand {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(final boolean saveEffects) {
-                finalSubcommands.forEach(c -> c.execute(saveEffects));
+            public void execute() {
+                finalSubcommands.forEach(UndoableCommand::execute);
             }
 
             @Override
@@ -77,7 +75,7 @@ public abstract class UndoableCommand {
 
         return new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute() {
                 updateMethod.accept(newValue);
             }
 

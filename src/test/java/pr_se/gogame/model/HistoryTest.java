@@ -316,7 +316,7 @@ class HistoryTest {
          */
         UndoableCommand command = new UndoableCommand() {
             @Override
-            public void execute(final boolean saveEffects) {
+            public void execute() {
 
             }
 

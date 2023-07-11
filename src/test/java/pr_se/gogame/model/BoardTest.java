@@ -2,14 +2,12 @@ package pr_se.gogame.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
 
 import java.io.File;
-import java.nio.file.NoSuchFileException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
@@ -218,7 +216,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute(false);
+        c.execute();
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
@@ -252,7 +250,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute(false);
+        c.execute();
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
@@ -363,13 +361,13 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(3, 1));
 
         c3.undo();
-        c.execute(false);
+        c.execute();
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(3, 1));
         assertEquals(null, board.getColorAt(2, 1));
         assertEquals(BLACK, board.getColorAt(4, 1));
 
-        c2.execute(false);
+        c2.execute();
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(3, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
@@ -390,7 +388,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute(false);
+        c.execute();
         assertEquals(BLACK, board.getColorAt(2, 1));
         assertEquals(null, board.getColorAt(1, 1));
     }

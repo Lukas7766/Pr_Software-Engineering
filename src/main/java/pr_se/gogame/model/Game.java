@@ -204,7 +204,7 @@ public class Game implements GameInterface {
         }
 
         UndoableCommand c = UndoableCommand.updateValue(gs -> gameState = gs, GameState.RUNNING, GameState.GAME_OVER);
-        c.execute(true);
+        c.execute();
 
         subcommands.add(c);
 
@@ -386,7 +386,7 @@ public class Game implements GameInterface {
             subcommands.add(uc03IsKo);
 
             final UndoableCommand uc04UpdateMoveNo = UndoableCommand.updateValue(i -> curMoveNumber = i, oldCurMoveNumber, oldCurMoveNumber + 1);
-            uc04UpdateMoveNo.execute(true);
+            uc04UpdateMoveNo.execute();
             subcommands.add(uc04UpdateMoveNo);
         }
 
@@ -396,7 +396,7 @@ public class Game implements GameInterface {
         if(saveToken == HANDICAP) {
             final UndoableCommand uc05UpdateCounter = new UndoableCommand() {
                 @Override
-                public void execute(final boolean saveEffects) {
+                public void execute() {
                     handicapStoneCounter = newHandicapCtr;
 
                     if (newHandicapCtr <= 0) {
@@ -411,7 +411,7 @@ public class Game implements GameInterface {
                     gameState = GameState.SETTING_UP;
                 }
             };
-            uc05UpdateCounter.execute(true);
+            uc05UpdateCounter.execute();
 
             subcommands.add(uc05UpdateCounter);
         }
@@ -532,7 +532,7 @@ public class Game implements GameInterface {
         final StoneColor oldColor = this.curColor;
 
         UndoableCommand ret = UndoableCommand.updateValue(c -> curColor = c, oldColor, newColor);
-        ret.execute(true);
+        ret.execute();
 
         return ret;
     }

@@ -55,7 +55,7 @@ public class History implements Iterable<History.HistoryNode> {
         if(!isAtEnd()) {
             hideAllMarks();
             current = current.getNext();
-            current.getCommand().execute(false);
+            current.getCommand().execute();
             current.getCommand().getExecuteEvents().forEach(game::fireGameEvent);
             showAllMarks();
 

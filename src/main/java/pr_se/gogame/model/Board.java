@@ -118,7 +118,7 @@ public class Board implements BoardInterface {
 
         final UndoableCommand uc03PlacePointer = (permittedSuicide) ? (null) : new UndoableCommand() {
             @Override
-            public void execute(final boolean saveEffects) {
+            public void execute() {
                 boardContents[x][y] =
                     firstSameColorGroup.getPointers().stream()
                         .findFirst()
@@ -131,7 +131,7 @@ public class Board implements BoardInterface {
             }
         };
         if(uc03PlacePointer != null) {
-            uc03PlacePointer.execute(true);
+            uc03PlacePointer.execute();
             subcommands.add(uc03PlacePointer);
         }
 
@@ -200,21 +200,13 @@ public class Board implements BoardInterface {
             final List<UndoableCommand> addLibertyCommands = new LinkedList<>();
 
             @Override
-            public void execute(final boolean saveEffects) {
+            public void execute() {
                 boardContents[x][y] = null;
 
                 Set<StoneGroup> surroundingSGs = getSurroundings(x, y, Objects::nonNull).stream()
                     .map(p -> boardContents[p.getX()][p.getY()].getStoneGroup()).collect(Collectors.toSet());
                 for (StoneGroup sg : surroundingSGs) {
                     addLibertyCommands.add(sg.addLiberty(new Position(x, y)));
-                }
-
-                // Update UI
-                if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
-                    if(boardAtXyPreviously != null) {
-                        getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, boardAtXyPreviously.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
-                    }
                 }
             }
 
@@ -227,7 +219,12 @@ public class Board implements BoardInterface {
                 }
             }
         };
-        ret.execute(true);
+        ret.execute();
+
+        ret.getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
+        if(boardAtXyPreviously != null) {
+            ret.getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, boardAtXyPreviously.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
+        }
 
         return ret;
     }
