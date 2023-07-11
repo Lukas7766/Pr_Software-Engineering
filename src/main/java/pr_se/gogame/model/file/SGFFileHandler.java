@@ -175,7 +175,7 @@ public class SGFFileHandler implements FileHandler {
             sb.append(String.format(t.getValue(), getStringFromCoords(e.getKey().getX(), e.getKey().getY())));
         }
 
-        if (!node.getComment().equals("")) {
+        if (!node.getComment().isEmpty()) {
             String reformattedComment = node.getComment().replace("\\", "\\\\").replace("]", "\\]").replace(":", "\\:");
             sb.append(String.format(C.getValue(), reformattedComment));
         }
@@ -335,7 +335,7 @@ public class SGFFileHandler implements FileHandler {
                         case B, W:
                             StoneColor c = correspondingColors.get(t.getToken());
                             game.setSetupMode(false);
-                            if (t.getAttributeValue().equals("")) {
+                            if (t.getAttributeValue().isEmpty()) {
                                 game.pass();
                             } else {
                                 decodedCoords = getCoordsFromString(t.getAttributeValue());
