@@ -27,7 +27,6 @@ import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 /**
- * View/Controller
  * Go Board graphical representation that uses image files for its tiles and stones
  */
 public class BoardPane extends GridPane {
