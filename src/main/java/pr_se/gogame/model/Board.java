@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 
 /**
- * Model
  * Go Board internal logic
  */
 public class Board implements BoardInterface {
@@ -34,9 +33,7 @@ public class Board implements BoardInterface {
     private final StoneGroupPointer[][] boardContents;
 
     /**
-     * Creates a new Board belonging to the specified Game, containing handicap stones of the specified beginner color
-     * (only if the Game has a handicap set)
-     *
+     * Creates a new Board belonging to the specified Game
      * @param game the Game that this Board belongs to
      * @param size the size of the board
      */
@@ -155,6 +152,13 @@ public class Board implements BoardInterface {
         return ret;
     }
 
+    /**
+     * Removes any supplied groups that do not have liberties, including the ones of the supplied color if suicide is permitted
+     * @param surroundingSGs The StoneGroups to be evaluated for removal
+     * @param color The current move's player color
+     * @param permittedSuicide Whether suicide, if it occurs, is permitted
+     * @return An UndoableCommand to undo the removal of these groups
+     */
     private UndoableCommand removeGroupsWithoutLiberties(final Set<StoneGroup> surroundingSGs, final StoneColor color, final boolean permittedSuicide) {
         final List<UndoableCommand> subCommands = new LinkedList<>();
 
@@ -278,9 +282,8 @@ public class Board implements BoardInterface {
         }
     }
 
-    public void printDebugInfo(int x, int y) {
-        checkXYCoordinates(x, y);
-
+    @Override
+    public void printDebugInfo() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (boardContents[i][j] != null) {

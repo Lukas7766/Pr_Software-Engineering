@@ -434,7 +434,7 @@ public class BoardPane extends GridPane {
             }
 
             if(GlobalSettings.DEBUG) {
-                game.printDebugInfo(col, row);
+                game.printDebugInfo();
             }
 
             /*

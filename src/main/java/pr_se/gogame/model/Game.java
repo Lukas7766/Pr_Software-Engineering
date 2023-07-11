@@ -19,6 +19,9 @@ import java.util.ListIterator;
 import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 import static pr_se.gogame.model.helper.StoneColor.getOpposite;
 
+/**
+ * Implementation of a Go Game
+ */
 public class Game implements GameInterface {
 
     /**
@@ -42,24 +45,69 @@ public class Game implements GameInterface {
     public static final int MIN_HANDICAP_AMOUNT = 0;
 
     //Settings
+    /**
+     * This Game's current ruleset
+     */
     private Ruleset ruleset = new JapaneseRuleset();
+
+    /**
+     * This Game's handicap
+     */
     private int handicap = 0;
 
+    /**
+     * The current state of this Game
+     */
     private GameState gameState;
+
+    /**
+     * The GameListeners listening to the GameEvents fired by this Game
+     */
     private final List<GameListener> listeners;
+
+    /**
+     * The current Game's board
+     */
     private Board board;
+
+    /**
+     * The current move number
+     */
     private int curMoveNumber;
+
+    /**
+     * The current player's color
+     */
     private StoneColor curColor;
+
+    /**
+     * The remaining number of handicap stones to be placed before the first move is played.
+     */
     private int handicapStoneCounter;
 
+    /**
+     * The current result of the game
+     */
     private GameResult gameResult;
 
+    /**
+     * The current Game's history
+     */
     private History history;
 
+    /**
+     * Whether this Game is currently in Setup Mode.
+     */
     private boolean setupMode;
 
+    /**
+     * The current Game's FileHandler
+     */
     private FileHandler fileHandler;
 
+    /**
+     * Instantiates a new Game with some default settings for initializing the view
+     */
     public Game() {
         this.listeners = new LinkedList<>();
         this.gameState = GameState.NOT_STARTED_YET;
@@ -185,6 +233,10 @@ public class Game implements GameInterface {
         endGame(SCORED_GAME);
     }
 
+    /**
+     * Adds an undoableCommand to the HistoryNode that the game has ended
+     * @param saveToken The saveToken determining what kind of ending it is (e.g., resignation or simply scoring the game)
+     */
     private void endGame(History.HistoryNode.AbstractSaveToken saveToken) {
         if(saveToken == null) {
             throw new NullPointerException();
@@ -334,6 +386,102 @@ public class Game implements GameInterface {
         return placeStone(x, y, color, MOVE);
     }
 
+    /**
+     * Fires the supplied GameEvent to all listeners
+     * @param e the GameEvent to be fired
+     */
+    void fireGameEvent(GameEvent e) { // package-private by design
+        if(e == null) {
+            throw new NullPointerException();
+        }
+
+        for (GameListener l : listeners) {
+            l.gameCommand(e);
+        }
+    }
+
+    @Override
+    public void printDebugInfo() {
+        board.printDebugInfo();
+    }
+
+    @Override
+    public FileHandler getFileHandler() {
+        return this.fileHandler;
+    }
+
+    @Override
+    public void mark(int x, int y, MarkShape shape) {
+        history.getCurrentNode().addMark(x, y, shape);
+        GameCommand gc = switch (shape) {
+            case CIRCLE -> GameCommand.MARK_CIRCLE;
+            case SQUARE -> GameCommand.MARK_SQUARE;
+            case TRIANGLE -> GameCommand.MARK_TRIANGLE;
+        };
+        fireGameEvent(new GameEvent(gc, x, y, curMoveNumber));
+    }
+
+    @Override
+    public void unmark(int x, int y) {
+        checkCoords(x, y);
+
+        history.getCurrentNode().removeMark(x, y);
+        fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
+    }
+
+    @Override
+    public String getComment() {
+        return history.getCurrentNode().getComment();
+    }
+
+    @Override
+    public void setComment(String comment) {
+        if(comment == null) {
+            throw new NullPointerException();
+        }
+        history.getCurrentNode().setComment(comment);
+        fireGameEvent(new GameEvent(GameCommand.UPDATE));
+    }
+
+    @Override
+    public GameResult getGameResult() {
+        return gameResult;
+    }
+
+    @Override
+    public void setSetupMode(boolean setupMode) {
+        if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
+            return;
+        }
+
+        if(handicapStoneCounter > 0) {
+            return;
+        }
+
+        this.setupMode = setupMode;
+
+        this.gameState = this.setupMode ? GameState.SETTING_UP : GameState.RUNNING;
+    }
+
+    @Override
+    public boolean isSetupMode() {
+        return setupMode;
+    }
+
+    public History getHistory() {
+        return history;
+    }
+
+
+    // private methods
+    /**
+     * Places a stone on the board and updates this Game's internal state accordingly
+     * @param x X coordinate starting at the bottom
+     * @param y Y coordinate starting at the top
+     * @param color The color of this move's player
+     * @param saveToken What kind of move this is (e.g., Setup, Handicap, normal move)
+     * @return
+     */
     private boolean placeStone(final int x, final int y, final StoneColor color, final History.HistoryNode.AbstractSaveToken saveToken) {
         if (color == null || saveToken == null) {
             throw new NullPointerException();
@@ -432,89 +580,10 @@ public class Game implements GameInterface {
         return true;
     }
 
-    void fireGameEvent(GameEvent e) { // package-private by design
-        if(e == null) {
-            throw new NullPointerException();
-        }
-
-        for (GameListener l : listeners) {
-            l.gameCommand(e);
-        }
-    }
-
-    public void printDebugInfo(int x, int y) {
-        board.printDebugInfo(x, y);
-    }
-
-    @Override
-    public FileHandler getFileHandler() {
-        return this.fileHandler;
-    }
-
-    @Override
-    public void mark(int x, int y, MarkShape shape) {
-        history.getCurrentNode().addMark(x, y, shape);
-        GameCommand gc = switch (shape) {
-            case CIRCLE -> GameCommand.MARK_CIRCLE;
-            case SQUARE -> GameCommand.MARK_SQUARE;
-            case TRIANGLE -> GameCommand.MARK_TRIANGLE;
-        };
-        fireGameEvent(new GameEvent(gc, x, y, curMoveNumber));
-    }
-
-    @Override
-    public void unmark(int x, int y) {
-        checkCoords(x, y);
-
-        history.getCurrentNode().removeMark(x, y);
-        fireGameEvent(new GameEvent(GameCommand.UNMARK, x, y, curMoveNumber));
-    }
-
-    @Override
-    public String getComment() {
-        return history.getCurrentNode().getComment();
-    }
-
-    @Override
-    public void setComment(String comment) {
-        if(comment == null) {
-            throw new NullPointerException();
-        }
-        history.getCurrentNode().setComment(comment);
-        fireGameEvent(new GameEvent(GameCommand.UPDATE));
-    }
-
-    @Override
-    public GameResult getGameResult() {
-        return gameResult;
-    }
-
-    @Override
-    public void setSetupMode(boolean setupMode) {
-        if(gameState != GameState.RUNNING && gameState != GameState.SETTING_UP) {
-            return;
-        }
-
-        if(handicapStoneCounter > 0) {
-            return;
-        }
-
-        this.setupMode = setupMode;
-
-        this.gameState = this.setupMode ? GameState.SETTING_UP : GameState.RUNNING;
-    }
-
-    @Override
-    public boolean isSetupMode() {
-        return setupMode;
-    }
-
-    public History getHistory() {
-        return history;
-    }
-
-
-    // private methods
+    /**
+     * Updates the current player color to the opposite one
+     * @return An UndoableCommand to undo this action
+     */
     private UndoableCommand switchColor() {
         UndoableCommand ret = setCurColor(StoneColor.getOpposite(curColor));
         ret.getExecuteEvents().add(new GameEvent(GameCommand.UPDATE));
@@ -524,6 +593,11 @@ public class Game implements GameInterface {
 
     }
 
+    /**
+     * Updates the current player color to the supplied one
+     * @param newColor the color that is to be set as the current player
+     * @return An UndoableCommand to undo this action
+     */
     private UndoableCommand setCurColor(final StoneColor newColor) {
         if (newColor == null) {
             throw new NullPointerException();
@@ -537,16 +611,36 @@ public class Game implements GameInterface {
         return ret;
     }
 
+    /**
+     * Tests whether these x and y coordinates are outside the bounds of the playing field
+     * @param x x coordinate starting at the left
+     * @param y y coordinate starting at the top
+     */
     private void checkCoords(int x, int y) {
         if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
             throw new IllegalArgumentException("Invalid coordinates x = " + x + ", y = " + y);
         }
     }
 
+    /**
+     * Coontains the possible states of this game
+     */
     public enum GameState {
+        /**
+         * Used between initialising and starting a new game
+         */
         NOT_STARTED_YET,
+        /**
+         * Used after starting a new game but before the first move can be made
+         */
         SETTING_UP,
+        /**
+         * Used during the game
+         */
         RUNNING,
+        /**
+         * Used after the game has ended
+         */
         GAME_OVER
     }
 }

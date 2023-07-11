@@ -59,14 +59,6 @@ class BoardTest {
         assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, maxCoord + 1));
     }
 
-    @Test
-    void printDebugInfoArguments() {
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(-1, 0));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(maxCoord + 1, 0));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, maxCoord + 1));
-    }
-
     // other tests
     @Test
     void setStonePrepare() {
@@ -186,17 +178,17 @@ class BoardTest {
     @Test
     void printDebugInfo() {
         assertNotNull(board.setStone(0, 0, BLACK, false));
-        assertDoesNotThrow(() -> board.printDebugInfo(0, 0));
+        assertDoesNotThrow(() -> board.printDebugInfo());
     }
 
     @Test
     void printDebugInfoRepeatedly() { // This method  really only exists for maximising branch coverage.
-        assertDoesNotThrow(() -> board.printDebugInfo(0, 0)); // board == null
+        assertDoesNotThrow(() -> board.printDebugInfo()); // board == null
         assertNotNull(board.setStone(0, 0, BLACK, false));
-        assertDoesNotThrow(() -> board.printDebugInfo(0, 0)); // x == lastDebugX && y == lastDebugY
+        assertDoesNotThrow(() -> board.printDebugInfo()); // x == lastDebugX && y == lastDebugY
         assertNotNull(board.setStone(0, 1, BLACK, false));
-        assertDoesNotThrow(() -> board.printDebugInfo(0, 1)); // x == lastDebugX && y != lastDebugY
-        assertDoesNotThrow(() -> board.printDebugInfo(1, 1)); // x != lastDebugX && [y == lastDebugY]
+        assertDoesNotThrow(() -> board.printDebugInfo()); // x == lastDebugX && y != lastDebugY
+        assertDoesNotThrow(() -> board.printDebugInfo()); // x != lastDebugX && [y == lastDebugY]
     }
 
     @Test

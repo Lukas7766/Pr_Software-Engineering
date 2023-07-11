@@ -7,7 +7,6 @@ import pr_se.gogame.model.helper.UndoableCommand;
 import java.util.*;
 
 /**
- * Model
  * Represents a group of stones on the Go Board, containing the stones' positions and the liberties of the group
  */
 public class StoneGroup {
@@ -31,7 +30,14 @@ public class StoneGroup {
      */
     private final Set<StoneGroupPointer> pointers;
 
+    /**
+     * Serial No. of the next instance of this class (used for debugging)
+     */
     private static int nextSerialNo = 0;
+
+    /**
+     * Serial No. of this instance of the StoneGroup class (used for debugging)
+     */
     public final int serialNo;
 
     /**
@@ -161,18 +167,32 @@ public class StoneGroup {
     }
 
     // Getters and Setters
+
+    /**
+     * @return this StoneGroup's color
+     */
     public StoneColor getStoneColor() {
         return stoneColor;
     }
 
+    /**
+     * @return this StoneGroup's locations
+     */
     public List<Position> getLocations() {
         return locations;
     }
 
+    /**
+     * @return this StoneGroup's liberties
+     */
     public Set<Position> getLiberties() {
         return this.liberties;
     }
 
+    /**
+     * Adds the supplied pointer to this StoneGroup's list of StoneGroupPointers
+     * @param ptr this StoneGroup's list of StoneGroupPointers
+     */
     public void addPointer(StoneGroupPointer ptr) {
         if(ptr == null) {
             throw new NullPointerException();
@@ -181,10 +201,16 @@ public class StoneGroup {
         pointers.add(ptr);
     }
 
+    /**
+     * @return This StoneGroup's list of StoneGroupPointers
+     */
     public Set<StoneGroupPointer> getPointers() {
         return pointers;
     }
 
+    /**
+     * Used for resetting debug variables
+     */
     public static void resetDebug() {
         nextSerialNo = 0;
     }

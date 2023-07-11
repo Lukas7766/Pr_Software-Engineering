@@ -3,6 +3,9 @@ package pr_se.gogame.model;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
+/**
+ * Interface for a Go Board
+ */
 public interface BoardInterface {
     /**
      * Places a stone on the board, calculating its liberties and adding it to an existing group where applicable, as
@@ -22,6 +25,10 @@ public interface BoardInterface {
     UndoableCommand removeStone(int x, int y);
 
     // Getters
+
+    /**
+     * @return this Board's size
+     */
     int getSize();
 
     /**
@@ -31,4 +38,9 @@ public interface BoardInterface {
      * @return the stone color at the specified location or null if no stone is set
      */
     StoneColor getColorAt(int x, int y);
+
+    /**
+     * Updates the view to display debug info.
+     */
+    void printDebugInfo();
 }

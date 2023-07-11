@@ -8,7 +8,6 @@ import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
-import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
 import pr_se.gogame.model.ruleset.Ruleset;
@@ -87,14 +86,6 @@ class GameTest {
     @Test
     void removeListenerArguments() {
         assertThrows(NullPointerException.class, () -> game.removeListener(null));
-    }
-
-    @Test
-    void printDebugInfoArguments() {
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(-1, 0));
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(maxCoord + 1, 0));
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, maxCoord + 1));
     }
 
     @Test
@@ -343,14 +334,14 @@ class GameTest {
     @Test
     void addListener() {
         game.addListener(e -> assertEquals(DEBUG_INFO, e.getGameCommand()));
-        game.printDebugInfo(0, 0);
+        game.printDebugInfo();
     }
 
     @Test
     void removeListener() {
         GameListener l1 = e -> assertEquals(DEBUG_INFO, e.getGameCommand());
         game.addListener(l1);
-        game.printDebugInfo(0, 0);
+        game.printDebugInfo();
 
         game.removeListener(l1);
         game.playMove(0, 0);
@@ -453,7 +444,7 @@ class GameTest {
     void printDebugInfo() {
         game.addListener(e -> assertEquals(DEBUG_INFO, e.getGameCommand()));
 
-        assertDoesNotThrow(() -> game.printDebugInfo(0, 0));
+        assertDoesNotThrow(() -> game.printDebugInfo());
     }
 
     @Test
