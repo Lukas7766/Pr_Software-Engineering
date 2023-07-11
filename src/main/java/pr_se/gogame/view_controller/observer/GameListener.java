@@ -1,14 +1,13 @@
 package pr_se.gogame.view_controller.observer;
 
 /**
- * This interface represents the listener of the goGame. <br>
- *
+ * This listener can be registered with the Game in the model.
  */
 public interface GameListener {
 
-    /** The listener is used to update the VIEW based on the passed Game Event.
+    /** The listener is used to update the view based on the passed GameEvent.
      *
-     * @param e Game Event
+     * @param e GameEvent containing info for the view's update
      */
     void gameCommand(GameEvent e);
 }
