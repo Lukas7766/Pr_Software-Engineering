@@ -2,10 +2,26 @@ package pr_se.gogame.model.helper;
 
 import java.util.Objects;
 
+/**
+ * Contains an absolute position on the Go board
+ */
 public class Position {
+
+    /**
+     * X coordinate of this Position, starting at the left
+     */
     private final int x;
+
+    /**
+     * Y coordinate of this Position, starting at the top
+     */
     private final int y;
 
+    /**
+     * Creates a new Position
+     * @param x X coordinate of this Position, starting at the left
+     * @param y Y coordinate of this Position, starting at the top
+     */
     public Position(int x, int y) {
         if(x < 0 || y < 0) {
             throw new IllegalArgumentException();
@@ -33,10 +49,18 @@ public class Position {
         return "(" + getX() + ", " + getY() + ")";
     }
 
+    /**
+     * Returns this Position's X coordinate
+     * @return this Position's X coordinate
+     */
     public int getX() {
         return x;
     }
 
+    /**
+     * Returns this Position's Y coordinate
+     * @return this Position's Y coordinate
+     */
     public int getY() {
         return y;
     }
