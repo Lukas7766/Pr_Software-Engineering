@@ -4,13 +4,16 @@ import pr_se.gogame.model.*;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
+/**
+ * Interface using the <a href="https://en.wikipedia.org/wiki/Strategy_pattern">Strategy pattern</a> to determine
+ * the behaviour of a ruleset
+ */
 public interface Ruleset {
     /**
-     * Because nothing is ever easy, some rulesets permit suicide, at least if it is collective suicide (apparently this
+     * Some rulesets permit suicide, at least if it is collective suicide (apparently this
      * can cause the opponent some inconvenience). See <a href="https://en.wikipedia.org/wiki/Rules_of_Go#Suicide">the
      * Wikipedia article</a>. To check whether suicide is solitary or collective, the ruleset needs the involved
      * StoneGroup.
-     *
      * @param existingGroup The group that is about to commit suicide
      * @param addedStone The stone that was added to the existingGroup
      * @return whether the ruleset permits suicide under the given circumstances on the board.
@@ -22,7 +25,7 @@ public interface Ruleset {
     /** Ko is a special rule that prevents immediate repetition of position, in which a single stone is captured and
      *  another single stone immediately taken back. <br> Depending on the ruleset a number of allowed repetition is given.
      *  <br> The default value is 2.
-     * @return the default value is two as move repetition is allowed twice.
+     * @return the default value is 2 as move repetition is allowed twice.
      */
     default int getKoAmount() {
         return 2;
@@ -37,8 +40,7 @@ public interface Ruleset {
 
     /**
      * This method calculates the score of the game for both players.
-     *
-     * @return
+     * @return an UndoableCommand to undo the side effects of the score calculation
      */
     UndoableCommand scoreGame(Game game);
 
@@ -102,12 +104,13 @@ public interface Ruleset {
     }
 
     /**
-     * Call this method when starting a new game. This causes the ruleset to reset any private bookkeeping.
+     * This method causes the ruleset to reset any private bookkeeping. It should be called when starting a new game.
      */
     default void reset() {
     }
 
     /**
+     * Returns the default komi value for the ruleset
      * @return the default komi value for the ruleset
      */
     default double getKomi(){

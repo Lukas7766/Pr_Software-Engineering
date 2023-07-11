@@ -7,6 +7,9 @@ import pr_se.gogame.model.helper.UndoableCommand;
 
 import java.util.*;
 
+/**
+ * Complete Ruleset implementation, based on though not necessarily identical with the Japanese Go ruleset
+ */
 public class JapaneseRuleset implements Ruleset {
 
     /**
@@ -20,6 +23,10 @@ public class JapaneseRuleset implements Ruleset {
      */
     private List<Position> territory;
 
+    /**
+     * This keeps track of the state of the board across multiple moves, ensuring that KO (a repetition of previous
+     * board states) does not happen
+     */
     private final int [] boardHashes = new int [getKoAmount()];
 
     @Override
@@ -72,8 +79,8 @@ public class JapaneseRuleset implements Ruleset {
      * Handicap is added to Black's score count.
      * Komi is added to White's score count.
      *
-     * @param game to calculate the score and define the winner
-     * @return An undoablecommand to undo the updating of the GameResult
+     * @param game Game to be scored
+     * @return An UndoableCommand to undo the updating of the GameResult
      */
     @Override
     public UndoableCommand scoreGame(Game game) {

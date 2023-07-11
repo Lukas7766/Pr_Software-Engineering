@@ -7,6 +7,9 @@ import pr_se.gogame.model.helper.UndoableCommand;
 import java.util.function.BiConsumer;
 import java.util.function.Predicate;
 
+/**
+ * Unfinished groundwork for a potential user-definable Ruleset. Not tested yet.
+ */
 public class UserDefinableRuleset implements Ruleset {
     private boolean suicideAllowed = false;
     private boolean hasDefaultHandicap = true;
