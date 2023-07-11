@@ -22,7 +22,6 @@ public interface GameInterface {
 
     /**
      * Starts a new game.
-     *
      * @param startingColor the StoneColor of the starting player
      * @param size          the size of the board
      * @param handicap      how many handicap stones are placed in favor of the beginner

@@ -5,6 +5,9 @@ import pr_se.gogame.model.History;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
+/**
+ * Stores several SGF tokens.
+ */
 public enum SGFToken {
 
     /**
@@ -124,7 +127,6 @@ public enum SGFToken {
 
     /**
      * Creates a token
-     *
      * @param token                String for the token
      * @param hasMultiAttribs whether the token may have multiple attributes in the file
      */
@@ -133,20 +135,27 @@ public enum SGFToken {
         this.hasMultiAttribs = hasMultiAttribs;
     }
 
-
     /**
      * Returns the value of the token
-     *
      * @return the token value
      */
     public String getValue() {
         return value;
     }
 
+    /**
+     * Returns whether the token may have multiple attributes in an SGF file
+     * @return whether the token may have multiple attributes in an SGF file
+     */
     public boolean hasMultiAttribs() {
         return hasMultiAttribs;
     }
 
+    /**
+     * Converts a HistoryNode to an SGFToken based on its SaveToken and Color
+     * @param node The HistoryNode to be converted
+     * @return The corresponding SGFToken
+     */
     public static SGFToken ofHistoryNode(History.HistoryNode node) {
         switch (node.getSaveToken()) {
             case SETUP, HANDICAP -> {

@@ -20,7 +20,13 @@ import static pr_se.gogame.model.file.SGFToken.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
+/**
+ * SGF-Specific implementation of the FileHandler
+ */
 public class SGFFileHandler implements FileHandler {
+    /**
+     * Maps StoneColors to color-specific SGF tokens
+     */
     private static final Map<SGFToken, StoneColor> correspondingColors =
         Map.of(
                 AW, WHITE,
@@ -28,10 +34,20 @@ public class SGFFileHandler implements FileHandler {
                 AB, BLACK,
                 B, BLACK);
 
+    /**
+     * The currently loaded file
+     */
     private File currentFile;
 
+    /**
+     * The game that this SGFFileHandler belongs to
+     */
     private final Game game;
 
+    /**
+     * Instantiates a new SGFFileHandler
+     * @param game The game that this SGFFileHandler belongs to
+     */
     public SGFFileHandler(Game game) {
         if(game == null) {
             throw new NullPointerException();
@@ -141,6 +157,11 @@ public class SGFFileHandler implements FileHandler {
         return true;
     }
 
+    /**
+     * Returns a string consisting of the Marks and Comments for the current HistoryNode
+     * @param node the current node in the History
+     * @return a string consisting of the Marks and Comments for the current HistoryNode
+     */
     private String getNodeMetaDataString(History.HistoryNode node) {
         StringBuilder sb = new StringBuilder();
 
@@ -363,13 +384,19 @@ public class SGFFileHandler implements FileHandler {
         return true;
     }
 
+    /**
+     * Method for throwing a standardised LoadingGameException if an unexpected ScannedToken was parsed. Reduces code
+     * duplication.
+     * @param expectedToken the ScannedToken that was expected
+     * @param actualToken the ScannedToken that was actually read
+     * @throws LoadingGameException always
+     */
     private static void unexpected(String expectedToken, ScannedToken actualToken) throws LoadingGameException {
         throw new LoadingGameException("Expected " + expectedToken + " but parsed " + actualToken, actualToken);
     }
 
     /**
-     * Calculates the coordinates for the sgf File
-     *
+     * Calculates the coordinates for the SGF File
      * @param x column of Stone
      * @param y row of Stone
      * @return The x and y-axis in letter format
@@ -378,6 +405,11 @@ public class SGFFileHandler implements FileHandler {
         return "" + (char) (x + 97) + (char) (97 + y);
     }
 
+    /**
+     * Parses the supplied SGF coordinate letters and returns the corresponding Position
+     * @param s SGF coordinate letters to be parsed
+     * @return the Position denoted by the supplied letters
+     */
     private static Position getCoordsFromString(String s) {
         return new Position(s.charAt(0) - 97, s.charAt(1) - 97);
     }
