@@ -76,7 +76,6 @@ public class BoardPane extends GridPane {
      */
     private Image tileCorner;
 
-
     /**
      * Image used for the black and white stones
      */
@@ -136,6 +135,9 @@ public class BoardPane extends GridPane {
      */
     private int keyboardCellY = -1;
 
+    /**
+     * File name of the last loaded graphics pack
+     */
     private String lastGraphicsPackFileName;
 
     /**
@@ -459,11 +461,12 @@ public class BoardPane extends GridPane {
     }
 
     // Getters and Setters
-    public boolean needsMoveConfirmation() {
-        return needsMoveConfirmation;
-    }
 
-    public void setMoveConfirmation(boolean needsMoveConfirmation) {
+    /**
+     * Sets whether stones are immediately placed or remain in selection mode, awaiting separate confirmation
+     * @param needsMoveConfirmation whether stones wait for confirmation
+     */
+    private void setMoveConfirmation(boolean needsMoveConfirmation) {
         if(!needsMoveConfirmation && selectionPBC != null) {
             selectionPBC.deselect();
             selectionPBC = null;
@@ -471,11 +474,11 @@ public class BoardPane extends GridPane {
         this.needsMoveConfirmation = needsMoveConfirmation;
     }
 
-    public boolean showsMoveNumbers() {
-        return showsMoveNumbers;
-    }
-
-    public void setShowsMoveNumbers(boolean showsMoveNumbers) {
+    /**
+     * Sets whether this BoardPane displays its move numbers or not
+     * @param showsMoveNumbers whether this BoardPane displays its move numbers
+     */
+    private void setShowsMoveNumbers(boolean showsMoveNumbers) {
         this.showsMoveNumbers = showsMoveNumbers;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -487,11 +490,11 @@ public class BoardPane extends GridPane {
         }
     }
 
-    public boolean showsCoordinates() {
-        return showsCoordinates;
-    }
-
-    public void setShowsCoordinates(boolean showsCoordinates) {
+    /**
+     * Sets whether this BoardPane displays its coordinate axes or not
+     * @param showsCoordinates whether this BoardPane displays its coordinate axes
+     */
+    private void setShowsCoordinates(boolean showsCoordinates) {
         this.showsCoordinates = showsCoordinates;
 
         for(int i = 0; i < size * 4; i++) {
@@ -500,6 +503,9 @@ public class BoardPane extends GridPane {
         }
     }
 
+    /**
+     * @return the size of the playable area of this BoardPane
+     */
     public int getSize() {
         return size;
     }
@@ -699,6 +705,10 @@ public class BoardPane extends GridPane {
         }
 
         // Getters
+
+        /**
+         * @return the label of this cell
+         */
         public Label getLabel() {
             return label;
         }
@@ -752,10 +762,19 @@ public class BoardPane extends GridPane {
          */
         private boolean isSelected = false;
 
+        /**
+         * whether this PlayableBoardCell is marked with a circle
+         */
         private boolean isCircleMarked = false;
 
+        /**
+         * whether this PlayableBoardCell is marked with a triangle
+         */
         private boolean isTriangleMarked = false;
 
+        /**
+         * whether this PlayableBoardCell is marked with a square
+         */
         private boolean isSquareMarked = false;
 
         /**
@@ -932,10 +951,16 @@ public class BoardPane extends GridPane {
             squareMarkOnWhite.setImage(squareMarks[1]);
         }
 
+        /**
+         * Shows the handicap slot on this cell
+         */
         public void showHandicapSlot() {
             handicapSlot.setVisible(true);
         }
 
+        /**
+         * Hides the handicap slot on this cell
+         */
         public void hideHandicapSlot() {
             handicapSlot.setVisible(false);
         }
@@ -1038,6 +1063,9 @@ public class BoardPane extends GridPane {
             }
         }
 
+        /**
+         * Automatically determines which selection hover image to display
+         */
         private void select() {
             if (game.getCurColor() == BLACK) {
                 selectBlack();
@@ -1151,6 +1179,9 @@ public class BoardPane extends GridPane {
             isSquareMarked = false;
         }
 
+        /**
+         * Shows a circle mark if it is currently invisible; hides it if it is already visible
+         */
         public void toggleCircleMark() {
             int x = getColumnIndex(this) - 1;
             int y = getRowIndex(this) - 1;
