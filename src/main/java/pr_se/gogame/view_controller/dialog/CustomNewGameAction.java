@@ -4,6 +4,9 @@ import javafx.scene.control.Alert;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
 
+/**
+ * Generates a dialog for starting a new game
+ */
 public final class CustomNewGameAction {
 
     private CustomNewGameAction() {

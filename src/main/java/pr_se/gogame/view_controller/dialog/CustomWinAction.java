@@ -8,6 +8,9 @@ import javafx.util.Pair;
 import pr_se.gogame.model.Game;
 import pr_se.gogame.model.helper.StoneColor;
 
+/**
+ * Generates a dialog to display game details after ending the game
+ */
 public final class CustomWinAction {
 
     private CustomWinAction() {
@@ -16,8 +19,6 @@ public final class CustomWinAction {
 
     /**
      * Handles the win action<br>
-     * -> without save <br>
-     * -> with save <br>
      *
      * @param stage pass stage
      * @param game pass game

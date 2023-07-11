@@ -10,6 +10,9 @@ import javafx.stage.Stage;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
+/**
+ * Generates an error dialog
+ */
 public final class CustomExceptionDialog {
 
     /**
@@ -23,18 +26,27 @@ public final class CustomExceptionDialog {
 
     /**
      * Creates a customised Exception Dialog
-     *
-     * @param e     pass Exception
+     * @param e     the exception to be included in the dialog
      */
     public static void show(Throwable e) {
         show(e, null, null);
     }
 
-
+    /**
+     * Creates a customised Exception Dialog
+     * @param e         the exception to be included in the dialog
+     * @param message   an additional error message to be displayed in a large font
+     */
     public static void show(Throwable e, String message) {
         show(e, message, null);
     }
 
+    /**
+     * Creates a customised Exception Dialog
+     * @param e         the exception to be included in the dialog
+     * @param headerMessage   an additional error message to be displayed in a large font
+     * @param contentMessage  an additional error message to be displayed in a slightly smaller font
+     */
     public static void show(Throwable e, String headerMessage, String contentMessage) {
         Alert alert = new Alert(Alert.AlertType.ERROR);
         alert.setTitle("Exception Dialog");
@@ -75,10 +87,10 @@ public final class CustomExceptionDialog {
         alert.showAndWait();
     }
 
-    public static Stage getStage() {
-        return stage;
-    }
-
+    /**
+     * Sets the stage within which this dialog is displayed
+     * @param stage
+     */
     public static void setStage(Stage stage) {
         CustomExceptionDialog.stage = stage;
     }

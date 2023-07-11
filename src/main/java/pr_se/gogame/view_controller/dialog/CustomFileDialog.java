@@ -5,7 +5,9 @@ import javafx.stage.Stage;
 
 import java.io.File;
 
-
+/**
+ * Generates a custom file chooser
+ */
 public final class CustomFileDialog {
     private CustomFileDialog() {
         // This private constructor solely exists to prevent instantiation.
