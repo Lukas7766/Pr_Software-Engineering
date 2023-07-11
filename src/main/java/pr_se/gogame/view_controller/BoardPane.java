@@ -57,7 +57,7 @@ public class BoardPane extends GridPane {
 
     // Custom resources
     /**
-     * Absolute path of the graphics pack zip-file
+     * path of the graphics pack zip-file
      */
     private String graphicsPath;
     
@@ -513,7 +513,7 @@ public class BoardPane extends GridPane {
     // private methods
     /**
      * loads the image files from the specified graphics pack into memory
-     * @param graphicsPath the absolute path of the graphics pack to be loaded
+     * @param graphicsPath path of the graphics pack to be loaded
      */
     private void loadGraphics(String graphicsPath) {
         if(graphicsPath == null) {

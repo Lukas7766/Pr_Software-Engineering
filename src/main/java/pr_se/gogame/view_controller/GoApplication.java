@@ -18,6 +18,9 @@ import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+/**
+ * Sets up the GUI and instantiates the model
+ */
 public class GoApplication extends Application {
 
     private static final int WIDTH = 760;
