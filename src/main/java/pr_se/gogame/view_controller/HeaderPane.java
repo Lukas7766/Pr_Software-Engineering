@@ -65,11 +65,6 @@ public class HeaderPane extends VBox {
     private final Scene scene;
 
     /**
-     * Buttons for navigating through the Game's History
-     */
-    private final List<Button> playbackControlList = new LinkedList<>();
-
-    /**
      * Constructor to create a Header Pane
      *
      * @param backcolor Background Color
@@ -312,14 +307,11 @@ public class HeaderPane extends VBox {
 
         game.addListener(e -> {
             switch (e.getGameCommand()) {
-                case INIT:
-                    playbackControlList.forEach(button -> button.setDisable(true));
                 case GAME_WON:
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(true));
                     break;
 
                 case NEW_GAME:
-                    playbackControlList.forEach(button -> button.setDisable(false));
                     setupMode.setSelected(false);
                 case UPDATE:
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
@@ -430,6 +422,8 @@ public class HeaderPane extends VBox {
 
         hotbar.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(0, 5, 0, 5))));
 
+        final List<Button> playbackControlList = new LinkedList<>();
+
         HBox playbackControl = new HBox();
         playbackControl.setPrefWidth(250);
         playbackControl.setAlignment(Pos.CENTER);
@@ -515,11 +509,13 @@ public class HeaderPane extends VBox {
         game.addListener(e -> {
             switch (e.getGameCommand()){
                 case INIT:
+                    playbackControlList.forEach(button -> button.setDisable(true));
                     pass.setText(passText);
                 case GAME_WON:
                     gameShortCutList.forEach(button -> button.setDisable(true));
                     break;
                 case NEW_GAME, UPDATE:
+                    playbackControlList.forEach(button -> button.setDisable(false));
                     gameShortCutList.forEach(button -> button.setDisable(false));
                     if(game.getGameState() != Game.GameState.RUNNING) {
                         scoreGame.setDisable(true);
