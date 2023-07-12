@@ -275,7 +275,7 @@ public class BoardPane extends GridPane {
 
     /**
      * (Re-)Initialises this BoardPane for a new game. Called automatically by the constructor. Use this to start
-     * a new game, instead of creating a new BoardPane. This does not reload the graphics pack - use setGraphics()
+     * a new game, instead of creating a new BoardPane. This does not reload the graphics pack - use loadGraphics()
      * instead.
      */
     private void init() {
