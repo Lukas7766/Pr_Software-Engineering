@@ -54,7 +54,7 @@ public class History implements Iterable<History.HistoryNode> {
     }
 
     /**
-     * Traverses the history to the end, redoing everythign along the way
+     * Traverses the history to the end, redoing everything along the way
      */
     public void goToEnd() {
         while(stepForward());

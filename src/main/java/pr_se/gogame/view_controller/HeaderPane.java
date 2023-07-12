@@ -594,7 +594,7 @@ public class HeaderPane extends VBox {
     }
 
     /**
-     * Implements the behaviour of the fast forward buttons. Goes before first normal move, then to the very last move
+     * Implements the behaviour of the fast-forward buttons. Goes before first normal move, then to the very last move
      */
     private void fastForward() {
         History history = game.getHistory();
