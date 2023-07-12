@@ -7,6 +7,7 @@ import javafx.scene.layout.BorderPane;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 import pr_se.gogame.view_controller.dialog.CustomCloseAction;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 
@@ -55,7 +56,7 @@ public class GoApplication extends Application {
 
         // Set up the actual program
         stage.setTitle("Go Game");
-        Game game = new Game();
+        GameInterface game = new Game();
 
         BorderPane root = new BorderPane();
 

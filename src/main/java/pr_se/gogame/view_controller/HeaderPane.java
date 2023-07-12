@@ -16,7 +16,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 import pr_se.gogame.model.History;
 import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.view_controller.dialog.*;
@@ -57,7 +57,7 @@ public class HeaderPane extends VBox {
     /**
      * Instance of game
      */
-    private final Game game;
+    private final GameInterface game;
 
     /**
      * Scene of the Go application
@@ -72,7 +72,7 @@ public class HeaderPane extends VBox {
      * @param stage     instance of actual stage -> needed to show file dialog
      * @param game      instance of actual game -> needed for triggering and observing changes in model
      */
-    public HeaderPane(Color backcolor, Application app, Scene scene, Stage stage, Game game) throws IOException {
+    public HeaderPane(Color backcolor, Application app, Scene scene, Stage stage, GameInterface game) throws IOException {
         this.backColor = backcolor;
         this.app = app;
         this.stage = stage;
@@ -110,7 +110,7 @@ public class HeaderPane extends VBox {
         newGameItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
         files.getItems().add(newGameItem);
         newGameItem.setOnAction(e -> {
-            if (game.getGameState() == Game.GameState.NOT_STARTED_YET) {
+            if (game.getGameState() == GameInterface.GameState.NOT_STARTED_YET) {
                 return;
             }
             CustomNewGameAction.onNewGameAction(stage, game);
@@ -263,8 +263,8 @@ public class HeaderPane extends VBox {
             game.setSetupMode(setupMode.isSelected());
 
             passItem.setText(game.isSetupMode() ? "Switch co_lor" : "_Pass");
-            resignItem.setDisable(game.getGameState() != Game.GameState.RUNNING);
-            scoreGameItem.setDisable(game.getGameState() != Game.GameState.RUNNING);
+            resignItem.setDisable(game.getGameState() != GameInterface.GameState.RUNNING);
+            scoreGameItem.setDisable(game.getGameState() != GameInterface.GameState.RUNNING);
 
             GlobalSettings.update();
         });
@@ -315,7 +315,7 @@ public class HeaderPane extends VBox {
                     setupMode.setSelected(false);
                 case UPDATE:
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
-                    if(game.getGameState() != Game.GameState.RUNNING) {
+                    if(game.getGameState() != GameInterface.GameState.RUNNING) {
                         resignItem.setDisable(true);
                         scoreGameItem.setDisable(true);
                     }
@@ -517,7 +517,7 @@ public class HeaderPane extends VBox {
                 case NEW_GAME, UPDATE:
                     playbackControlList.forEach(button -> button.setDisable(false));
                     gameShortCutList.forEach(button -> button.setDisable(false));
-                    if(game.getGameState() != Game.GameState.RUNNING) {
+                    if(game.getGameState() != GameInterface.GameState.RUNNING) {
                         scoreGame.setDisable(true);
                         resign.setDisable(true);
                     }
@@ -557,8 +557,8 @@ public class HeaderPane extends VBox {
             public void onSettingsUpdated() {
                 confirm.setVisible(GlobalSettings.isConfirmationNeeded());
                 pass.setText(game.isSetupMode() ? "Switch color" : passText);
-                resign.setDisable(game.getGameState() != Game.GameState.RUNNING);
-                scoreGame.setDisable(game.getGameState() != Game.GameState.RUNNING);
+                resign.setDisable(game.getGameState() != GameInterface.GameState.RUNNING);
+                scoreGame.setDisable(game.getGameState() != GameInterface.GameState.RUNNING);
 
                 EventHandler<ActionEvent> comboBoxHandler = graphicsPackSelectorComboBox.getOnAction();
                 graphicsPackSelectorComboBox.setOnAction(null);

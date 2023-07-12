@@ -2,7 +2,7 @@ package pr_se.gogame.view_controller.dialog;
 
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 
 /**
  * Generates a dialog for starting a new game
@@ -22,7 +22,7 @@ public final class CustomNewGameAction {
      * @param stage pass stage
      * @param game pass game
      */
-    public static void onNewGameAction(Stage stage, Game game) {
+    public static void onNewGameAction(Stage stage, GameInterface game) {
         Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
         alert.setTitle("Go Game - New Game");
         alert.setHeaderText("Do you want to save your game before starting a new one?");

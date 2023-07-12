@@ -21,8 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static pr_se.gogame.model.Game.GameState.RUNNING;
-import static pr_se.gogame.model.Game.GameState.SETTING_UP;
+import static pr_se.gogame.model.GameInterface.GameState.RUNNING;
+import static pr_se.gogame.model.GameInterface.GameState.SETTING_UP;
 import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 import static pr_se.gogame.model.helper.GameCommand.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
@@ -200,7 +200,7 @@ class GameTest {
     void passBlackStarts() {
         StoneColor prevColor = game.getCurColor();
         assertEquals(BLACK, prevColor);
-        Game.GameState prevState = game.getGameState();
+        GameInterface.GameState prevState = game.getGameState();
         assertEquals(RUNNING, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
@@ -233,7 +233,7 @@ class GameTest {
 
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
-        Game.GameState prevState = game.getGameState();
+        GameInterface.GameState prevState = game.getGameState();
         assertEquals(RUNNING, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);

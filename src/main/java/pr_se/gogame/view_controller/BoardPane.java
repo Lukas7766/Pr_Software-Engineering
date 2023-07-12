@@ -12,7 +12,7 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 import pr_se.gogame.view_controller.observer.DebugEvent;
@@ -53,7 +53,7 @@ public class BoardPane extends GridPane {
     /**
      * the game that is being displayed by this BoardPane
      */
-    private final Game game;
+    private final GameInterface game;
 
     // Custom resources
     /**
@@ -144,7 +144,7 @@ public class BoardPane extends GridPane {
      *
      * @param game the game that is to be displayed by this BoardPane
      */
-    public BoardPane(Game game) {
+    public BoardPane(GameInterface game) {
         if(game == null) {
             throw new NullPointerException();
         }

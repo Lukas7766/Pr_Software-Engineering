@@ -68,7 +68,7 @@ public class Game implements GameInterface {
     /**
      * The current Game's board
      */
-    private Board board;
+    private BoardInterface board;
 
     /**
      * The current move number
@@ -468,6 +468,7 @@ public class Game implements GameInterface {
         return setupMode;
     }
 
+    @Override
     public History getHistory() {
         return history;
     }
@@ -620,28 +621,6 @@ public class Game implements GameInterface {
         if(x < 0 || y < 0 || x >= board.getSize() || y >= board.getSize()) {
             throw new IllegalArgumentException("Invalid coordinates x = " + x + ", y = " + y);
         }
-    }
-
-    /**
-     * Coontains the possible states of this game
-     */
-    public enum GameState {
-        /**
-         * Used between initialising and starting a new game
-         */
-        NOT_STARTED_YET,
-        /**
-         * Used after starting a new game but before the first move can be made
-         */
-        SETTING_UP,
-        /**
-         * Used during the game
-         */
-        RUNNING,
-        /**
-         * Used after the game has ended
-         */
-        GAME_OVER
     }
 }
 

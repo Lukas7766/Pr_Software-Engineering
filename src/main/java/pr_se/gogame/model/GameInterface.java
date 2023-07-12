@@ -110,7 +110,7 @@ public interface GameInterface {
     /**
      * @return the current state of this Game
      */
-    Game.GameState getGameState();
+    GameInterface.GameState getGameState();
 
     /**
      * @return the Game's board size
@@ -223,5 +223,31 @@ public interface GameInterface {
      */
     FileHandler getFileHandler();
 
+    /**
+     * @return the Game's History
+     */
+    History getHistory();
+
+    /**
+     * Coontains the possible states of a game
+     */
+    enum GameState {
+        /**
+         * Used between initialising and starting a new game
+         */
+        NOT_STARTED_YET,
+        /**
+         * Used after starting a new game but before the first move can be made
+         */
+        SETTING_UP,
+        /**
+         * Used during the game
+         */
+        RUNNING,
+        /**
+         * Used after the game has ended
+         */
+        GAME_OVER
+    }
 }
 
