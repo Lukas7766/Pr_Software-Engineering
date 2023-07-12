@@ -481,7 +481,7 @@ public class Game implements GameInterface {
      * @param y Y coordinate starting at the top
      * @param color The color of this move's player
      * @param saveToken What kind of move this is (e.g., Setup, Handicap, normal move)
-     * @return
+     * @return whether placing the stone was successful
      */
     private boolean placeStone(final int x, final int y, final StoneColor color, final History.HistoryNode.AbstractSaveToken saveToken) {
         if (color == null || saveToken == null) {
