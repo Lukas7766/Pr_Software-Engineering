@@ -45,7 +45,7 @@ public class GameResult {
      * Adds a caller-definable component to the GameResult
      * @param c The StoneColor to whom this component applies
      * @param type The PointType of this score component
-     * @param value The numeric score value of this score comoponent
+     * @param value The numeric score value of this score component
      * @return An UndoableCommand to undo this method's effects
      */
     public UndoableCommand addScoreComponent(final StoneColor c, final PointType type, final Number value) {

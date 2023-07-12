@@ -25,7 +25,7 @@ public final class GlobalSettings {
     private static boolean showMoveNumbers = false;
 
     /**
-     * If true, coordiante axes are shown at the sides of the board
+     * If true, coordinate axes are shown at the sides of the board
      */
     private static boolean showCoordinates = true;
 

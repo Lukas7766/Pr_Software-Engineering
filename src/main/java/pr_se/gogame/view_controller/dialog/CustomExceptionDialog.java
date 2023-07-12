@@ -89,7 +89,7 @@ public final class CustomExceptionDialog {
 
     /**
      * Sets the stage within which this dialog is displayed
-     * @param stage
+     * @param stage The stage within which this dialog is to be shown
      */
     public static void setStage(Stage stage) {
         CustomExceptionDialog.stage = stage;

@@ -229,7 +229,7 @@ public interface GameInterface {
     History getHistory();
 
     /**
-     * Coontains the possible states of a game
+     * Contains the possible states of a game
      */
     enum GameState {
         /**

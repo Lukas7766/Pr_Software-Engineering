@@ -86,7 +86,7 @@ public abstract class UndoableCommand {
     }
 
     /**
-     * Generates an UndoableComand that updates a variable
+     * Generates an UndoableCommand that updates a variable
      * @param updateMethod Consumer that takes the value to be applied (consider this like a pass by reference)
      * @param oldValue The value to be applied upon undoing the returned command
      * @param newValue The value to be applied upon (re-)executing the returned command

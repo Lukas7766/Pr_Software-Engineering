@@ -1,7 +1,7 @@
 package pr_se.gogame.model.helper;
 
 /**
- * Stores gamecommands that the Game may use for updating the view.
+ * Stores game commands that the Game may use for updating the view.
  */
 public enum GameCommand {
 

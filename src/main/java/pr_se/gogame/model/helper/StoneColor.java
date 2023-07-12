@@ -7,7 +7,7 @@ public enum StoneColor {
     BLACK("Black"), WHITE("White");
 
     /**
-     * The default name that is to be displayed for each StoenColor.
+     * The default name that is to be displayed for each StoneColor.
      */
     private final String name;
 
