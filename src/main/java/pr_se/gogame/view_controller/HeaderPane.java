@@ -35,7 +35,7 @@ import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 
 /**
  * This class contains the controller and view function of the game header panel.<br>
- * It is recommended to place the panel on the top of the application.
+ * It is designed to be displayed horizontally and positioned at the top of the window.
  */
 public class HeaderPane extends VBox {
 
@@ -64,11 +64,10 @@ public class HeaderPane extends VBox {
      */
     private final Scene scene;
 
+    /**
+     * Buttons for navigating through the Game's History
+     */
     private final List<Button> playbackControlList = new LinkedList<>();
-
-    private final List<Button> gameShortCutList = new LinkedList<>();
-
-    private final List<MenuItem> gameSectionItems = new LinkedList<>();
 
     /**
      * Constructor to create a Header Pane
@@ -99,14 +98,15 @@ public class HeaderPane extends VBox {
     }
 
     /**
-     * Creates the file section for the menu bar <br>
+     * Creates the File section for the menu bar <br>
      * contains at least: <br>
      * -> New Game <br>
-     * -> Import Game <br>
-     * -> Export Game <br>
-     * -> Exit Game
+     * -> Load Game <br>
+     * -> Save Game <br>
+     * -> Save Game as <br>
+     * -> Quit Game
      *
-     * @return the file section for the menu bar
+     * @return the File section for the menu bar
      */
     private Menu fileSection() {
         Menu files = new Menu("_File");
@@ -186,6 +186,16 @@ public class HeaderPane extends VBox {
         return files;
     }
 
+    /**
+     * Creates the History section for the menu bar
+     * contains at least:
+     * -> Rewind <br>
+     * -> Undo <br>
+     * -> Redo <br>
+     * -> Fast Forward <br>
+     *
+     * @return the History section for the menu bar
+     */
     private Menu historySection() {
         Menu menu = new Menu("_History");
 
@@ -227,16 +237,21 @@ public class HeaderPane extends VBox {
     }
 
     /**
-     * Creates the game section for the menu bar <br>
+     * Creates the Game section for the menu bar <br>
      * contains at least: <br>
+     * -> Enable/Disable Setup Mode <br>
+     * -> Enable/Disable Move Confirmation <br>
      * -> Pass <br>
      * -> Resign <br>
+     * -> Confirm move <br>
      * -> Score Game
      *
-     * @return the game section for the menu bar
+     * @return the Game section for the menu bar
      */
     private Menu gameSection() {
         Menu menu = new Menu("_Game");
+
+        final List<MenuItem> gameSectionItems = new LinkedList<>();
 
         CheckMenuItem setupMode = new CheckMenuItem("Set_up mode");
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
@@ -369,7 +384,7 @@ public class HeaderPane extends VBox {
     /**
      * Creates the help section for the menu bar <br>
      * contains at least: <br>
-     * -> Help -> Link to WebSite <br>
+     * -> Help -> Link to website (Wikipedia in this case) <br>
      * -> About us -> Information ab the developer
      *
      * @return the help section for the menu bar
@@ -405,7 +420,7 @@ public class HeaderPane extends VBox {
      * -> pass button <br>
      * -> resign button <br>
      * -> score game button <br>
-     * -> confirm move button
+     * -> confirm move button (only if move confirmation is required)
      *
      * @return a horizontal box layout object which includes all needed elements of the short menu
      */
@@ -459,8 +474,9 @@ public class HeaderPane extends VBox {
         gameShortCuts.setAlignment(Pos.CENTER);
         gameShortCuts.setSpacing(25);
 
-        final String passText = "Pass";
+        final List<Button> gameShortCutList = new LinkedList<>();
 
+        final String passText = "Pass";
         Button pass = new Button(passText);
         pass.setFocusTraversable(false);
         pass.setOnAction(e -> game.pass());
@@ -567,6 +583,9 @@ public class HeaderPane extends VBox {
 
     }
 
+    /**
+     * Implements the behaviour of the rewind buttons. Goes before first normal move, then before first Node in the history
+     */
     private void rewind() {
         History history = game.getHistory();
         if(!history.isAtBeginning()) {
@@ -578,6 +597,9 @@ public class HeaderPane extends VBox {
         }
     }
 
+    /**
+     * Implements the behaviour of the fast forward buttons. Goes before first normal move, then to the very last move
+     */
     private void fastForward() {
         History history = game.getHistory();
         History.HistoryNode n = history.getCurrentNode();
