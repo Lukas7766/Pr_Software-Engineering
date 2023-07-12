@@ -45,12 +45,12 @@ public class HeaderPane extends VBox {
     private final Color backColor;
 
     /**
-     * Instance of application
+     * Instance of the Go application
      */
     private final Application app;
 
     /**
-     * Instance of stage
+     * Instance of stage that may contain dialogs
      */
     private final Stage stage;
 
@@ -60,7 +60,7 @@ public class HeaderPane extends VBox {
     private final Game game;
 
     /**
-     * Scene of application
+     * Scene of the Go application
      */
     private final Scene scene;
 
