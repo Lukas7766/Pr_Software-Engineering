@@ -73,8 +73,9 @@ public class SidePane extends StackPane {
     /**
      * GameInformation contains a mechanism to show relevant information based on current GameCommand <br>
      * contains at least: <br>
-     * -> Game Board <br>
-     * -> Turn Explanation <br>
+     * -> Name of the current player
+     * -> Current score (only captured stones, komi, and handicap) <br>
+     * -> Comment to current move <br>
      *
      * @return a VBox which contains items to show relevant game info.
      */
@@ -197,10 +198,11 @@ public class SidePane extends StackPane {
 
     /**
      * newGame creates a panel that is a dialog for creating a new game<br>
-     * At least it contains: <br>
+     * Contains at least: <br>
      * -> Board size options <br>
      * -> Handicap spinner <br>
-     * -> Komi <br>
+     * -> Komi information <br>
+     * -> Button to start the game
      *
      * @return a GridPane which contains items for creating a new game.
      */
