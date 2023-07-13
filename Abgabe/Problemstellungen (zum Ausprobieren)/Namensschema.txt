@@ -1,1 +1,0 @@
-Die Dateien sind nach den Diagrammen in "go-samples.pdf" benannt.
