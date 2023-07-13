@@ -2,7 +2,6 @@
 
 HA[0]
 
-
 ;AB[lf][kf][je]C[placeSetupStone(11, 5)]
 ;AW[ke]CR[ke]C[placeSetupStone(10, 4)]
 ;B[kd]CR[ke]C[Black 1 will capture the white marked stone by shicho.]
@@ -21,7 +20,7 @@ HA[0]
 ;W[ob]C[...]
 ;B[pb]C[...]
 ;W[oa]C[...]
-;B[pa]C[... and then capture all of White's stones with 17. If White had a stone in the vicinity of 10 (see previous move), before Black played 1, the shicho would not work and Black's efforts would fail. 
+;B[pa]CR[nc]C[... and then capture all of White's stones with 17. If White had a stone in the vicinity of the marked position, before Black played 1, the shicho would not work and Black's efforts would fail. 
 
 Such a stone is called a shicho-breaker and when considering a shicho, close attention must be paid to all stones in the line of projected shicho.]
 
