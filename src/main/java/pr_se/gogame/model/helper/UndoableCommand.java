@@ -7,28 +7,43 @@ import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Consumer;
 
+/**
+ * Template for Commands that can be un- and redone. Contains static convenience methods
+ */
 public abstract class UndoableCommand {
 
+    /**
+     * The GameEvents that are to be fired on (re-)execution of this UndoableCommand
+     */
     private final List<GameEvent> executeEvents = new LinkedList<>();
 
+    /**
+     * The GameEvents that are to be fired on undoing this UndoableCommand
+     */
     private final List<GameEvent> undoEvents = new LinkedList<>();
 
     /**
      * Executes this UndoableCommand
-     * @param saveEffects If true, any action that should only be taken upon the very first execution of this command
-     *                    will be taken (so that the command can be used, which reduces code duplication significantly).
      */
-    public abstract void execute(final boolean saveEffects);
+    public abstract void execute();
 
     /**
      * Undoes this UndoableCommand
      */
     public abstract void undo();
 
+    /**
+     * Returns the list of GameEvents that are to be fired on (re-)execution of this UndoableCommand
+     * @return the list of GameEvents that are to be fired on (re-)execution of this UndoableCommand
+     */
     public List<GameEvent> getExecuteEvents() {
         return executeEvents;
     }
 
+    /**
+     * Returns the list of GameEvents that are to be fired on undoing this UndoableCommand
+     * @return the list of GameEvents that are to be fired on undoing this UndoableCommand
+     */
     public List<GameEvent> getUndoEvents() {
         return undoEvents;
     }
@@ -47,8 +62,8 @@ public abstract class UndoableCommand {
 
         UndoableCommand ret = new UndoableCommand() {
             @Override
-            public void execute(final boolean saveEffects) {
-                finalSubcommands.forEach(c -> c.execute(saveEffects));
+            public void execute() {
+                finalSubcommands.forEach(UndoableCommand::execute);
             }
 
             @Override
@@ -70,6 +85,14 @@ public abstract class UndoableCommand {
         return ret;
     }
 
+    /**
+     * Generates an UndoableCommand that updates a variable
+     * @param updateMethod Consumer that takes the value to be applied (consider this like a pass by reference)
+     * @param oldValue The value to be applied upon undoing the returned command
+     * @param newValue The value to be applied upon (re-)executing the returned command
+     * @return An UndoableCommand that calls the updateMethod with the newValue upon (re-)execution or the oldValue upon being undone
+     * @param <T> The type of the variable to be updated
+     */
     public static <T> UndoableCommand updateValue(final Consumer<T> updateMethod, final T oldValue, final T newValue) {
         if(updateMethod == null) {
             throw new NullPointerException();
@@ -77,7 +100,7 @@ public abstract class UndoableCommand {
 
         return new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute() {
                 updateMethod.accept(newValue);
             }
 

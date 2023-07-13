@@ -8,7 +8,6 @@ import pr_se.gogame.model.file.SGFFileHandler;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.model.helper.Position;
 import pr_se.gogame.model.helper.StoneColor;
-import pr_se.gogame.model.ruleset.GameResult;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
 import pr_se.gogame.model.ruleset.Ruleset;
@@ -22,8 +21,8 @@ import java.util.Iterator;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static pr_se.gogame.model.Game.GameState.RUNNING;
-import static pr_se.gogame.model.Game.GameState.SETTING_UP;
+import static pr_se.gogame.model.GameInterface.GameState.RUNNING;
+import static pr_se.gogame.model.GameInterface.GameState.SETTING_UP;
 import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 import static pr_se.gogame.model.helper.GameCommand.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
@@ -87,14 +86,6 @@ class GameTest {
     @Test
     void removeListenerArguments() {
         assertThrows(NullPointerException.class, () -> game.removeListener(null));
-    }
-
-    @Test
-    void printDebugInfoArguments() {
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(-1, 0));
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(maxCoord + 1, 0));
-        assertThrows(IllegalArgumentException.class, () -> game.printDebugInfo(0, maxCoord + 1));
     }
 
     @Test
@@ -209,7 +200,7 @@ class GameTest {
     void passBlackStarts() {
         StoneColor prevColor = game.getCurColor();
         assertEquals(BLACK, prevColor);
-        Game.GameState prevState = game.getGameState();
+        GameInterface.GameState prevState = game.getGameState();
         assertEquals(RUNNING, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
@@ -242,7 +233,7 @@ class GameTest {
 
         StoneColor prevColor = game.getCurColor();
         assertEquals(WHITE, prevColor);
-        Game.GameState prevState = game.getGameState();
+        GameInterface.GameState prevState = game.getGameState();
         assertEquals(RUNNING, prevState);
         int prevMoveNumber = game.getCurMoveNumber();
         assertEquals(1, prevMoveNumber);
@@ -343,14 +334,14 @@ class GameTest {
     @Test
     void addListener() {
         game.addListener(e -> assertEquals(DEBUG_INFO, e.getGameCommand()));
-        game.printDebugInfo(0, 0);
+        game.printDebugInfo();
     }
 
     @Test
     void removeListener() {
         GameListener l1 = e -> assertEquals(DEBUG_INFO, e.getGameCommand());
         game.addListener(l1);
-        game.printDebugInfo(0, 0);
+        game.printDebugInfo();
 
         game.removeListener(l1);
         game.playMove(0, 0);
@@ -453,7 +444,7 @@ class GameTest {
     void printDebugInfo() {
         game.addListener(e -> assertEquals(DEBUG_INFO, e.getGameCommand()));
 
-        assertDoesNotThrow(() -> game.printDebugInfo(0, 0));
+        assertDoesNotThrow(() -> game.printDebugInfo());
     }
 
     @Test

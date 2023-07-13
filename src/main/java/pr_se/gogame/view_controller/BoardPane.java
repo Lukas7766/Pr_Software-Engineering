@@ -12,7 +12,7 @@ import javafx.scene.image.PixelReader;
 import javafx.scene.input.MouseButton;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.StackPane;
-import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 import pr_se.gogame.model.helper.MarkShape;
 import pr_se.gogame.view_controller.dialog.CustomExceptionDialog;
 import pr_se.gogame.view_controller.observer.DebugEvent;
@@ -20,7 +20,6 @@ import pr_se.gogame.view_controller.observer.ViewListener;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.NoSuchFileException;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -28,7 +27,6 @@ import static pr_se.gogame.model.helper.StoneColor.BLACK;
 import static pr_se.gogame.model.helper.StoneColor.WHITE;
 
 /**
- * View/Controller
  * Go Board graphical representation that uses image files for its tiles and stones
  */
 public class BoardPane extends GridPane {
@@ -55,11 +53,11 @@ public class BoardPane extends GridPane {
     /**
      * the game that is being displayed by this BoardPane
      */
-    private final Game game;
+    private final GameInterface game;
 
     // Custom resources
     /**
-     * Absolute path of the graphics pack zip-file
+     * path of the graphics pack zip-file
      */
     private String graphicsPath;
     
@@ -77,7 +75,6 @@ public class BoardPane extends GridPane {
      * Background Image (not to be confused with BackgroundImage) for outer corner playable BoardCells
      */
     private Image tileCorner;
-
 
     /**
      * Image used for the black and white stones
@@ -138,13 +135,16 @@ public class BoardPane extends GridPane {
      */
     private int keyboardCellY = -1;
 
+    /**
+     * File name of the last loaded graphics pack
+     */
     private String lastGraphicsPackFileName;
 
     /**
      *
      * @param game the game that is to be displayed by this BoardPane
      */
-    public BoardPane(Game game) {
+    public BoardPane(GameInterface game) {
         if(game == null) {
             throw new NullPointerException();
         }
@@ -275,7 +275,7 @@ public class BoardPane extends GridPane {
 
     /**
      * (Re-)Initialises this BoardPane for a new game. Called automatically by the constructor. Use this to start
-     * a new game, instead of creating a new BoardPane. This does not reload the graphics pack - use setGraphics()
+     * a new game, instead of creating a new BoardPane. This does not reload the graphics pack - use loadGraphics()
      * instead.
      */
     private void init() {
@@ -435,7 +435,7 @@ public class BoardPane extends GridPane {
             }
 
             if(GlobalSettings.DEBUG) {
-                game.printDebugInfo(col, row);
+                game.printDebugInfo();
             }
 
             /*
@@ -461,11 +461,12 @@ public class BoardPane extends GridPane {
     }
 
     // Getters and Setters
-    public boolean needsMoveConfirmation() {
-        return needsMoveConfirmation;
-    }
 
-    public void setMoveConfirmation(boolean needsMoveConfirmation) {
+    /**
+     * Sets whether stones are immediately placed or remain in selection mode, awaiting separate confirmation
+     * @param needsMoveConfirmation whether stones wait for confirmation
+     */
+    private void setMoveConfirmation(boolean needsMoveConfirmation) {
         if(!needsMoveConfirmation && selectionPBC != null) {
             selectionPBC.deselect();
             selectionPBC = null;
@@ -473,11 +474,11 @@ public class BoardPane extends GridPane {
         this.needsMoveConfirmation = needsMoveConfirmation;
     }
 
-    public boolean showsMoveNumbers() {
-        return showsMoveNumbers;
-    }
-
-    public void setShowsMoveNumbers(boolean showsMoveNumbers) {
+    /**
+     * Sets whether this BoardPane displays its move numbers or not
+     * @param showsMoveNumbers whether this BoardPane displays its move numbers
+     */
+    private void setShowsMoveNumbers(boolean showsMoveNumbers) {
         this.showsMoveNumbers = showsMoveNumbers;
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
@@ -489,11 +490,11 @@ public class BoardPane extends GridPane {
         }
     }
 
-    public boolean showsCoordinates() {
-        return showsCoordinates;
-    }
-
-    public void setShowsCoordinates(boolean showsCoordinates) {
+    /**
+     * Sets whether this BoardPane displays its coordinate axes or not
+     * @param showsCoordinates whether this BoardPane displays its coordinate axes
+     */
+    private void setShowsCoordinates(boolean showsCoordinates) {
         this.showsCoordinates = showsCoordinates;
 
         for(int i = 0; i < size * 4; i++) {
@@ -502,6 +503,9 @@ public class BoardPane extends GridPane {
         }
     }
 
+    /**
+     * @return the size of the playable area of this BoardPane
+     */
     public int getSize() {
         return size;
     }
@@ -509,7 +513,7 @@ public class BoardPane extends GridPane {
     // private methods
     /**
      * loads the image files from the specified graphics pack into memory
-     * @param graphicsPath the absolute path of the graphics pack to be loaded
+     * @param graphicsPath path of the graphics pack to be loaded
      */
     private void loadGraphics(String graphicsPath) {
         if(graphicsPath == null) {
@@ -701,6 +705,10 @@ public class BoardPane extends GridPane {
         }
 
         // Getters
+
+        /**
+         * @return the label of this cell
+         */
         public Label getLabel() {
             return label;
         }
@@ -754,10 +762,19 @@ public class BoardPane extends GridPane {
          */
         private boolean isSelected = false;
 
+        /**
+         * whether this PlayableBoardCell is marked with a circle
+         */
         private boolean isCircleMarked = false;
 
+        /**
+         * whether this PlayableBoardCell is marked with a triangle
+         */
         private boolean isTriangleMarked = false;
 
+        /**
+         * whether this PlayableBoardCell is marked with a square
+         */
         private boolean isSquareMarked = false;
 
         /**
@@ -934,10 +951,16 @@ public class BoardPane extends GridPane {
             squareMarkOnWhite.setImage(squareMarks[1]);
         }
 
+        /**
+         * Shows the handicap slot on this cell
+         */
         public void showHandicapSlot() {
             handicapSlot.setVisible(true);
         }
 
+        /**
+         * Hides the handicap slot on this cell
+         */
         public void hideHandicapSlot() {
             handicapSlot.setVisible(false);
         }
@@ -1040,6 +1063,9 @@ public class BoardPane extends GridPane {
             }
         }
 
+        /**
+         * Automatically determines which selection hover image to display
+         */
         private void select() {
             if (game.getCurColor() == BLACK) {
                 selectBlack();
@@ -1153,6 +1179,9 @@ public class BoardPane extends GridPane {
             isSquareMarked = false;
         }
 
+        /**
+         * Shows a circle mark if it is currently invisible; hides it if it is already visible
+         */
         public void toggleCircleMark() {
             int x = getColumnIndex(this) - 1;
             int y = getRowIndex(this) - 1;

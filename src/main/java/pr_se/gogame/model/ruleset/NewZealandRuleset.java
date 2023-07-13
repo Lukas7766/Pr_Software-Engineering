@@ -4,13 +4,16 @@ import pr_se.gogame.model.*;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 
+/**
+ * Incomplete implementation of the New Zealand Ruleset. Useful for testing manual handicap placement.
+ */
 public class NewZealandRuleset implements Ruleset {
 
     @Override
     public UndoableCommand scoreGame(Game game) {
         return new UndoableCommand() {
             @Override
-            public void execute(boolean saveEffects) {
+            public void execute() {
                 // Do Nothing
             }
 
@@ -30,7 +33,7 @@ public class NewZealandRuleset implements Ruleset {
     public UndoableCommand isKo(Game game) {
         return new UndoableCommand() {
             @Override
-            public void execute(final boolean saveEffects) {
+            public void execute() {
                 // Returning this equates to telling the caller that ko has not occurred.
             }
 

@@ -4,8 +4,11 @@ import javafx.application.Platform;
 import javafx.event.Event;
 import javafx.scene.control.Alert;
 import javafx.stage.Stage;
-import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 
+/**
+ * Generates a dialog for closing the game
+ */
 public final class CustomCloseAction {
 
     private CustomCloseAction() {
@@ -22,8 +25,8 @@ public final class CustomCloseAction {
      * @param game pass game
      * @param e Event
      */
-    public static void onCloseAction(Stage stage, Game game, Event e) {
-        if (game.getGameState() == Game.GameState.NOT_STARTED_YET) {
+    public static void onCloseAction(Stage stage, GameInterface game, Event e) {
+        if (game.getGameState() == GameInterface.GameState.NOT_STARTED_YET) {
             Platform.exit();
             System.exit(0);
         }

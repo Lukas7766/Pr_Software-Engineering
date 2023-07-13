@@ -14,7 +14,6 @@ import java.util.stream.Collectors;
 
 
 /**
- * Model
  * Go Board internal logic
  */
 public class Board implements BoardInterface {
@@ -34,9 +33,7 @@ public class Board implements BoardInterface {
     private final StoneGroupPointer[][] boardContents;
 
     /**
-     * Creates a new Board belonging to the specified Game, containing handicap stones of the specified beginner color
-     * (only if the Game has a handicap set)
-     *
+     * Creates a new Board belonging to the specified Game
      * @param game the Game that this Board belongs to
      * @param size the size of the board
      */
@@ -118,7 +115,7 @@ public class Board implements BoardInterface {
 
         final UndoableCommand uc03PlacePointer = (permittedSuicide) ? (null) : new UndoableCommand() {
             @Override
-            public void execute(final boolean saveEffects) {
+            public void execute() {
                 boardContents[x][y] =
                     firstSameColorGroup.getPointers().stream()
                         .findFirst()
@@ -131,7 +128,7 @@ public class Board implements BoardInterface {
             }
         };
         if(uc03PlacePointer != null) {
-            uc03PlacePointer.execute(true);
+            uc03PlacePointer.execute();
             subcommands.add(uc03PlacePointer);
         }
 
@@ -155,6 +152,13 @@ public class Board implements BoardInterface {
         return ret;
     }
 
+    /**
+     * Removes any supplied groups that do not have liberties, including the ones of the supplied color if suicide is permitted
+     * @param surroundingSGs The StoneGroups to be evaluated for removal
+     * @param color The current move's player color
+     * @param permittedSuicide Whether suicide, if it occurs, is permitted
+     * @return An UndoableCommand to undo the removal of these groups
+     */
     private UndoableCommand removeGroupsWithoutLiberties(final Set<StoneGroup> surroundingSGs, final StoneColor color, final boolean permittedSuicide) {
         final List<UndoableCommand> subCommands = new LinkedList<>();
 
@@ -200,21 +204,13 @@ public class Board implements BoardInterface {
             final List<UndoableCommand> addLibertyCommands = new LinkedList<>();
 
             @Override
-            public void execute(final boolean saveEffects) {
+            public void execute() {
                 boardContents[x][y] = null;
 
                 Set<StoneGroup> surroundingSGs = getSurroundings(x, y, Objects::nonNull).stream()
                     .map(p -> boardContents[p.getX()][p.getY()].getStoneGroup()).collect(Collectors.toSet());
                 for (StoneGroup sg : surroundingSGs) {
                     addLibertyCommands.add(sg.addLiberty(new Position(x, y)));
-                }
-
-                // Update UI
-                if(saveEffects) {
-                    getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
-                    if(boardAtXyPreviously != null) {
-                        getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, boardAtXyPreviously.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
-                    }
                 }
             }
 
@@ -227,7 +223,12 @@ public class Board implements BoardInterface {
                 }
             }
         };
-        ret.execute(true);
+        ret.execute();
+
+        ret.getExecuteEvents().add(new GameEvent(GameCommand.STONE_WAS_REMOVED, x, y, null, game.getCurMoveNumber()));
+        if(boardAtXyPreviously != null) {
+            ret.getUndoEvents().add(new GameEvent(GameCommand.STONE_WAS_SET, x, y, boardAtXyPreviously.getStoneGroup().getStoneColor(), game.getCurMoveNumber()));
+        }
 
         return ret;
     }
@@ -281,9 +282,8 @@ public class Board implements BoardInterface {
         }
     }
 
-    public void printDebugInfo(int x, int y) {
-        checkXYCoordinates(x, y);
-
+    @Override
+    public void printDebugInfo() {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 if (boardContents[i][j] != null) {

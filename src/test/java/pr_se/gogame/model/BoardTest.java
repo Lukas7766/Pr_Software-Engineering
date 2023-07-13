@@ -2,14 +2,12 @@ package pr_se.gogame.model;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.helper.UndoableCommand;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.model.ruleset.NewZealandRuleset;
 
 import java.io.File;
-import java.nio.file.NoSuchFileException;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static pr_se.gogame.model.helper.StoneColor.BLACK;
@@ -59,14 +57,6 @@ class BoardTest {
         assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, -1));
         assertThrows(IllegalArgumentException.class, () -> board.getColorAt(maxCoord + 1, 0));
         assertThrows(IllegalArgumentException.class, () -> board.getColorAt(0, maxCoord + 1));
-    }
-
-    @Test
-    void printDebugInfoArguments() {
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(-1, 0));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, -1));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(maxCoord + 1, 0));
-        assertThrows(IllegalArgumentException.class, () -> board.printDebugInfo(0, maxCoord + 1));
     }
 
     // other tests
@@ -188,17 +178,17 @@ class BoardTest {
     @Test
     void printDebugInfo() {
         assertNotNull(board.setStone(0, 0, BLACK, false));
-        assertDoesNotThrow(() -> board.printDebugInfo(0, 0));
+        assertDoesNotThrow(() -> board.printDebugInfo());
     }
 
     @Test
     void printDebugInfoRepeatedly() { // This method  really only exists for maximising branch coverage.
-        assertDoesNotThrow(() -> board.printDebugInfo(0, 0)); // board == null
+        assertDoesNotThrow(() -> board.printDebugInfo()); // board == null
         assertNotNull(board.setStone(0, 0, BLACK, false));
-        assertDoesNotThrow(() -> board.printDebugInfo(0, 0)); // x == lastDebugX && y == lastDebugY
+        assertDoesNotThrow(() -> board.printDebugInfo()); // x == lastDebugX && y == lastDebugY
         assertNotNull(board.setStone(0, 1, BLACK, false));
-        assertDoesNotThrow(() -> board.printDebugInfo(0, 1)); // x == lastDebugX && y != lastDebugY
-        assertDoesNotThrow(() -> board.printDebugInfo(1, 1)); // x != lastDebugX && [y == lastDebugY]
+        assertDoesNotThrow(() -> board.printDebugInfo()); // x == lastDebugX && y != lastDebugY
+        assertDoesNotThrow(() -> board.printDebugInfo()); // x != lastDebugX && [y == lastDebugY]
     }
 
     @Test
@@ -218,7 +208,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute(false);
+        c.execute();
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
@@ -252,7 +242,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute(false);
+        c.execute();
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
     }
@@ -363,13 +353,13 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(3, 1));
 
         c3.undo();
-        c.execute(false);
+        c.execute();
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(WHITE, board.getColorAt(3, 1));
         assertEquals(null, board.getColorAt(2, 1));
         assertEquals(BLACK, board.getColorAt(4, 1));
 
-        c2.execute(false);
+        c2.execute();
         assertEquals(null, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(3, 1));
         assertEquals(BLACK, board.getColorAt(2, 1));
@@ -390,7 +380,7 @@ class BoardTest {
         assertEquals(WHITE, board.getColorAt(1, 1));
         assertEquals(null, board.getColorAt(2, 1));
 
-        c.execute(false);
+        c.execute();
         assertEquals(BLACK, board.getColorAt(2, 1));
         assertEquals(null, board.getColorAt(1, 1));
     }

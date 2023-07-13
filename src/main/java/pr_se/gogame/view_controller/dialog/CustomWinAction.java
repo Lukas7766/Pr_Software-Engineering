@@ -5,9 +5,12 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Dialog;
 import javafx.stage.Stage;
 import javafx.util.Pair;
-import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 import pr_se.gogame.model.helper.StoneColor;
 
+/**
+ * Generates a dialog to display game details after ending the game
+ */
 public final class CustomWinAction {
 
     private CustomWinAction() {
@@ -16,14 +19,12 @@ public final class CustomWinAction {
 
     /**
      * Handles the win action<br>
-     * -> without save <br>
-     * -> with save <br>
      *
      * @param stage pass stage
      * @param game pass game
      */
-    public static void winAction(Stage stage, Game game) {
-        if (game.getGameState() != Game.GameState.GAME_OVER){
+    public static void winAction(Stage stage, GameInterface game) {
+        if (game.getGameState() != GameInterface.GameState.GAME_OVER){
             throw new IllegalStateException("Game is not over yet!");
         }
 

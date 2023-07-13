@@ -16,7 +16,7 @@ import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 import pr_se.gogame.model.History;
 import pr_se.gogame.model.file.LoadingGameException;
 import pr_se.gogame.view_controller.dialog.*;
@@ -35,7 +35,7 @@ import static pr_se.gogame.model.History.HistoryNode.AbstractSaveToken.*;
 
 /**
  * This class contains the controller and view function of the game header panel.<br>
- * It is recommended to place the panel on the top of the application.
+ * It is designed to be displayed horizontally and positioned at the top of the window.
  */
 public class HeaderPane extends VBox {
 
@@ -45,30 +45,24 @@ public class HeaderPane extends VBox {
     private final Color backColor;
 
     /**
-     * Instance of application
+     * Instance of the Go application
      */
     private final Application app;
 
     /**
-     * Instance of stage
+     * Instance of stage that may contain dialogs
      */
     private final Stage stage;
 
     /**
      * Instance of game
      */
-    private final Game game;
+    private final GameInterface game;
 
     /**
-     * Scene of application
+     * Scene of the Go application
      */
     private final Scene scene;
-
-    private final List<Button> playbackControlList = new LinkedList<>();
-
-    private final List<Button> gameShortCutList = new LinkedList<>();
-
-    private final List<MenuItem> gameSectionItems = new LinkedList<>();
 
     /**
      * Constructor to create a Header Pane
@@ -78,7 +72,7 @@ public class HeaderPane extends VBox {
      * @param stage     instance of actual stage -> needed to show file dialog
      * @param game      instance of actual game -> needed for triggering and observing changes in model
      */
-    public HeaderPane(Color backcolor, Application app, Scene scene, Stage stage, Game game) throws IOException {
+    public HeaderPane(Color backcolor, Application app, Scene scene, Stage stage, GameInterface game) throws IOException {
         this.backColor = backcolor;
         this.app = app;
         this.stage = stage;
@@ -99,14 +93,15 @@ public class HeaderPane extends VBox {
     }
 
     /**
-     * Creates the file section for the menu bar <br>
+     * Creates the File section for the menu bar <br>
      * contains at least: <br>
      * -> New Game <br>
-     * -> Import Game <br>
-     * -> Export Game <br>
-     * -> Exit Game
+     * -> Load Game <br>
+     * -> Save Game <br>
+     * -> Save Game as <br>
+     * -> Quit Game
      *
-     * @return the file section for the menu bar
+     * @return the File section for the menu bar
      */
     private Menu fileSection() {
         Menu files = new Menu("_File");
@@ -115,7 +110,7 @@ public class HeaderPane extends VBox {
         newGameItem.setAccelerator(new KeyCodeCombination(KeyCode.N, KeyCombination.CONTROL_DOWN));
         files.getItems().add(newGameItem);
         newGameItem.setOnAction(e -> {
-            if (game.getGameState() == Game.GameState.NOT_STARTED_YET) {
+            if (game.getGameState() == GameInterface.GameState.NOT_STARTED_YET) {
                 return;
             }
             CustomNewGameAction.onNewGameAction(stage, game);
@@ -186,6 +181,16 @@ public class HeaderPane extends VBox {
         return files;
     }
 
+    /**
+     * Creates the History section for the menu bar
+     * contains at least:
+     * -> Rewind <br>
+     * -> Undo <br>
+     * -> Redo <br>
+     * -> Fast Forward <br>
+     *
+     * @return the History section for the menu bar
+     */
     private Menu historySection() {
         Menu menu = new Menu("_History");
 
@@ -227,16 +232,21 @@ public class HeaderPane extends VBox {
     }
 
     /**
-     * Creates the game section for the menu bar <br>
+     * Creates the Game section for the menu bar <br>
      * contains at least: <br>
+     * -> Enable/Disable Setup Mode <br>
+     * -> Enable/Disable Move Confirmation <br>
      * -> Pass <br>
      * -> Resign <br>
+     * -> Confirm move <br>
      * -> Score Game
      *
-     * @return the game section for the menu bar
+     * @return the Game section for the menu bar
      */
     private Menu gameSection() {
         Menu menu = new Menu("_Game");
+
+        final List<MenuItem> gameSectionItems = new LinkedList<>();
 
         CheckMenuItem setupMode = new CheckMenuItem("Set_up mode");
         CheckMenuItem moveConfirmationRequired = new CheckMenuItem("Move _confirmation required");
@@ -253,8 +263,8 @@ public class HeaderPane extends VBox {
             game.setSetupMode(setupMode.isSelected());
 
             passItem.setText(game.isSetupMode() ? "Switch co_lor" : "_Pass");
-            resignItem.setDisable(game.getGameState() != Game.GameState.RUNNING);
-            scoreGameItem.setDisable(game.getGameState() != Game.GameState.RUNNING);
+            resignItem.setDisable(game.getGameState() != GameInterface.GameState.RUNNING);
+            scoreGameItem.setDisable(game.getGameState() != GameInterface.GameState.RUNNING);
 
             GlobalSettings.update();
         });
@@ -297,18 +307,15 @@ public class HeaderPane extends VBox {
 
         game.addListener(e -> {
             switch (e.getGameCommand()) {
-                case INIT:
-                    playbackControlList.forEach(button -> button.setDisable(true));
                 case GAME_WON:
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(true));
                     break;
 
                 case NEW_GAME:
-                    playbackControlList.forEach(button -> button.setDisable(false));
                     setupMode.setSelected(false);
                 case UPDATE:
                     gameSectionItems.forEach(menuItem -> menuItem.setDisable(false));
-                    if(game.getGameState() != Game.GameState.RUNNING) {
+                    if(game.getGameState() != GameInterface.GameState.RUNNING) {
                         resignItem.setDisable(true);
                         scoreGameItem.setDisable(true);
                     }
@@ -369,7 +376,7 @@ public class HeaderPane extends VBox {
     /**
      * Creates the help section for the menu bar <br>
      * contains at least: <br>
-     * -> Help -> Link to WebSite <br>
+     * -> Help -> Link to website (Wikipedia in this case) <br>
      * -> About us -> Information ab the developer
      *
      * @return the help section for the menu bar
@@ -405,7 +412,7 @@ public class HeaderPane extends VBox {
      * -> pass button <br>
      * -> resign button <br>
      * -> score game button <br>
-     * -> confirm move button
+     * -> confirm move button (only if move confirmation is required)
      *
      * @return a horizontal box layout object which includes all needed elements of the short menu
      */
@@ -414,6 +421,8 @@ public class HeaderPane extends VBox {
         hotbar.setPrefHeight(35);
 
         hotbar.setBackground(new Background(new BackgroundFill(this.backColor, new CornerRadii(5), new Insets(0, 5, 0, 5))));
+
+        final List<Button> playbackControlList = new LinkedList<>();
 
         HBox playbackControl = new HBox();
         playbackControl.setPrefWidth(250);
@@ -459,8 +468,9 @@ public class HeaderPane extends VBox {
         gameShortCuts.setAlignment(Pos.CENTER);
         gameShortCuts.setSpacing(25);
 
-        final String passText = "Pass";
+        final List<Button> gameShortCutList = new LinkedList<>();
 
+        final String passText = "Pass";
         Button pass = new Button(passText);
         pass.setFocusTraversable(false);
         pass.setOnAction(e -> game.pass());
@@ -499,13 +509,15 @@ public class HeaderPane extends VBox {
         game.addListener(e -> {
             switch (e.getGameCommand()){
                 case INIT:
+                    playbackControlList.forEach(button -> button.setDisable(true));
                     pass.setText(passText);
                 case GAME_WON:
                     gameShortCutList.forEach(button -> button.setDisable(true));
                     break;
                 case NEW_GAME, UPDATE:
+                    playbackControlList.forEach(button -> button.setDisable(false));
                     gameShortCutList.forEach(button -> button.setDisable(false));
-                    if(game.getGameState() != Game.GameState.RUNNING) {
+                    if(game.getGameState() != GameInterface.GameState.RUNNING) {
                         scoreGame.setDisable(true);
                         resign.setDisable(true);
                     }
@@ -545,8 +557,8 @@ public class HeaderPane extends VBox {
             public void onSettingsUpdated() {
                 confirm.setVisible(GlobalSettings.isConfirmationNeeded());
                 pass.setText(game.isSetupMode() ? "Switch color" : passText);
-                resign.setDisable(game.getGameState() != Game.GameState.RUNNING);
-                scoreGame.setDisable(game.getGameState() != Game.GameState.RUNNING);
+                resign.setDisable(game.getGameState() != GameInterface.GameState.RUNNING);
+                scoreGame.setDisable(game.getGameState() != GameInterface.GameState.RUNNING);
 
                 EventHandler<ActionEvent> comboBoxHandler = graphicsPackSelectorComboBox.getOnAction();
                 graphicsPackSelectorComboBox.setOnAction(null);
@@ -567,6 +579,9 @@ public class HeaderPane extends VBox {
 
     }
 
+    /**
+     * Implements the behaviour of the rewind buttons. Goes before first normal move, then before first Node in the history
+     */
     private void rewind() {
         History history = game.getHistory();
         if(!history.isAtBeginning()) {
@@ -578,6 +593,9 @@ public class HeaderPane extends VBox {
         }
     }
 
+    /**
+     * Implements the behaviour of the fast-forward buttons. Goes before first normal move, then to the very last move
+     */
     private void fastForward() {
         History history = game.getHistory();
         History.HistoryNode n = history.getCurrentNode();

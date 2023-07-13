@@ -9,6 +9,9 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
+/**
+ * Incomplete implementation of the Ancient Chinese Ruleset. Useful for placing alternate automatic handicap placement.
+ */
 public class AncientChineseRuleset implements Ruleset {
     private int lastBoardHash;
 
@@ -30,7 +33,7 @@ public class AncientChineseRuleset implements Ruleset {
         }
 
         UndoableCommand ret = UndoableCommand.updateValue(i -> lastBoardHash = i, oldBoardHash, newBoardHash);
-        ret.execute(true);
+        ret.execute();
 
         return ret;
     }

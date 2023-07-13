@@ -9,6 +9,7 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.stage.Stage;
 import pr_se.gogame.model.Game;
+import pr_se.gogame.model.GameInterface;
 import pr_se.gogame.model.helper.StoneColor;
 import pr_se.gogame.model.ruleset.JapaneseRuleset;
 import pr_se.gogame.view_controller.dialog.CustomWinAction;
@@ -22,14 +23,14 @@ public class SidePane extends StackPane {
     /**
      * instance of actual game
      */
-    private final Game game;
+    private final GameInterface game;
 
     /**
      * Constructor to create a SidePane
      *
      * @param game instance of actual game -> needed for triggering and observing changes in model
      */
-    public SidePane(Color backColor, Stage stage, Game game) {
+    public SidePane(Color backColor, Stage stage, GameInterface game) {
         this.game = game;
         this.setBackground(new Background(new BackgroundFill(backColor, new CornerRadii(5), new Insets(5, 2.5, 5, 5))));
         this.setMinWidth(250);
@@ -71,10 +72,11 @@ public class SidePane extends StackPane {
     }
 
     /**
-     * GameInformation contains a mechanism to show relevant information based on current GameCommand <br>
+     * GameInformation contains a mechanism to show relevant information <br>
      * contains at least: <br>
-     * -> Game Board <br>
-     * -> Turn Explanation <br>
+     * -> Name of the current player
+     * -> Current score (only captured stones, komi, and handicap) <br>
+     * -> Comment to current move <br>
      *
      * @return a VBox which contains items to show relevant game info.
      */
@@ -197,10 +199,11 @@ public class SidePane extends StackPane {
 
     /**
      * newGame creates a panel that is a dialog for creating a new game<br>
-     * At least it contains: <br>
+     * Contains at least: <br>
      * -> Board size options <br>
      * -> Handicap spinner <br>
-     * -> Komi <br>
+     * -> Komi information <br>
+     * -> Button to start the game
      *
      * @return a GridPane which contains items for creating a new game.
      */

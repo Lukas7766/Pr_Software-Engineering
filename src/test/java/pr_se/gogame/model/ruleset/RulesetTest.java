@@ -27,7 +27,7 @@ class RulesetTest {
             public UndoableCommand scoreGame(Game game) {
                 return new UndoableCommand() {
                     @Override
-                    public void execute(boolean saveEffects) {
+                    public void execute() {
                         // Do nothing
                     }
 
