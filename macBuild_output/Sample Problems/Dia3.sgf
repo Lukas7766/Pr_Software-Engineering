@@ -2,10 +2,9 @@
 
 HA[0]
 
-
-;AW[qa][rb][rc][rd][re][pb][pc][oc][qd][qe][pf][pg][qg][ng][rh][rk][qk][qj][pi][oi][ni][nj][nk][oh]C[placeSetupStone(16, 0)]
-;AB[ob][nc][nd][od][pd][pe][se][qf][rf][rg][ph][qh][qi][ri][rj][oj][pj][pk][ql][rl]C[placeSetupStone(14, 1)]
-;W[sh]CR[sg]CR[si]CR[sk]CR[rh]CR[sh]C[Damezumari means shortage of liberties.
+;AW[qa][rb][rc][rd][re][pb][pc][oc][qd][qe][pf][pg][qg][ng][rh][rk][qk][qj][pi][oi][ni][nj][nk][oh]
+;AB[ob][nc][nd][od][pd][pe][se][qf][rf][rg][ph][qh][qi][ri][rj][oj][pj][pk][ql][rl]
+;W[sh]CR[sg]CR[si]CR[sk]CR[rh]CR[sh]C[Damezumari means "shortage of liberties".
 
 In this example, Black would like to play at either of the top two marked positions, so as to capture the two white marked stones. However, if Black plays at either of the two positions, he puts his own stones in check, i.e., White will be able to capture the Black stones with his next move.
 

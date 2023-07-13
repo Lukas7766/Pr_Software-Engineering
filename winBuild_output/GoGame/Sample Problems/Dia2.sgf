@@ -2,8 +2,8 @@
 
 HA[0]
 
-;AB[lf][kf][je]C[placeSetupStone(11, 5)]
-;AW[ke]CR[ke]C[placeSetupStone(10, 4)]
+;AB[lf][kf][je]
+;AW[ke]CR[ke]
 ;B[kd]CR[ke]C[Black 1 will capture the white marked stone by shicho.]
 ;W[le]C[If White resists ...]
 ;B[me]C[... then Black will drive White into the side ...]

@@ -2,9 +2,9 @@
 
 HA[0]
 
-;AB[sc][rc][qc][pd][pe][pf][pg][ph][pi][qi][ri][si]C[placeSetupStone(18, 8)]
-;AW[sh][rh][qh][qg][qf][qe][qd][rd][sd]C[placeSetupStone(18, 3)]
-;AB[oc]C[placeSetupStone(14, 2)]
+;AB[sc][rc][qc][pd][pe][pf][pg][ph][pi][qi][ri][si]
+;AW[sh][rh][qh][qg][qf][qe][qd][rd][sd]
+;AB[oc]
 ;B[rf]C[When Black plays 1 ...]
 ;W[sf]C[... White must play 2 in order to keep White's stones alive. 
 
